@@ -5,7 +5,6 @@
 Capture song ideas, write lyrics with AI assistance, generate full songs, create cover art, and manage your music projects — all in one self-hosted application.
 
 [![Build Status](https://github.com/rwellinger/chmusicpro/actions/workflows/release.yml/badge.svg)](https://github.com/rwellinger/chmusicpro/actions)
-[![License: ELv2](https://img.shields.io/badge/License-ELv2-blue.svg)](LICENSE)
 [![Angular](https://img.shields.io/badge/Angular-20-red.svg)](https://angular.io/)
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 
