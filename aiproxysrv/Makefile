@@ -27,15 +27,15 @@ help:
 
 # Check if correct Conda environment is activated
 check-conda:
-	@if [ "$$CONDA_DEFAULT_ENV" != "mac_ki_service_py312" ]; then \
+	@if [ "$$CONDA_DEFAULT_ENV" != "chmusicpro_py312" ]; then \
 		echo "ERROR: Wrong Conda environment!"; \
 		echo "Current: $$CONDA_DEFAULT_ENV"; \
-		echo "Required: mac_ki_service_py312"; \
+		echo "Required: chmusicpro_py312"; \
 		echo ""; \
-		echo "Activate with: conda activate mac_ki_service_py312"; \
+		echo "Activate with: conda activate chmusicpro_py312"; \
 		exit 1; \
 	else \
-		echo "Conda environment OK: mac_ki_service_py312"; \
+		echo "Conda environment OK: chmusicpro_py312"; \
 	fi
 
 # Ruff linting

@@ -33,13 +33,12 @@ This project uses the **arc42 architecture template** for comprehensive document
 
 ### Key Components
 - **aiwebui**: Angular 20 frontend with Material Design
-- **aiproxysrv**: FastAPI backend + proxy for external APIs (OpenAI, Mureka, Ollama)
+- **aiproxysrv**: FastAPI backend + proxy for external APIs (OpenAI, Ollama)
 - **forwardproxy**: Nginx reverse proxy (production)
-- **aitestmock**: Mock API for cost-free testing
 
 ### Core Features
 - **Image Generation** (DALL-E/OpenAI): Fast Enhancement, Gallery, Detail View
-- **Song Generation** (Mureka API): Sketches, Styles, FLAC/MP3/Stems, Playback
+- **Song Management**: Sketches, Styles, FLAC/MP3/Stems, Playback
 - **Lyric Creation**: AI-assisted editor, Lyric Architect, Parsing Rules
 - **Chat**: Ollama (local) & OpenAI, Multi-conversation, Streaming, Export
 - **Prompt Management**: Templates, Categories, Pre/post-conditions

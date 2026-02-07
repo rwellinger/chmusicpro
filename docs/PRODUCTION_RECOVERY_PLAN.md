@@ -31,7 +31,7 @@
 ssh rob@<production-server>
 
 # PostgreSQL Backup
-docker exec -t mac_ki_service-postgres-1 pg_dump -U aiuser -d aiproxy > /tmp/aiproxy_backup_$(date +%Y%m%d_%H%M%S).sql
+docker exec -t chmusicpro-postgres-1 pg_dump -U aiuser -d aiproxy > /tmp/aiproxy_backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Backup auf lokalen Rechner kopieren
 scp rob@<production-server>:/tmp/aiproxy_backup_*.sql ~/Desktop/
@@ -40,7 +40,7 @@ scp rob@<production-server>:/tmp/aiproxy_backup_*.sql ~/Desktop/
 ### SCHRITT 2: Alembic-Status auf Produktion prüfen
 ```bash
 # Im aiproxysrv Container
-docker exec -it mac_ki_service-aiproxysrv-1 bash
+docker exec -it chmusicpro-aiproxysrv-1 bash
 cd /app
 alembic current
 alembic history | head -20
@@ -54,11 +54,11 @@ alembic history | head -20
 ### SCHRITT 3: Fehlende Migrationen anwenden
 ```bash
 # Im aiproxysrv Container (oder direkt im Docker Command)
-docker exec -it mac_ki_service-aiproxysrv-1 alembic upgrade head
+docker exec -it chmusicpro-aiproxysrv-1 alembic upgrade head
 
 # Oder als einzelne Steps:
-docker exec -it mac_ki_service-aiproxysrv-1 alembic upgrade 234ea0f4b6c3
-docker exec -it mac_ki_service-aiproxysrv-1 alembic upgrade d4641a241b98
+docker exec -it chmusicpro-aiproxysrv-1 alembic upgrade 234ea0f4b6c3
+docker exec -it chmusicpro-aiproxysrv-1 alembic upgrade d4641a241b98
 ```
 
 **Was passiert:**
@@ -71,7 +71,7 @@ docker exec -it mac_ki_service-aiproxysrv-1 alembic upgrade d4641a241b98
 ### SCHRITT 4: Verifizierung
 ```bash
 # Alembic Version prüfen
-docker exec -it mac_ki_service-aiproxysrv-1 alembic current
+docker exec -it chmusicpro-aiproxysrv-1 alembic current
 
 # Sollte zeigen:
 # d4641a241b98 (head)
@@ -79,24 +79,24 @@ docker exec -it mac_ki_service-aiproxysrv-1 alembic current
 
 ```sql
 -- PostgreSQL Tabellen prüfen
-docker exec -it mac_ki_service-postgres-1 psql -U aiuser -d aiproxy -c "\d songs"
+docker exec -it chmusicpro-postgres-1 psql -U aiuser -d aiproxy -c "\d songs"
 -- Sollte jetzt sketch_id Spalte zeigen
 
-docker exec -it mac_ki_service-postgres-1 psql -U aiuser -d aiproxy -c "\dt"
+docker exec -it chmusicpro-postgres-1 psql -U aiuser -d aiproxy -c "\dt"
 -- Sollte song_sketches Tabelle zeigen
 
 -- Songs-Daten prüfen
-docker exec -it mac_ki_service-postgres-1 psql -U aiuser -d aiproxy -c "SELECT COUNT(*) FROM songs;"
+docker exec -it chmusicpro-postgres-1 psql -U aiuser -d aiproxy -c "SELECT COUNT(*) FROM songs;"
 ```
 
 ### SCHRITT 5: Backend-Container neu starten
 ```bash
 # Container neu starten, damit Model-Änderungen aktiv werden
-docker restart mac_ki_service-aiproxysrv-1
-docker restart mac_ki_service-celery-worker-1
+docker restart chmusicpro-aiproxysrv-1
+docker restart chmusicpro-celery-worker-1
 
 # Logs prüfen
-docker logs -f mac_ki_service-aiproxysrv-1
+docker logs -f chmusicpro-aiproxysrv-1
 ```
 
 ### SCHRITT 6: Funktionstest
@@ -111,8 +111,8 @@ docker logs -f mac_ki_service-aiproxysrv-1
 
 ### Option 1: Migration rückgängig machen
 ```bash
-docker exec -it mac_ki_service-aiproxysrv-1 alembic downgrade 0f864573b58a
-docker restart mac_ki_service-aiproxysrv-1
+docker exec -it chmusicpro-aiproxysrv-1 alembic downgrade 0f864573b58a
+docker restart chmusicpro-aiproxysrv-1
 ```
 
 **ABER ACHTUNG:** Das würde nur funktionieren, wenn der alte Code deployed wäre!
@@ -124,7 +124,7 @@ scp ~/Desktop/aiproxy_backup_*.sql rob@<production-server>:/tmp/
 
 # Restore
 ssh rob@<production-server>
-docker exec -i mac_ki_service-postgres-1 psql -U aiuser -d aiproxy < /tmp/aiproxy_backup_*.sql
+docker exec -i chmusicpro-postgres-1 psql -U aiuser -d aiproxy < /tmp/aiproxy_backup_*.sql
 ```
 
 ---
@@ -160,6 +160,6 @@ docker exec -i mac_ki_service-postgres-1 psql -U aiuser -d aiproxy < /tmp/aiprox
 ---
 
 ## Kontakt bei Problemen
-- **GitHub Issues:** https://github.com/rwellinger/thwellys-ai-toolbox/issues
+- **GitHub Issues:** https://github.com/rwellinger/chmusicpro/issues
 
 **Status:** ⏳ Warte auf Bestätigung für Durchführung

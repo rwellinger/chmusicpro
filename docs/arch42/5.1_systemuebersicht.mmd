@@ -17,11 +17,6 @@ graph TB
         REDIS[Redis Controller]
     end
 
-    subgraph "Processing Layer"
-        CELERY[Celery Worker]
-        MUREKA[Mureka Handler]
-    end
-
     subgraph "Data Layer"
         PG[(PostgreSQL)]
         RD[(Redis)]
@@ -30,7 +25,6 @@ graph TB
 
     subgraph "External APIs"
         OPENAI[OpenAI DALL-E 3]
-        MRK[Mureka API]
         OLLAMA[Ollama LLM]
     end
 
@@ -44,9 +38,6 @@ graph TB
     API --> REDIS
 
     IMG --> OPENAI
-    SONG --> CELERY
-    CELERY --> MUREKA
-    MUREKA --> MRK
     CHAT --> OLLAMA
     CONV --> OLLAMA
 
@@ -56,5 +47,4 @@ graph TB
     CHAT --> PG
     CHAT --> PROMPT
     CONV --> PG
-    CELERY --> RD
     IMG --> FILES

@@ -69,18 +69,18 @@
 
 **Via GitHub UI:**
 ```
-https://github.com/rwellinger/thwellys-ai-toolbox/actions
+https://github.com/rwellinger/chmusicpro/actions
 ```
 
 **Via gh CLI:**
 ```bash
-gh run list --repo rwellinger/thwellys-ai-toolbox
-gh run watch --repo rwellinger/thwellys-ai-toolbox
+gh run list --repo rwellinger/chmusicpro
+gh run watch --repo rwellinger/chmusicpro
 ```
 
 **Badge for README:**
 ```markdown
-[![Build Status](https://github.com/rwellinger/thwellys-ai-toolbox/actions/workflows/release.yml/badge.svg)](https://github.com/rwellinger/thwellys-ai-toolbox/actions)
+[![Build Status](https://github.com/rwellinger/chmusicpro/actions/workflows/release.yml/badge.svg)](https://github.com/rwellinger/chmusicpro/actions)
 ```
 
 ---
@@ -92,13 +92,13 @@ gh run watch --repo rwellinger/thwellys-ai-toolbox
 **Check logs:**
 ```bash
 # Via GitHub UI
-https://github.com/rwellinger/thwellys-ai-toolbox/actions
+https://github.com/rwellinger/chmusicpro/actions
 
 # Via CLI
-gh run view --repo rwellinger/thwellys-ai-toolbox
+gh run view --repo rwellinger/chmusicpro
 
 # Re-run failed build
-gh run rerun <RUN_ID> --repo rwellinger/thwellys-ai-toolbox
+gh run rerun <RUN_ID> --repo rwellinger/chmusicpro
 ```
 
 ### Images nicht in GHCR
@@ -150,7 +150,7 @@ https://github.com/rwellinger?tab=packages
 4. **Deploy to Production:**
    ```bash
    # SSH to production server
-   cd /path/to/mac_ki_service
+   cd /path/to/chmusicpro
 
    # Pull new images
    docker compose pull
@@ -176,7 +176,7 @@ https://github.com/rwellinger?tab=packages
 
 ### GHCR Registry Structure
 ```
-ghcr.io/rwellinger/thwellys-ai-toolboxsrv-app:v2.2.6
+ghcr.io/rwellinger/aiproxysrv-app:v2.2.6
 ghcr.io/rwellinger/celery-worker-app:v2.2.6
 ghcr.io/rwellinger/aiwebui-app:v2.2.6
 ```
@@ -233,7 +233,7 @@ ghcr.io/rwellinger/aiwebui-app:v2.2.6
 
 1. **Identify last working version:**
    ```bash
-   gh run list --repo rwellinger/thwellys-ai-toolbox --limit 10
+   gh run list --repo rwellinger/chmusicpro --limit 10
    ```
 
 2. **Rollback Docker images:**

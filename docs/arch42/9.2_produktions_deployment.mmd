@@ -35,7 +35,6 @@ graph TB
 
     subgraph "External Services"
         OPENAI_EXT[OpenAI API<br/>DALL-E 3]
-        MUREKA_EXT[Mureka API<br/>Song Generation]
     end
 
     NGINX --> API_CONTAINER
@@ -50,7 +49,6 @@ graph TB
 
     WORKER_CONTAINER --> PROD_REDIS
     WORKER_CONTAINER --> PROD_PG
-    WORKER_CONTAINER --> MUREKA_EXT
     WORKER_CONTAINER -->|S3 :9000| MINIO_NAS
 
     PROD_PG --> PG_VOL

@@ -88,7 +88,7 @@
 ### 1.1 Requirements Overview
 The Mac AI Service System is a personal AI-based multimedia generation platform offering the following main features:
 - **AI Chat Conversations** - Interactive conversational AI via Ollama with persistent conversation history
-  - Integrated chat UI as part of thWelly Toolbox (replaced Open WebUI dependency)
+  - Integrated chat UI as part of Swiss Music Production (replaced Open WebUI dependency)
   - Direct Ollama integration with full conversation management
 - **Lyric Creation Editor** - Professional songwriting tool with AI-powered assistance
   - Section-based editing (Intro, Verse, Pre-Chorus, Chorus, Bridge, Outro)
@@ -132,7 +132,7 @@ The Mac AI Service System is a personal AI-based multimedia generation platform 
     - Monthly and all-time cost aggregation
     - Integration with OpenAI Admin API
     - Display in User Profile page
-- **Music Generation** via Mureka API
+- **Song Management**: Sketches, Styles, FLAC/MP3/Stems, Playback
 - **Asynchronous Processing** for time-intensive generation processes
 - **Ollama Model Chat** for prompt improvements via prompt templates
 - **Web-based User Interface** for easy operation
@@ -181,7 +181,6 @@ The Mac AI Service System is a personal AI-based multimedia generation platform 
 
 **External Interfaces:**
 - **OpenAI API**: DALL-E 3 for image generation (HTTPS/REST)
-- **Mureka API**: Music generation (HTTPS/REST)
 - **AI Test Mock**: Mock server for development/testing (HTTP/REST) - Cost reduction
 
 **Internal Interfaces:**
@@ -318,7 +317,6 @@ ApiCostService (src/db/api_cost_service.py)
   │   ├── text-overlay-editor/  # Add text overlays to generated images
   │   ├── song-generator/     # UI for music generation
   │   ├── song-view/          # Display of generated songs
-  │   ├── song-profile/       # Mureka account information
   │   ├── user-profile/       # User profile page
   │   └── prompt-templates/   # Template management for prompts
   ├── services/      # API Services & Business Logic
@@ -447,12 +445,6 @@ Users can change the language in **User Profile → Settings → Language**. The
   ```
   src/
   ├── adapters/               # External API Clients (Adapter Pattern)
-  │   ├── mureka/             # Mureka API integration
-  │   │   ├── base_client.py         # Base HTTP client
-  │   │   ├── generation_client.py   # Song generation client
-  │   │   ├── instrumental_client.py # Instrumental generation client
-  │   │   ├── handlers.py            # Response handlers
-  │   │   └── json_utils.py          # JSON utilities
   │   ├── ollama/             # Ollama API integration
   │   │   └── api_client.py          # Ollama HTTP client
   │   └── openai/             # OpenAI API integration
@@ -502,7 +494,7 @@ Users can change the language in **User Profile → Settings → Language**. The
   │   ├── song_schemas.py
   │   └── user_schemas.py
   │
-  ├── celery_app/             # Async Processing (Mureka API)
+  ├── celery_app/             # Async Processing
   │   ├── celery_config.py
   │   ├── slot_manager.py
   │   └── tasks.py
@@ -522,21 +514,7 @@ Users can change the language in **User Profile → Settings → Language**. The
   └── worker.py               # Celery Worker
   ```
 
-#### 5.2.3 aitestmock (Test Mock Server)
-- **Technology**: Python Flask
-- **Purpose**: Mock server for OpenAI and Mureka APIs to reduce costs in development/testing
-- **Structure**:
-  ```
-  src/           # Source Code
-  data/          # JSON Response Templates
-  static/        # Mock Images, Audio Files (FLAC/MP3/ZIP)
-  ```
-- **Test Scenarios**:
-  - **Image Generation**: Prompt with "0001" → Success, "0002" → Invalid Token Error
-  - **Song Generation**: Lyrics with "0001" → Success, "0002" → Invalid Token, "0003" → Generation Failed
-  - **Timing**: Style-Prompt "30s" → 30 seconds sync duration
-
-#### 5.2.4 forwardproxy (Nginx)
+#### 5.2.3 forwardproxy (Nginx)
 - **Technology**: Nginx 1.23.3
 - **Functions**:
   - HTTPS termination (TLS 1.3)
@@ -638,7 +616,7 @@ Users can change the language in **User Profile → Settings → Language**. The
 7. **Integration with Song Generator**
    - Lyrics persist in localStorage under song generator key
    - User navigates to Song Generator page
-   - Lyrics pre-filled, ready for Mureka generation
+   - Lyrics pre-filled, ready for external music generation
 
 **Technical Details:**
 
@@ -1359,7 +1337,7 @@ export PATH="$HOME/bin:$PATH"
 
 **Overview**: Complete project management system for music production workflows, enabling users to organize songs, sketches, stems, references, and images in a hierarchical folder structure with S3-backed cloud storage.
 
-**Purpose**: Bridge the gap between song generation (Mureka API) and professional DAW workflows (Logic Pro, Ableton, FL Studio) by providing a centralized repository for all project assets with local/cloud synchronization.
+**Purpose**: Bridge the gap between song generation (external music generation tools) and professional DAW workflows (Logic Pro, Ableton, FL Studio) by providing a centralized repository for all project assets with local/cloud synchronization.
 
 **Database Tables:**
 - `song_projects` - Project metadata, sync status, storage configuration
@@ -1633,7 +1611,7 @@ Backend: Creates SongProject + 5 ProjectFolders
 S3: Empty folders (metadata only)
 ```
 
-**Step 2: Generate Song via Mureka**
+**Step 2: Generate Song via External Tool**
 ```
 User: Generates song → Assigns to "01 Arrangement" folder
 Backend: Creates Song record with project_id + folder_id
@@ -1758,14 +1736,14 @@ S3_REGION=us-east-1
 
 ### 7.1 Development Environment
 
-**Repository:** `mac_ki_service/` (Development)
-**Location:** `~/Workspace/mac_ki_service` (or your preferred location)
+**Repository:** `chmusicpro/` (Development)
+**Location:** `~/Workspace/chmusicpro` (or your preferred location)
 
 ```
 MacBook Air M4 (32GB RAM)
 ├── Host macOS
 ├── PyCharm Pro (ARM64)
-├── Python miniconda3 (mac_ki_service env)
+├── Python miniconda3 (chmusicpro env)
 ├── Docker colima
 │   └── PostgreSQL Container (Port 5432)
 ├── Local Services
@@ -1774,7 +1752,7 @@ MacBook Air M4 (32GB RAM)
 │   ├── Angular Dev Server (ng serve)
 │   └── AI Test Mock Server (aitestmock) - Optional for cost reduction
 └── Configuration
-    └── .env files with Mock-API URLs instead of real OpenAI/Mureka APIs
+    └── .env files with Mock-API URLs instead of real OpenAI APIs
 ```
 
 **Purpose:** Source code development, testing, CI/CD
@@ -1826,7 +1804,7 @@ Only deployment configuration: docker-compose.yml, .env, runtime scripts
 1. **DEV (aiproxy):** Code changes → Commit → GitHub Actions builds images → Push to GHCR
 2. **PROD:** Update docker-compose.yml image versions → `docker compose pull` → `docker compose up -d`
 
-**Note:** Chat functionality previously provided by Open WebUI is now integrated directly into the thWelly Toolbox Angular frontend.
+**Note:** Chat functionality previously provided by Open WebUI is now integrated directly into the Swiss Music Production Angular frontend.
 
 ### 7.3 Network Architecture
 
@@ -1891,7 +1869,7 @@ Controller → Orchestrator → Transformer/Normalizer + Repository
 ### 8.2 API Routing & Security
 
 **Context:**
-Frontend services need a centralized, secure way to communicate with backend APIs and external services (OpenAI, Mureka, Ollama). Hardcoding URLs leads to production failures when environments change.
+Frontend services need a centralized, secure way to communicate with backend APIs and external services (OpenAI, Ollama). Hardcoding URLs leads to production failures when environments change.
 
 **Decision:**
 Implement mandatory `ApiConfigService` for all HTTP calls:
@@ -1903,7 +1881,7 @@ Implement mandatory `ApiConfigService` for all HTTP calls:
    - Services inject `ApiConfigService` and use `this.apiConfig.endpoints.*`
 
 2. **External APIs ONLY via aiproxysrv Proxy**
-   - **ALL** external calls (OpenAI, Mureka, Ollama) **MUST** go through aiproxysrv
+   - **ALL** external calls (OpenAI, Ollama) **MUST** go through aiproxysrv
    - **NEVER** call external APIs directly from Angular (Browser ≠ HTTPS/CORS)
    - **Why?** HTTPS/CORS handling, API Keys in Backend (not Browser), Centralized control
 
@@ -1948,7 +1926,7 @@ def get_user_profile():
 - ✅ All new services MUST inject `ApiConfigService`
 - ✅ All external API calls go through aiproxysrv
 - ✅ All backend endpoints (except auth) require JWT
-- ❌ NO direct Ollama/OpenAI/Mureka calls from frontend
+- ❌ NO direct Ollama/OpenAI calls from frontend
 
 **Enforcement:**
 - Frontend architecture linter (`dependency-cruiser`) detects `environment.apiUrl` violations
@@ -2338,7 +2316,6 @@ services:
     environment:
       - DATABASE_URL
       - REDIS_URL
-      - MUREKA_API_KEY
 
   aiproxy-app:
     image: ghcr.io/rwellinger/aiproxysrv-app:latest  # Pre-built from GitHub Actions
@@ -2397,7 +2374,6 @@ services:
 ### 12.1 Performance
 - **API Response Time**: < 200ms for standard requests
 - **Image Generation**: < 30s for DALL-E 3 calls
-- **Song Generation**: 2-5 minutes (depending on Mureka)
 - **AI Chat Response**: 1-5 seconds (depending on Ollama model and context size)
 - **Lyric AI Operations**: 2-8 seconds (improve/rewrite/extend via Ollama)
 - **Concurrent Users**: 1 (personal use)
@@ -2420,13 +2396,12 @@ services:
 | Term           | Definition                                                                      |
 | -------------- | ------------------------------------------------------------------------------- |
 | **DALL-E 3**   | OpenAI's image generation AI                                                    |
-| **Mureka**     | Song generation API service                                                     |
 | **Celery**     | Python task queue for asynchronous processing                                   |
 | **Colima**     | Container runtime for macOS (Docker alternative)                                |
 | **Alembic**    | Database migration tool for SQLAlchemy                                          |
 | **Task ID**    | Celery task identifier for async operations                                     |
-| **Job ID**     | Mureka job identifier for song generation                                       |
-| **Choice**     | Single music variant from Mureka (usually 2 per generation)                     |
+| **Job ID**     | External job identifier for song generation (legacy)                            |
+| **Choice**     | Single music variant (usually 2 per generation)                                 |
 | **Ollama**     | Open-source LLM runtime for local chat generation (localhost:11434)             |
 | **Chat API**   | Ollama-based text generation for conversational AI with 4 endpoints             |
 | **Conversation** | Persistent chat session with AI model, system context, and token tracking     |
@@ -2438,7 +2413,7 @@ services:
 | **Template Processing** | Automatic prompt optimization with model, temperature, max_tokens        |
 | **Settings**   | Frontend component for system configuration and user preferences                |
 | **Entity-Relationship** | Database schema with 10 tables (songs, sketches, conversations, users, etc.) |
-| **aitestmock** | Mock server for OpenAI and Mureka APIs for cost reduction in development/testing |
+| **aitestmock** | Mock server for OpenAI APIs for cost reduction in development/testing            |
 | **Lyric Editor** | Integrated songwriting tool with section-based editing and AI assistance        |
 | **Song Architecture** | Structured song layout definition (INTRO, VERSE, CHORUS, BRIDGE, OUTRO, etc.) |
 | **Section Editor** | Split-view interface for editing individual lyric sections with AI tools        |
@@ -2510,7 +2485,7 @@ services:
 |--------|-----|-------------|
 | `id` | UUID | Primary Key |
 | `task_id` | VARCHAR(255) | Celery Task ID (unique) |
-| `job_id` | VARCHAR(255) | MUREKA Job ID |
+| `job_id` | VARCHAR(255) | External Job ID (legacy) |
 | `sketch_id` | UUID | Foreign Key to song_sketches.id (nullable) |
 | `lyrics` | TEXT | Song text input |
 | `prompt` | TEXT | Style prompt for generation |
@@ -2522,20 +2497,20 @@ services:
 | `status` | VARCHAR(50) | PENDING, PROGRESS, SUCCESS, FAILURE, CANCELLED |
 | `progress_info` | TEXT | JSON progress details |
 | `error_message` | TEXT | Error information |
-| `mureka_response` | TEXT | Complete MUREKA response (JSON) |
-| `mureka_status` | VARCHAR(100) | MUREKA-specific status |
+| `mureka_response` | TEXT | Legacy field (JSON) |
+| `mureka_status` | VARCHAR(100) | Legacy field |
 | `created_at` | TIMESTAMP | Creation timestamp |
 | `updated_at` | TIMESTAMP | Last update |
 | `completed_at` | TIMESTAMP | Completion timestamp |
 
 #### 14.2.2 song_choices
-**Purpose**: Individual song variants from MUREKA (1:N to songs)
+**Purpose**: Individual song variants (1:N to songs)
 
 | Column | Type | Description |
 |--------|-----|-------------|
 | `id` | UUID | Primary Key |
 | `song_id` | UUID | Foreign Key to songs.id |
-| `mureka_choice_id` | VARCHAR(255) | MUREKA Choice Identifier |
+| `mureka_choice_id` | VARCHAR(255) | Legacy Choice Identifier |
 | `choice_index` | INTEGER | Index in choices array |
 | `mp3_url` | VARCHAR(1000) | MP3 file URL |
 | `flac_url` | VARCHAR(1000) | FLAC file URL |
@@ -2727,7 +2702,7 @@ services:
 | Column | Type | Description |
 |--------|-----|-------------|
 | `id` | UUID | Primary Key |
-| `provider` | VARCHAR(50) | API provider (openai, mureka) |
+| `provider` | VARCHAR(50) | API provider (openai) |
 | `organization_id` | VARCHAR(255) | Optional organization identifier |
 | `year` | INTEGER | Year (e.g., 2025) |
 | `month` | INTEGER | Month (1-12) |

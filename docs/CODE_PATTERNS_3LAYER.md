@@ -19,7 +19,7 @@ Controller (HTTP)
 | File Pattern | Purpose | Testable? | Example |
 |--------------|---------|-----------|---------|
 | `*_orchestrator.py` | Coordinates services, NO business logic | ❌ No | `SketchOrchestrator`, `SongOrchestrator` |
-| `*_transformer.py` | Pure functions: transformations, mappings | ✅ Yes (100%) | `SongMurekaTransformer` |
+| `*_transformer.py` | Pure functions: transformations, mappings | ✅ Yes (100%) | `SongTransformer` |
 | `*_normalizer.py` | Pure functions: string normalization | ✅ Yes (100%) | `SketchNormalizer` |
 | `*_auth_service.py` | Pure functions: authentication logic | ✅ Yes (100%) | `UserAuthService` |
 | `*_service.py` (in `db/`) | CRUD operations only | ❌ No | `SketchService`, `SongService` |
@@ -100,23 +100,23 @@ class SketchOrchestrator:
 **Testable:** ✅ Yes (100% coverage, no mocks)
 **Location:** `src/business/*_transformer.py`
 
-### Example: SongMurekaTransformer
+### Example: SongTransformer
 
 ```python
 from typing import Any
 
-class SongMurekaTransformer:
-    """Transform MUREKA API responses (pure functions)"""
+class SongTransformer:
+    """Transform song API responses (pure functions)"""
 
     @staticmethod
-    def parse_mureka_result(result_data: dict[str, Any]) -> dict[str, Any]:
+    def parse_generation_result(result_data: dict[str, Any]) -> dict[str, Any]:
         """
-        Parse MUREKA API response to DB format
+        Parse song generation API response to DB format
 
         Pure function - NO DB, NO file system, fully unit-testable
 
         Args:
-            result_data: Raw MUREKA response
+            result_data: Raw API response
 
         Returns:
             Parsed data ready for DB insertion
@@ -128,10 +128,10 @@ class SongMurekaTransformer:
         # Parse each choice
         parsed_choices = [
             {
-                "mureka_choice_id": choice.get("id"),
+                "choice_id": choice.get("id"),
                 "audio_url": choice.get("url"),
-                "duration": SongMurekaTransformer.parse_duration(choice.get("duration")),
-                "tags": SongMurekaTransformer.parse_tags_array(choice.get("tags", [])),
+                "duration": SongTransformer.parse_duration(choice.get("duration")),
+                "tags": SongTransformer.parse_tags_array(choice.get("tags", [])),
             }
             for choice in choices
         ]
@@ -168,14 +168,14 @@ class SongMurekaTransformer:
 
 ```python
 import pytest
-from business.song_mureka_transformer import SongMurekaTransformer
+from business.song_transformer import SongTransformer
 
-class TestSongMurekaTransformer:
-    def test_parse_mureka_result_success(self):
-        """Test parsing valid MUREKA response"""
+class TestSongTransformer:
+    def test_parse_generation_result_success(self):
+        """Test parsing valid generation response"""
         result_data = {
             "status": "succeeded",
-            "model": "mureka-7.5",
+            "model": "song-gen-v2",
             "choices": [
                 {
                     "id": "choice-123",
@@ -186,28 +186,28 @@ class TestSongMurekaTransformer:
             ]
         }
 
-        parsed = SongMurekaTransformer.parse_mureka_result(result_data)
+        parsed = SongTransformer.parse_generation_result(result_data)
 
         assert parsed["status"] == "succeeded"
-        assert parsed["model"] == "mureka-7.5"
+        assert parsed["model"] == "song-gen-v2"
         assert len(parsed["choices"]) == 1
-        assert parsed["choices"][0]["mureka_choice_id"] == "choice-123"
+        assert parsed["choices"][0]["choice_id"] == "choice-123"
         assert parsed["choices"][0]["duration"] == 30567.89
         assert parsed["choices"][0]["tags"] == "pop,upbeat"
 
     def test_parse_duration_various_formats(self):
         """Test duration parsing with different input types"""
-        assert SongMurekaTransformer.parse_duration(123) == 123.0
-        assert SongMurekaTransformer.parse_duration(123.45) == 123.45
-        assert SongMurekaTransformer.parse_duration("123.45") == 123.45
-        assert SongMurekaTransformer.parse_duration(None) is None
-        assert SongMurekaTransformer.parse_duration("invalid") is None
+        assert SongTransformer.parse_duration(123) == 123.0
+        assert SongTransformer.parse_duration(123.45) == 123.45
+        assert SongTransformer.parse_duration("123.45") == 123.45
+        assert SongTransformer.parse_duration(None) is None
+        assert SongTransformer.parse_duration("invalid") is None
 
     def test_parse_tags_array(self):
         """Test tags array conversion"""
-        assert SongMurekaTransformer.parse_tags_array(["pop", "rock"]) == "pop,rock"
-        assert SongMurekaTransformer.parse_tags_array([]) == ""
-        assert SongMurekaTransformer.parse_tags_array(["pop", None, "rock"]) == "pop,rock"
+        assert SongTransformer.parse_tags_array(["pop", "rock"]) == "pop,rock"
+        assert SongTransformer.parse_tags_array([]) == ""
+        assert SongTransformer.parse_tags_array(["pop", None, "rock"]) == "pop,rock"
 ```
 
 **Key Points:**
@@ -606,7 +606,6 @@ src/business/
 ├── sketch_orchestrator.py        ❌ 0% coverage (orchestration only)
 ├── sketch_normalizer.py          ✅ 100% coverage (pure functions)
 ├── song_orchestrator.py          ❌ 0% coverage (orchestration only)
-├── song_mureka_transformer.py    ✅ 100% coverage (pure functions)
 └── song_transformer.py           ✅ 100% coverage (pure functions)
 
 src/db/
@@ -615,8 +614,7 @@ src/db/
 
 tests/business/
 ├── test_sketch_normalizer.py     ✅ 13 tests (100% coverage)
-├── test_song_mureka_transformer.py ✅ 25 tests (100% coverage)
-└── test_song_transformer.py      ✅ 11 tests (100% coverage)
+└── test_song_transformer.py      ✅ 25 tests (100% coverage)
 ```
 
 ---
@@ -644,7 +642,6 @@ tests/business/
 - `src/business/sketch_orchestrator.py` - Orchestration
 - `src/business/sketch_normalizer.py` - Pure functions (tested)
 - `src/business/song_orchestrator.py` - Orchestration
-- `src/business/song_mureka_transformer.py` - Pure functions (tested)
 - `src/business/song_transformer.py` - Pure functions (tested)
 - `src/business/user_auth_service.py` - Pure functions (tested)
 

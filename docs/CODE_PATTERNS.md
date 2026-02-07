@@ -483,7 +483,7 @@ class SongCreate(SongBase):
     @classmethod
     def validate_model(cls, v):
         """Validate model field (Pydantic V2 pattern)."""
-        allowed_models = ["auto", "mureka-7.5", "mureka-7", "mureka-6"]
+        allowed_models = ["auto", "song-gen-v2", "song-gen-v1", "song-gen-lite"]
         if v not in allowed_models:
             raise ValueError(f"model must be one of: {', '.join(allowed_models)}")
         return v
@@ -536,7 +536,7 @@ from pydantic import validator
 
 @validator("model")
 def validate_model(cls, v):
-    if v not in ["auto", "mureka-7.5"]:
+    if v not in ["auto", "song-gen-v2"]:
         raise ValueError("Invalid model")
     return v
 
@@ -546,7 +546,7 @@ from pydantic import field_validator
 @field_validator("model")
 @classmethod
 def validate_model(cls, v):
-    if v not in ["auto", "mureka-7.5"]:
+    if v not in ["auto", "song-gen-v2"]:
         raise ValueError("Invalid model")
     return v
 ```

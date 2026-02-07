@@ -93,14 +93,14 @@ docker compose restart postgres
 
 # Nuclear option: Remove and recreate
 docker compose down postgres
-docker volume rm mac_ki_service_postgres_data
+docker volume rm chmusicpro_postgres_data
 docker compose up -d postgres
 ```
 
 #### Cannot connect to database
 ```bash
 # From project root
-docker exec -it mac_ki_service-postgres-1 psql -U aiuser -d aiproxy
+docker exec -it chmusicpro-postgres-1 psql -U aiuser -d aiproxy
 
 # Test connection from host
 psql -h localhost -U aiuser -d aiproxy -W
@@ -161,7 +161,7 @@ docker compose ps redis
 docker compose logs redis
 
 # Connect to Redis CLI
-docker exec -it mac_ki_service-redis-1 redis-cli
+docker exec -it chmusicpro-redis-1 redis-cli
 
 # List all keys
 > KEYS *
@@ -186,7 +186,7 @@ lsof -i :5050
 kill -9 <PID>
 
 # Check Python environment
-conda activate mac_ki_service_py312
+conda activate chmusicpro_py312
 which python
 python --version
 
@@ -323,14 +323,14 @@ vim docker-compose.yml
 docker volume ls
 
 # Inspect volume
-docker volume inspect mac_ki_service_postgres_data
+docker volume inspect chmusicpro_postgres_data
 
 # Remove volume (DANGEROUS - data loss!)
 docker compose down
-docker volume rm mac_ki_service_postgres_data
+docker volume rm chmusicpro_postgres_data
 
 # Backup volume before removal
-docker run --rm -v mac_ki_service_postgres_data:/data -v $(pwd):/backup alpine tar czf /backup/postgres_backup.tar.gz /data
+docker run --rm -v chmusicpro_postgres_data:/data -v $(pwd):/backup alpine tar czf /backup/postgres_backup.tar.gz /data
 ```
 
 ### Network issues
@@ -340,11 +340,11 @@ docker run --rm -v mac_ki_service_postgres_data:/data -v $(pwd):/backup alpine t
 
 # Check network
 docker network ls
-docker network inspect mac_ki_service_default
+docker network inspect chmusicpro_default
 
 # Recreate network
 docker compose down
-docker network rm mac_ki_service_default
+docker network rm chmusicpro_default
 docker compose up -d
 ```
 
@@ -372,22 +372,6 @@ cat aiproxysrv/.env | grep OPENAI_API_KEY
 # Test API key
 curl https://api.openai.com/v1/models \
   -H "Authorization: Bearer $OPENAI_API_KEY"
-```
-
-### Mureka API
-
-#### Job status not updating
-```bash
-# Check Celery worker is running
-celery -A src.worker inspect active
-
-# Check Redis for stuck jobs
-docker exec -it mac_ki_service-redis-1 redis-cli
-> KEYS celery-task-meta-*
-
-# Manually check job status
-curl https://api.mureka.ai/v1/jobs/<job_id> \
-  -H "Authorization: Bearer $MUREKA_API_KEY"
 ```
 
 ### Ollama API
@@ -582,10 +566,10 @@ export const environment = {
 docker compose down
 
 # 2. Backup current database (if possible)
-docker run --rm -v mac_ki_service_postgres_data:/data -v $(pwd):/backup alpine tar czf /backup/postgres_emergency_backup.tar.gz /data
+docker run --rm -v chmusicpro_postgres_data:/data -v $(pwd):/backup alpine tar czf /backup/postgres_emergency_backup.tar.gz /data
 
 # 3. Remove corrupted volume
-docker volume rm mac_ki_service_postgres_data
+docker volume rm chmusicpro_postgres_data
 
 # 4. Recreate database
 docker compose up -d postgres

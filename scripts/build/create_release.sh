@@ -137,9 +137,9 @@ cd "$PROJECT_DIR/aiproxysrv"
 
 # Check Conda Environment
 print_info "Prüfe Conda Environment..."
-if ! conda env list | grep -q "mac_ki_service_py312.*\*"; then
-    print_error "Conda environment 'mac_ki_service_py312' ist nicht aktiv!"
-    print_error "Aktiviere es mit: conda activate mac_ki_service_py312"
+if ! conda env list | grep -q "chmusicpro_py312.*\*"; then
+    print_error "Conda environment 'chmusicpro_py312' ist nicht aktiv!"
+    print_error "Aktiviere es mit: conda activate chmusicpro_py312"
     exit 1
 fi
 print_success "Conda environment OK"
@@ -268,7 +268,7 @@ print_header "GitHub Actions Build"
 if [ "$REMOTE_AVAILABLE" = true ]; then
     print_info "Build wird automatisch in GitHub Actions gestartet..."
     echo ""
-    echo "  🔗 Build Status: ${BLUE}https://github.com/rwellinger/thwellys-ai-toolbox/actions${NC}"
+    echo "  🔗 Build Status: ${BLUE}https://github.com/rwellinger/chmusicpro/actions${NC}"
     echo ""
     print_info "GitHub Actions wird folgende Images bauen und pushen:"
     echo "  • ghcr.io/rwellinger/aiproxysrv-app:${VERSION}"

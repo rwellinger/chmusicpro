@@ -1,0 +1,28 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="aiproxysrv" type="PythonConfigurationType" factoryName="Python" activateToolWindowBeforeRun="false" show_console_on_std_err="true" show_console_on_std_out="true">
+    <output_file path="$PROJECT_DIR$/logs/aiproxysrv.log" is_save="true" />
+    <module name="mac_ki_service" />
+    <option name="ENV_FILES" value="$PROJECT_DIR$/aiproxysrv/.env_mock" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="PARENT_ENVS" value="true" />
+    <envs>
+      <env name="PYTHONUNBUFFERED" value="1" />
+    </envs>
+    <option name="SDK_HOME" value="" />
+    <option name="SDK_NAME" value="mac_ki_service_py312" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/aiproxysrv/src" />
+    <option name="IS_MODULE_SDK" value="false" />
+    <option name="ADD_CONTENT_ROOTS" value="false" />
+    <option name="ADD_SOURCE_ROOTS" value="false" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <option name="RUN_TOOL" value="" />
+    <option name="SCRIPT_NAME" value="server" />
+    <option name="PARAMETERS" value="" />
+    <option name="SHOW_COMMAND_LINE" value="false" />
+    <option name="EMULATE_TERMINAL" value="false" />
+    <option name="MODULE_MODE" value="true" />
+    <option name="REDIRECT_INPUT" value="false" />
+    <option name="INPUT_FILE" value="" />
+    <method v="2" />
+  </configuration>
+</component>

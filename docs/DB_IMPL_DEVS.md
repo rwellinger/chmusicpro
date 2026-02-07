@@ -131,7 +131,7 @@ alembic current
 alembic history
 
 # Connect to DB and verify schema
-docker exec -it mac_ki_service-postgres-1 psql -U aiuser -d aiproxy
+docker exec -it chmusicpro-postgres-1 psql -U aiuser -d aiproxy
 \d songs
 ```
 
@@ -321,7 +321,7 @@ docker compose logs postgres
 cat alembic.ini
 
 # Check database state
-docker exec -it mac_ki_service-postgres-1 psql -U aiuser -d aiproxy
+docker exec -it chmusicpro-postgres-1 psql -U aiuser -d aiproxy
 SELECT * FROM alembic_version;
 ```
 
@@ -356,7 +356,7 @@ alembic merge -m "merge migrations" <rev1> <rev2>
 docker compose down
 
 # Remove volumes
-docker volume rm mac_ki_service_postgres_data
+docker volume rm chmusicpro_postgres_data
 
 # Restart and recreate
 docker compose up postgres -d
@@ -399,10 +399,10 @@ alembic upgrade head
 
 ```bash
 # 1. Backup database
-docker exec mac_ki_service-postgres-1 pg_dump -U aiuser aiproxy > backup.sql
+docker exec chmusicpro-postgres-1 pg_dump -U aiuser aiproxy > backup.sql
 
 # 2. Apply migration
-docker exec -it mac_ki_service-aiproxysrv-1 bash
+docker exec -it chmusicpro-aiproxysrv-1 bash
 cd src
 alembic upgrade head
 
@@ -417,7 +417,7 @@ docker compose restart aiproxysrv
 
 ```bash
 # Rollback migration
-docker exec -it mac_ki_service-aiproxysrv-1 bash
+docker exec -it chmusicpro-aiproxysrv-1 bash
 cd src
 alembic downgrade -1
 
@@ -453,7 +453,7 @@ cd src && alembic history
 
 ```bash
 # Connect to PostgreSQL
-docker exec -it mac_ki_service-postgres-1 psql -U aiuser -d aiproxy
+docker exec -it chmusicpro-postgres-1 psql -U aiuser -d aiproxy
 
 # Common psql commands
 \dt              # List tables

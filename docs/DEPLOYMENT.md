@@ -1,6 +1,6 @@
 # Production Deployment Guide
 
-This guide covers deploying thWelly's AI Toolbox in a production environment using Docker containers across multiple hosts.
+This guide covers deploying Swiss Music Production in a production environment using Docker containers across multiple hosts.
 
 > **Note:** This documentation uses anonymized placeholder values. All IP addresses (e.g., `192.168.1.10`, `192.168.1.20`), container registry paths (`ghcr.io/<your-username>/`), and credentials are examples only. Replace them with your actual infrastructure values before deployment.
 
@@ -427,7 +427,7 @@ location /api/ {
 client_max_body_size 2048M;
 
 # Extended timeouts for AI endpoints
-location ~ ^/api/v1/(ollama|mureka|openai)/ {
+location ~ ^/api/v1/(ollama|openai)/ {
     proxy_read_timeout 600s;
     proxy_send_timeout 600s;
     proxy_pass http://aiproxysrv-app:5050;
@@ -611,9 +611,6 @@ ENCRYPTION_SECRET_KEY=your-fernet-key
 # =============================================================================
 # OpenAI - for DALL-E image generation
 OPENAI_API_KEY=sk-...
-
-# Mureka - for music generation
-MUREKA_API_KEY=...
 
 # Anthropic - for Claude AI
 CLAUDE_API_KEY=...

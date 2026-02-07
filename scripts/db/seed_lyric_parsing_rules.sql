@@ -8,7 +8,7 @@
 --   psql -h localhost -U aiuser -d aiproxy -f seed_lyric_parsing_rules.sql
 --
 -- Usage (Docker):
---   cat seed_lyric_parsing_rules.sql | docker exec -i mac_ki_service-postgres-1 psql -U aiuser -d aiproxy
+--   cat seed_lyric_parsing_rules.sql | docker exec -i chmusicpro-postgres-1 psql -U aiuser -d aiproxy
 --
 -- NOTE: All replacement values are Base64-encoded for safe storage
 -- ============================================================

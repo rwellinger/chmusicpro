@@ -7,7 +7,7 @@ Command-line tool for uploading files to Song Projects.
 ### From Repository
 
 ```bash
-cd mac_ki_service
+cd chmusicpro
 make install-cli
 ```
 

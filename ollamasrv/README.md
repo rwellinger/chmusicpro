@@ -1,18 +1,18 @@
 # Ollama AI Server - Local LLM Backend
 
-Local AI server running Ollama as LLM backend for thWelly Toolbox chat functionality.
+Local AI server running Ollama as LLM backend for Swiss Music Production chat functionality.
 
 ## Overview
 
 This setup provides:
 - **Ollama 0.12.0**: Latest stable version with full GPU support
 - **Native Mac Installation**: Direct GitHub releases for optimal M1/M4 performance
-- **thWelly Toolbox Integration**: Chat UI integrated in Angular frontend (replaced Open WebUI)
+- **Swiss Music Production Integration**: Chat UI integrated in Angular frontend (replaced Open WebUI)
 - **LaunchDaemon**: Auto-start on system boot
 - **GPU Acceleration**: Full Metal GPU support on Apple Silicon
 
 > **Note**: Chat functionality previously provided by Open WebUI is now integrated
-> directly into the thWelly Toolbox Angular frontend at `/ai-chat`.
+> directly into the Swiss Music Production Angular frontend at `/ai-chat`.
 
 ## Architecture
 
@@ -25,7 +25,7 @@ This setup provides:
                │
                ▼
 ┌─────────────────────────────────────┐
-│    thWelly Toolbox (Angular)        │
+│    Swiss Music Production (Angular) │
 │  Chat UI @ /ai-chat                 │
 │  via aiproxysrv proxy               │
 └─────────────────────────────────────┘
@@ -46,7 +46,7 @@ This setup provides:
 
 - macOS with Apple Silicon (M1/M2/M3/M4)
 - Internet connection for downloading models
-- thWelly Toolbox for chat UI (Angular frontend)
+- Swiss Music Production for chat UI (Angular frontend)
 
 ### 1. Install Ollama
 
@@ -170,10 +170,10 @@ ollama pull llava:13b
 
 ### 5. Access Chat UI
 
-The chat interface is integrated into thWelly Toolbox Angular frontend.
+The chat interface is integrated into Swiss Music Production Angular frontend.
 
 **Access Chat**:
-- Navigate to `/ai-chat` in thWelly Toolbox
+- Navigate to `/ai-chat` in Swiss Music Production
 - Chat UI connects to Ollama via aiproxysrv proxy
 - Full conversation management with persistent history
 - Multi-model support (llama3.2:3b, gpt-oss:20b, etc.)
@@ -468,7 +468,7 @@ sudo launchctl start com.ollama.serve
 ollama --version
 ```
 
-### Update thWelly Toolbox
+### Update Swiss Music Production
 
 Chat UI is part of the Angular frontend. Update via:
 
@@ -502,7 +502,7 @@ docker pull ghcr.io/rwellinger/aiwebui-app:latest
 ## Related Documentation
 
 - **Ollama GitHub**: https://github.com/ollama/ollama
-- **thWelly Toolbox**: `../aiwebui/README.md`
+- **Swiss Music Production**: `../aiwebui/README.md`
 - **Backend Integration**: `../aiproxysrv/README.md`
 - **Model Library**: https://ollama.ai/library
 - **Chat UI Component**: `../aiwebui/src/app/pages/ai-chat/`
@@ -526,6 +526,6 @@ curl http://localhost:11434/api/tags
 ollama run gpt-oss:20b "Hello!"
 
 # Access Chat UI
-# Navigate to thWelly Toolbox at /ai-chat
+# Navigate to Swiss Music Production at /ai-chat
 # Chat connects via aiproxysrv proxy to Ollama
 ```

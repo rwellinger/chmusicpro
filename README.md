@@ -1,10 +1,10 @@
-# thWelly's AI Toolbox
+# Swiss Music Production
 
 **Your AI-powered music production workflow** — from first idea to finished release.
 
 Capture song ideas, write lyrics with AI assistance, generate full songs, create cover art, and manage your music projects — all in one self-hosted application.
 
-[![Build Status](https://github.com/rwellinger/thwellys-ai-toolbox/actions/workflows/release.yml/badge.svg)](https://github.com/rwellinger/thwellys-ai-toolbox/actions)
+[![Build Status](https://github.com/rwellinger/chmusicpro/actions/workflows/release.yml/badge.svg)](https://github.com/rwellinger/chmusicpro/actions)
 [![License: ELv2](https://img.shields.io/badge/License-ELv2-blue.svg)](LICENSE)
 [![Angular](https://img.shields.io/badge/Angular-20-red.svg)](https://angular.io/)
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
@@ -22,7 +22,7 @@ Idea → Sketch → Lyrics → Song → Cover → Project
 | **Idea** | Capture a musical concept or mood | — |
 | **Sketch** | Structure your idea with title, genre, mood | Generate catchy titles |
 | **Lyrics** | Write verses, chorus, bridge | Improve, rewrite, extend lyrics |
-| **Song** | Generate full audio from lyrics | Use your own tool (Suno, Mureka, etc.) |
+| **Song** | Generate full audio from lyrics | Use your own tool (Suno, Udio, etc.) |
 | **Cover** | Create album artwork | Image generation (DALL-E 3) |
 | **Project** | Organize files, sync with DAW | S3 storage, CLI integration |
 
@@ -37,7 +37,7 @@ Capture and organize your song ideas before they slip away. Tag with genre, mood
 Section-based editor for verses, choruses, bridges, and more. AI-powered tools help you improve phrasing, rewrite weak lines, or extend sections. Build your song architecture with drag & drop, then export to the music generator.
 
 ### Music Generation
-Use your preferred AI music generation tool (such as Suno, Mureka, or others) to generate songs from your lyrics. Export lyrics directly from the lyric editor in the format your tool needs. Prompt suggestions and lyric formatting are optimized for the most popular AI music generation tools.
+Use your preferred AI music generation tool (such as Suno, Udio, or others) to generate songs from your lyrics. Export lyrics directly from the lyric editor in the format your tool needs. Prompt suggestions and lyric formatting are optimized for the most popular AI music generation tools.
 
 ### Cover Art
 DALL-E 3 integration creates album artwork. One-click AI prompt enhancement for better results. Built-in text overlay editor adds titles and artist names. Gallery view keeps all your artwork organized.
@@ -85,15 +85,15 @@ Track your music production software, plugins, and gear. Secure credential stora
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/rwellinger/thwellys-ai-toolbox.git
-   cd thwellys-ai-toolbox
+   git clone git@github.com:rwellinger/chmusicpro.git
+   cd chmusicpro
    ```
 
 2. **Backend Setup**
    ```bash
    cd aiproxysrv
-   conda create -n mac_ki_service_py312 python=3.12
-   conda activate mac_ki_service_py312
+   conda create -n chmusicpro_py312 python=3.12
+   conda activate chmusicpro_py312
    pip install -r requirements.txt
 
    # Copy and configure environment
@@ -173,7 +173,7 @@ For detailed architecture documentation, see [docs/arch42/README.md](docs/arch42
 ### Project Structure
 
 ```
-thwellys-ai-toolbox/
+chmusicpro/
 ├── aiproxysrv/          # Python Backend (FastAPI)
 │   ├── src/
 │   │   ├── adapters/    # External API clients (OpenAI, Ollama)

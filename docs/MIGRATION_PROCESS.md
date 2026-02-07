@@ -157,7 +157,7 @@ docker-compose restart db-migration
 ssh rob@<production-server>
 
 # Backup database
-cd /path/to/mac_ki_service/aiproxysrv
+cd /path/to/chmusicpro/aiproxysrv
 ./scripts/operation/dbbackup.sh
 
 # Verify backup created
@@ -167,7 +167,7 @@ ls -lh ~/backup/*.sql.gz
 **2. Pull Latest Code**
 
 ```bash
-cd /path/to/mac_ki_service
+cd /path/to/chmusicpro
 git pull origin main
 
 # Verify migration files are present
@@ -467,7 +467,7 @@ docker run --rm -it \
 ## Emergency Contacts
 
 **Issues?**
-- GitHub Issues: https://github.com/rwellinger/thwellys-ai-toolbox/issues
+- GitHub Issues: https://github.com/rwellinger/chmusicpro/issues
 
 **Documentation:**
 - ARC42 Docs: `docs/arch42/README.md`

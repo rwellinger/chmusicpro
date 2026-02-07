@@ -12,7 +12,7 @@ Command-line tool for uploading files to Song Projects.
 import os
 import sys
 
-REQUIRED_CONDA_ENV = "mac_ki_service_py312"
+REQUIRED_CONDA_ENV = "chmusicpro_py312"
 
 
 def check_conda_environment():

@@ -176,7 +176,7 @@ make test-watch               # Tests in watch mode
 
 ```bash
 # Activate conda environment first!
-conda activate mac_ki_service_py312
+conda activate chmusicpro_py312
 
 # Development
 python src/server.py           # Dev server
@@ -195,7 +195,7 @@ make test                      # pytest
 ## Database Seeding
 
 ```bash
-# From project root (mac_ki_service/)
+# From project root (chmusicpro/)
 cat scripts/db/seed_prompts.sql | docker exec -i postgres psql -U aiproxy -d aiproxysrv
 cat scripts/db/seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U aiproxy -d aiproxysrv
 ```

@@ -140,6 +140,9 @@ POSTGRES_DB=aiproxysrv
 POSTGRES_USER=aiproxy
 POSTGRES_PASSWORD=
 
+# Database Echo SQL queries (true/false, default: false)
+#DATABASE_ECHO=false
+
 # Database Connection Pool Settings (Optional - uses defaults if not set)
 # pool_size: Number of permanent connections (default: 10)
 # max_overflow: Additional burst connections (default: 20)
@@ -156,7 +159,26 @@ POSTGRES_PASSWORD=
 #DATABASE_POOL_RECYCLE=3600
 
 # ==================================================
-# Minio S3 Storage
+# S3 Storage (MinIO / AWS / Backblaze / Wasabi)
 # ==================================================
+# Storage backend: 's3' or 'filesystem'
+STORAGE_BACKEND=s3
+
+# S3 Provider: 'minio', 'aws', 'backblaze', 'wasabi'
+S3_PROVIDER=minio
+S3_ENDPOINT=http://localhost:9000
+S3_ACCESS_KEY=minioadmin
+S3_SECRET_KEY=minioadmin
+S3_REGION=us-east-1
+
+# S3 Buckets
+S3_BUCKET=aiproxy-media
+S3_SONG_PROJECTS_BUCKET=song-projects
+S3_SONG_RELEASES_BUCKET=song-releases
+S3_SONGS_BUCKET=songs
+S3_IMAGES_BUCKET=ai-generated-images
+S3_EQUIPMENT_DATA_BUCKET=equipment-data
+
+# MinIO Root Credentials (for Docker/MinIO setup)
 MINIO_ROOT_USER:
 MINIO_ROOT_PASSWORD:
