@@ -16,7 +16,7 @@ class TestTransformSongToListFormat:
         song.id = 123
         song.lyrics = "Test lyrics"
         song.title = "Test Song"
-        song.model = "mureka-7.5"
+        song.model = "song-gen-v2"
         song.tags = "pop,rock"
         song.workflow = "simple"
         song.is_instrumental = False
@@ -30,7 +30,7 @@ class TestTransformSongToListFormat:
             "id": "123",
             "lyrics": "Test lyrics",
             "title": "Test Song",
-            "model": "mureka-7.5",
+            "model": "song-gen-v2",
             "tags": "pop,rock",
             "workflow": "simple",
             "is_instrumental": False,
@@ -82,7 +82,7 @@ class TestTransformSongToDetailFormat:
         song.job_id = "job-456"
         song.lyrics = "Detailed lyrics"
         song.prompt = "Test prompt"
-        song.model = "mureka-7.5"
+        song.model = "song-gen-v2"
         song.title = "Detailed Song"
         song.tags = "electronic"
         song.workflow = "simple"
@@ -124,7 +124,7 @@ class TestTransformSongToDetailFormat:
         assert result["job_id"] == "job-456"
         assert result["lyrics"] == "Detailed lyrics"
         assert result["prompt"] == "Test prompt"
-        assert result["model"] == "mureka-7.5"
+        assert result["model"] == "song-gen-v2"
         assert result["title"] == "Detailed Song"
         assert result["tags"] == "electronic"
         assert result["workflow"] == "simple"
@@ -199,7 +199,7 @@ class TestTransformSongToDetailFormat:
         song.job_id = "job-888"
         song.lyrics = "Multiple choices"
         song.prompt = "Test"
-        song.model = "mureka-7.5"
+        song.model = "song-gen-v2"
         song.title = "Multi Choice Song"
         song.tags = "test"
         song.workflow = "simple"

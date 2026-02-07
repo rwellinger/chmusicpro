@@ -662,7 +662,7 @@ You made things right',
 SELECT upsert_prompt_template(
     'music',
     'enhance',
-    'You are a professional music style prompt enhancer for Mureka and Suno AI.
+    'You are a professional music style prompt enhancer for AI music generation tools.
 Refine the input into an ideal prompt by:
   • Describing genre and subgenre precisely (e.g., "melodic death metal", "synthwave pop")
   • Including mood and emotional quality (e.g., "melancholic", "uplifting", "dark")
@@ -688,7 +688,7 @@ DO NOT:
 Examples:
     - Input: "electronic music with guitar" → Output: "Upbeat electronic techno with driving synths, distorted electric guitar riffs, punchy drums. Modern polished production."
     - Input: "traurige Ballade" → Output: "Melancholische Pop-Ballade mit Klavier, sanften Streichern, subtilen Drums. Emotionale, intime Stimmung."',
-    'Enhances music style prompts for Mureka and Suno (optimized for genre, mood, instruments, production)',
+    'Enhances music style prompts for AI music generation (optimized for genre, mood, instruments, production)',
     '4.0',
     'gpt-oss:20b',
     0.9,

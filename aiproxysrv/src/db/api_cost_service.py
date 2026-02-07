@@ -26,7 +26,7 @@ class ApiCostService:
 
         Args:
             db: Database session
-            provider: 'openai' or 'mureka'
+            provider: 'openai'
             year: Year (e.g., 2025)
             month: Month (1-12)
             organization_id: Optional organization ID for user-specific keys
@@ -88,7 +88,7 @@ class ApiCostService:
 
         Args:
             db: Database session
-            provider: 'openai' or 'mureka'
+            provider: 'openai'
             year: Year (e.g., 2025)
             month: Month (1-12)
             costs: Dict with total, image, chat, breakdown, etc.
@@ -189,7 +189,7 @@ class ApiCostService:
 
         Args:
             db: Database session
-            provider: 'openai' or 'mureka'
+            provider: 'openai'
 
         Returns:
             Tuple of (total_cost, image_cost, chat_cost) as floats

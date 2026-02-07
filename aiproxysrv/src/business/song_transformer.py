@@ -62,7 +62,7 @@ class SongTransformer:
                 "id": str(choice.id),
                 "mureka_choice_id": choice.mureka_choice_id,
                 "choice_index": choice.choice_index,
-                # Legacy Mureka URLs (kept for backward compatibility)
+                # Legacy URLs (kept for backward compatibility)
                 "mp3_url": choice.mp3_url,
                 "flac_url": choice.flac_url,
                 "wav_url": choice.wav_url,

@@ -138,7 +138,7 @@ class Song(Base):
     # Primary identifiers
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     task_id = Column(String(255), nullable=False, unique=True, index=True)  # Celery Task ID
-    job_id = Column(String(255), nullable=True, index=True)  # MUREKA Job ID
+    job_id = Column(String(255), nullable=True, index=True)  # External Job ID (legacy)
 
     # Input parameters
     lyrics = Column(Text, nullable=False)
@@ -175,8 +175,8 @@ class Song(Base):
     project = relationship("SongProject", back_populates="songs")
     project_folder = relationship("ProjectFolder", foreign_keys=[project_folder_id])
 
-    # MUREKA response data
-    mureka_response = Column(Text, nullable=True)  # JSON string der kompletten MUREKA Response
+    # Legacy response data
+    mureka_response = Column(Text, nullable=True)  # Legacy JSON response (kept for backward compatibility)
     mureka_status = Column(String(100), nullable=True)
 
     # Timestamps
@@ -189,7 +189,7 @@ class Song(Base):
 
 
 class SongChoice(Base):
-    """Model for storing individual song choice results from MUREKA"""
+    """Model for storing individual song choice results"""
 
     __tablename__ = "song_choices"
     __table_args__ = {"extend_existing": True}
@@ -198,11 +198,11 @@ class SongChoice(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     song_id = Column(UUID(as_uuid=True), ForeignKey("songs.id"), nullable=False, index=True)
 
-    # MUREKA choice data
-    mureka_choice_id = Column(String(255), nullable=True)  # MUREKA's choice ID
+    # Legacy choice data
+    mureka_choice_id = Column(String(255), nullable=True)  # Legacy choice ID
     choice_index = Column(Integer, nullable=True)  # Index in choices array
 
-    # URLs and files (legacy Mureka URLs - kept for backward compatibility)
+    # URLs and files (legacy - kept for backward compatibility)
     mp3_url = Column(String(1000), nullable=True)
     flac_url = Column(String(1000), nullable=True)
     wav_url = Column(String(1000), nullable=True)  # WAV audio URL
@@ -217,7 +217,7 @@ class SongChoice(Base):
     stem_s3_key = Column(String(500), nullable=True)  # S3 key for stems ZIP file
 
     # Metadata
-    duration = Column(Float, nullable=True)  # Duration in milliseconds (as returned by MUREKA)
+    duration = Column(Float, nullable=True)  # Duration in milliseconds
     title = Column(String(500), nullable=True)
     tags = Column(String(1000), nullable=True)  # Comma-separated
     rating = Column(Integer, nullable=True)  # User rating: NULL=not set, 0=thumbs down, 1=thumbs up
@@ -482,7 +482,7 @@ class ApiCostMonthly(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
 
     # Provider and organization
-    provider = Column(String(50), nullable=False, index=True)  # 'openai', 'mureka'
+    provider = Column(String(50), nullable=False, index=True)  # 'openai'
     organization_id = Column(String(100), nullable=True, index=True)  # User-specific keys (optional)
 
     # Time period

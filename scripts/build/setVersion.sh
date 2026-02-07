@@ -9,7 +9,6 @@
 #
 # Updates:
 # - aiproxysrv/pyproject.toml
-# - aitestmock/pyproject.toml
 # - aiwebui/package.json
 #
 # NOTE: Does NOT update production docker-compose.yml files
@@ -30,7 +29,6 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # File paths
 AIPROXYSRV_TOML="$PROJECT_ROOT/aiproxysrv/pyproject.toml"
-AITESTMOCK_TOML="$PROJECT_ROOT/aitestmock/pyproject.toml"
 AIWEBUI_PACKAGE="$PROJECT_ROOT/aiwebui/package.json"
 
 # Function to print usage
@@ -40,7 +38,6 @@ usage() {
     echo ""
     echo "Updates version in SOURCE files:"
     echo "  - aiproxysrv/pyproject.toml"
-    echo "  - aitestmock/pyproject.toml"
     echo "  - aiwebui/package.json"
     echo ""
     echo "Production docker-compose.yml files are in separate deployment repo"
@@ -120,7 +117,7 @@ main() {
     validate_version "$NEW_VERSION"
 
     # Check if all files exist
-    for file in "$AIPROXYSRV_TOML" "$AITESTMOCK_TOML" "$AIWEBUI_PACKAGE"; do
+    for file in "$AIPROXYSRV_TOML" "$AIWEBUI_PACKAGE"; do
         if [ ! -f "$file" ]; then
             echo -e "${RED}Error:${NC} File not found: $file"
             exit 1
@@ -133,7 +130,6 @@ main() {
 
     # Update source files only
     update_pyproject "$AIPROXYSRV_TOML" "$NEW_VERSION"
-    update_pyproject "$AITESTMOCK_TOML" "$NEW_VERSION"
     update_package_json "$AIWEBUI_PACKAGE" "$NEW_VERSION"
 
     echo ""

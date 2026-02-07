@@ -348,10 +348,10 @@ class SongOrchestrator:
 
     def migrate_choice_to_s3(self, db, choice_id: str, file_type: str) -> str:
         """
-        Lazy migration: Download file from Mureka URL to S3 if not already migrated
+        Lazy migration: Download file from legacy URL to S3 if not already migrated
 
         This is the core lazy migration logic - checks if s3_key exists,
-        if not downloads from mureka_url and uploads to S3.
+        if not downloads from legacy URL and uploads to S3.
 
         Args:
             db: Database session
@@ -380,17 +380,19 @@ class SongOrchestrator:
             )
             return existing_s3_key
 
-        # 3. Get Mureka URL for download
-        mureka_url = self._get_mureka_url(choice, file_type)
-        if not mureka_url:
-            raise SongS3MigrationError(f"No Mureka URL found for choice {choice_id}, file_type={file_type}")
+        # 3. Get legacy URL for download
+        legacy_url = self._get_legacy_url(choice, file_type)
+        if not legacy_url:
+            raise SongS3MigrationError(f"No legacy URL found for choice {choice_id}, file_type={file_type}")
 
-        # 4. Download file from Mureka CDN
-        logger.info("Downloading from Mureka", choice_id=choice_id, file_type=file_type, url_preview=mureka_url[:80])
+        # 4. Download file from legacy URL
+        logger.info(
+            "Downloading from legacy URL", choice_id=choice_id, file_type=file_type, url_preview=legacy_url[:80]
+        )
         try:
-            file_data = self._download_from_url(mureka_url)
+            file_data = self._download_from_url(legacy_url)
         except Exception as e:
-            raise SongS3MigrationError(f"Failed to download from Mureka: {str(e)}") from e
+            raise SongS3MigrationError(f"Failed to download from legacy URL: {str(e)}") from e
 
         # 5. Generate S3 key (readable format with title + song_id)
         song_title = choice.song.title if choice.song else None
@@ -431,8 +433,8 @@ class SongOrchestrator:
         }
         return s3_key_map.get(file_type)
 
-    def _get_mureka_url(self, choice, file_type: str) -> str | None:
-        """Get Mureka URL for download"""
+    def _get_legacy_url(self, choice, file_type: str) -> str | None:
+        """Get legacy URL for download"""
         url_map = {
             "mp3": choice.mp3_url,
             "flac": choice.flac_url,
@@ -443,7 +445,7 @@ class SongOrchestrator:
 
     def _download_from_url(self, url: str, timeout: int = 300) -> bytes:
         """
-        Download file from URL (Mureka CDN)
+        Download file from URL
 
         Args:
             url: URL to download from

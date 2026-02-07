@@ -29,7 +29,7 @@ export class HealthService {
      * Check if S3 storage backend (MinIO) is reachable
      *
      * Use BEFORE expensive operations:
-     * - Song generation (Mureka AI credits)
+     * - Song management
      * - Image generation (OpenAI/DALL-E credits)
      * - Large file uploads
      *

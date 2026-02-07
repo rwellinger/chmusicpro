@@ -38,7 +38,7 @@ class SongService:
             return None
 
     def get_song_by_job_id(self, job_id: str) -> Song | None:
-        """Get song by job_id (MUREKA job ID) with choices loaded"""
+        """Get song by job_id with choices loaded"""
         try:
             db = next(get_db())
             try:
@@ -73,7 +73,7 @@ class SongService:
             return []
 
     def get_choice_by_mureka_id(self, mureka_choice_id: str) -> SongChoice | None:
-        """Get a specific choice by MUREKA choice ID"""
+        """Get a specific choice by legacy choice ID"""
         try:
             db = next(get_db())
             try:

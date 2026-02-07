@@ -80,7 +80,7 @@ export class MusicStyleChooserModalComponent implements OnInit, OnDestroy {
             // Show all instruments for normal mode
             this.availableInstruments = [...MUSIC_STYLE_CATEGORIES.instruments];
 
-            // Note: Auto-select male-voice removed - Mureka ignores voice selection anyway
+            // Note: Auto-select male-voice removed - voice selection handled by external tools
         }
     }
 
@@ -143,9 +143,7 @@ export class MusicStyleChooserModalComponent implements OnInit, OnDestroy {
 
     save(): void {
         try {
-            // Note: Voice validation removed - Mureka ignores "no vocals" setting anyway
-            // and randomly selects voices regardless of the prompt instruction.
-            // Keeping this for future reference if Mureka fixes this behavior.
+            // Note: Voice validation removed - handled by external tools
 
             this.styleChooserService.saveConfig(this.config);
             const stylePrompt = this.styleChooserService.generateStylePrompt(this.config, this.isInstrumental);

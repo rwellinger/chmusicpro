@@ -135,7 +135,7 @@ export class MusicStyleChooserService {
             const voiceInstruments = instruments.filter(i => i === "male-voice" || i === "female-voice");
             const otherInstruments = instruments.filter(i => i !== "male-voice" && i !== "female-voice");
 
-            // Vocals first (better hit rate for Mureka)
+            // Vocals first (better hit rate for AI music generation)
             if (voiceInstruments.length > 0) {
                 const voiceType = voiceInstruments[0].replace("-voice", "");
                 const voiceLabel = isGerman
