@@ -1,9 +1,9 @@
-# AiProxy Service - Main Makefile
+# CH Music Pro - Main Makefile
 
 .PHONY: help install-cli install-cli-dev install-cli-prod setup-cli-config-dev setup-cli-config-prod
 
 help:
-	@echo "AiProxy Service - Available commands:"
+	@echo "CH Music Pro - Available commands:"
 	@echo ""
 	@echo "  make install-cli           Install CLI tool (no config)"
 	@echo "  make install-cli-dev       Install CLI + DEV config (localhost:5050)"
@@ -13,11 +13,11 @@ help:
 	@echo ""
 
 install-cli:
-	@echo "Installing aiproxy-cli..."
+	@echo "Installing chmusicpro-cli..."
 	@mkdir -p ~/bin
-	@cp scripts/cli/aiproxy-cli.py ~/bin/aiproxy-cli
-	@chmod +x ~/bin/aiproxy-cli
-	@echo "✓ Installed to ~/bin/aiproxy-cli"
+	@cp scripts/cli/chmusicpro-cli.py ~/bin/chmusicpro-cli
+	@chmod +x ~/bin/chmusicpro-cli
+	@echo "✓ Installed to ~/bin/chmusicpro-cli"
 	@echo ""
 	@echo "Installing Python dependencies..."
 	@pip install -r scripts/cli/requirements.txt
@@ -30,35 +30,35 @@ install-cli:
 	@echo "⚠ No config created. Run one of:"
 	@echo "  make setup-cli-config-dev   (for localhost development)"
 	@echo "  make setup-cli-config-prod  (for production macstudio)"
-	@echo "  aiproxy-cli login           (interactive setup)"
+	@echo "  chmusicpro-cli login           (interactive setup)"
 
 install-cli-dev: install-cli setup-cli-config-dev
 
 install-cli-prod: install-cli setup-cli-config-prod
 
 setup-cli-config-dev:
-	@echo "Creating DEV config (~/.aiproxy/config.json)..."
-	@mkdir -p ~/.aiproxy
-	@chmod 700 ~/.aiproxy
-	@echo '{\n  "api_url": "http://localhost:5050",\n  "jwt_token": "",\n  "email": "",\n  "expires_at": "",\n  "ssl_verify": true\n}' > ~/.aiproxy/config.json
-	@chmod 600 ~/.aiproxy/config.json
-	@if [ ! -f ~/.aiproxy/.aiproxyignore ]; then \
-		cp scripts/cli/.aiproxyignore.default ~/.aiproxy/.aiproxyignore; \
-		chmod 600 ~/.aiproxy/.aiproxyignore; \
-		echo "✓ Created default .aiproxyignore"; \
+	@echo "Creating DEV config (~/.chmusicpro/config.json)..."
+	@mkdir -p ~/.chmusicpro
+	@chmod 700 ~/.chmusicpro
+	@echo '{\n  "api_url": "http://localhost:5050",\n  "jwt_token": "",\n  "email": "",\n  "expires_at": "",\n  "ssl_verify": true\n}' > ~/.chmusicpro/config.json
+	@chmod 600 ~/.chmusicpro/config.json
+	@if [ ! -f ~/.chmusicpro/.chmusicproignore ]; then \
+		cp scripts/cli/.chmusicproignore.default ~/.chmusicpro/.chmusicproignore; \
+		chmod 600 ~/.chmusicpro/.chmusicproignore; \
+		echo "✓ Created default .chmusicproignore"; \
 	fi
-	@echo "✓ DEV config created: ~/.aiproxy/config.json"
+	@echo "✓ DEV config created: ~/.chmusicpro/config.json"
 	@echo ""
 	@echo "⚠ JWT token is empty. Run to login:"
-	@echo "  aiproxy-cli login --api-url http://localhost:5050"
+	@echo "  chmusicpro-cli login --api-url http://localhost:5050"
 
 setup-cli-config-prod:
-	@echo "Creating PROD config (~/.aiproxy/config.json)..."
-	@mkdir -p ~/.aiproxy
-	@chmod 700 ~/.aiproxy
-	@echo '{\n  "api_url": "https://macstudio/aiproxysrv",\n  "jwt_token": "",\n  "email": "",\n  "expires_at": "",\n  "ssl_verify": false\n}' > ~/.aiproxy/config.json
-	@chmod 600 ~/.aiproxy/config.json
-	@echo "✓ PROD config created: ~/.aiproxy/config.json"
+	@echo "Creating PROD config (~/.chmusicpro/config.json)..."
+	@mkdir -p ~/.chmusicpro
+	@chmod 700 ~/.chmusicpro
+	@echo '{\n  "api_url": "https://macstudio/musicproapi",\n  "jwt_token": "",\n  "email": "",\n  "expires_at": "",\n  "ssl_verify": false\n}' > ~/.chmusicpro/config.json
+	@chmod 600 ~/.chmusicpro/config.json
+	@echo "✓ PROD config created: ~/.chmusicpro/config.json"
 	@echo ""
 	@echo "⚠ JWT token is empty. Run to login:"
-	@echo "  aiproxy-cli login"
+	@echo "  chmusicpro-cli login"

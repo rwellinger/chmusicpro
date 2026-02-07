@@ -1,4 +1,4 @@
-# AiProxy CLI Tool
+# CH Music Pro CLI Tool
 
 Command-line tool for uploading files to Song Projects.
 
@@ -12,7 +12,7 @@ make install-cli
 ```
 
 This will:
-1. Copy the script to `~/bin/aiproxy-cli`
+1. Copy the script to `~/bin/chmusicpro-cli`
 2. Make it executable
 3. Install Python dependencies
 
@@ -29,10 +29,10 @@ export PATH="$HOME/bin:$PATH"
 mkdir -p ~/bin
 
 # Copy script
-cp scripts/cli/aiproxy-cli.py ~/bin/aiproxy-cli
+cp scripts/cli/chmusicpro-cli.py ~/bin/chmusicpro-cli
 
 # Make executable
-chmod +x ~/bin/aiproxy-cli
+chmod +x ~/bin/chmusicpro-cli
 
 # Install dependencies
 pip install -r scripts/cli/requirements.txt
@@ -47,12 +47,12 @@ pip install -r scripts/cli/requirements.txt
 First, you need to login to get a JWT token:
 
 ```bash
-aiproxy-cli login
+chmusicpro-cli login
 ```
 
 **Interactive prompts:**
 ```
-API URL [https://macstudio/aiproxysrv]: <Enter>
+API URL [https://macstudio/musicproapi]: <Enter>
 Email: your@email.com
 Password: ***
 
@@ -60,7 +60,7 @@ Password: ***
 Token expires: 2024-11-03T10:30:00Z
 ```
 
-**Token is stored in:** `~/.aiproxy/config.json` (permissions: `0600`)
+**Token is stored in:** `~/.chmusicpro/config.json` (permissions: `0600`)
 
 ---
 
@@ -73,12 +73,12 @@ Use the "Copy Upload Command" button in the Song Project UI to get the correct c
 cd ~/Music/my-project/ai-files
 
 # Paste and execute the copied command
-aiproxy-cli upload <project-id> <folder-id> .
+chmusicpro-cli upload <project-id> <folder-id> .
 ```
 
 **Example:**
 ```bash
-aiproxy-cli upload 003ec827-e412-4bb0-9434-2abce08973de abc-123-folder ~/Music/songs/
+chmusicpro-cli upload 003ec827-e412-4bb0-9434-2abce08973de abc-123-folder ~/Music/songs/
 ```
 
 **What happens:**
@@ -108,11 +108,11 @@ Done in 45s.
 
 ## Configuration
 
-Config file: `~/.aiproxy/config.json`
+Config file: `~/.chmusicpro/config.json`
 
 ```json
 {
-  "api_url": "https://macstudio/aiproxysrv",
+  "api_url": "https://macstudio/musicproapi",
   "jwt_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "email": "user@example.com",
   "expires_at": "2024-11-03T10:30:00Z",
@@ -138,7 +138,7 @@ Config file: `~/.aiproxy/config.json`
 - Use on shared/multi-user systems
 
 **Token Expiry:**
-Tokens expire after 24 hours. Re-run `aiproxy-cli login` if authentication fails.
+Tokens expire after 24 hours. Re-run `chmusicpro-cli login` if authentication fails.
 
 ---
 
@@ -147,20 +147,20 @@ Tokens expire after 24 hours. Re-run `aiproxy-cli login` if authentication fails
 ### "Not logged in" error
 
 ```bash
-aiproxy-cli login
+chmusicpro-cli login
 ```
 
 ### "Token expired" error
 
 ```bash
-aiproxy-cli login  # Re-login to get new token
+chmusicpro-cli login  # Re-login to get new token
 ```
 
 ### "Connection error"
 
 Check if:
-1. API URL is correct (`https://macstudio/aiproxysrv`)
-2. You can reach the server (try `curl https://macstudio/aiproxysrv/api/v1/health`)
+1. API URL is correct (`https://macstudio/musicproapi`)
+2. You can reach the server (try `curl https://macstudio/musicproapi/api/v1/health`)
 3. VPN/Network is connected
 
 ### SSL Certificate error
@@ -173,8 +173,8 @@ The config file has `ssl_verify: false` for self-signed certificates. This is no
 
 | Command | Description |
 |---------|-------------|
-| `aiproxy-cli login [--api-url URL]` | Login and save JWT token |
-| `aiproxy-cli upload PROJECT_ID FOLDER_ID PATH` | Upload files recursively |
+| `chmusicpro-cli login [--api-url URL]` | Login and save JWT token |
+| `chmusicpro-cli upload PROJECT_ID FOLDER_ID PATH` | Upload files recursively |
 
 ---
 
@@ -203,9 +203,9 @@ The config file has `ssl_verify: false` for self-signed certificates. This is no
 ## Future Features (Phase 6)
 
 Planned for later:
-- `aiproxy-cli list` - List all projects
-- `aiproxy-cli sync` - Two-way sync (download + upload)
-- `aiproxy-cli watch` - Auto-sync with file watcher
+- `chmusicpro-cli list` - List all projects
+- `chmusicpro-cli sync` - Two-way sync (download + upload)
+- `chmusicpro-cli watch` - Auto-sync with file watcher
 - Keychain integration for token encryption
 
 ---
@@ -215,11 +215,11 @@ Planned for later:
 **Test the CLI:**
 ```bash
 # Make script executable
-chmod +x scripts/cli/aiproxy-cli.py
+chmod +x scripts/cli/chmusicpro-cli.py
 
 # Run directly
-./scripts/cli/aiproxy-cli.py login
-./scripts/cli/aiproxy-cli.py upload <project-id> <folder-id> /path
+./scripts/cli/chmusicpro-cli.py login
+./scripts/cli/chmusicpro-cli.py upload <project-id> <folder-id> /path
 ```
 
 **Dependencies:**

@@ -30,9 +30,9 @@ CLEANUP_DANGLING=false
 
 # Images to clean up (both local and registry-tagged)
 IMAGES=(
-    "aiproxysrv-app"
+    "chmusicprosrv-app"
     "celery-worker-app"
-    "aiwebui-app"
+    "chmusicproweb-app"
 )
 
 # Print functions

@@ -30,18 +30,18 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: aiwebui/package-lock.json
+          cache-dependency-path: chmusicproweb/package-lock.json
 
       - name: Install dependencies
-        working-directory: aiwebui
+        working-directory: chmusicproweb
         run: npm ci --prefer-offline --no-audit
 
       - name: Run ESLint
-        working-directory: aiwebui
+        working-directory: chmusicproweb
         run: npm run lint
 
       - name: Run Unit Tests
-        working-directory: aiwebui
+        working-directory: chmusicproweb
         run: npm run test -- --watch=false --browsers=ChromeHeadless
 
   # ─────────────────────────────────────────────────────────
@@ -60,31 +60,31 @@ jobs:
         with:
           python-version: '3.12'
           cache: 'pip'
-          cache-dependency-path: aiproxysrv/pyproject.toml
+          cache-dependency-path: chmusicprosrv/pyproject.toml
 
       - name: Install dependencies
-        working-directory: aiproxysrv
+        working-directory: chmusicprosrv
         run: |
           pip install --upgrade pip
           pip install -e ".[dev,test]"
 
       - name: Run Ruff (Linter)
-        working-directory: aiproxysrv
+        working-directory: chmusicprosrv
         run: ruff check .
 
       - name: Run Ruff (Formatter Check)
-        working-directory: aiproxysrv
+        working-directory: chmusicprosrv
         run: ruff format --check .
 
       - name: Run Unit Tests
-        working-directory: aiproxysrv
+        working-directory: chmusicprosrv
         run: pytest -v
 
   # ─────────────────────────────────────────────────────────
-  # Backend: aiproxysrv-app
+  # Backend: chmusicprosrv-app
   # ─────────────────────────────────────────────────────────
   build-backend:
-    name: Build Backend (aiproxysrv-app)
+    name: Build Backend (chmusicprosrv-app)
     runs-on: ubuntu-latest
     needs: [quality-frontend, quality-backend]
     permissions:
@@ -114,31 +114,31 @@ jobs:
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      - name: Build and push aiproxysrv-app
+      - name: Build and push chmusicprosrv-app
         uses: docker/build-push-action@v5
         with:
-          context: ./aiproxysrv
-          file: ./aiproxysrv/Dockerfile
+          context: ./chmusicprosrv
+          file: ./chmusicprosrv/Dockerfile
           target: app
           platforms: linux/arm64
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/aiproxysrv-app:${{ steps.version.outputs.VERSION }}
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/aiproxysrv-app:latest
-          cache-from: type=gha,scope=aiproxysrv-app
-          cache-to: type=gha,mode=max,scope=aiproxysrv-app
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/chmusicprosrv-app:${{ steps.version.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/chmusicprosrv-app:latest
+          cache-from: type=gha,scope=chmusicprosrv-app
+          cache-to: type=gha,mode=max,scope=chmusicprosrv-app
 
       - name: Build Summary
         run: |
           echo "## Backend Build Successful! :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** \`${{ env.REGISTRY }}/${{ github.repository_owner }}/aiproxysrv-app:${{ steps.version.outputs.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`${{ env.REGISTRY }}/${{ github.repository_owner }}/chmusicprosrv-app:${{ steps.version.outputs.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
 
   # ─────────────────────────────────────────────────────────
-  # Frontend: aiwebui-app
+  # Frontend: chmusicproweb-app
   # ─────────────────────────────────────────────────────────
   build-frontend:
-    name: Build Frontend (aiwebui-app)
+    name: Build Frontend (chmusicproweb-app)
     runs-on: ubuntu-latest
     needs: [quality-frontend, quality-backend]
     permissions:
@@ -168,20 +168,20 @@ jobs:
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      - name: Build and push aiwebui-app
+      - name: Build and push chmusicproweb-app
         uses: docker/build-push-action@v5
         with:
-          context: ./aiwebui
-          file: ./aiwebui/Dockerfile
+          context: ./chmusicproweb
+          file: ./chmusicproweb/Dockerfile
           target: production
           platforms: linux/arm64
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/aiwebui-app:${{ steps.version.outputs.VERSION }}
-            ${{ env.REGISTRY }}/${{ github.repository_owner }}/aiwebui-app:latest
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/chmusicproweb-app:${{ steps.version.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/chmusicproweb-app:latest
 
       - name: Build Summary
         run: |
           echo "## Frontend Build Successful! :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** \`${{ env.REGISTRY }}/${{ github.repository_owner }}/aiwebui-app:${{ steps.version.outputs.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`${{ env.REGISTRY }}/${{ github.repository_owner }}/chmusicproweb-app:${{ steps.version.outputs.VERSION }}\`" >> $GITHUB_STEP_SUMMARY

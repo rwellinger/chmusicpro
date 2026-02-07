@@ -24,8 +24,8 @@ The arc42 documentation includes:
 
 Documentation for individual services and components:
 
-- [**aiproxysrv**](../aiproxysrv/README.md) - Backend API service (FastAPI/Python)
-- [**aiwebui**](../aiwebui/README.md) - Angular 20 frontend application
+- [**chmusicprosrv**](../chmusicprosrv/README.md) - Backend API service (FastAPI/Python)
+- [**chmusicproweb**](../chmusicproweb/README.md) - Angular 20 frontend application
 - [**forwardproxy**](../forwardproxy/README.md) - Nginx reverse proxy configuration
 - [**ollamasrv**](../ollamasrv/README.md) - Ollama LLM backend service
 

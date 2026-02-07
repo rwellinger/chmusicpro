@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Cleanup after failed CI/CD release
-# Resets VERSION files in aiproxysrv and aiwebui to last successfully released version
+# Resets VERSION files in chmusicprosrv and chmusicproweb to last successfully released version
 # Usage: ./cleanup_cifail.sh
 
 set -e
@@ -62,12 +62,12 @@ print_success "Letzte erfolgreiche Version: ${LAST_VERSION}"
 # ──────────────────────────────────────
 # 2. Prüfe ob Änderungen notwendig sind
 # ──────────────────────────────────────
-CURRENT_AIPROXYSRV=$(cat "$PROJECT_DIR/aiproxysrv/VERSION" | tr -d '[:space:]')
-CURRENT_AIWEBUI=$(cat "$PROJECT_DIR/aiwebui/VERSION" | tr -d '[:space:]')
+CURRENT_AIPROXYSRV=$(cat "$PROJECT_DIR/chmusicprosrv/VERSION" | tr -d '[:space:]')
+CURRENT_AIWEBUI=$(cat "$PROJECT_DIR/chmusicproweb/VERSION" | tr -d '[:space:]')
 
 print_info "Aktuelle Versionen:"
-echo "  aiproxysrv/VERSION: ${CURRENT_AIPROXYSRV}"
-echo "  aiwebui/VERSION:    ${CURRENT_AIWEBUI}"
+echo "  chmusicprosrv/VERSION: ${CURRENT_AIPROXYSRV}"
+echo "  chmusicproweb/VERSION:    ${CURRENT_AIWEBUI}"
 
 if [ "$CURRENT_AIPROXYSRV" = "$LAST_VERSION" ] && [ "$CURRENT_AIWEBUI" = "$LAST_VERSION" ]; then
     print_success "VERSION Files sind bereits auf ${LAST_VERSION} - nichts zu tun"
@@ -79,18 +79,18 @@ fi
 # ──────────────────────────────────────
 print_info "Setze VERSION Files auf ${LAST_VERSION} zurück..."
 
-echo "${LAST_VERSION}" > "$PROJECT_DIR/aiproxysrv/VERSION"
-print_success "aiproxysrv/VERSION → ${LAST_VERSION}"
+echo "${LAST_VERSION}" > "$PROJECT_DIR/chmusicprosrv/VERSION"
+print_success "chmusicprosrv/VERSION → ${LAST_VERSION}"
 
-echo "${LAST_VERSION}" > "$PROJECT_DIR/aiwebui/VERSION"
-print_success "aiwebui/VERSION → ${LAST_VERSION}"
+echo "${LAST_VERSION}" > "$PROJECT_DIR/chmusicproweb/VERSION"
+print_success "chmusicproweb/VERSION → ${LAST_VERSION}"
 
 # ──────────────────────────────────────
 # 4. Committe Änderungen
 # ──────────────────────────────────────
 if ! git diff-index --quiet HEAD --; then
     print_info "Committe VERSION Resets..."
-    git add aiproxysrv/VERSION aiwebui/VERSION
+    git add chmusicprosrv/VERSION chmusicproweb/VERSION
     git commit -m "Reset VERSION files after failed release"
     print_success "VERSION Files committed"
 

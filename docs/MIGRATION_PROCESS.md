@@ -36,7 +36,7 @@ db-migration container starts:
   ↓
 Only if db-migration succeeded:
   - celery-worker starts
-  - aiproxysrv starts
+  - chmusicprosrv starts
 ```
 
 **Benefits:**
@@ -52,7 +52,7 @@ Only if db-migration succeeded:
 ### Step 1: Create Migration File
 
 ```bash
-# From aiproxysrv directory
+# From chmusicprosrv directory
 cd src
 alembic revision --autogenerate -m "add_feature_xyz"
 ```
@@ -92,7 +92,7 @@ if not table_exists("new_table"):
 ### Step 3: Test on Development
 
 ```bash
-# From aiproxysrv directory
+# From chmusicprosrv directory
 docker-compose down
 docker-compose up -d
 
@@ -100,7 +100,7 @@ docker-compose up -d
 docker logs db-migration
 
 # Verify schema
-docker exec -it aiproxysrv python scripts/verify_schema.py
+docker exec -it chmusicprosrv python scripts/verify_schema.py
 ```
 
 **Expected output:**
@@ -129,7 +129,7 @@ docker-compose restart db-migration
 docker exec -it db-migration alembic downgrade -1
 
 # Check schema still valid
-docker exec -it aiproxysrv python scripts/verify_schema.py
+docker exec -it chmusicprosrv python scripts/verify_schema.py
 
 # Upgrade again
 docker-compose restart db-migration
@@ -157,7 +157,7 @@ docker-compose restart db-migration
 ssh rob@<production-server>
 
 # Backup database
-cd /path/to/chmusicpro/aiproxysrv
+cd /path/to/chmusicpro/chmusicprosrv
 ./scripts/operation/dbbackup.sh
 
 # Verify backup created
@@ -171,13 +171,13 @@ cd /path/to/chmusicpro
 git pull origin main
 
 # Verify migration files are present
-ls aiproxysrv/src/alembic/versions/
+ls chmusicprosrv/src/alembic/versions/
 ```
 
 **3. Pull Latest Images**
 
 ```bash
-cd aiproxysrv
+cd chmusicprosrv
 docker-compose pull
 ```
 
@@ -185,7 +185,7 @@ docker-compose pull
 
 ```bash
 # Stop services (but keep database running!)
-docker-compose stop aiproxy-app celery-worker
+docker-compose stop chmusicpro-app celery-worker
 
 # Run migration
 docker-compose up -d db-migration
@@ -213,7 +213,7 @@ docker-compose up -d
 docker ps
 
 # Check logs
-docker logs aiproxysrv
+docker logs chmusicprosrv
 docker logs celery-worker
 ```
 
@@ -286,7 +286,7 @@ ERROR: column "xyz" already exists
 
 3. **Re-verify:**
    ```bash
-   docker exec -it aiproxysrv python scripts/verify_schema.py
+   docker exec -it chmusicprosrv python scripts/verify_schema.py
    ```
 
 ### Services Won't Start
@@ -340,10 +340,10 @@ docker-compose up -d --force-recreate
 docker exec -it db-migration alembic downgrade -1
 
 # Verify
-docker exec -it aiproxysrv python scripts/verify_schema.py
+docker exec -it chmusicprosrv python scripts/verify_schema.py
 
 # Restart services
-docker-compose restart aiproxy-app celery-worker
+docker-compose restart chmusicpro-app celery-worker
 ```
 
 ### Manual Rollback (from Backup)
@@ -458,7 +458,7 @@ docker run --rm -it \
   -v $(pwd):/app \
   -v $(pwd)/alembic.ini:/app/alembic.ini:ro \
   --env-file .env \
-  ghcr.io/rwellinger/aiproxysrv-app:v2.4.0 \
+  ghcr.io/rwellinger/chmusicprosrv-app:v2.4.0 \
   /bin/bash
 ```
 

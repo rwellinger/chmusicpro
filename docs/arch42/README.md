@@ -27,7 +27,7 @@
    - [6.5 Text Overlay Workflow](#65-text-overlay-workflow)
    - [6.6 S3 Storage Migration (Hybrid Storage Architecture)](#66-s3-storage-migration-hybrid-storage-architecture)
    - [6.7 Lyric Parsing Rules Engine](#67-lyric-parsing-rules-engine)
-   - [6.8 CLI Tool (aiproxy-cli)](#68-cli-tool-aiproxy-cli)
+   - [6.8 CLI Tool (chmusicpro-cli)](#68-cli-tool-chmusicpro-cli)
    - [6.9 Song Projects (Music Production Project Management)](#69-song-projects-music-production-project-management)
 7. [Deployment View](#7-deployment-view)
    - [7.1 Development Environment](#71-development-environment)
@@ -65,13 +65,13 @@
 
 - [Figure 3.1: Business Context](#31-business-context) - `images/3.1_fachlicher_kontext.png`
 - [Figure 5.1: System Overview](#51-system-overview) - `images/5.1_systemuebersicht.png`
-- [Figure 5.2.1: Angular Project Structure](#521-aiwebui-frontend) - `images/5.2.1_angular_projektstruktur.png`
+- [Figure 5.2.1: Angular Project Structure](#521-chmusicproweb-frontend) - `images/5.2.1_angular_projektstruktur.png`
 - [Figure 6.1: Image Generation (Synchronous)](#61-image-generation-synchronous) - `images/6.1_bildgenerierung.png`
 - [Figure 6.2: Music Generation (Asynchronous)](#62-music-generation-asynchronous) - `images/6.2_musikgenerierung.png`
 - [Figure 6.3: AI Chat Conversation (Persistent)](#63-ai-chat-conversation-persistent) - `images/6.3_ai_chat_workflow.png`
 - [Figure 6.6.1: Storage Migration Architecture](#66-s3-storage-migration-hybrid-storage-architecture) - `images/6.7_storage_migration.png`
 - [Figure 6.6.2: S3 Migration Workflow](#66-s3-storage-migration-hybrid-storage-architecture) - `images/6.8_s3_migration_workflow.png`
-- [Figure 6.8: CLI Tool Workflow](#68-cli-tool-aiproxy-cli) - Command-line interaction diagrams
+- [Figure 6.8: CLI Tool Workflow](#68-cli-tool-chmusicpro-cli) - Command-line interaction diagrams
 - [Figure 7.3: Network Architecture](#73-network-architecture) - `images/7.3_netzwerk_architektur.png`
 - [Figure 10.1: Development Deployment](#101-development-deployment) - `images/9.1_entwicklungs_deployment.png`
 - [Figure 10.2: Production Deployment](#102-production-deployment) - `images/9.2_produktions_deployment.png`
@@ -162,7 +162,7 @@ The Mac AI Service System is a personal AI-based multimedia generation platform 
 ### 2.2 Organizational Constraints
 - Personal project (no team development)
 - **Repository Separation**: Two separate Git repositories for DEV and PROD environments
-  - **aiproxy/** - Development repository (source code, CI/CD, builds)
+  - **chmusicpro/** - Development repository (source code, CI/CD, builds)
   - **Separate production repository** - Production repository (deployment configs, secrets, data volumes)
 - Development and production environments separated
 - .env files not in Git (API keys, passwords)
@@ -287,7 +287,7 @@ ApiCostService (src/db/api_cost_service.py)
 
 ### 5.2 Component Details
 
-#### 5.2.1 aiwebui (Frontend)
+#### 5.2.1 chmusicproweb (Frontend)
 
 <img src="images/5.2.1_angular_projektstruktur.png" alt="Angular Project Structure" style="zoom: 67%;" />
 
@@ -336,7 +336,7 @@ ApiCostService (src/db/api_cost_service.py)
 - **Services**: API integration, configuration, prompt management, notifications
 - **Shared Components**: Header, footer, detail panels, audio player, progress overlay
 - **Dependencies**: Angular Material, RxJS, ngx-cookie-service, compromise, ngx-translate
-- **Build**: `npm run build:prod` → Deployment to `forwardproxy/html/aiwebui`
+- **Build**: `npm run build:prod` → Deployment to `forwardproxy/html/chmusicproweb`
 
 ##### 5.2.1.1 Internationalization (i18n)
 
@@ -439,7 +439,7 @@ src/assets/i18n/
 **Language Switching**:
 Users can change the language in **User Profile → Settings → Language**. The selection is persisted in `UserSettings` and automatically applied on app startup.
 
-#### 5.2.2 aiproxysrv (Backend API)
+#### 5.2.2 chmusicprosrv (Backend API)
 - **Technology**: Python 3.12.12 + FastAPI + SQLAlchemy + Pydantic
 - **Struktur**:
   ```
@@ -520,7 +520,7 @@ Users can change the language in **User Profile → Settings → Language**. The
   - HTTPS termination (TLS 1.3)
   - Rate limiting (5req/s)
   - Static file serving
-  - API proxy to aiproxysrv:5050
+  - API proxy to chmusicprosrv:5050
 
 ---
 
@@ -725,7 +725,7 @@ Edit Individual Sections → [AI Tools] → Improve/Rewrite/Extend →
     - `bottom-left` (0.1, 0.9), `bottom-center` (0.5, 0.9), `bottom-right` (0.9, 0.9)
   - **Custom Positions**: Percentage-based (0.0-1.0 range), converted to pixels
 
-- **Font Files** (stored in `aiproxysrv/fonts/`):
+- **Font Files** (stored in `chmusicprosrv/fonts/`):
   - `Anton-Regular.ttf` - Heavy display font (bold style)
   - `PlayfairDisplay-Regular.ttf` - Elegant serif font
   - `Roboto-Light.ttf` - Thin sans-serif font
@@ -898,11 +898,11 @@ elif image.file_path:
 ```
 
 **Related Files:**
-- `aiproxysrv/src/infrastructure/storage/storage_interface.py` - Abstract interface
-- `aiproxysrv/src/infrastructure/storage/s3_storage.py` - S3 implementation
-- `aiproxysrv/src/business/image_orchestrator.py` - Image operations with dual backend
-- `aiproxysrv/src/business/song_project_orchestrator.py` - Song project file management
-- `aiproxysrv/src/alembic/versions/281d8c3887b4_*.py` - Database migration
+- `chmusicprosrv/src/infrastructure/storage/storage_interface.py` - Abstract interface
+- `chmusicprosrv/src/infrastructure/storage/s3_storage.py` - S3 implementation
+- `chmusicprosrv/src/business/image_orchestrator.py` - Image operations with dual backend
+- `chmusicprosrv/src/business/song_project_orchestrator.py` - Song project file management
+- `chmusicprosrv/src/alembic/versions/281d8c3887b4_*.py` - Database migration
 
 ---
 
@@ -998,18 +998,18 @@ The fundamental difference is that **RegEx patterns have an interpreter (the Reg
 8. Applies: `lyrics.replace(/,/g, ",\n")` ✅ Works!
 
 **Files Changed:**
-- `aiproxysrv/src/api/controllers/lyric_parsing_rule_controller.py` - Encode/decode logic
-- `aiproxysrv/scripts/seed_lyric_parsing_rules.py` - Base64-encoded seeds
-- `aiproxysrv/src/alembic/versions/234ea0f4b6c3_*.py` - Migration
-- `aiwebui/src/app/pages/lyric-creation/lyric-creation.component.ts` - Removed hardcoded escapes (4 locations)
+- `chmusicprosrv/src/api/controllers/lyric_parsing_rule_controller.py` - Encode/decode logic
+- `chmusicprosrv/scripts/seed_lyric_parsing_rules.py` - Base64-encoded seeds
+- `chmusicprosrv/src/alembic/versions/234ea0f4b6c3_*.py` - Migration
+- `chmusicproweb/src/app/pages/lyric-creation/lyric-creation.component.ts` - Removed hardcoded escapes (4 locations)
 
 ---
 
-### 6.8 CLI Tool (aiproxy-cli)
+### 6.8 CLI Tool (chmusicpro-cli)
 
 **Overview**: Command-line tool for managing song projects, batch uploading/downloading files, and one-way syncing with the backend. Built with Python Click framework for local file operations with S3-backed remote storage.
 
-**Location:** `scripts/cli/aiproxy-cli.py` (1,177 lines)
+**Location:** `scripts/cli/chmusicpro-cli.py` (1,177 lines)
 
 **Key Components:**
 
@@ -1018,18 +1018,18 @@ The fundamental difference is that **RegEx patterns have an interpreter (the Reg
    - **HTTP Client:** requests 2.31.0+ with SSL self-signed certificate support
    - **Terminal UI:** rich 13.7.0+ for progress bars, color output, and formatting
    - **Hashing:** hashlib (SHA256) for file comparison in mirror operations
-   - **Configuration:** JSON-based config in `~/.aiproxy/config.json` (0600 permissions)
+   - **Configuration:** JSON-based config in `~/.chmusicpro/config.json` (0600 permissions)
 
 2. **Authentication System**
    - JWT token-based authentication via `/api/v1/user/login`
-   - Token storage: `~/.aiproxy/config.json` with strict file permissions (0600)
+   - Token storage: `~/.chmusicpro/config.json` with strict file permissions (0600)
    - Token expiry tracking (ISO 8601 or RFC 2822 format)
    - Pre-flight token validation before all commands (except `login`)
    - SSL verification configurable (disabled for self-signed certs in dev)
 
 3. **Ignore Pattern Engine**
-   - Global ignore file: `~/.aiproxy/.aiproxyignore`
-   - Local ignore file: `{upload_dir}/.aiproxyignore` (higher priority)
+   - Global ignore file: `~/.chmusicpro/.chmusicproignore`
+   - Local ignore file: `{upload_dir}/.chmusicproignore` (higher priority)
    - Gitignore-compatible syntax (wildcards, directory patterns, exact matches)
    - Patterns applied recursively during directory scans
 
@@ -1043,13 +1043,13 @@ The fundamental difference is that **RegEx patterns have an interpreter (the Reg
 1. User provides email + password (interactive input)
 2. POST credentials to backend API
 3. Receive JWT token + expiry timestamp
-4. Store in `~/.aiproxy/config.json` with 0600 permissions
+4. Store in `~/.chmusicpro/config.json` with 0600 permissions
 5. Future commands use token via `Authorization: Bearer {jwt_token}` header
 
 **Configuration Structure:**
 ```json
 {
-  "api_url": "https://macstudio/aiproxysrv",
+  "api_url": "https://macstudio/musicproapi",
   "jwt_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "email": "user@example.com",
   "expires_at": "2024-11-03T10:30:00Z",
@@ -1069,7 +1069,7 @@ The fundamental difference is that **RegEx patterns have an interpreter (the Reg
 
 **Workflow:**
 1. **Directory Scan:** Recursively collect all files from `LOCAL_PATH`
-2. **Ignore Filter:** Apply `.aiproxyignore` patterns (global + local merge)
+2. **Ignore Filter:** Apply `.chmusicproignore` patterns (global + local merge)
 3. **Batch Grouping:** Group files into batches of 3 (conservative: 3 × 150MB = 450MB < 500MB Nginx limit)
 4. **Upload:** For each batch:
    - Open files as `multipart/form-data`
@@ -1157,7 +1157,7 @@ The fundamental difference is that **RegEx patterns have an interpreter (the Reg
 **Phase 1: Local Analysis**
 1. Scan directory recursively
 2. Calculate SHA256 hash for each file
-3. Apply `.aiproxyignore` patterns
+3. Apply `.chmusicproignore` patterns
 4. Collect file metadata: `{path: str, hash: str, size: int}`
 
 **Phase 2: Remote Comparison**
@@ -1201,10 +1201,10 @@ Files to DELETE:
 **Use Case:**
 ```bash
 # Workflow: Local editing with periodic sync
-aiproxy-cli clone proj-id ~/Projects/ -d           # Initial clone
+chmusicpro-cli clone proj-id ~/Projects/ -d           # Initial clone
 # [work locally, edit stems, add effects, export]
-aiproxy-cli mirror proj-id 01-arrangement ~/Projects/"My Song"/01-arrangement --dry-run  # Preview
-aiproxy-cli mirror proj-id 01-arrangement ~/Projects/"My Song"/01-arrangement --yes      # Sync
+chmusicpro-cli mirror proj-id 01-arrangement ~/Projects/"My Song"/01-arrangement --dry-run  # Preview
+chmusicpro-cli mirror proj-id 01-arrangement ~/Projects/"My Song"/01-arrangement --yes      # Sync
 ```
 
 **Technical Details:**
@@ -1248,7 +1248,7 @@ files = [
 |------|-----------|
 | JWT Token Plaintext | File permissions: 0600 (owner-only) |
 | Token on Shared System | Documentation warning: NOT for multi-user systems |
-| Token in Cloud Sync | Documentation warning: Exclude `~/.aiproxy/` from Dropbox/iCloud |
+| Token in Cloud Sync | Documentation warning: Exclude `~/.chmusicpro/` from Dropbox/iCloud |
 | SSL Man-in-the-Middle | SSL verification configurable (dev: disabled, prod: enabled) |
 | Token Expiry | 24h TTL, automatic expiry check before commands |
 
@@ -1264,8 +1264,8 @@ make install-cli-prod         # CLI + PROD config (macstudio)
 **Manual:**
 ```bash
 mkdir -p ~/bin
-cp scripts/cli/aiproxy-cli.py ~/bin/aiproxy-cli
-chmod +x ~/bin/aiproxy-cli
+cp scripts/cli/chmusicpro-cli.py ~/bin/chmusicpro-cli
+chmod +x ~/bin/chmusicpro-cli
 pip install -r scripts/cli/requirements.txt
 
 # Add to PATH (in ~/.zshrc or ~/.bashrc)
@@ -1273,11 +1273,11 @@ export PATH="$HOME/bin:$PATH"
 ```
 
 **Configuration Files:**
-- CLI script: `scripts/cli/aiproxy-cli.py` (1,177 lines)
+- CLI script: `scripts/cli/chmusicpro-cli.py` (1,177 lines)
 - User docs: `scripts/cli/README.md`
 - Dependencies: `scripts/cli/requirements.txt`
-- Default ignores: `scripts/cli/.aiproxyignore.default`
-- Runtime config: `~/.aiproxy/config.json` (created on first login)
+- Default ignores: `scripts/cli/.chmusicproignore.default`
+- Runtime config: `~/.chmusicpro/config.json` (created on first login)
 
 **Related Database Tables:**
 - `project_files` - File metadata (path, size, hash, S3 key)
@@ -1288,7 +1288,7 @@ export PATH="$HOME/bin:$PATH"
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│         aiproxy-cli (Python Click CLI)              │
+│         chmusicpro-cli (Python Click CLI)              │
 ├─────────────────────────────────────────────────────┤
 │  Commands:                                          │
 │  ├── login    → JWT Auth                            │
@@ -1299,9 +1299,9 @@ export PATH="$HOME/bin:$PATH"
 │                                                     │
 ├─────────────────────────────────────────────────────┤
 │              Config Management                      │
-│  - ~/.aiproxy/config.json (0600)                   │
+│  - ~/.chmusicpro/config.json (0600)                   │
 │  - Token Expiry Check                              │
-│  - .aiproxyignore Pattern Loading                  │
+│  - .chmusicproignore Pattern Loading                  │
 │                                                     │
 ├─────────────────────────────────────────────────────┤
 │            HTTP Client (requests)                   │
@@ -1311,7 +1311,7 @@ export PATH="$HOME/bin:$PATH"
 │  - Stream Download (8KB Chunks)                    │
 │                                                     │
 ├─────────────────────────────────────────────────────┤
-│     Backend API (aiproxysrv)                       │
+│     Backend API (chmusicprosrv)                       │
 │  - /api/v1/user/login                              │
 │  - /api/v1/song-projects/{id}/folders/{id}/       │
 │    - batch-upload (POST)                           │
@@ -1584,18 +1584,18 @@ syncing → Active sync operation in progress
 
 #### 6.9.6 Frontend Implementation
 
-**Page Component:** `aiwebui/src/app/pages/song-projects/song-projects.component.ts`
+**Page Component:** `chmusicproweb/src/app/pages/song-projects/song-projects.component.ts`
 
 **Layout:** Master-Detail Pattern (similar to Equipment Gallery)
 - **Master Panel** (left): List of projects with search, filter, pagination
 - **Detail Panel** (right): Project details with folder structure, files, assigned assets
 
-**Service:** `aiwebui/src/app/services/business/song-project.service.ts`
+**Service:** `chmusicproweb/src/app/services/business/song-project.service.ts`
 - CRUD operations via ApiConfigService
 - File upload with progress tracking
 - Pre-signed URL download handling
 
-**Models:** `aiwebui/src/app/models/song-project.model.ts`
+**Models:** `chmusicproweb/src/app/models/song-project.model.ts`
 - `SongProject`, `ProjectFolder`, `ProjectFile`
 - `ProjectFolderWithAssets`, `SongProjectDetail`
 - Enums: `SyncStatus`, `StorageBackend`, `StorageProvider`
@@ -1620,7 +1620,7 @@ Frontend: Shows song in project folder's assigned_songs list
 
 **Step 3: Clone Project via CLI**
 ```bash
-aiproxy-cli clone proj-id ~/Music/Projects/ -d
+chmusicpro-cli clone proj-id ~/Music/Projects/ -d
 # → Creates ~/Music/Projects/My Rock Song/
 # → Downloads all files with full directory structure
 ```
@@ -1634,12 +1634,12 @@ Local: ~/Music/Projects/My Rock Song/02 Mixing/mixdown_v3.wav
 
 **Step 5: Mirror Sync via CLI**
 ```bash
-aiproxy-cli mirror proj-id 02-mixing ~/Music/Projects/"My Rock Song"/02 Mixing/ --dry-run
+chmusicpro-cli mirror proj-id 02-mixing ~/Music/Projects/"My Rock Song"/02 Mixing/ --dry-run
 # Output:
 # ⬆️  Upload: 1 file (new): mixdown_v3.wav
 # ✅ Unchanged: 0 files
 
-aiproxy-cli mirror proj-id 02-mixing ~/Music/Projects/"My Rock Song"/02 Mixing/ --yes
+chmusicpro-cli mirror proj-id 02-mixing ~/Music/Projects/"My Rock Song"/02 Mixing/ --yes
 # Uploads mixdown_v3.wav to S3
 # Creates ProjectFile record
 # Updates project stats
@@ -1682,10 +1682,10 @@ ProjectFile Upload Flow:
 
 ```
 CLI Commands → Backend API → S3 Storage
-  ├─ aiproxy-cli upload   → POST /batch-upload → S3
-  ├─ aiproxy-cli download → GET /files → S3 pre-signed URL
-  ├─ aiproxy-cli clone    → GET /files/all → S3 batch download
-  └─ aiproxy-cli mirror   → POST /mirror → Compare → Upload/Delete
+  ├─ chmusicpro-cli upload   → POST /batch-upload → S3
+  ├─ chmusicpro-cli download → GET /files → S3 pre-signed URL
+  ├─ chmusicpro-cli clone    → GET /files/all → S3 batch download
+  └─ chmusicpro-cli mirror   → POST /mirror → Compare → Upload/Delete
 ```
 
 #### 6.9.9 Storage Providers
@@ -1771,10 +1771,10 @@ Production Server (Apple Silicon recommended)
 │   ├── Redis (Container: redis)
 │   ├── Celery Worker (Container: celery-worker)
 │   │   └── Image: ghcr.io/<your-registry>/celery-worker-app:latest
-│   ├── API Server (Container: aiproxysrv)
-│   │   └── Image: ghcr.io/<your-registry>/aiproxysrv-app:latest
+│   ├── API Server (Container: chmusicprosrv)
+│   │   └── Image: ghcr.io/<your-registry>/chmusicprosrv-app:latest
 │   └── Nginx Proxy (Container: forward-proxy)
-│       └── Image: ghcr.io/<your-registry>/aiwebui-app:latest
+│       └── Image: ghcr.io/<your-registry>/chmusicproweb-app:latest
 ├── Native Services
 │   └── Ollama (Port 11434) - LLM backend for chat conversations
 └── Storage
@@ -1877,11 +1877,11 @@ Implement mandatory `ApiConfigService` for all HTTP calls:
 1. **All API endpoints MUST use ApiConfigService**
    - **NEVER** hardcode URLs in Services (no `baseUrl`, no IPs)
    - **NEVER** use `environment.apiUrl` directly in Services
-   - **ALL** endpoints defined in `aiwebui/src/app/services/config/api-config.service.ts`
+   - **ALL** endpoints defined in `chmusicproweb/src/app/services/config/api-config.service.ts`
    - Services inject `ApiConfigService` and use `this.apiConfig.endpoints.*`
 
-2. **External APIs ONLY via aiproxysrv Proxy**
-   - **ALL** external calls (OpenAI, Ollama) **MUST** go through aiproxysrv
+2. **External APIs ONLY via chmusicprosrv Proxy**
+   - **ALL** external calls (OpenAI, Ollama) **MUST** go through chmusicprosrv
    - **NEVER** call external APIs directly from Angular (Browser ≠ HTTPS/CORS)
    - **Why?** HTTPS/CORS handling, API Keys in Backend (not Browser), Centralized control
 
@@ -1924,7 +1924,7 @@ def get_user_profile():
 
 **Consequences:**
 - ✅ All new services MUST inject `ApiConfigService`
-- ✅ All external API calls go through aiproxysrv
+- ✅ All external API calls go through chmusicprosrv
 - ✅ All backend endpoints (except auth) require JWT
 - ❌ NO direct Ollama/OpenAI calls from frontend
 
@@ -2025,8 +2025,8 @@ async wrongImplementation(input: string): Promise<string> {
 - ❌ Templates must exist in DB before use (seed scripts required)
 
 **Related:**
-- Reference implementation: `aiwebui/src/app/services/config/chat.service.ts`
-- Backend endpoint: `aiproxysrv/src/api/routes/chat_routes.py`
+- Reference implementation: `chmusicproweb/src/app/services/config/chat.service.ts`
+- Backend endpoint: `chmusicprosrv/src/api/routes/chat_routes.py`
 - External API docs: https://github.com/ollama/ollama/blob/main/docs/api.md
 
 ---
@@ -2057,7 +2057,7 @@ All buttons MUST use mixins from `src/scss/_mixins.scss`:
 ```
 
 **Reference Implementation:**
-**Equipment Gallery** (`aiwebui/src/app/pages/equipment-gallery/`) is the **current reference** for:
+**Equipment Gallery** (`chmusicproweb/src/app/pages/equipment-gallery/`) is the **current reference** for:
 - ✅ Master-Detail Layout
 - ✅ Button Standards (with mixins)
 - ✅ Detail Actions Pattern
@@ -2159,7 +2159,7 @@ logger.info("Processing", task_id=task_id)  # TypeError!
 
 **Mandatory Workflow:**
 ```bash
-# From aiwebui/ directory
+# From chmusicproweb/ directory
 npm run build && npm run lint:all  # TypeScript + SCSS + Architecture
 ```
 
@@ -2204,12 +2204,12 @@ Implement automated architecture linters that enforce layer separation and depen
 
 **Run validation:**
 ```bash
-# From aiproxysrv/ directory
+# From chmusicprosrv/ directory
 lint-imports                    # Quick check
 make lint-all                   # Ruff + import-linter + Conda check
 ```
 
-**Configuration:** `aiproxysrv/.importlinter`
+**Configuration:** `chmusicprosrv/.importlinter`
 
 **Common violations:**
 ```bash
@@ -2231,12 +2231,12 @@ src.api.controllers.foo_controller -> src.business.foo_orchestrator -> src.db.ba
 
 **Run validation:**
 ```bash
-# From aiwebui/ directory
+# From chmusicproweb/ directory
 npm run lint:arch               # Architecture only
 npm run lint:all                # TypeScript + SCSS + Architecture
 ```
 
-**Configuration:** `aiwebui/.dependency-cruiser.js`
+**Configuration:** `chmusicproweb/.dependency-cruiser.js`
 
 **Common violations:**
 ```bash
@@ -2317,8 +2317,8 @@ services:
       - DATABASE_URL
       - REDIS_URL
 
-  aiproxy-app:
-    image: ghcr.io/rwellinger/aiproxysrv-app:latest  # Pre-built from GitHub Actions
+  chmusicpro-app:
+    image: ghcr.io/rwellinger/chmusicprosrv-app:latest  # Pre-built from GitHub Actions
     ports: ["5050:8000"]
     depends_on: [postgres, celery-worker]
     volumes: [images-data:/images]
@@ -2328,7 +2328,7 @@ services:
       - OPENAI_API_KEY
 
   nginx:
-    image: ghcr.io/rwellinger/aiwebui-app:latest  # Pre-built Angular app with Nginx
+    image: ghcr.io/rwellinger/chmusicproweb-app:latest  # Pre-built Angular app with Nginx
     ports: ["80:80", "443:443"]
     volumes:
       - ./certs:/etc/nginx/certs:ro
@@ -2446,13 +2446,13 @@ services:
 | **Hybrid Storage** | Dual backend system supporting both filesystem and S3 during migration          |
 | **Storage Interface** | Abstract base class for pluggable storage backends (filesystem, S3)            |
 | **Boto3** | AWS SDK for Python, used for S3-compatible storage operations                  |
-| **aiproxy-cli** | Command-line tool for song project file management (upload, download, clone, mirror) |
-| **CLI Login** | JWT-based authentication command storing token in `~/.aiproxy/config.json`      |
+| **chmusicpro-cli** | Command-line tool for song project file management (upload, download, clone, mirror) |
+| **CLI Login** | JWT-based authentication command storing token in `~/.chmusicpro/config.json`      |
 | **Batch Upload** | CLI upload strategy grouping 3 files/batch (450MB) to comply with Nginx 500MB limit |
 | **Mirror Command** | One-way sync (local → remote) with SHA256 hash-based comparison and destructive delete |
 | **Clone Command** | Complete project download preserving full S3 directory structure (1:1 replication) |
-| **.aiproxyignore** | Gitignore-style pattern file for excluding files from CLI upload operations      |
-| **Click Framework** | Python CLI framework (8.1.0+) used for aiproxy-cli command-line interface       |
+| **.chmusicproignore** | Gitignore-style pattern file for excluding files from CLI upload operations      |
+| **Click Framework** | Python CLI framework (8.1.0+) used for chmusicpro-cli command-line interface       |
 | **Rich Library** | Python terminal UI library (13.7.0+) providing progress bars and color formatting |
 | **SHA256 Hash** | File content hashing algorithm used by mirror command for change detection       |
 | **Dry-Run Mode** | CLI mirror preview mode showing changes without executing upload/delete operations |

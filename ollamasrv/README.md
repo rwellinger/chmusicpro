@@ -27,7 +27,7 @@ This setup provides:
 ┌─────────────────────────────────────┐
 │    Swiss Music Production (Angular) │
 │  Chat UI @ /ai-chat                 │
-│  via aiproxysrv proxy               │
+│  via chmusicprosrv proxy               │
 └─────────────────────────────────────┘
 ```
 
@@ -174,7 +174,7 @@ The chat interface is integrated into Swiss Music Production Angular frontend.
 
 **Access Chat**:
 - Navigate to `/ai-chat` in Swiss Music Production
-- Chat UI connects to Ollama via aiproxysrv proxy
+- Chat UI connects to Ollama via chmusicprosrv proxy
 - Full conversation management with persistent history
 - Multi-model support (llama3.2:3b, gpt-oss:20b, etc.)
 
@@ -366,11 +366,11 @@ export OLLAMA_HOST=0.0.0.0:11435
 # Verify Ollama is accessible
 curl http://localhost:11434/api/tags
 
-# Test via aiproxysrv proxy
+# Test via chmusicprosrv proxy
 curl http://localhost:5050/api/v1/ollama/models
 
-# Check aiproxysrv logs
-docker compose logs -f aiproxysrv
+# Check chmusicprosrv logs
+docker compose logs -f chmusicprosrv
 
 # Verify OLLAMA_API_BASE_URL in .env
 # Should be: http://localhost:11434 (or production server IP for prod)
@@ -411,11 +411,11 @@ tar -czf ollama-models-backup.tar.gz ~/.ollama/models
 tar -xzf ollama-models-backup.tar.gz -C ~/
 ```
 
-## Integration with aiproxysrv
+## Integration with chmusicprosrv
 
-The aiproxysrv backend proxies chat requests to Ollama.
+The chmusicprosrv backend proxies chat requests to Ollama.
 
-**Configuration** (`aiproxysrv/.env`):
+**Configuration** (`chmusicprosrv/.env`):
 
 ```bash
 OLLAMA_API_BASE_URL=http://localhost:11434
@@ -425,7 +425,7 @@ OLLAMA_MODEL=gpt-oss:20b
 **API Endpoint**:
 
 ```bash
-# Via aiproxysrv
+# Via chmusicprosrv
 curl http://localhost:5050/api/v1/ollama/chat -d '{
   "message": "Hello, how are you?",
   "model": "gpt-oss:20b"
@@ -473,11 +473,11 @@ ollama --version
 Chat UI is part of the Angular frontend. Update via:
 
 ```bash
-cd aiwebui
+cd chmusicproweb
 npm run build:prod
 
 # Or pull latest Docker image
-docker pull ghcr.io/rwellinger/aiwebui-app:latest
+docker pull ghcr.io/rwellinger/chmusicproweb-app:latest
 ```
 
 ## Best Practices
@@ -502,10 +502,10 @@ docker pull ghcr.io/rwellinger/aiwebui-app:latest
 ## Related Documentation
 
 - **Ollama GitHub**: https://github.com/ollama/ollama
-- **Swiss Music Production**: `../aiwebui/README.md`
-- **Backend Integration**: `../aiproxysrv/README.md`
+- **Swiss Music Production**: `../chmusicproweb/README.md`
+- **Backend Integration**: `../chmusicprosrv/README.md`
 - **Model Library**: https://ollama.ai/library
-- **Chat UI Component**: `../aiwebui/src/app/pages/ai-chat/`
+- **Chat UI Component**: `../chmusicproweb/src/app/pages/ai-chat/`
 
 ## Quick Reference
 
@@ -527,5 +527,5 @@ ollama run gpt-oss:20b "Hello!"
 
 # Access Chat UI
 # Navigate to Swiss Music Production at /ai-chat
-# Chat connects via aiproxysrv proxy to Ollama
+# Chat connects via chmusicprosrv proxy to Ollama
 ```
