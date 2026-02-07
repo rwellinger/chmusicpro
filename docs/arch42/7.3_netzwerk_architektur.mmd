@@ -22,7 +22,7 @@ graph TB
     end
 
     CLIENT -->|HTTPS| NGINX
-    NGINX -->|/aiwebui/<br/>incl. /ai-chat| NGINX
+    NGINX -->|/chmusicproweb/<br/>incl. /ai-chat| NGINX
     NGINX -->|/ MinIO Console| MINIO
     NGINX -->|/api/v1/image/| API
     NGINX -->|/api/v1/song/| API

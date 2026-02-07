@@ -18,10 +18,6 @@ chmusicprosrv/alembic.ini.docker
 ollamasrv/backup
 ollamasrv/data
 ollamasrv/docker_images
-forwardproxy/nginx/.htpasswd
-forwardproxy/certs/*
-forwardproxy/logs
-forwardproxy/html/chmusicproweb
 appendonlydir
 dump.rdb
 *.egg-info
@@ -44,3 +40,4 @@ dump.rdb
 /test_song_prj/
 /chmusicprosrv/.coverage
 /docs/gotobusiness.md
+/forwardproxy/

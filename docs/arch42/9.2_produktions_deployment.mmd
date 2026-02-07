@@ -1,10 +1,10 @@
 graph TB
     subgraph "Production Server (Apple Silicon)"
         subgraph "Docker Network: webui-network"
-            NGINX[Nginx Forward Proxy<br/>forward-proxy<br/>:80,:443<br/>Image: GHCR aiwebui-app]
+            NGINX[Nginx Forward Proxy<br/>forward-proxy<br/>:80,:443<br/>Image: GHCR chmusicproweb-app]
 
             subgraph "API Stack"
-                API_CONTAINER[AI Proxy Server<br/>aiproxysrv<br/>:5050<br/>Image: GHCR aiproxysrv-app]
+                API_CONTAINER[AI Proxy Server<br/>chmusicprosrv<br/>:5050<br/>Image: GHCR chmusicprosrv-app]
                 WORKER_CONTAINER[Celery Worker<br/>celery-worker<br/>Image: GHCR celery-worker-app<br/>Health Check]
             end
 
@@ -25,7 +25,7 @@ graph TB
         end
 
         subgraph "Static Files"
-            STATIC[/usr/share/nginx/html/<br/>aiwebui/]
+            STATIC[/usr/share/nginx/html/<br/>chmusicproweb/]
         end
     end
 

@@ -20,7 +20,7 @@ def check_storage():
     Check S3 storage backend health (MinIO/AWS S3)
 
     Quick health check with 2s timeout to detect if storage backend is reachable.
-    Used by CLI tools (aiproxy-cli) before upload/mirror operations to fail-fast
+    Used by CLI tools (chmusicpro-cli) before upload/mirror operations to fail-fast
     instead of waiting for long timeouts.
 
     Response:
@@ -32,7 +32,7 @@ def check_storage():
         Headers: Authorization: Bearer <JWT_TOKEN>
 
     CLI Usage:
-        aiproxy-cli checks this endpoint before upload/mirror to prevent:
+        chmusicpro-cli checks this endpoint before upload/mirror to prevent:
         - Long timeout waits (600s per batch)
         - User confusion (seeing "success" but nothing uploaded)
         - Inconsistent state (DB records without S3 files)

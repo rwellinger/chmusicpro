@@ -46,7 +46,7 @@ The production deployment consists of three service stacks distributed across tw
 │  │ Backend Stack                                                         │   │
 │  │ - Redis (cache & broker)                                             │   │
 │  │ - Celery Worker (async tasks)                                        │   │
-│  │ - aiproxysrv (FastAPI on :5050)                                      │   │
+│  │ - chmusicprosrv (FastAPI on :5050)                                    │   │
 │  └──────────────────────────────────────────────────────────────────────┘   │
 │                                    ↑                                         │
 │                                    │                                         │
@@ -82,9 +82,9 @@ git tag v1.0.0
 git push origin v1.0.0
 
 # Images will be available at:
-# ghcr.io/<your-username>/aiproxysrv-app:v1.0.0
+# ghcr.io/<your-username>/chmusicprosrv-app:v1.0.0
 # ghcr.io/<your-username>/celery-worker-app:v1.0.0
-# ghcr.io/<your-username>/aiwebui-app:v1.0.0
+# ghcr.io/<your-username>/chmusicproweb-app:v1.0.0
 ```
 
 See [docs/CI_CD.md](CI_CD.md) for details on the build pipeline.
@@ -95,13 +95,13 @@ Build images directly on your deployment server:
 
 ```bash
 # Backend (FastAPI + Celery)
-cd aiproxysrv
-docker build -t aiproxysrv-app:latest .
+cd chmusicprosrv
+docker build -t chmusicprosrv-app:latest .
 docker build -t celery-worker-app:latest .  # Same image, different entrypoint
 
 # Frontend (Angular)
-cd aiwebui
-docker build -t aiwebui-app:latest .
+cd chmusicproweb
+docker build -t chmusicproweb-app:latest .
 ```
 
 When building locally, update the `docker-compose.yml` files to use local image names instead of GHCR paths.
@@ -150,7 +150,7 @@ All backend services connect to this network for inter-container communication.
 ┌─────────────────────────────────────────────────────────────────┐
 │ App Server (Docker: thwelly-net)                                │
 │                                                                 │
-│   Nginx ─────► aiproxysrv ─────► Redis                         │
+│   Nginx ─────► chmusicprosrv ─────► Redis                      │
 │    :443         :5050              :6379                        │
 │                   │                  │                          │
 │                   │                  ▼                          │
@@ -191,20 +191,20 @@ Located on the Application Server, handles API and async processing.
 - **Redis** - Cache and Celery message broker
 - **db-migration** - One-shot container for Alembic migrations
 - **Celery Worker** - Async task processing (music generation, etc.)
-- **aiproxysrv** - FastAPI backend application
+- **chmusicprosrv** - FastAPI backend application
 
 **Startup Order:**
 1. Redis (health check: ping)
 2. db-migration (runs Alembic upgrade, exits)
 3. Celery Worker (depends on Redis + migration)
-4. aiproxysrv (depends on migration + Celery)
+4. chmusicprosrv (depends on migration + Celery)
 
 ### Stack 3: Proxy Stack
 
 Located on the Application Server, handles HTTPS termination and serves the frontend.
 
 **Services:**
-- **aiwebui-init** - One-shot container to copy Angular build to volume
+- **chmusicproweb-init** - One-shot container to copy Angular build to volume
 - **Nginx** - Reverse proxy with SSL/TLS termination
 
 **Features:**
@@ -259,7 +259,7 @@ services:
       retries: 3
 ```
 
-### Backend Stack (`aiproxysrv/docker-compose.yml`)
+### Backend Stack (`chmusicprosrv/docker-compose.yml`)
 
 ```yaml
 networks:
@@ -282,7 +282,7 @@ services:
       retries: 3
 
   db-migration:
-    image: ghcr.io/<your-username>/aiproxysrv-app:<version>
+    image: ghcr.io/<your-username>/chmusicprosrv-app:<version>
     container_name: db-migration
     networks:
       - thwelly-net
@@ -311,9 +311,9 @@ services:
       retries: 3
       start_period: 30s
 
-  aiproxysrv-app:
-    image: ghcr.io/<your-username>/aiproxysrv-app:<version>
-    container_name: aiproxysrv-app
+  chmusicprosrv-app:
+    image: ghcr.io/<your-username>/chmusicprosrv-app:<version>
+    container_name: chmusicprosrv-app
     networks:
       - thwelly-net
     ports:
@@ -345,9 +345,9 @@ networks:
     external: true
 
 services:
-  aiwebui-init:
-    image: ghcr.io/<your-username>/aiwebui-app:<version>
-    container_name: aiwebui-init
+  chmusicproweb-init:
+    image: ghcr.io/<your-username>/chmusicproweb-app:<version>
+    container_name: chmusicproweb-init
     volumes:
       - webui-content:/app/dist
     command: ["sh", "-c", "cp -r /app/browser/* /app/dist/ && echo 'UI copied'"]
@@ -363,11 +363,11 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./certs:/etc/nginx/certs:ro
-      - webui-content:/usr/share/nginx/html/aiwebui:ro
+      - webui-content:/usr/share/nginx/html/chmusicproweb:ro
       - ./logs:/var/log/nginx
     restart: unless-stopped
     depends_on:
-      aiwebui-init:
+      chmusicproweb-init:
         condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/nginx_status"]
@@ -411,12 +411,12 @@ limit_req_zone $binary_remote_addr zone=auth:10m rate=1r/s;
 # Apply rate limits
 location /api/v1/auth/ {
     limit_req zone=auth burst=3 nodelay;
-    proxy_pass http://aiproxysrv-app:5050;
+    proxy_pass http://chmusicprosrv-app:5050;
 }
 
 location /api/ {
     limit_req zone=general burst=20 nodelay;
-    proxy_pass http://aiproxysrv-app:5050;
+    proxy_pass http://chmusicprosrv-app:5050;
 }
 ```
 
@@ -430,7 +430,7 @@ client_max_body_size 2048M;
 location ~ ^/api/v1/(ollama|openai)/ {
     proxy_read_timeout 600s;
     proxy_send_timeout 600s;
-    proxy_pass http://aiproxysrv-app:5050;
+    proxy_pass http://chmusicprosrv-app:5050;
 }
 ```
 
@@ -438,7 +438,7 @@ location ~ ^/api/v1/(ollama|openai)/ {
 
 ```nginx
 location / {
-    root /usr/share/nginx/html/aiwebui;
+    root /usr/share/nginx/html/chmusicproweb;
     try_files $uri $uri/ /index.html;
 
     # Cache static assets
@@ -488,7 +488,7 @@ http {
 
     # Upstream definitions
     upstream backend {
-        server aiproxysrv-app:5050;
+        server chmusicprosrv-app:5050;
     }
 
     # HTTP redirect to HTTPS
@@ -548,7 +548,7 @@ http {
 
         # Angular SPA
         location / {
-            root /usr/share/nginx/html/aiwebui;
+            root /usr/share/nginx/html/chmusicproweb;
             try_files $uri $uri/ /index.html;
 
             location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
@@ -672,14 +672,14 @@ CELERY_RESULT_BACKEND=redis://redis:6379/0
 
 4. **Configure Environment**
    ```bash
-   cd aiproxysrv/
+   cd chmusicprosrv/
    cp env_template .env
    # Edit .env with production values
    ```
 
 5. **Start Backend Stack**
    ```bash
-   cd aiproxysrv/
+   cd chmusicprosrv/
    docker compose up -d
 
    # Watch migration logs
@@ -764,7 +764,7 @@ docker compose down
 
 # Edit docker-compose.yml to previous version tag
 # Or use explicit image tag:
-docker compose up -d --force-recreate aiproxysrv-app celery-worker
+docker compose up -d --force-recreate chmusicprosrv-app celery-worker
 ```
 
 ---
@@ -775,7 +775,7 @@ docker compose up -d --force-recreate aiproxysrv-app celery-worker
 
 | Service | Health Check | Expected Response |
 |---------|--------------|-------------------|
-| **aiproxysrv** | `GET /api/v1/health` | `{"status": "healthy"}` |
+| **chmusicprosrv** | `GET /api/v1/health` | `{"status": "healthy"}` |
 | **Nginx** | `GET /nginx_status` | Stub status page |
 | **PostgreSQL** | `pg_isready -U user` | Exit code 0 |
 | **Redis** | `redis-cli ping` | `PONG` |
@@ -791,7 +791,7 @@ docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 curl -s https://your-domain/api/v1/health | jq
 
 # Check container logs
-docker logs -f aiproxysrv-app --tail 100
+docker logs -f chmusicprosrv-app --tail 100
 docker logs -f celery-worker --tail 100
 docker logs -f nginx --tail 100
 
@@ -806,7 +806,7 @@ docker exec redis redis-cli info clients
 
 | Symptom | Check | Solution |
 |---------|-------|----------|
-| 502 Bad Gateway | Is aiproxysrv running? | `docker logs aiproxysrv-app` |
+| 502 Bad Gateway | Is chmusicprosrv running? | `docker logs chmusicprosrv-app` |
 | Database connection failed | Is PostgreSQL accessible? | Check firewall, credentials |
 | Slow AI responses | Is Celery worker running? | `docker logs celery-worker` |
 | File upload fails | Check nginx body size | Increase `client_max_body_size` |
@@ -848,13 +848,13 @@ if [ -z "$BACKUP_FILE" ]; then
 fi
 
 # Stop dependent services
-docker stop aiproxysrv-app celery-worker
+docker stop chmusicprosrv-app celery-worker
 
 # Restore database
 gunzip -c "$BACKUP_FILE" | docker exec -i postgres psql -U aiproxy -d aiproxysrv
 
 # Restart services
-docker start celery-worker aiproxysrv-app
+docker start celery-worker chmusicprosrv-app
 
 echo "Restore completed"
 ```
@@ -929,7 +929,7 @@ For production, consider adding resource limits:
 
 ```yaml
 services:
-  aiproxysrv-app:
+  chmusicprosrv-app:
     deploy:
       resources:
         limits:

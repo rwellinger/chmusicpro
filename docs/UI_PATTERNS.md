@@ -2,7 +2,7 @@
 
 **Project:** Multi-AI Creative Platform
 **Last Updated:** 2025-10-29
-**Reference Implementation:** Equipment Gallery (`aiwebui/src/app/pages/equipment-gallery/`)
+**Reference Implementation:** Equipment Gallery (`chmusicproweb/src/app/pages/equipment-gallery/`)
 
 ---
 
@@ -455,20 +455,20 @@ Before creating a new page, ensure you:
 ## Reference Files
 
 **Equipment Gallery (Reference Implementation):**
-- `/aiwebui/src/app/pages/equipment-gallery/equipment-gallery.component.html`
-- `/aiwebui/src/app/pages/equipment-gallery/equipment-gallery.component.scss`
-- `/aiwebui/src/app/pages/equipment-gallery/equipment-gallery.component.ts`
+- `/chmusicproweb/src/app/pages/equipment-gallery/equipment-gallery.component.html`
+- `/chmusicproweb/src/app/pages/equipment-gallery/equipment-gallery.component.scss`
+- `/chmusicproweb/src/app/pages/equipment-gallery/equipment-gallery.component.ts`
 
 **Equipment Editor:**
-- `/aiwebui/src/app/pages/equipment-editor/equipment-editor.component.html`
-- `/aiwebui/src/app/pages/equipment-editor/equipment-editor.component.scss`
+- `/chmusicproweb/src/app/pages/equipment-editor/equipment-editor.component.html`
+- `/chmusicproweb/src/app/pages/equipment-editor/equipment-editor.component.scss`
 
 **Sketch Library (Original Pattern):**
-- `/aiwebui/src/app/pages/song-sketch-library/song-sketch-library.component.html`
-- `/aiwebui/src/app/pages/song-sketch-library/song-sketch-library.component.scss`
+- `/chmusicproweb/src/app/pages/song-sketch-library/song-sketch-library.component.html`
+- `/chmusicproweb/src/app/pages/song-sketch-library/song-sketch-library.component.scss`
 
 **Button Mixins:**
-- `/aiwebui/src/scss/_mixins.scss` (Lines 48-71)
+- `/chmusicproweb/src/scss/_mixins.scss` (Lines 48-71)
 
 ---
 

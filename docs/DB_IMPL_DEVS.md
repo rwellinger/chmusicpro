@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers the workflow for database schema changes using SQLAlchemy and Alembic in the aiproxysrv backend.
+This guide covers the workflow for database schema changes using SQLAlchemy and Alembic in the chmusicprosrv backend.
 
 ## Architecture
 
@@ -16,7 +16,7 @@ This guide covers the workflow for database schema changes using SQLAlchemy and 
 
 **Directory Structure**
 ```
-aiproxysrv/src/
+chmusicprosrv/src/
 ├── db/
 │   ├── database.py          # DB connection & session management
 │   ├── models.py            # SQLAlchemy ORM models
@@ -402,7 +402,7 @@ alembic upgrade head
 docker exec chmusicpro-postgres-1 pg_dump -U aiuser aiproxy > backup.sql
 
 # 2. Apply migration
-docker exec -it chmusicpro-aiproxysrv-1 bash
+docker exec -it chmusicpro-chmusicprosrv-1 bash
 cd src
 alembic upgrade head
 
@@ -410,14 +410,14 @@ alembic upgrade head
 alembic current
 
 # 4. Restart services if needed
-docker compose restart aiproxysrv
+docker compose restart chmusicprosrv
 ```
 
 ### Rollback Procedure
 
 ```bash
 # Rollback migration
-docker exec -it chmusicpro-aiproxysrv-1 bash
+docker exec -it chmusicpro-chmusicprosrv-1 bash
 cd src
 alembic downgrade -1
 
@@ -425,7 +425,7 @@ alembic downgrade -1
 alembic current
 
 # Restart services
-docker compose restart aiproxysrv
+docker compose restart chmusicprosrv
 ```
 
 ## Quick Reference

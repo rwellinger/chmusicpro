@@ -1,6 +1,6 @@
 /**
  * TypeScript models for Image Generation feature
- * Matches backend schemas in aiproxysrv/src/schemas/image_schemas.py
+ * Matches backend schemas in chmusicprosrv/src/schemas/image_schemas.py
  */
 
 // ============================================================================

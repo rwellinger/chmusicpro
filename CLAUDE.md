@@ -45,7 +45,7 @@ getData() {
 private baseUrl = 'http://localhost:5050/api';
 ```
 
-### External APIs ONLY via aiproxysrv Proxy
+### External APIs ONLY via chmusicprosrv Proxy
 - **ALL** external calls (OpenAI, Ollama, S3/MinIO) **MUST** go through backend
 - **NEVER** call external APIs directly from Angular
 - **NEVER** use S3 presigned URLs in Angular (Browser can't access internal MinIO!)
@@ -138,7 +138,7 @@ grep -r "serve.*s3\|proxy.*resource" src/
 | **S3 Proxy** | `song_release_routes.py:123` → `s3_proxy_service.py` | Serve S3 resources via backend |
 | **3-Layer** | `sketch_controller.py` → `sketch_orchestrator.py` → `sketch_transformer.py` | Testable business logic |
 | **AI Integration** | Backend: `chat_controller.py`, Frontend: `chat.service.ts` | Template-driven Ollama |
-| **DB Migration** | `aiproxysrv/src/alembic/versions/` | Schema changes |
+| **DB Migration** | `chmusicprosrv/src/alembic/versions/` | Schema changes |
 
 ## Frontend Patterns
 
@@ -155,7 +155,7 @@ grep -r "serve.*s3\|proxy.*resource" src/
 
 # 🛠️ Quick Commands
 
-## Frontend (aiwebui)
+## Frontend (chmusicproweb)
 
 ```bash
 # Code Quality & Build (ALWAYS run before commit!)
@@ -172,7 +172,7 @@ make test                      # Unit tests
 make test-watch               # Tests in watch mode
 ```
 
-## Backend (aiproxysrv)
+## Backend (chmusicprosrv)
 
 ```bash
 # Activate conda environment first!
@@ -196,8 +196,8 @@ make test                      # pytest
 
 ```bash
 # From project root (chmusicpro/)
-cat scripts/db/seed_prompts.sql | docker exec -i postgres psql -U aiproxy -d aiproxysrv
-cat scripts/db/seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U aiproxy -d aiproxysrv
+cat scripts/db/seed_prompts.sql | docker exec -i postgres psql -U aiproxy -d chmusicprosrv
+cat scripts/db/seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U aiproxy -d chmusicprosrv
 ```
 
 **DB Credentials:** See `.env` file (not committed to repository)

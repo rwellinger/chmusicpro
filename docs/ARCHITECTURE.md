@@ -32,8 +32,8 @@ This project uses the **arc42 architecture template** for comprehensive document
 - **Hardware**: Apple Silicon (M1/M4)
 
 ### Key Components
-- **aiwebui**: Angular 20 frontend with Material Design
-- **aiproxysrv**: FastAPI backend + proxy for external APIs (OpenAI, Ollama)
+- **chmusicproweb**: Angular 20 frontend with Material Design
+- **chmusicprosrv**: FastAPI backend + proxy for external APIs (OpenAI, Ollama)
 - **forwardproxy**: Nginx reverse proxy (production)
 
 ### Core Features

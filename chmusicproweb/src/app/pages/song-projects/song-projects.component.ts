@@ -468,7 +468,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     async copyCLICommand(folder: any): Promise<void> {
         if (!this.selectedProject) return;
 
-        const command = `aiproxy-cli upload ${this.selectedProject.id} ${folder.id}`;
+        const command = `chmusicpro-cli upload ${this.selectedProject.id} ${folder.id}`;
 
         try {
             await navigator.clipboard.writeText(command);
@@ -489,7 +489,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     async copyCLIDownloadCommand(folder: any): Promise<void> {
         if (!this.selectedProject) return;
 
-        const command = `aiproxy-cli download ${this.selectedProject.id} ${folder.id}`;
+        const command = `chmusicpro-cli download ${this.selectedProject.id} ${folder.id}`;
 
         try {
             await navigator.clipboard.writeText(command);
@@ -510,7 +510,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     async copyCLIMirrorCommand(folder: any): Promise<void> {
         if (!this.selectedProject) return;
 
-        const command = `aiproxy-cli mirror ${this.selectedProject.id} ${folder.id} . --dry-run`;
+        const command = `chmusicpro-cli mirror ${this.selectedProject.id} ${folder.id} . --dry-run`;
 
         try {
             await navigator.clipboard.writeText(command);
@@ -531,7 +531,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     async copyCLICompleteCloneCommand(): Promise<void> {
         if (!this.selectedProject) return;
 
-        const command = `aiproxy-cli clone ${this.selectedProject.id} .`;
+        const command = `chmusicpro-cli clone ${this.selectedProject.id} .`;
 
         try {
             await navigator.clipboard.writeText(command);
