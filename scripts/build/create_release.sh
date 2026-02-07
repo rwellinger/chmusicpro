@@ -238,8 +238,12 @@ print_success "chmusicproweb/VERSION → ${VERSION}"
 # ──────────────────────────────────────
 print_info "Committe VERSION Updates..."
 git add chmusicprosrv/VERSION chmusicproweb/VERSION
-git commit -m "Bump version to ${VERSION}"
-print_success "VERSION Files committed"
+if git diff --cached --quiet; then
+    print_info "VERSION Files bereits aktuell - kein Commit nötig"
+else
+    git commit -m "Bump version to ${VERSION}"
+    print_success "VERSION Files committed"
+fi
 
 # ──────────────────────────────────────
 # 8. Git Tag erstellen und pushen
