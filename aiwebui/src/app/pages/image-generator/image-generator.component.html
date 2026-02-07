@@ -1,0 +1,324 @@
+<div class="image-generator-container master-detail-layout">
+    <!-- Main Content Grid -->
+    <div class="generator-grid">
+        <!-- Left Side: Image Creation Card -->
+        <div class="image-creation-section">
+            <mat-card class="image-creation-card">
+                <mat-card-content>
+                    <div class="image-generator-header">
+                        <div class="image-generator-title">
+                            <h2>
+                                <i class="fas fa-image"></i>
+                                {{ 'imageGenerator.title' | translate }}
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div class="controls-content">
+                        <form [formGroup]="promptForm" (ngSubmit)="onSubmit()">
+                            <!-- Title Field -->
+                            <div class="form-group">
+                                <label for="title">{{ 'imageGenerator.titleLabel' | translate }}</label>
+                                <div class="prompt-input-group">
+                                    <input
+                                            id="title"
+                                            type="text"
+                                            formControlName="title"
+                                            [placeholder]="'imageGenerator.titlePlaceholder' | translate"
+                                            maxlength="50"
+                                            [disabled]="isLoading"
+                                            class="title-input">
+                                    <div class="title-dropdown-container">
+                                        <button
+                                                type="button"
+                                                (click)="toggleTitleDropdown()"
+                                                [disabled]="isLoading || isGeneratingTitle"
+                                                class="magic-icon-button"
+                                                [title]="'imageGenerator.titleActions' | translate">
+                                            <i class="fas fa-ellipsis-vertical" *ngIf="!isGeneratingTitle"></i>
+                                            <i class="fas fa-spinner fa-spin" *ngIf="isGeneratingTitle"></i>
+                                        </button>
+                                        <div class="dropdown-menu" *ngIf="showTitleDropdown"
+                                             (click)="$event.stopPropagation()">
+                                            <button
+                                                    type="button"
+                                                    class="dropdown-item"
+                                                    [disabled]="isLoading || isGeneratingTitle"
+                                                    (click)="selectTitleAction('generate')">
+                                                <i class="fas fa-wand-magic-sparkles"></i>
+                                                <span>{{ 'imageGenerator.generateTitle' | translate }}</span>
+                                                <i class="fas fa-spinner fa-spin action-spinner"
+                                                   *ngIf="isGeneratingTitle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="char-counter">{{ 'imageGenerator.charCounter' | translate: {count: promptForm.get('title')?.value?.length || 0} }}</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="prompt">{{ 'imageGenerator.promptLabel' | translate }}</label>
+                                <div class="prompt-input-group">
+                        <textarea
+                                id="prompt"
+                                formControlName="prompt"
+                                [placeholder]="'imageGenerator.promptPlaceholder' | translate"
+                                required
+                                maxlength="2500"
+                                [disabled]="isLoading"
+                                class="prompt-input">
+                        </textarea>
+                                    <div class="prompt-dropdown-container">
+                                        <button
+                                                type="button"
+                                                (click)="togglePromptDropdown()"
+                                                [disabled]="isLoading || isImprovingPrompt || isTranslatingPrompt || isInterpretingLyric || !promptForm.get('prompt')?.value?.trim()"
+                                                class="magic-icon-button"
+                                                [title]="'imageGenerator.picturePromptActions' | translate">
+                                            <i class="fas fa-ellipsis-vertical"
+                                               *ngIf="!isImprovingPrompt && !isTranslatingPrompt && !isInterpretingLyric"></i>
+                                            <i class="fas fa-spinner fa-spin"
+                                               *ngIf="isImprovingPrompt || isTranslatingPrompt || isInterpretingLyric"></i>
+                                        </button>
+                                        <div class="dropdown-menu" *ngIf="showPromptDropdown"
+                                             (click)="$event.stopPropagation()">
+                                            <button
+                                                    type="button"
+                                                    class="dropdown-item"
+                                                    [disabled]="isLoading || isImprovingPrompt || isTranslatingPrompt || isInterpretingLyric"
+                                                    (click)="selectPromptAction('translate')">
+                                                <i class="fas fa-language"></i>
+                                                <span>{{ 'imageGenerator.translateToEnglish' | translate }}</span>
+                                                <i class="fas fa-spinner fa-spin action-spinner"
+                                                   *ngIf="isTranslatingPrompt"></i>
+                                            </button>
+                                            <button
+                                                    type="button"
+                                                    class="dropdown-item"
+                                                    [disabled]="isLoading || isImprovingPrompt || isTranslatingPrompt || isInterpretingLyric"
+                                                    (click)="selectPromptAction('interpret-lyric')">
+                                                <i class="fas fa-music"></i>
+                                                <span>{{ 'imageGenerator.interpretLyric' | translate }}</span>
+                                                <i class="fas fa-spinner fa-spin action-spinner"
+                                                   *ngIf="isInterpretingLyric"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="char-counter">{{
+                                        'imageGenerator.promptCharCounter' | translate: {
+                                            count: promptForm.get('prompt')?.value?.length || 0,
+                                            max: 2500
+                                        }
+                                    }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="size">{{ 'imageGenerator.sizeLabel' | translate }}</label>
+                                <select id="size" formControlName="size" required
+                                        [disabled]="isLoading || isAlbumCoverMode"
+                                        class="size-select">
+                                    <option value="1024x1024">{{ 'imageGenerator.size.square' | translate }}</option>
+                                    <option value="1792x1024">{{ 'imageGenerator.size.landscape' | translate }}</option>
+                                    <option value="1024x1792">{{ 'imageGenerator.size.portrait' | translate }}</option>
+                                </select>
+                                <div *ngIf="isAlbumCoverMode" class="hint-text">
+                                    {{ 'imageGenerator.albumCoverSquareOnly' | translate }}
+                                </div>
+                            </div>
+
+                            <!-- Style Preferences Section -->
+                            <div class="style-preferences-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-palette"></i>
+                                    {{ 'imageGenerator.styles.sectionTitle' | translate }}
+                                </h3>
+
+                                <!-- Style Selectors Grid (2x2) -->
+                                <div class="style-selectors">
+                                    <!-- Artistic Style -->
+                                    <mat-form-field appearance="outline" class="style-field">
+                                        <mat-label>{{ 'imageGenerator.styles.artisticStyle.label' | translate }}</mat-label>
+                                        <mat-select [formControl]="artisticStyle" [disabled]="isLoading">
+                                            <mat-option *ngFor="let option of artisticStyleOptions"
+                                                        [value]="option.value"
+                                                        [disabled]="isArtisticStyleIncompatibleWithAlbumCover(option.value)">
+                                                {{ option.labelKey | translate }}
+                                                <span *ngIf="isArtisticStyleIncompatibleWithAlbumCover(option.value)"
+                                                      class="option-hint">
+                                                    ({{ 'imageGenerator.incompatibleWithAlbumCover' | translate }})
+                                                </span>
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+
+                                    <!-- Composition -->
+                                    <mat-form-field appearance="outline" class="style-field">
+                                        <mat-label>{{ 'imageGenerator.styles.composition.label' | translate }}</mat-label>
+                                        <mat-select [formControl]="composition" [disabled]="isLoading">
+                                            <mat-option *ngFor="let option of compositionOptions" [value]="option.value"
+                                                        [disabled]="option.value === 'album-cover' && !canUseAlbumCover">
+                                                {{ option.labelKey | translate }}
+                                                <span *ngIf="option.value === 'album-cover' && !canUseAlbumCover"
+                                                      class="option-hint">
+                                                    ({{ 'imageGenerator.titleRequired' | translate }})
+                                                </span>
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+
+                                    <!-- Lighting -->
+                                    <mat-form-field appearance="outline" class="style-field">
+                                        <mat-label>{{ 'imageGenerator.styles.lighting.label' | translate }}</mat-label>
+                                        <mat-select [formControl]="lighting" [disabled]="isLoading">
+                                            <mat-option *ngFor="let option of lightingOptions" [value]="option.value"
+                                                        [disabled]="isLightingIncompatibleWithAlbumCover(option.value)">
+                                                {{ option.labelKey | translate }}
+                                                <span *ngIf="isLightingIncompatibleWithAlbumCover(option.value)"
+                                                      class="option-hint">
+                                                    ({{ 'imageGenerator.incompatibleWithAlbumCover' | translate }})
+                                                </span>
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+
+                                    <!-- Color Palette -->
+                                    <mat-form-field appearance="outline" class="style-field">
+                                        <mat-label>{{ 'imageGenerator.styles.colorPalette.label' | translate }}</mat-label>
+                                        <mat-select [formControl]="colorPalette" [disabled]="isLoading">
+                                            <mat-option *ngFor="let option of colorPaletteOptions"
+                                                        [value]="option.value"
+                                                        [disabled]="isColorPaletteIncompatibleWithAlbumCover(option.value)">
+                                                {{ option.labelKey | translate }}
+                                                <span *ngIf="isColorPaletteIncompatibleWithAlbumCover(option.value)"
+                                                      class="option-hint">
+                                                    ({{ 'imageGenerator.incompatibleWithAlbumCover' | translate }})
+                                                </span>
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+
+                                <!-- Detail Level & AI Enhancement Quality (Side by Side) -->
+                                <div class="detail-enhancement-row">
+                                    <mat-form-field appearance="outline" class="style-field">
+                                        <mat-label>{{ 'imageGenerator.styles.detailLevel.label' | translate }}</mat-label>
+                                        <mat-select [formControl]="detailLevel" [disabled]="isLoading">
+                                            <mat-option *ngFor="let option of detailLevelOptions"
+                                                        [value]="option.value">
+                                                {{ option.labelKey | translate }}
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+
+                                    <mat-form-field appearance="outline" class="style-field">
+                                        <mat-label>{{ 'imageGenerator.enhanceQuality.label' | translate }}</mat-label>
+                                        <mat-select [formControl]="enhanceQuality"
+                                                    [disabled]="isLoading || isAlbumCoverMode">
+                                            <mat-option *ngFor="let option of enhanceQualityOptions"
+                                                        [value]="option.value">
+                                                {{ option.labelKey | translate }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <app-info-tooltip matSuffix
+                                                          *ngIf="isAlbumCoverMode"
+                                                          [text]="'imageGenerator.albumCoverEnhancementHint'">
+                                        </app-info-tooltip>
+                                        <app-info-tooltip matSuffix
+                                                          *ngIf="!isAlbumCoverMode && enhanceQuality.value === 'auto'"
+                                                          [text]="isManualMode
+                                                ? 'imageGenerator.enhanceQuality.hints.autoManual'
+                                                : 'imageGenerator.enhanceQuality.hints.autoQuality'">
+                                        </app-info-tooltip>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <!-- Storage Health Warning (Preventive UX) -->
+                            <div *ngIf="!isStorageHealthy && !isCheckingStorage" class="storage-warning"
+                                 style="margin-bottom: 1rem; padding: 1rem; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; color: #856404;">
+                                <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+                                <strong>Storage Unavailable:</strong> Image generation is temporarily disabled. The
+                                storage backend (MinIO) is not reachable. Please try again later or contact support.
+                            </div>
+
+                            <div class="button-group">
+                                <button type="submit"
+                                        [disabled]="promptForm.invalid || isLoading || isImprovingPrompt || isTranslatingPrompt || isGeneratingTitle || !isStorageHealthy || isCheckingStorage"
+                                        class="create-button">
+                                    <i class="fas fa-spinner fa-spin" *ngIf="isLoading || isCheckingStorage"></i>
+                                    <i class="fas fa-brain" *ngIf="!isLoading && !isCheckingStorage"></i>
+                                    {{ isCheckingStorage ? 'Checking storage...' : (isLoading ? ('imageGenerator.creating' | translate) : ('imageGenerator.createButton' | translate)) }}
+                                </button>
+                                <button type="button" (click)="resetForm()"
+                                        [disabled]="isLoading || isImprovingPrompt || isTranslatingPrompt || isGeneratingTitle"
+                                        class="reset-button">
+                                    <i class="fas fa-rotate-left"></i> {{ 'imageGenerator.resetButton' | translate }}
+                                </button>
+                            </div>
+
+                            <div *ngIf="isLoading" class="loading-status">
+                                <small class="loading-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    {{ 'imageGenerator.loadingMessage' | translate }}
+                                </small>
+                            </div>
+                        </form>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions align="end">
+                    <p class="cost-info">
+                        <i class="fas fa-info-circle"></i>
+                        {{ 'imageGenerator.costInfo' | translate }}
+                    </p>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+
+        <!-- Right Side: Generated Image Card -->
+        <div class="generated-image-section">
+            <mat-card class="generated-image-card">
+                <mat-card-content>
+                    <app-image-detail-panel
+                            [image]="generatedImageData"
+                            [imageId]="generatedImageId"
+                            [showEditTitle]="true"
+                            [showActionButtons]="false"
+                            [isGenerating]="isLoading"
+                            title=""
+                            [showMetaInfo]="['model', 'size']"
+                            [placeholderText]="'imageView.placeholderText' | translate"
+                            (titleChanged)="onTitleChanged()">
+                    </app-image-detail-panel>
+                </mat-card-content>
+                <mat-card-actions align="end">
+                    <div class="detail-actions" *ngIf="generatedImageData">
+                        <button mat-button type="button" (click)="onDownloadImage()">
+                            <i class="fas fa-download"></i> {{ 'imageDetailPanel.actions.download' | translate }}
+                        </button>
+                        <button mat-button type="button" (click)="onPreviewImage()">
+                            <i class="fas fa-expand"></i> {{ 'imageDetailPanel.actions.fullSize' | translate }}
+                        </button>
+                    </div>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+    </div>
+</div>
+
+
+<!-- Image Modal -->
+<div *ngIf="showImageModal" class="modal-overlay" (click)="closeImageModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <button class="close-button" (click)="closeImageModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <img [src]="generatedImageBlobUrl" [alt]="'imageDetailPanel.alt.image' | translate" class="preview-image">
+        </div>
+    </div>
+</div>
+

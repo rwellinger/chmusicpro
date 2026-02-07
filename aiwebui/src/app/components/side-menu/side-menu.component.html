@@ -1,0 +1,165 @@
+<aside class="side-menu">
+    <!-- Logo and Brand Section -->
+    <div class="brand-section">
+        <div class="logo">
+            <i class="fa-duotone fa-solid fa-toolbox"></i>
+        </div>
+        <div class="brand">
+            <span class="brand-text">thWelly's AI Toolbox</span>
+            <span class="version-text">v{{ version }}</span>
+        </div>
+    </div>
+
+    <!-- Navigation Section -->
+    <nav class="nav-section">
+
+        <div class="nav-group">
+            <span class="group-label">
+                <i class="fas fa-robot"></i>
+                {{ 'sideMenu.aiChat' | translate }}
+            </span>
+            <div class="group-items">
+                <a routerLink="/ai-chat" routerLinkActive="active">
+                    <i class="fas fa-server"></i>
+                    {{ 'sideMenu.ollamaChat' | translate }}
+                </a>
+                <a routerLink="/openai-chat" routerLinkActive="active">
+                    <i class="fas fa-cloud"></i>
+                    {{ 'sideMenu.openaiChat' | translate }}
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <span class="group-label">
+                <i class="fas fa-folder-tree"></i>
+                {{ 'sideMenu.songProjects' | translate }}
+            </span>
+            <div class="group-items">
+                <a routerLink="/song-projects" routerLinkActive="active">
+                    <i class="fas fa-folder-open"></i>
+                    {{ 'sideMenu.songProjects' | translate }}
+                </a>
+                <a routerLink="/song-releases" routerLinkActive="active">
+                    <i class="fas fa-compact-disc"></i>
+                    {{ 'sideMenu.songReleases' | translate }}
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <span class="group-label">
+                <i class="fas fa-image"></i>
+                {{ 'sideMenu.picture' | translate }}
+            </span>
+            <div class="group-items">
+                <a routerLink="/imageview" routerLinkActive="active">
+                    <i class="fas fa-images"></i>
+                    {{ 'sideMenu.gallery' | translate }}
+                </a>
+                <a routerLink="/imagegen" routerLinkActive="active">
+                    <i class="fas fa-plus"></i>
+                    {{ 'sideMenu.createImage' | translate }}
+                </a>
+                <a routerLink="/text-overlay-editor" routerLinkActive="active">
+                    <i class="fas fa-layer-group"></i>
+                    {{ 'sideMenu.textOverlayEditor' | translate }}
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <span class="group-label">
+                <i class="fas fa-music"></i>
+                {{ 'sideMenu.music' | translate }}
+            </span>
+            <div class="group-items">
+                <a routerLink="/song-sketch-library" routerLinkActive="active">
+                    <i class="fas fa-folder-open"></i>
+                    {{ 'sideMenu.sketchLibrary' | translate }}
+                </a>
+                <a routerLink="/song-sketch-creator" routerLinkActive="active">
+                    <i class="fas fa-lightbulb"></i>
+                    {{ 'sideMenu.newSketch' | translate }}
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <span class="group-label">
+                <i class="fas fa-pen-fancy"></i>
+                {{ 'sideMenu.textWorkshop' | translate }}
+            </span>
+            <div class="group-items">
+                <a routerLink="/text-workshop" routerLinkActive="active">
+                    <i class="fas fa-book-open"></i>
+                    {{ 'sideMenu.workshopLibrary' | translate }}
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <span class="group-label">
+                <i class="fas fa-toolbox"></i>
+                {{ 'sideMenu.equipment' | translate }}
+            </span>
+            <div class="group-items">
+                <a routerLink="/equipment-gallery" routerLinkActive="active">
+                    <i class="fas fa-folder-open"></i>
+                    {{ 'sideMenu.equipmentGallery' | translate }}
+                </a>
+                <a routerLink="/equipment-editor" routerLinkActive="active">
+                    <i class="fas fa-plus"></i>
+                    {{ 'sideMenu.newEquipment' | translate }}
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <span class="group-label">
+                <i class="fas fa-cogs"></i>
+                {{ 'sideMenu.settings' | translate }}
+            </span>
+            <div class="group-items">
+                <a routerLink="/prompt-templates" routerLinkActive="active">
+                    <i class="fas fa-file-text"></i>
+                    {{ 'sideMenu.promptTemplates' | translate }}
+                </a>
+                <a routerLink="/lyric-parsing-rules" routerLinkActive="active">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    {{ 'sideMenu.lyricParsingRules' | translate }}
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group" *ngIf="authState && authState.isAuthenticated">
+            <span class="group-label">
+                <i class="fas fa-user"></i>
+                {{ firstName }} ({{ currentLang }})
+            </span>
+            <div class="group-items">
+                <a routerLink="/profile" routerLinkActive="active">
+                    <i class="fas fa-user-circle"></i>
+                    {{ 'sideMenu.profile' | translate }}
+                </a>
+                <a href="javascript:void(0)" (click)="onLogout()" class="logout-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    {{ 'sideMenu.logout' | translate }}
+                </a>
+            </div>
+        </div>
+
+        <!-- Login Button (when not authenticated) -->
+        <div class="auth-section" *ngIf="authState && !authState.isAuthenticated">
+            <a routerLink="/login" class="login-button">
+                <i class="fas fa-sign-in-alt"></i>
+                {{ 'sideMenu.login' | translate }}
+            </a>
+        </div>
+    </nav>
+
+    <!-- Footer Section -->
+    <div class="footer-section">
+        <p>© 2026 <a href="https://www.thwelly.ch/" class="external-link" target="_blank">thWelly</a></p>
+    </div>
+</aside>

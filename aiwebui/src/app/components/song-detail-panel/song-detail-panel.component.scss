@@ -1,0 +1,1029 @@
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+/* ===== SONG DETAILS PANEL ===== */
+.song-details-panel {
+  @include detail-panel-layout();
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  
+  .song-details-section {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    overflow-x: hidden;
+  }
+}
+
+/* ===== SONG META INFO ===== */
+.song-meta-info {
+  background-color: $background-light;
+  padding: $spacing-20;
+  border-radius: $border-radius-lg;
+  margin-bottom: $spacing-20;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: $spacing-md;
+}
+
+.song-details-section h2 {
+  margin-bottom: $spacing-20;
+  padding-bottom: $spacing-10;
+  border-bottom: 1px solid $border-light;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-10;
+  min-width: 0;
+  min-height: 32px;
+  padding: $spacing-6 0;
+}
+
+.meta-icon {
+  font-size: $font-sm;
+  width: 16px;
+  flex-shrink: 0;
+  color: $text-muted;
+}
+
+.meta-value {
+  color: $text-primary;
+  font-size: $font-sm;
+  font-weight: $font-weight-medium;
+  word-break: break-word;
+  min-width: fit-content;
+}
+
+/* ===== ID ROW (SPECIAL STYLING) ===== */
+.meta-id-row {
+  margin-bottom: $spacing-md;
+  
+  .meta-item-id {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-xs 0;
+    
+    .meta-icon {
+      color: $primary-color;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    
+    .meta-id {
+      font-family: 'Courier New', monospace;
+      font-size: $font-sm;
+      color: $text-secondary;
+      background: $background-light;
+      padding: 6px 12px;
+      border-radius: $border-radius-sm;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+    
+    .copy-id-btn {
+      background: transparent;
+      border: none;
+      color: $text-secondary;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: $border-radius-sm;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      
+      &:hover {
+        background: $background-light;
+        color: $primary-color;
+      }
+      
+      &:active {
+        transform: scale(0.95);
+      }
+      
+      i {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+/* Status styling */
+.status-success {
+  color: $success-color;
+  font-weight: $font-weight-semibold;
+}
+
+.status-completed {
+  color: $success-color;
+  font-weight: $font-weight-semibold;
+}
+
+.status-processing {
+  color: $primary-color;
+  font-weight: $font-weight-semibold;
+}
+
+.status-pending {
+  color: $warning-color;
+  font-weight: $font-weight-semibold;
+}
+
+.status-failure {
+  color: $danger-color;
+  font-weight: $font-weight-semibold;
+}
+
+.status-failed {
+  color: $danger-color;
+  font-weight: $font-weight-semibold;
+}
+
+/* Status icon colors */
+.status-icon-success {
+  color: $success-color !important;
+}
+
+.status-icon-completed {
+  color: $success-color !important;
+}
+
+.status-icon-processing {
+  color: $primary-color !important;
+}
+
+.status-icon-pending {
+  color: $warning-color !important;
+}
+
+.status-icon-failure {
+  color: $danger-color !important;
+}
+
+.status-icon-failed {
+  color: $danger-color !important;
+}
+
+/* ===== TITLE EDITING ===== */
+.song-title-section {
+  background-color: $background-light;
+  padding: $spacing-sm;
+  border-radius: $border-radius-lg;
+  margin-bottom: $spacing-10;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-sm;
+}
+
+.song-title {
+  margin: 0;
+  color: $text-primary;
+  font-size: $font-base;
+  font-weight: $font-weight-semibold;
+  flex: 1;
+  word-break: break-word;
+}
+
+.title-edit-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.title-input {
+  flex: 1;
+  padding: $spacing-sm $spacing-12;
+  border: 2px solid $primary-color;
+  border-radius: $border-radius-sm;
+  font-size: $font-lg;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  background: $background-white;
+}
+
+.title-input:focus {
+  @include input-focus-state($primary-hover);
+}
+
+/* ===== TAGS & WORKFLOW CONTAINER ===== */
+.tags-workflow-container {
+  display: flex;
+  gap: $spacing-12;
+  align-items: flex-start;
+  margin-bottom: $spacing-20;
+}
+
+/* ===== TAGS SECTION ===== */
+.song-tags-section {
+  background-color: $background-light;
+  padding: $spacing-12;
+  border-radius: $border-radius-lg;
+  flex: 0 0 60%;
+}
+
+/* ===== WORKFLOW SECTION ===== */
+.song-workflow-section {
+  background-color: $background-light;
+  padding: $spacing-12;
+  border-radius: $border-radius-lg;
+  flex: 0 0 40%;
+}
+
+/* ===== EDIT STATE STYLES ===== */
+// When editing, make the visible section take full width
+.tags-workflow-container {
+  &.tags-editing .song-tags-section {
+    flex: 1;
+  }
+  
+  &.workflow-editing .song-workflow-section {
+    flex: 1;
+  }
+}
+
+.workflow-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-10;
+  flex-wrap: wrap;
+  padding-right: $spacing-10;
+}
+
+.workflow-title {
+  margin: 0;
+  color: $text-primary;
+  font-size: $font-base;
+  font-weight: $font-weight-semibold;
+  min-width: 70px;
+}
+
+.workflow-display {
+  color: $text-secondary;
+  font-size: $font-sm;
+  flex: 1;
+  word-break: break-word;
+}
+
+.workflow-edit-section {
+  margin-top: $spacing-10;
+}
+
+.workflow-edit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-12;
+}
+
+.workflow-edit-buttons {
+  display: flex;
+  gap: $spacing-6;
+}
+
+.workflow-options {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.workflow-option {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  cursor: pointer;
+  padding: $spacing-6 $spacing-10;
+  border-radius: $border-radius-sm;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: rgba($primary-color, 0.1);
+  }
+  
+  input[type="radio"] {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+  
+  .option-label {
+    font-size: $font-sm;
+    color: $text-primary;
+    user-select: none;
+    flex: 1;
+  }
+}
+
+.tags-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-10;
+  flex-wrap: wrap;
+}
+
+.tags-title {
+  margin: 0;
+  color: $text-primary;
+  font-size: $font-base;
+  font-weight: $font-weight-semibold;
+  min-width: 45px;
+}
+
+.tags-display {
+  flex: 1;
+  color: #495057;
+  font-size: $font-base;
+  word-break: break-word;
+}
+
+.tags-edit-section {
+  margin-top: $spacing-10;
+}
+
+.tags-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-15;
+}
+
+.tags-edit-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.tags-categories {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-15;
+}
+
+.tag-category {
+  background: $background-white;
+  padding: $spacing-10;
+  border-radius: $border-radius-sm;
+  border: 1px solid $border-light;
+}
+
+.category-title {
+  margin: 0 0 $spacing-sm 0;
+  color: #495057;
+  font-size: $font-sm;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tag-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.tag-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: $spacing-xs $spacing-sm;
+  background: $background-light;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  font-size: $font-sm;
+  transition: background-color 0.2s;
+  user-select: none;
+}
+
+.tag-checkbox:hover {
+  background-color: $border-light;
+}
+
+.tag-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.checkmark {
+  width: 12px;
+  height: 12px;
+  border: 2px solid $text-muted;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.tag-checkbox input[type="checkbox"]:checked + .checkmark {
+  background-color: $primary-color;
+  border-color: $primary-color;
+}
+
+.tag-checkbox input[type="checkbox"]:checked + .checkmark::after {
+  content: '';
+  color: white;
+  font-size: $font-xs;
+  font-weight: bold;
+}
+
+/* ===== BUTTONS ===== */
+.save-btn, .cancel-btn {
+  @include inline-edit-controls();
+}
+
+.edit-btn {
+  @include button-primary('sm');
+  padding: $spacing-6 $spacing-10 !important;
+}
+
+.save-btn {
+  @include button-success('base');
+  padding: $spacing-sm $spacing-12 !important;
+}
+
+
+/* ===== CHOICES TABLE ===== */
+.song-choices {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: $spacing-20;
+}
+
+.song-choices h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: $font-lg;
+  font-weight: $font-weight-semibold;
+}
+
+.choices-table {
+  font-size: $font-sm;
+  @include list-table-styling($background-light, $text-primary);
+}
+
+.choices-table th {
+  padding: 12px 8px;
+  text-align: center;
+  background-color: rgba(23, 162, 184, 0.1);
+  font-weight: $font-weight-semibold;
+}
+
+.choices-table td {
+  vertical-align: middle;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.choices-table tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.choices-table button {
+  background-color: $success-color;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  font-size: $font-xs;
+  transition: background-color 0.2s;
+  margin: 0;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.choices-table button:hover:not(:disabled) {
+  background-color: $success-hover;
+}
+
+.choices-table button.active {
+  background-color: #155724;
+  position: relative;
+  animation: playing-pulse 2s infinite;
+}
+
+.choices-table button.active:hover {
+  background-color: #1e7e34;
+}
+
+@keyframes playing-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(21, 87, 36, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(21, 87, 36, 0);
+  }
+}
+
+.choices-table button:disabled {
+  background-color: $text-muted;
+  cursor: not-allowed;
+}
+
+.download-stems-btn, .download-flac-btn, .download-wav-btn {
+  background-color: $primary-color !important;
+}
+
+.download-stems-btn:hover:not(:disabled), .download-flac-btn:hover:not(:disabled), .download-wav-btn:hover:not(:disabled) {
+  background-color: $primary-hover !important;
+}
+
+.download-wav-btn {
+  margin-left: $spacing-sm !important;
+}
+
+.not-available {
+  color: $text-muted;
+  font-style: italic;
+  font-size: $font-sm;
+}
+
+/* ===== LYRICS & STYLE CONTAINER ===== */
+.lyrics-style-container {
+  display: flex;
+  flex-direction: column;
+  
+  /* Add gap only when both elements exist */
+  .song-lyrics:not(:last-child) {
+    margin-bottom: $spacing-12;
+  }
+}
+
+/* ===== LYRICS SECTION ===== */
+.song-lyrics {
+  background-color: $background-light;
+  padding: $spacing-12;
+  border-radius: $border-radius-lg;
+}
+
+.lyrics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+.lyrics-header h3 {
+  margin: 0;
+  color: $text-primary;
+  font-size: $font-base;
+}
+
+.copy-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: $font-xs;
+  transition: background-color 0.2s;
+}
+
+.copy-button:hover {
+  background-color: #5a6268;
+}
+
+.lyrics-content {
+  background: white;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+  font-family: 'Courier New', monospace;
+  font-size: $font-sm;
+  color: #495057;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 100px;
+  overflow-y: auto;
+  margin: 0;
+}
+
+.character-count {
+  text-align: right;
+  font-size: $font-xs;
+  color: $text-muted;
+  margin-top: $spacing-6;
+  font-style: italic;
+}
+
+/* ===== SONG PROMPT ===== */
+.song-prompt {
+  background-color: $background-light;
+  padding: $spacing-12;
+  border-radius: $border-radius-lg;
+}
+
+.song-prompt h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: $font-base;
+}
+
+.prompt-content {
+  background: white;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+  font-style: italic;
+  color: #495057;
+  font-size: $font-base;
+  margin: 0;
+}
+
+/* ===== NO CHOICES ===== */
+.no-choices {
+  padding: 20px;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* ===== LYRICS DIALOG ===== */
+.lyrics-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.lyrics-dialog {
+  background: $background-white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.lyrics-dialog-header {
+  padding: $spacing-20 $spacing-20 $spacing-15 $spacing-20;
+  border-bottom: 1px solid $border-light;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, $primary-color, $primary-hover);
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.lyrics-dialog-header h3 {
+  margin: 0;
+  font-size: $font-xl;
+  font-weight: $font-weight-semibold;
+}
+
+.close-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.lyrics-dialog-content {
+  padding: $spacing-20;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.lyrics-textarea {
+  width: 100%;
+  height: 300px;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-lg;
+  padding: $spacing-12;
+  font-family: 'Courier New', monospace;
+  font-size: $font-base;
+  color: #495057;
+  background: $background-light;
+  resize: none;
+  box-sizing: border-box;
+}
+
+.lyrics-dialog-actions {
+  padding: $spacing-15 $spacing-20 $spacing-20 $spacing-20;
+  border-top: 1px solid $border-light;
+  display: flex;
+  gap: $spacing-10;
+  justify-content: flex-end;
+}
+
+.copy-all-button, .close-dialog-button {
+  padding: $spacing-sm $spacing-md;
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+  font-size: $font-base;
+  font-weight: $font-weight-medium;
+  transition: all 0.2s;
+}
+
+.copy-all-button {
+  background-color: $primary-color;
+  color: white;
+  border: none;
+}
+
+.copy-all-button:hover {
+  background-color: $primary-hover;
+}
+
+.close-dialog-button {
+  background: $text-muted;
+  color: white;
+  border: none;
+}
+
+.close-dialog-button:hover {
+  background-color: #5a6268;
+}
+
+/* ===== RESPONSIVE ===== */
+/* Responsive height adjustments - MacBook Air 13" M4 2025 */
+@media (max-height: 1000px) {
+  .song-details-panel {
+    max-height: calc(100vh - 200px);
+  }
+}
+
+@media (max-height: 900px) {
+  .song-details-panel {
+    max-height: calc(100vh - 180px);
+  }
+}
+
+@media (max-height: 700px) {
+  .song-details-panel {
+    max-height: calc(100vh - 160px);
+  }
+}
+
+@media (max-width: 1024px) {
+  .song-details-panel {
+    max-height: none;
+    height: 50vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .choices-table {
+    font-size: $font-xs;
+  }
+  
+  .choices-table th,
+  .choices-table td {
+    padding: 6px 4px;
+  }
+  
+  .song-details-panel {
+    margin: 10px 0;
+    max-height: calc(100vh - 280px);
+    height: 45vh;
+  }
+  
+  .lyrics-dialog {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .lyrics-dialog-actions {
+    flex-direction: column;
+  }
+  
+  .tags-workflow-container {
+    flex-direction: column;
+    gap: $spacing-10;
+  }
+  
+  .song-tags-section,
+  .song-workflow-section {
+    flex: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .song-details-panel {
+    max-height: calc(100vh - 260px);
+  }
+}
+
+@media (max-width: 480px) {
+  .choices-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .tag-checkboxes {
+    justify-content: center;
+  }
+}
+
+/* ===== RATING BUTTONS ===== */
+.rating-buttons {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.rating-btn {
+  background: transparent;
+  border: 1px solid #ddd;
+  padding: 8px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 32px;
+  
+  &:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+  }
+  
+  // Inactive state - when the other button is active
+  &.inactive {
+    opacity: 0.4;
+    color: #999;
+    border-color: #eee;
+    
+    &:hover {
+      background: #f9f9f9;
+      border-color: #ddd;
+      opacity: 0.6;
+    }
+  }
+  
+  &.thumbs-up {
+    &:hover:not(.inactive) {
+      background: #e8f5e8;
+      color: #28a745;
+      border-color: #28a745;
+    }
+    
+    &.active {
+      background: #28a745;
+      color: white;
+      border-color: #28a745;
+      
+      &:hover {
+        background: #218838;
+        border-color: #218838;
+      }
+    }
+    
+    &.inactive {
+      &:hover {
+        background: #f9f9f9;
+        color: #aaa;
+        border-color: #ddd;
+      }
+    }
+  }
+  
+  &.thumbs-down {
+    &:hover:not(.inactive) {
+      background: #f8e8e8;
+      color: $danger-color;
+      border-color: $danger-color;
+    }
+    
+    &.active {
+      background: $danger-color;
+      color: white;
+      border-color: $danger-color;
+      
+      &:hover {
+        background: #c82333;
+        border-color: #c82333;
+      }
+    }
+    
+    &.inactive {
+      &:hover {
+        background: #f9f9f9;
+        color: #aaa;
+        border-color: #ddd;
+      }
+    }
+  }
+  
+  i {
+    font-size: 12px;
+  }
+}
+
+// Responsive design for rating buttons
+@media (max-width: 768px) {
+  .rating-buttons {
+    gap: 4px;
+  }
+  
+  .rating-btn {
+    padding: 4px 6px;
+    min-width: 28px;
+    height: 24px;
+    
+    i {
+      font-size: 10px;
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .rating-btn {
+    border-color: #555;
+    color: #ccc;
+    
+    &:hover {
+      background: #333;
+      border-color: #666;
+    }
+    
+    &.inactive {
+      opacity: 0.3;
+      color: #777;
+      border-color: #444;
+      
+      &:hover {
+        background: #2a2a2a;
+        border-color: #555;
+        opacity: 0.5;
+      }
+    }
+    
+    &.thumbs-up {
+      &.active {
+        background: #198754;
+        border-color: #198754;
+      }
+      
+      &.inactive {
+        &:hover {
+          background: #2a2a2a;
+          color: #777;
+          border-color: #555;
+        }
+      }
+    }
+    
+    &.thumbs-down {
+      &.active {
+        background: #bb2d3b;
+        border-color: #bb2d3b;
+      }
+      
+      &.inactive {
+        &:hover {
+          background: #2a2a2a;
+          color: #777;
+          border-color: #555;
+        }
+      }
+    }
+  }
+}
+

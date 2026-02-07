@@ -1,0 +1,50 @@
+<div class="search-replace-dialog">
+    <h2 mat-dialog-title>{{ 'lyricCreation.searchReplaceDialog.title' | translate }}</h2>
+
+    <mat-dialog-content>
+        <form [formGroup]="searchReplaceForm" class="search-replace-form">
+            <!-- Search Text -->
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>{{ 'lyricCreation.searchReplaceDialog.searchLabel' | translate }}</mat-label>
+                <input
+                        matInput
+                        formControlName="searchText"
+                        [placeholder]="'lyricCreation.searchReplaceDialog.searchPlaceholder' | translate"
+                        autocomplete="off">
+            </mat-form-field>
+
+            <!-- Replace Text -->
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>{{ 'lyricCreation.searchReplaceDialog.replaceLabel' | translate }}</mat-label>
+                <input
+                        matInput
+                        formControlName="replaceText"
+                        [placeholder]="'lyricCreation.searchReplaceDialog.replacePlaceholder' | translate"
+                        autocomplete="off">
+            </mat-form-field>
+
+            <!-- Live Preview (deaktiviert for jetzt) -->
+            <div class="preview-info" *ngIf="false">
+                <span *ngIf="matchCount > 0">
+                    {{ 'lyricCreation.searchReplaceDialog.matchesFound' | translate:{count: matchCount} }}
+                </span>
+                <span *ngIf="matchCount === 0 && searchReplaceForm.get('searchText')?.value?.trim()">
+                    {{ 'lyricCreation.searchReplaceDialog.noMatches' | translate }}
+                </span>
+            </div>
+        </form>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="cancel()">
+            {{ 'common.cancel' | translate }}
+        </button>
+        <button
+                mat-raised-button
+                class="apply-button"
+                (click)="apply()"
+                [disabled]="!searchReplaceForm.valid">
+            {{ 'common.apply' | translate }}
+        </button>
+    </mat-dialog-actions>
+</div>

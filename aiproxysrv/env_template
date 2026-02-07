@@ -1,0 +1,162 @@
+# ==================================================
+# JWT AUTHENTICATION
+# ==================================================
+# JWT Secret Key (IMPORTANT: Change in production! Use 32+ random characters)
+# Generate with: openssl rand -base64 32
+JWT_SECRET_KEY=
+
+# JWT Token Expiration in hours (default: 240 = 10 days)
+# Examples: 24 (1 day), 168 (1 week), 240 (10 days), 720 (30 days)
+JWT_EXPIRATION_HOURS=240
+
+# ==================================================
+# ENCRYPTION (Fernet symmetric encryption for Equipment)
+# ==================================================
+# Encryption Secret Key for reversible encryption (passwords, license keys, prices)
+# Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+ENCRYPTION_SECRET_KEY=
+
+# ==================================================
+# Image storage directory (defaults to "./images" in
+# debug mode, "/images" in production)
+# ==================================================
+IMAGES_DIR=./images
+# Base URL for image downloads (DEV: http://localhost:5050/api/v1/image, PROD: https://macstudio/aiproxysrv/api/v1/image)
+IMAGE_BASE_URL=http://localhost:5050/api/v1/image
+
+# Control if physical files should be deleted when images are deleted (defaults to true)
+# S3 images: Moved to archive/ folder (soft delete, recoverable)
+# Filesystem images: Deleted permanently (old images)
+DELETE_PHYSICAL_FILES=true
+
+# Chat Debug Logging - Shows detailed prompt construction (true/false)
+CHAT_DEBUG_LOGGING=false
+LOG_LEVEL=INFO
+
+# ==================================================
+# OLLAMA API CONFIGURATION
+# ==================================================
+OLLAMA_URL=http://localhost:11434
+OLLAMA_TIMEOUT=360
+
+# Ollama Chat Models (comma-separated list, empty = all models from server)
+# Example: llama3.2:3b,llama3.1:8b,mistral:7b,gemma2:9b
+# Leave empty to automatically show all models installed on Ollama server
+OLLAMA_CHAT_MODELS=
+
+# Default Ollama Chat Model (must be in OLLAMA_CHAT_MODELS if set)
+OLLAMA_DEFAULT_MODEL=llama3.2:3b
+
+# Allowed models for Prompt Templates (comma-separated list)
+# These models can be assigned to prompt templates for text generation
+OLLAMA_ALLOWED_MODELS=llama3.2:3b,gpt-oss:20b,deepseek-r1:8b,gemma3:4b,MichelRosselli/apertus:latest
+
+# Dedicated model for conversation summarization/compression (optional)
+# If set, this model will be used for all Ollama conversation summaries
+# If empty, the conversation's own model will be used (default behavior)
+OLLAMA_SUMMARY_MODEL=MichelRosselli/apertus:latest
+
+# ==================================================
+# FLASK SERVER CONFIGURATION
+# ==================================================
+FLASK_SERVER_PORT=5050
+FLASK_SERVER_HOST=0.0.0.0
+
+# ==================================================
+# OPENAI CONFIGURATION (Images + Chat + Admin API)
+# ==================================================
+# OpenAI API Key (for images and chat)
+OPENAI_API_KEY=
+
+# OpenAI Admin API Key (for organization cost tracking)
+# Get from: https://platform.openai.com/settings/organization/admin-keys
+OPENAI_ADMIN_API_KEY=
+
+# OpenAI Base URL (used for ALL OpenAI API calls: images, chat, and admin)
+OPENAI_ADMIN_BASE_URL=https://api.openai.com/v1
+
+# Image and Chat Model Configuration
+OPENAI_IMAGE_MODEL=dall-e-3
+OPENAI_CHAT_MODELS=gpt-4o,gpt-4o-mini,gpt-4,gpt-5,gpt-5-mini,gpt-5-nano,gpt-4.1,gpt-4.1-mini
+
+# Timeout for OpenAI API requests in seconds
+# Images (default: 120) - DALL-E 3 generation can take 60-120 seconds
+# Admin API (default: 30) - Cost tracking endpoints are faster
+OPENAI_TIMEOUT=120
+OPENAI_ADMIN_TIMEOUT=30
+
+# OpenAI Max Tokens (default: 4096)
+# Default max_tokens value if not specified in API request
+OPENAI_MAX_TOKENS=4096
+
+# OpenAI Cost Cache TTL in seconds (default: 3600 = 1 hour)
+# Controls how long cost data is cached before fetching fresh data from OpenAI Admin API
+# Lower values = more frequent API calls (useful for testing)
+# Higher values = less API load (recommended for production)
+OPENAI_COST_CACHE_TTL=3600
+
+# Deprecated (backwards compatibility) - will be removed in future
+# OPENAI_URL=https://api.openai.com/v1/images
+# OPENAI_MODEL=dall-e-3
+
+# ==================================================
+# CLAUDE CONFIGURATION (Anthropic Claude API)
+# ==================================================
+# Claude API Key (for chat)
+# Get from: https://console.anthropic.com/settings/keys
+CLAUDE_API_KEY=
+
+# Claude Base URL (Messages API)
+CLAUDE_BASE_URL=https://api.anthropic.com/v1
+
+# Claude API Version Header
+# See: https://docs.anthropic.com/en/api/versioning
+CLAUDE_API_VERSION=2023-06-01
+
+# Claude Chat Models (comma-separated list)
+# Available: claude-sonnet-4-5-20250929, claude-haiku-4-5-20250929, claude-opus-4-5-20251101
+CLAUDE_CHAT_MODELS=claude-sonnet-4-5-20250929,claude-haiku-4-5-20250929,claude-opus-4-5-20251101
+
+# Timeout for Claude API requests in seconds (default: 120)
+CLAUDE_TIMEOUT=120
+
+# Claude Max Tokens (default: 4096)
+# REQUIRED by Claude Messages API - must be specified in every request
+CLAUDE_MAX_TOKENS=4096
+
+# ==================================================
+# APPLICATION SETTINGS
+# ==================================================
+# Debug Mode (true/false)
+DEBUG=true
+
+# ==================================================
+# Database PostgreSQL
+# ==================================================
+DATABASE_URL=postgresql://aiproxy:***@localhost:5432/aiproxysrv
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=aiproxysrv
+POSTGRES_USER=aiproxy
+POSTGRES_PASSWORD=
+
+# Database Connection Pool Settings (Optional - uses defaults if not set)
+# pool_size: Number of permanent connections (default: 10)
+# max_overflow: Additional burst connections (default: 20)
+# pool_pre_ping: Test connections before use (default: true)
+# pool_recycle: Recycle connections after N seconds (default: 3600 = 1 hour)
+#
+# Recommended settings:
+# - Development: pool_size=5, max_overflow=10 (lighter load)
+# - Production: pool_size=10, max_overflow=20 (handle concurrent users)
+# - High-traffic: pool_size=20, max_overflow=40 (heavy load)
+#DATABASE_POOL_SIZE=10
+#DATABASE_MAX_OVERFLOW=20
+#DATABASE_POOL_PRE_PING=true
+#DATABASE_POOL_RECYCLE=3600
+
+# ==================================================
+# Minio S3 Storage
+# ==================================================
+MINIO_ROOT_USER:
+MINIO_ROOT_PASSWORD:

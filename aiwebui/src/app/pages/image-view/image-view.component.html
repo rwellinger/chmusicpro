@@ -1,0 +1,236 @@
+<div class="image-view-container master-detail-layout">
+    <!-- Main Content Grid -->
+    <div class="image-grid">
+        <!-- Left Side: Image Gallery Card -->
+        <div class="image-gallery-section">
+            <mat-card class="image-gallery-card">
+                <!-- Header -->
+                <div class="list-header">
+                    <div class="header-title">
+                        <div class="header-title-group">
+                            <h2>
+                                <i class="fas fa-images"></i>
+                                {{ 'imageView.gallery.header' | translate }}
+                            </h2>
+                            <div class="images-count-badge" *ngIf="pagination.total > 0">
+                                {{ 'imageView.header.count' | translate:{count: pagination.total} }}
+                            </div>
+                        </div>
+                        <p class="subtitle">{{ 'imageView.gallery.subtitle' | translate }}</p>
+                    </div>
+                    <button
+                            type="button"
+                            class="action-button new-image-button"
+                            (click)="navigateToImageGenerator()"
+                            [title]="'imageView.actions.newImage' | translate">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+
+                <!-- Search -->
+                <div class="filters-section">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input
+                                type="text"
+                                [placeholder]="'imageView.gallery.searchPlaceholder' | translate"
+                                [(ngModel)]="searchTerm"
+                                (ngModelChange)="onSearchChange($event)"
+                                class="search-input">
+                        <button type="button"
+                                class="clear-search-button"
+                                *ngIf="searchTerm"
+                                (click)="clearSearch()"
+                                [title]="'imageView.gallery.clearSearch' | translate">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Images List -->
+                <div class="images-list">
+                    <div
+                            *ngFor="let image of images; trackBy: trackByImage"
+                            class="image-item"
+                            [class.selected]="selectedImage?.id === image.id"
+                            [class.selection-selected]="isSelectionMode && selectedImageIds.has(image.id)"
+                            (click)="isSelectionMode ? toggleImageSelection(image.id) : selectImage(image)">
+                        <!-- Checkbox for selection mode -->
+                        <input
+                                *ngIf="isSelectionMode"
+                                type="checkbox"
+                                class="image-checkbox"
+                                [checked]="selectedImageIds.has(image.id)"
+                                [disabled]="!canDeleteImage(image)"
+                                [title]="!canDeleteImage(image) ? ('imageView.tooltips.cannotDeleteProject' | translate:{count: image.projects_count}) : ''"
+                                (click)="$event.stopPropagation()"
+                                (change)="toggleImageSelection(image.id)">
+
+                        <div class="image-item-header">
+                            <h4 class="image-title">
+                                <i class="fas"
+                                   [class.fa-layer-group]="hasTextOverlay(image)"
+                                   [class.fa-image]="!hasTextOverlay(image)"
+                                   [title]="hasTextOverlay(image) ? ('imageView.tooltips.withOverlay' | translate) : ('imageView.tooltips.original' | translate)"></i>
+                                {{ getDisplayTitle(image) }}
+                            </h4>
+                            <div class="image-badges">
+                                <!-- Album Cover Badge -->
+                                <span *ngIf="image.composition === 'album-cover'"
+                                      class="composition-badge album-cover-badge">
+                  <i class="fas fa-compact-disc"></i>
+                                    {{ 'imageView.compositionBadge.albumCover' | translate }}
+                </span>
+                                <!-- Project Badge -->
+                                <span *ngIf="image.projects_count && image.projects_count > 0" class="project-badge"
+                                      (click)="navigateToFirstProject(image, $event)"
+                                      [title]="'common.projectBadge.viewProject' | translate">
+                  <i class="fas fa-folder-open"></i>
+                                    {{ image.projects_count === 1 ? ('common.projectBadge.inProject' | translate:{count: image.projects_count}) : ('common.projectBadge.inProjects' | translate:{count: image.projects_count}) }}
+                </span>
+                            </div>
+                        </div>
+                        <div class="image-item-meta">
+              <span class="meta-date">
+                <i class="fas fa-clock"></i>
+                  {{ formatDate(image.created_at) }}
+              </span>
+                            <span class="meta-size">
+                <i class="fas fa-ruler-combined"></i>
+                                {{ 'imageView.orientation.' + getImageOrientation(image.size) | translate }}
+              </span>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div *ngIf="images.length === 0 && !isLoading && !searchTerm.trim()" class="empty-state">
+                        <i class="fas fa-images"></i>
+                        <p>{{ 'imageView.messages.noImagesInDb' | translate }}</p>
+                    </div>
+
+                    <!-- No Results State -->
+                    <div *ngIf="images.length === 0 && !isLoading && searchTerm.trim()" class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <p>{{ 'imageView.messages.noSearchResults' | translate }}</p>
+                        <small>{{ 'imageView.messages.adjustSearch' | translate }}</small>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div *ngIf="isLoading" class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>{{ 'imageView.messages.loadingImages' | translate }}</p>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" *ngIf="pagination.total > pagination.limit">
+                    <button
+                            class="pagination-btn"
+                            (click)="previousPage()"
+                            [disabled]="currentPage === 0 || isLoading">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span class="pagination-info">
+            {{
+                            'imageView.pagination.info' | translate: {
+                                current: currentPage + 1,
+                                total: Math.ceil(pagination.total / pagination.limit)
+                            }
+                        }}
+          </span>
+                    <button
+                            class="pagination-btn"
+                            (click)="nextPage()"
+                            [disabled]="!pagination.has_more || isLoading">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <mat-card-actions align="end">
+                    <div class="gallery-actions">
+                        <div class="action-groups">
+                            <!-- Left Group: Selection controls - only visible in selection mode -->
+                            <div class="action-group-left">
+                                <ng-container *ngIf="isSelectionMode">
+                                    <button mat-button type="button" (click)="selectAllImages()" [disabled]="isLoading">
+                                        <i class="fas fa-check-double"></i> {{ 'imageView.actions.selectAll' | translate }}
+                                    </button>
+                                    <button mat-button type="button" (click)="deselectAllImages()"
+                                            [disabled]="isLoading || selectedImageIds.size === 0">
+                                        <i class="fas fa-square"></i> {{ 'imageView.actions.deselectAll' | translate }}
+                                    </button>
+                                    <button mat-raised-button color="warn" type="button" (click)="bulkDeleteImages()"
+                                            [disabled]="isLoading || selectedImageIds.size === 0">
+                                        <i class="fas fa-trash"></i> {{ 'imageView.actions.deleteCount' | translate:{count: selectedImageIds.size} }}
+                                    </button>
+                                </ng-container>
+                            </div>
+
+                            <!-- Right Group: Main controls -->
+                            <div class="action-group-right">
+                                <button mat-button type="button" (click)="loadImages(0)" [disabled]="isLoading">
+                                    <i class="fas fa-refresh"></i> {{ 'imageView.actions.refresh' | translate }}
+                                </button>
+                                <button mat-button type="button" (click)="toggleSelectionMode()" [disabled]="isLoading"
+                                        [class.active]="isSelectionMode">
+                                    <i class="fas fa-check-square"></i> {{ isSelectionMode ? ('imageView.actions.exitSelect' | translate) : ('imageView.actions.selectMode' | translate) }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+
+        <!-- Right Side: Image Details Card -->
+        <div class="image-details-section">
+            <mat-card class="image-details-card">
+                <mat-card-content>
+                    <app-image-detail-panel
+                            [imageId]="selectedImage?.id || null"
+                            [showEditTitle]="true"
+                            [showActionButtons]="false"
+                            title=""
+                            [showMetaInfo]="['model', 'size', 'created', 'id']"
+                            [placeholderText]="'imageView.messages.selectImagePlaceholder' | translate"
+                            (titleChanged)="onTitleChanged()">
+                    </app-image-detail-panel>
+                </mat-card-content>
+                <mat-card-actions align="end">
+                    <div class="detail-actions" *ngIf="selectedImage">
+                        <button mat-button type="button" (click)="openAssignToProjectDialog()">
+                            <i class="fas fa-folder-plus"></i> {{ 'imageView.actions.assignToProject' | translate }}
+                        </button>
+                        <button mat-button type="button"
+                                *ngIf="selectedImage.projects_count && selectedImage.projects_count > 0"
+                                (click)="unassignFromProject()">
+                            <i class="fas fa-folder-minus"></i> {{ 'imageView.actions.unassignFromProject' | translate }}
+                        </button>
+                        <button mat-button type="button" (click)="onDownloadImage()">
+                            <i class="fas fa-download"></i> {{ 'imageView.actions.downloadOriginal' | translate }}
+                        </button>
+                        <button mat-button type="button" (click)="onPreviewImage()">
+                            <i class="fas fa-expand"></i> {{ 'imageView.actions.fullSize' | translate }}
+                        </button>
+                    </div>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+    </div>
+</div>
+
+<!-- Picture Modal -->
+<div *ngIf="showImageModal && selectedImage" class="modal-overlay" (click)="closeImageModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <button class="close-button" (click)="closeImageModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <img [src]="selectedImageBlobUrl"
+                 [alt]="(selectedImage.user_prompt || selectedImage.prompt || 'Image') | displayName"
+                 class="preview-image">
+        </div>
+    </div>
+</div>
+

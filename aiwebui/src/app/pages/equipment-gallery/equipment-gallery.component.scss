@@ -1,0 +1,971 @@
+@use "sass:color";
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+.equipment-gallery-container {
+  height: 100vh;
+  overflow: hidden;
+  
+  &.master-detail-layout {
+    display: grid;
+    grid-template-columns: 35fr 65fr;
+    gap: 0;
+    
+    // MacBook Air 13" M4 2025: Stack layout at 1470px
+    @media (max-width: 1470px) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      height: auto;
+    }
+  }
+}
+
+// Left Side: List Section
+.list-section {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: $spacing-md;
+  border-right: 1px solid $border-light;
+  background-color: $background-light;
+  
+  // MacBook Air 13" M4 2025: Adjust height and border
+  @media (max-width: 1470px) {
+    height: auto;
+    max-height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid $border-light;
+    padding: $spacing-sm;
+  }
+}
+
+.list-card {
+  height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  
+  mat-card-content {
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-light;
+}
+
+.header-title {
+  .header-title-group {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+  
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin: 0 0 $spacing-xs 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    
+    i {
+      color: $primary-color;
+    }
+  }
+  
+  .equipment-count-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #1976d2;
+    background-color: #e3f2fd;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  
+  .subtitle {
+    margin: 0;
+    color: $text-muted;
+    font-size: $font-sm;
+  }
+}
+
+.filters-section {
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-light;
+}
+
+.search-box {
+  position: relative;
+  margin-bottom: $spacing-sm;
+  
+  i.fa-search {
+    position: absolute;
+    left: $spacing-sm;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-muted;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: $spacing-sm $spacing-sm $spacing-sm 2.5rem;
+    border: 1px solid $border-light;
+    border-radius: 8px;
+    font-size: $font-sm;
+    transition: all 0.2s;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+    }
+  }
+}
+
+.clear-search-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: $text-secondary;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 2;
+  
+  &:hover:not(:disabled) {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: $text-primary;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  i {
+    font-size: 12px;
+  }
+}
+
+.type-filter,
+.status-filter {
+  display: flex;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-sm;
+  flex-wrap: wrap;
+  
+  .filter-btn {
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid $border-light;
+    border-radius: 8px;
+    background-color: $background-white;
+    color: $text-primary;
+    font-size: $font-sm;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+    
+    &:hover {
+      border-color: $primary-color;
+      background-color: rgba(25, 118, 210, 0.05);
+    }
+    
+    &.active {
+      border-color: $primary-color;
+      background-color: $primary-color;
+      color: white;
+    }
+  }
+}
+
+.status-filter {
+  .filter-btn {
+    &.status-active.active {
+      background-color: #4caf50;
+      border-color: #4caf50;
+    }
+    
+    &.status-trial.active {
+      background-color: #ff9800;
+      border-color: #ff9800;
+    }
+    
+    &.status-expired.active {
+      background-color: #f44336;
+      border-color: #f44336;
+    }
+    
+    &.status-archived.active {
+      background-color: #9e9e9e;
+      border-color: #9e9e9e;
+    }
+  }
+}
+
+.equipment-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-md;
+}
+
+.equipment-item {
+  padding: $spacing-md;
+  border: 1px solid $border-light;
+  border-radius: 8px;
+  margin-bottom: $spacing-sm;
+  background-color: $background-white;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    border-color: $primary-color;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  &.selected {
+    border-color: $primary-color;
+    background-color: rgba(25, 118, 210, 0.05);
+  }
+}
+
+.equipment-item-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xs;
+}
+
+.equipment-type-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background-color: rgba(25, 118, 210, 0.1);
+  
+  mat-icon {
+    color: $primary-color;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.equipment-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.equipment-title {
+  margin: 0;
+  font-size: $font-base;
+  font-weight: 600;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.equipment-manufacturer {
+  margin: 0;
+  font-size: $font-sm;
+  color: $text-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.equipment-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  
+  &.status-active {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+  
+  &.status-trial {
+    background-color: #fff3e0;
+    color: #e65100;
+  }
+  
+  &.status-expired {
+    background-color: #ffebee;
+    color: #c62828;
+  }
+  
+  &.status-archived {
+    background-color: #f5f5f5;
+    color: #616161;
+  }
+}
+
+.equipment-item-footer {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+  margin-top: $spacing-xs;
+  flex-wrap: wrap;
+  
+  .meta-date {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: 0.75rem;
+    color: $text-muted;
+    
+    i {
+      font-size: 0.7rem;
+    }
+  }
+  
+  .meta-tags {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: 0.75rem;
+    color: $primary-color;
+    font-weight: 500;
+    
+    i {
+      font-size: 0.7rem;
+    }
+  }
+}
+
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg;
+  text-align: center;
+  
+  i {
+    font-size: 4rem;
+    color: $text-muted;
+    margin-bottom: $spacing-md;
+  }
+  
+  p {
+    color: $text-muted;
+    margin-bottom: $spacing-md;
+  }
+}
+
+// Pagination
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  border-top: 1px solid $border-light;
+}
+
+.pagination-btn {
+  padding: $spacing-xs $spacing-sm;
+  border: 1px solid $border-standard;
+  background-color: $background-white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    background-color: $primary-color;
+    color: $background-white;
+    border-color: $primary-color;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.pagination-info {
+  font-size: $font-sm;
+  color: $text-muted;
+  font-weight: 500;
+}
+
+// Right Side: Detail Section
+.detail-section {
+  height: 100%;
+  overflow-y: auto;
+  padding: $spacing-md;
+  
+  // MacBook Air 13" M4 2025: Adjust height
+  @media (max-width: 1470px) {
+    height: auto;
+    max-height: 50vh;
+    padding: $spacing-sm;
+  }
+}
+
+// Responsive - MacBook Air 13" M4 2025 - Height (956px)
+@media (max-height: 1000px) {
+  .equipment-gallery-container {
+    height: auto;
+    overflow: visible;
+  }
+  
+  .list-section,
+  .detail-section {
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+  }
+  
+  .list-card,
+  .detail-card {
+    height: auto;
+    max-height: none;
+  }
+}
+
+.detail-card {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  
+  &.empty-detail {
+    height: calc(100vh - 2rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.empty-detail-content {
+  text-align: center;
+  color: $text-muted;
+  
+  i {
+    font-size: 4rem;
+    margin-bottom: $spacing-md;
+  }
+  
+  p {
+    font-size: $font-base;
+  }
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-light;
+}
+
+.detail-type-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  background-color: rgba(25, 118, 210, 0.1);
+  
+  mat-icon {
+    color: $primary-color;
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.detail-title-group {
+  flex: 1;
+  
+  h3 {
+    margin: 0 0 $spacing-xs 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $text-primary;
+  }
+  
+  .detail-manufacturer {
+    margin: 0;
+    color: $text-muted;
+    font-size: $font-base;
+  }
+}
+
+.detail-content {
+  padding: $spacing-md;
+}
+
+// Section Blocks (Flat Design - matches Image/Song Gallery)
+.detail-section-block {
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  background-color: $background-light;
+  border-radius: 12px;
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    margin: 0 0 $spacing-md 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-primary;
+    
+    i {
+      color: $primary-color;
+      font-size: 16px;
+      width: 16px;
+    }
+  }
+}
+
+.detail-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  .detail-field {
+    margin-bottom: 0;
+  }
+}
+
+.detail-field-row-3col {
+  display: grid;
+  grid-template-columns: auto 1fr 120px;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  .detail-field {
+    margin-bottom: 0;
+  }
+}
+
+.detail-field {
+  margin-bottom: $spacing-md;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  .field-label {
+    display: block;
+    font-size: $font-sm;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: $spacing-xs;
+  }
+  
+  .field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-xs;
+  }
+  
+  .readonly-field {
+    background: $background-light;
+    border: 1px solid $border-light;
+    border-radius: 8px;
+    padding: $spacing-sm;
+    font-size: $font-sm;
+    color: $text-primary;
+    word-wrap: break-word;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    
+    &.multiline {
+      white-space: pre-wrap;
+      line-height: 1.5;
+      max-height: 200px;
+      overflow-y: auto;
+      display: block;
+    }
+    
+    .type-icon {
+      color: $primary-color;
+      font-size: 1rem;
+      width: 1rem;
+      height: 1rem;
+    }
+    
+    a {
+      color: $primary-color;
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  .field-actions {
+    display: flex;
+    gap: $spacing-xs;
+  }
+}
+
+// Copy Button (Transparent - matches Image/Song Gallery)
+.copy-icon-btn,
+.copy-id-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: transparent;
+  color: $primary-color;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.6;
+  
+  i {
+    font-size: 14px;
+  }
+  
+  &:hover {
+    opacity: 1;
+    background-color: rgba(25, 118, 210, 0.1);
+  }
+}
+
+// Visibility Toggle Button (Transparent)
+.visibility-toggle-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: transparent;
+  color: $primary-color;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.6;
+  
+  i {
+    font-size: 14px;
+  }
+  
+  &:hover {
+    opacity: 1;
+    background-color: rgba(25, 118, 210, 0.1);
+  }
+}
+
+// Metadata Section (Icon-only, compact - matches Image Gallery)
+.metadata-compact {
+  background-color: $background-light;
+  padding: $spacing-sm $spacing-md;
+  border-radius: 12px;
+}
+
+.meta-id-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-bottom: $spacing-sm;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  
+  .meta-icon {
+    color: $primary-color;
+    font-size: 14px;
+    width: 14px;
+    flex-shrink: 0;
+  }
+  
+  .meta-id {
+    flex: 1;
+    font-family: monospace;
+    font-size: 11px;
+    color: $text-primary;
+    opacity: 0.7;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  
+  .meta-icon {
+    color: $primary-color;
+    font-size: 14px;
+    width: 14px;
+    flex-shrink: 0;
+  }
+  
+  .meta-value {
+    color: $text-primary;
+    font-size: $font-sm;
+    font-weight: 500;
+  }
+}
+
+// Sensitive Fields (With readonly-field background)
+.sensitive-field {
+  .sensitive-value {
+    font-family: monospace;
+    font-size: $font-sm;
+    color: $text-primary;
+    transition: all 0.2s;
+    
+    &.masked {
+      font-size: 1rem;
+      letter-spacing: 2px;
+      color: $text-muted;
+    }
+  }
+}
+
+// Price Value
+.price-value {
+  font-weight: 600;
+  color: #2e7d32;
+  
+  i {
+    color: #2e7d32;
+  }
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+
+  mat-chip {
+    font-size: $font-sm;
+  }
+}
+
+// Attachments List (Gallery Detail View)
+.attachments-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.attachment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm $spacing-md;
+  background-color: $background-light;
+  border-radius: 6px;
+  border: 1px solid $border-light;
+
+  &:hover {
+    border-color: $primary-color;
+    background-color: rgba(25, 118, 210, 0.02);
+  }
+}
+
+.attachment-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .attachment-icon {
+    color: $text-muted;
+    font-size: 16px;
+  }
+}
+
+.attachment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .attachment-name {
+    font-weight: 500;
+    color: $text-primary;
+    font-size: $font-sm;
+    word-break: break-all;
+  }
+
+  .attachment-meta {
+    font-size: 0.75rem;
+    color: $text-muted;
+  }
+}
+
+.download-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: $spacing-xs;
+  border-radius: 4px;
+  color: $text-muted;
+  transition: all 0.2s;
+
+  &:hover {
+    color: $primary-color;
+    background-color: rgba(25, 118, 210, 0.1);
+  }
+
+  i {
+    font-size: 14px;
+  }
+}
+
+.detail-actions {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  border-top: 1px solid $border-light;
+  justify-content: flex-end;
+}
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-weight: $font-weight-medium !important;
+  
+  i {
+    font-size: $font-base;
+  }
+  
+  span {
+    display: inline-block;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.new-equipment-button {
+  @include button-primary('base');
+  min-width: auto !important;
+  width: 40px;
+  height: 40px;
+  padding: 0 !important;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  i {
+    font-size: $font-lg;
+    margin: 0;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.edit-button {
+  @include button-secondary('base');
+}
+
+.duplicate-button {
+  @include button-secondary('base');
+}
+
+.delete-button {
+  @include button-secondary('base');
+}
+
+.load-more-button {
+  @include button-primary('base');
+  width: 100%;
+}
+
+// Delete Confirmation Dialog
+.delete-confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.delete-confirmation-dialog {
+  background-color: $background-white;
+  border-radius: 12px;
+  padding: $spacing-lg;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  
+  h3 {
+    margin: 0 0 $spacing-md 0;
+    color: $text-primary;
+  }
+  
+  .dialog-actions {
+    display: flex;
+    gap: $spacing-sm;
+    justify-content: flex-end;
+  }
+  
+  .secondary-button {
+    background-color: $background-light;
+    border-color: $border-light;
+    
+    &:hover {
+      background-color: color.adjust($background-light, $lightness: -5%);
+    }
+  }
+}

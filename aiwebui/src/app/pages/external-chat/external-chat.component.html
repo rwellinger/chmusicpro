@@ -1,0 +1,311 @@
+<div class="external-chat-container">
+    <!-- Left sidebar - Conversation list -->
+    <aside class="conversation-list">
+        <div class="conversation-list-header">
+            <h2>{{ 'externalChat.title' | translate }}</h2>
+            <div class="header-actions">
+                <button mat-icon-button (click)="toggleShowArchived()"
+                        [title]="(showArchived ? 'aiChat.sidebar.showActive' : 'aiChat.sidebar.showArchive') | translate">
+                    <mat-icon>{{ showArchived ? 'unarchive' : 'archive' }}</mat-icon>
+                </button>
+                <button mat-raised-button color="primary" (click)="showNewChat()">
+                    <mat-icon>add</mat-icon>
+                    {{ 'aiChat.sidebar.newChat' | translate }}
+                </button>
+            </div>
+        </div>
+
+        <!-- New chat form -->
+        @if (showNewChatForm) {
+            <mat-card class="new-chat-form">
+                <!-- Provider selection -->
+                <mat-form-field appearance="outline">
+                    <mat-label>{{ 'externalChat.providerLabel' | translate }}</mat-label>
+                    <mat-select [(ngModel)]="selectedProvider" (selectionChange)="onProviderChange()">
+                        @for (provider of availableProviders; track provider.value) {
+                            <mat-option [value]="provider.value">{{ provider.label }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- Model selection -->
+                <mat-form-field appearance="outline">
+                    <mat-label>{{ 'aiChat.form.model' | translate }}</mat-label>
+                    <mat-select [(ngModel)]="selectedModel" [disabled]="isLoadingModels">
+                        @for (model of models; track model.name) {
+                            <mat-option [value]="model.name">{{ model.name }}</mat-option>
+                        }
+                    </mat-select>
+                    @if (isLoadingModels) {
+                        <mat-hint>{{ 'aiChat.loadingModels' | translate }}</mat-hint>
+                    }
+                </mat-form-field>
+
+                <!-- Title input -->
+                <mat-form-field appearance="outline">
+                    <mat-label>{{ 'aiChat.form.title' | translate }}</mat-label>
+                    <input matInput [(ngModel)]="newChatTitle"
+                           [placeholder]="'aiChat.form.titlePlaceholder' | translate">
+                </mat-form-field>
+
+                <mat-expansion-panel class="system-context-panel">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <mat-icon>settings</mat-icon>
+                            {{ 'aiChat.form.systemContextOptional' | translate }}
+                            @if (systemContext.trim()) {
+                                <span class="context-indicator">●</span>
+                            }
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>{{ 'aiChat.form.systemContext' | translate }}</mat-label>
+                        <textarea matInput [(ngModel)]="systemContext" (ngModelChange)="onSystemContextChange()"
+                                  rows="4"
+                                  [placeholder]="'aiChat.form.systemContextPlaceholder' | translate"></textarea>
+                        <mat-hint>{{ 'aiChat.form.systemContextHint' | translate }}</mat-hint>
+                    </mat-form-field>
+
+                    @if (systemContext.trim()) {
+                        <button mat-stroked-button color="warn" (click)="clearSystemContext()"
+                                class="clear-context-btn">
+                            <mat-icon>clear</mat-icon>
+                            {{ 'aiChat.form.clearSystemContext' | translate }}
+                        </button>
+                    }
+                </mat-expansion-panel>
+
+                <div class="form-actions">
+                    <button mat-button (click)="cancelNewChat()">{{ 'common.cancel' | translate }}</button>
+                    <button mat-raised-button color="primary"
+                            (click)="createConversation()">{{ 'common.create' | translate }}
+                    </button>
+                </div>
+            </mat-card>
+        }
+
+        <!-- Conversation items -->
+        <div class="conversation-items">
+            @if (isLoading && conversations.length === 0) {
+                <div class="loading-state">
+                    <mat-spinner diameter="40"></mat-spinner>
+                </div>
+            }
+
+            @for (conv of conversations; track conv.id) {
+                <div class="conversation-item"
+                     [class.active]="currentConversation?.id === conv.id"
+                     (click)="selectConversation(conv)">
+                    <div class="conversation-item-title">{{ conv.title }}</div>
+                    <div class="conversation-item-model">{{ conv.model }}</div>
+                    <div class="conversation-item-meta">
+                        <span>{{ 'aiChat.sidebar.messagesCount' | translate:{count: conv.message_count || 0} }}</span>
+                        <span class="conversation-date">{{ formatDate(conv.updated_at || conv.created_at) }}</span>
+                    </div>
+                </div>
+            }
+
+            @if (!isLoading && conversations.length === 0) {
+                <div class="empty-state">
+                    <p>{{ 'aiChat.sidebar.noConversations' | translate }}</p>
+                    <p>{{ 'aiChat.sidebar.getStarted' | translate }}</p>
+                </div>
+            }
+        </div>
+    </aside>
+
+    <!-- Main content - Conversation view -->
+    <main class="conversation-view">
+        @if (!currentConversation) {
+            <div class="empty-conversation">
+                <mat-icon>chat_bubble_outline</mat-icon>
+                <h2>{{ 'aiChat.conversation.noSelection' | translate }}</h2>
+                <p>{{ 'aiChat.conversation.noSelectionHint' | translate }}</p>
+            </div>
+        } @else {
+            <div class="conversation-header">
+                <div class="conversation-info">
+                    <div class="title-section">
+                        <span class="model-badge-small">{{ currentConversation.model }}</span>
+                        @if (!isEditingTitle) {
+                            <div class="title-display">
+                                <h2>{{ currentConversation.title }}</h2>
+                                <button mat-icon-button (click)="startEditTitle()"
+                                        [title]="'aiChat.conversation.editTitle' | translate"
+                                        class="edit-title-btn">
+                                    <mat-icon>edit</mat-icon>
+                                </button>
+                            </div>
+                        } @else {
+                            <div class="title-edit">
+                                <input
+                                        type="text"
+                                        [(ngModel)]="editTitleValue"
+                                        (keydown)="onTitleInputKeydown($event)"
+                                        class="title-input"
+                                        [placeholder]="'aiChat.conversation.conversationTitle' | translate">
+                                <button mat-icon-button color="primary" (click)="saveTitle()"
+                                        [title]="'common.save' | translate">
+                                    <mat-icon>check</mat-icon>
+                                </button>
+                                <button mat-icon-button (click)="cancelEditTitle()"
+                                        [title]="'common.cancel' | translate">
+                                    <mat-icon>close</mat-icon>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="token-info">
+                    <span class="token-count">{{ formattedTokenCount }} {{ 'aiChat.conversation.tokens' | translate }}</span>
+                    <mat-progress-bar
+                            mode="determinate"
+                            [value]="tokenPercentage"
+                            [color]="getTokenProgressColor()"
+                            class="token-progress">
+                    </mat-progress-bar>
+                </div>
+                @if (currentConversation.has_archived_messages) {
+                    <button mat-icon-button [matMenuTriggerFor]="exportMenu"
+                            [title]="'aiChat.actions.exportChat' | translate">
+                        <mat-icon>download</mat-icon>
+                    </button>
+                    <mat-menu #exportMenu="matMenu">
+                        <button mat-menu-item (click)="exportToMarkdown()">
+                            <mat-icon>description</mat-icon>
+                            <span>{{ 'aiChat.actions.export' | translate }}</span>
+                        </button>
+                        <button mat-menu-item (click)="exportFullToMarkdown()">
+                            <mat-icon>history</mat-icon>
+                            <span>{{ 'aiChat.actions.exportWithHistory' | translate }}</span>
+                        </button>
+                    </mat-menu>
+                } @else {
+                    <button mat-icon-button (click)="exportToMarkdown()"
+                            [title]="'aiChat.actions.exportChat' | translate">
+                        <mat-icon>download</mat-icon>
+                    </button>
+                }
+                <button mat-icon-button (click)="toggleArchive()"
+                        [title]="(currentConversation.archived ? 'aiChat.actions.unarchive' : 'aiChat.actions.archive') | translate">
+                    <mat-icon>{{ currentConversation.archived ? 'unarchive' : 'archive' }}</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteConversation()" [title]="'aiChat.actions.delete' | translate">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+
+            @if (isCompressing) {
+                <div class="compressing-indicator">
+                    <mat-spinner diameter="20"></mat-spinner>
+                    <span>{{ 'aiChat.compression.compressing' | translate }}</span>
+                </div>
+            }
+
+            @if (shouldShowCompressionWarning() && !isCompressing) {
+                <div class="compression-warning">
+                    <mat-icon>compress</mat-icon>
+                    <span>{{ 'aiChat.compression.memoryLow' | translate:{percent: tokenPercentage.toFixed(0)} }}</span>
+                    <button mat-raised-button color="accent" (click)="compressConversation()"
+                            [disabled]="isCompressing">
+                        {{ 'aiChat.compression.compressChat' | translate }}
+                    </button>
+                </div>
+            }
+
+            @if (shouldShowTokenWarning() && !isCompressing) {
+                <div class="token-warning">
+                    <mat-icon>warning</mat-icon>
+                    <span>{{ 'aiChat.compression.contextFull' | translate:{percent: tokenPercentage.toFixed(0)} }}</span>
+                    <button mat-raised-button color="warn" (click)="compressConversation()" [disabled]="isCompressing">
+                        {{ 'aiChat.compression.compressNow' | translate }}
+                    </button>
+                </div>
+            }
+
+            @if (currentConversation.system_context) {
+                <mat-expansion-panel class="conversation-system-context">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <mat-icon>info</mat-icon>
+                            {{ 'aiChat.form.systemContext' | translate }}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="system-context-content">
+                        {{ currentConversation.system_context }}
+                    </div>
+                </mat-expansion-panel>
+            }
+
+            <div class="messages-container" #messagesContainer>
+                @for (message of messages; track message.id) {
+                    @if (message.role !== 'system') {
+                        <div class="message" [ngClass]="getMessageClass(message)">
+                            <div class="message-role">{{ message.role }}</div>
+                            <div class="message-content" [innerHTML]="message.content | messageContent"></div>
+                            <div class="message-footer">
+                                @if (message.role === 'assistant') {
+                                    <div class="copy-buttons">
+                                        <button mat-icon-button class="copy-btn"
+                                                (click)="copyToClipboard(message.content)"
+                                                [title]="'aiChat.messages.copyPlainText' | translate">
+                                            <mat-icon>content_copy</mat-icon>
+                                        </button>
+                                        <button mat-icon-button class="copy-btn"
+                                                (click)="copyAsMarkdown(message.content)"
+                                                [title]="'aiChat.messages.copyMarkdown' | translate">
+                                            <mat-icon>article</mat-icon>
+                                        </button>
+                                    </div>
+                                }
+                                <div class="message-time">{{ formatDate(message.created_at) }}</div>
+                            </div>
+                        </div>
+                    }
+                }
+
+                @if (isSending) {
+                    <div class="message message--assistant message--loading">
+                        <div class="message-role">assistant</div>
+                        <div class="message-content">
+                            <mat-spinner diameter="20"></mat-spinner>
+                            {{ 'aiChat.messages.thinking' | translate }}
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="message-input-container">
+                <!-- Cost Info Banner -->
+                <div class="cost-info-banner">
+                    <mat-icon>info</mat-icon>
+                    <span>{{ 'openaiChat.costInfo' | translate }}</span>
+                </div>
+
+                @if (currentConversation.archived) {
+                    <div class="archived-notice">
+                        <mat-icon>archive</mat-icon>
+                        <span>{{ 'aiChat.messages.archived' | translate }}</span>
+                    </div>
+                }
+                <textarea
+                    #messageInputField
+                    class="message-input"
+                    [(ngModel)]="messageInput"
+                    (keydown)="onMessageInputKeydown($event)"
+                    [placeholder]="'aiChat.messages.sendPlaceholder' | translate"
+                    rows="3"
+                    [disabled]="isSending || isCompressing || currentConversation.archived === true"></textarea>
+                <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="sendMessage()"
+                        [disabled]="!messageInput.trim() || isSending || isCompressing || currentConversation.archived === true">
+                    <mat-icon>send</mat-icon>
+                    {{ 'aiChat.messages.send' | translate }}
+                </button>
+            </div>
+        }
+    </main>
+</div>

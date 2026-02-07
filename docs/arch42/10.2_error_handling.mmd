@@ -1,0 +1,23 @@
+flowchart TD
+    START([API Request]) --> TRY[Try Operation]
+    TRY --> SUCCESS{Success?}
+    SUCCESS -->|Yes| LOG_SUCCESS[Log Success]
+    SUCCESS -->|No| ERROR_TYPE{Error Type?}
+
+    ERROR_TYPE -->|Network Error| RETRY_CHECK{Retries < 3?}
+    ERROR_TYPE -->|API Rate Limit| WAIT[Wait + Retry]
+    ERROR_TYPE -->|Invalid Input| REJECT[Return 400 Error]
+    ERROR_TYPE -->|Server Error| LOG_ERROR[Log Error]
+
+    RETRY_CHECK -->|Yes| WAIT_RETRY[Wait 5s]
+    RETRY_CHECK -->|No| GIVE_UP[Return 500 Error]
+
+    WAIT_RETRY --> TRY
+    WAIT --> TRY
+    LOG_ERROR --> RETURN_500[Return 500 Error]
+
+    LOG_SUCCESS --> RETURN_SUCCESS[Return Success Response]
+    REJECT --> END([End])
+    GIVE_UP --> END
+    RETURN_500 --> END
+    RETURN_SUCCESS --> END

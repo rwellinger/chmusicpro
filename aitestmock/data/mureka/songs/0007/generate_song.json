@@ -1,0 +1,6 @@
+{
+  "error": "Rate limit reached for requests",
+  "message": "Rate limit reached for requests. Pace your requests. Check the concurrent request limit in the pricing plans.",
+  "code": "rate_limit_exceeded",
+  "type": "rate_limit"
+}

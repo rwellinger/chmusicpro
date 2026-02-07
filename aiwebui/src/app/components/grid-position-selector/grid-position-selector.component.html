@@ -1,0 +1,11 @@
+<div class="grid-selector">
+    <button
+            *ngFor="let position of positions"
+            type="button"
+            class="grid-selector__cell"
+            [class.grid-selector__cell--selected]="position === selectedPosition()"
+            (click)="selectPosition(position)"
+            [attr.aria-label]="position">
+        <span class="grid-selector__dot"></span>
+    </button>
+</div>

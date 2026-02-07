@@ -1,0 +1,39 @@
+graph TB
+    subgraph "External Network"
+        CLIENT[Browser Client]
+    end
+
+    subgraph "Production Server"
+        subgraph "Docker Network: webui-network"
+            NGINX[Nginx Proxy<br/>:443<br/>serves Angular + API]
+            API[AI Proxy Server<br/>:5050]
+            WORKER[Celery Worker<br/>:6379]
+            PG[PostgreSQL<br/>:5432]
+            REDIS[Redis<br/>:6379]
+        end
+
+        subgraph "Host Services"
+            OLLAMA[Ollama<br/>:11434<br/>LLM Backend]
+        end
+    end
+
+    subgraph "NAS / S3 Storage"
+        MINIO[MinIO S3 Storage<br/>:9000 S3 API<br/>:9001 Console<br/>/volume1/minio-data]
+    end
+
+    CLIENT -->|HTTPS| NGINX
+    NGINX -->|/aiwebui/<br/>incl. /ai-chat| NGINX
+    NGINX -->|/ MinIO Console| MINIO
+    NGINX -->|/api/v1/image/| API
+    NGINX -->|/api/v1/song/| API
+    NGINX -->|/api/v1/ollama/chat/| API
+    NGINX -->|/api/v1/prompts/| API
+    NGINX -->|/api/v1/redis/| API
+
+    API --> PG
+    API --> REDIS
+    API -->|Chat Generation| OLLAMA
+    API -->|S3 API :9000| MINIO
+    WORKER --> REDIS
+    WORKER --> PG
+    WORKER -->|S3 API :9000| MINIO

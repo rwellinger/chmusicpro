@@ -1,0 +1,635 @@
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+.image-view-container {
+  height: 100vh;
+  overflow: hidden;
+  
+  &.master-detail-layout {
+    display: grid;
+    grid-template-columns: 40fr 60fr; // Gleiche Breite wie Song Gallery (mehr Platz für Buttons)
+    gap: 0;
+    
+    @media (max-width: 1200px) {
+      grid-template-columns: 1fr; // Stacked layout on smaller screens
+    }
+  }
+  
+  .image-grid {
+    display: contents;
+  }
+}
+
+// Left Side: List Section
+.image-gallery-section {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: $spacing-md;
+  border-right: 1px solid $border-light;
+  background-color: $background-light;
+}
+
+.image-gallery-card {
+  height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  
+  mat-card-content {
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-light;
+  
+  .header-title {
+    .header-title-group {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+    }
+    
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      margin: 0 0 $spacing-xs 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: $text-primary;
+      
+      i {
+        color: $primary-color;
+      }
+    }
+    
+    .images-count-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #1976d2;
+      background-color: #e3f2fd;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    
+    .subtitle {
+      margin: 0;
+      color: $text-muted;
+      font-size: $font-sm;
+    }
+  }
+}
+
+.filters-section {
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-light;
+}
+
+.search-box {
+  position: relative;
+  
+  i.fa-search {
+    position: absolute;
+    left: $spacing-sm;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-muted;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: $spacing-sm $spacing-sm $spacing-sm 2.5rem;
+    border: 1px solid $border-standard;
+    border-radius: 8px;
+    font-size: $font-sm;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+  }
+}
+
+.clear-search-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: $text-secondary;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 2;
+  
+  &:hover:not(:disabled) {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: $text-primary;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  i {
+    font-size: 12px;
+  }
+}
+
+.images-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-sm;
+}
+
+.image-item {
+  padding: $spacing-md;
+  margin-bottom: $spacing-sm;
+  border: 1px solid $border-light;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: $background-white;
+  position: relative;
+  
+  &:hover {
+    border-color: $primary-color;
+    box-shadow: 0 2px 8px rgba($primary-color, 0.1);
+  }
+  
+  &.selected {
+    border-color: $primary-color;
+    background-color: rgba($primary-color, 0.05);
+  }
+  
+  &.selection-selected {
+    background: linear-gradient(135deg,
+        rgba(255, 193, 7, 0.15) 0%,
+        rgba(255, 193, 7, 0.25) 100%) !important;
+    border-left: 4px solid $warning-color !important;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+  }
+  
+  .image-checkbox {
+    position: absolute;
+    top: $spacing-md;
+    left: $spacing-sm;
+    transform: scale(1.1);
+    cursor: pointer;
+  }
+  
+  .image-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-xs;
+    
+    .image-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 500;
+      color: $text-primary;
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      
+      i {
+        font-size: 0.9rem;
+        color: $primary-color;
+      }
+    }
+    
+    .image-badges {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .composition-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      white-space: nowrap;
+      
+      i {
+        font-size: 0.75rem;
+      }
+    }
+    
+    .project-badge {
+      @include project-badge;
+    }
+    
+    .album-cover-badge {
+      background-color: rgba(156, 39, 176, 0.1);
+      color: #9c27b0;
+      border: 1px solid rgba(156, 39, 176, 0.3);
+      
+      i {
+        color: #9c27b0;
+      }
+    }
+    
+    .storage-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      white-space: nowrap;
+      
+      i {
+        font-size: 0.75rem;
+      }
+    }
+    
+    .s3-badge {
+      background-color: $storage-bg;
+      color: $storage-text;
+      border: 1px solid rgba(146, 64, 14, 0.3);
+      
+      i {
+        color: $storage-text;
+      }
+    }
+  }
+  
+  .image-item-meta {
+    display: flex;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-xs;
+    flex-wrap: wrap;
+    
+    .meta-size,
+    .meta-date {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: 0.75rem;
+      color: $text-muted;
+      
+      i {
+        font-size: 0.7rem;
+      }
+    }
+    
+    .meta-size {
+      font-weight: 500;
+      color: $text-primary;
+    }
+  }
+}
+
+.empty-state,
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl;
+  text-align: center;
+  color: $text-muted;
+  
+  i {
+    font-size: 3rem;
+    margin-bottom: $spacing-md;
+    color: $text-muted;
+    opacity: 0.5;
+  }
+  
+  p {
+    margin: 0 0 $spacing-md 0;
+  }
+  
+  small {
+    font-size: $font-sm;
+    color: $text-muted;
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  border-top: 1px solid $border-light;
+  
+  .pagination-btn {
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid $border-standard;
+    background-color: $background-white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover:not(:disabled) {
+      background-color: $primary-color;
+      color: $background-white;
+      border-color: $primary-color;
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  .pagination-info {
+    font-size: $font-sm;
+    color: $text-muted;
+  }
+}
+
+// Right Side: Detail Section
+.image-details-section {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: $spacing-md;
+  background-color: $background-white;
+}
+
+.image-details-card {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 2rem);
+  
+  mat-card-content {
+    padding: 0;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  mat-card-actions {
+    padding: 0.75rem 1.5rem 1rem 1.5rem;
+    border-top: 1px solid $border-light;
+    background: #f8f9fa;
+  }
+}
+
+// Action Buttons
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-weight: $font-weight-medium !important;
+  
+  i {
+    font-size: $font-base;
+  }
+  
+  span {
+    display: inline-block;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.new-image-button {
+  @include button-primary('base');
+  min-width: auto !important;
+  width: 40px;
+  height: 40px;
+  padding: 0 !important;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  i {
+    font-size: $font-lg;
+    margin: 0;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// Gallery Actions
+.gallery-actions {
+  width: 100%;
+  
+  .action-groups {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 2rem;
+    
+    .action-group-left {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .action-group-right {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+  }
+}
+
+// Detail Actions
+.detail-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+// Image Modal
+.modal-overlay {
+  @include modal-overlay(0.8, 1500);
+}
+
+.modal-content {
+  background: $background-white;
+  border-radius: 12px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  padding: $spacing-15 $spacing-20;
+  border-bottom: 1px solid $border-light;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.close-button {
+  background: $text-muted;
+  color: $background-white;
+  border: none;
+  border-radius: $border-radius-sm;
+  padding: $spacing-6 $spacing-12;
+  cursor: pointer;
+  font-size: $font-base;
+  
+  &:hover {
+    background: #5a6268;
+  }
+}
+
+.modal-body {
+  padding: $spacing-15;
+  text-align: center;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: $border-radius-xl;
+}
+
+// Responsive - MacBook Air 13" M4 2025 (1470px)
+@media (max-width: 1470px) {
+  .image-view-container.master-detail-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    height: auto;
+  }
+  
+  .image-gallery-section {
+    height: auto;
+    max-height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid $border-light;
+    padding: $spacing-sm;
+  }
+  
+  .image-details-section {
+    height: auto;
+    max-height: 50vh;
+    padding: $spacing-sm;
+  }
+  
+  .image-gallery-card,
+  .image-details-card {
+    height: auto;
+  }
+}
+
+// iPad & Touch Device Optimizations
+@media (max-width: 1024px) and (hover: none) {
+  // Stack Master-Detail layout on iPad
+  .image-view-container.master-detail-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  // Sections with adjusted heights
+  .image-gallery-section,
+  .image-details-section {
+    height: auto;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  
+  // Larger touch targets for image items
+  .image-item {
+    min-height: 60px;
+    padding: 12px;
+    
+    &:active {
+      background: rgba($primary-color, 0.08);
+      transform: scale(0.99);
+    }
+  }
+  
+  // Image grid - 2 columns on iPad
+  .images-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  // Full-width action buttons
+  .action-button,
+  .detail-actions button {
+    width: 100%;
+    height: 60px;
+    margin-bottom: 0.5rem;
+  }
+  
+  // Adjust card heights
+  .image-gallery-card,
+  .image-details-card {
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .image-view-container {
+    padding: 1rem;
+    
+    .image-grid {
+      gap: 1rem;
+      
+      .image-gallery-card,
+      .image-details-card {
+        min-height: 300px;
+        
+        mat-card-content {
+          padding: 0.75rem;
+        }
+      }
+    }
+  }
+}
+
+// Responsive - MacBook Air 13" M4 2025 - Height (956px)
+@media (max-height: 1000px) {
+  .image-view-container {
+    height: auto;
+    overflow: visible;
+  }
+  
+  .image-gallery-section,
+  .image-details-section {
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+  }
+  
+  .image-gallery-card,
+  .image-details-card {
+    height: auto;
+    max-height: none;
+  }
+}

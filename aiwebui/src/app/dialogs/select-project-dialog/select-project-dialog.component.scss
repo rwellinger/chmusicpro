@@ -1,0 +1,31 @@
+.dialog-subtitle {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.project-option {
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.project-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  
+  i {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+  }
+  
+  .project-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+}

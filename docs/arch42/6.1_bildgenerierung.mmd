@@ -1,0 +1,63 @@
+sequenceDiagram
+    participant User
+    participant WebUI as Angular WebUI
+    participant API as aiproxysrv API
+    participant Ollama as Ollama LLM<br/>(Enhancement)
+    participant OpenAI as OpenAI DALL-E 3
+    participant DB as PostgreSQL
+    participant Files as File System
+
+    Note over User,Files: Image Generation with AI-Powered Enhancement
+
+    User->>WebUI: Enter Prompt + Select Size<br/>(Optional: Title, Styles)
+    WebUI->>WebUI: Check Enhance Mode<br/>(off, fast, quality)
+
+    alt Title is empty
+        WebUI->>Ollama: Generate Title (Fast Template)
+        Ollama-->>WebUI: Auto-generated Title
+        WebUI->>WebUI: Update Form with Title
+    end
+
+    alt Enhancement Mode != 'off'
+        alt Album Cover Mode
+            WebUI->>Ollama: Enhance Cover Prompt<br/>(Title, Artist Name)
+            Ollama-->>WebUI: Enhanced Cover Prompt
+        else Regular Enhancement
+            alt Quality Mode
+                WebUI->>Ollama: Improve Prompt (Quality Template)
+                Ollama-->>WebUI: High-Quality Enhanced Prompt
+            else Fast Mode
+                WebUI->>Ollama: Improve Prompt (Fast Template)
+                Ollama-->>WebUI: Fast Enhanced Prompt
+            end
+        end
+        WebUI->>WebUI: finalPrompt = Enhanced Prompt
+    else Enhancement Mode == 'off'
+        WebUI->>WebUI: finalPrompt = Original Prompt
+    end
+
+    WebUI->>API: POST /api/v1/image/generate<br/>{user_prompt, prompt, size,<br/>artistic_style, composition,<br/>lighting, color_palette, detail_level}
+
+    Note over API: Combine Prompt with Style Parameters
+
+    API->>API: Build Enhanced Prompt<br/>finalPrompt + Style Instructions
+
+    API->>OpenAI: DALL-E 3 API Call<br/>(finalPrompt + Styles)
+    OpenAI-->>API: Generated Image URL<br/>+ revised_prompt
+
+    API->>Files: Download Image from URL
+    Files-->>API: Image File
+    API->>Files: Save Image Locally
+
+    API->>DB: INSERT generated_images<br/>(user_prompt, prompt,<br/>enhanced_prompt, revised_prompt,<br/>artistic_style, title, tags)
+
+    DB-->>API: Image ID
+
+    API-->>WebUI: Response {id, url, prompts}
+
+    WebUI->>Files: Load Image (local URL)
+    Files-->>WebUI: Image Blob
+
+    WebUI-->>User: Display Generated Image<br/>+ Detail Panel with Metadata
+
+    Note over User,Files: Metadata includes: Original, Enhanced,<br/>Final (with Styles), and Revised Prompts

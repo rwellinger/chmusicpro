@@ -1,0 +1,94 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aitestmock"
+version = "2.15.0"
+dependencies = [
+    "Flask>=3.1.2",
+    "Flask-CORS>=4.0.0",
+    "Werkzeug>=3.1.0",
+    "requests>=2.32.5",
+    "python-dotenv>=1.1.1",
+    "gunicorn>=23.0.0",
+    "tomli>=2.0.0",
+    "loguru>=0.7.0"
+]
+
+# ===================================
+# Ruff Configuration
+# ===================================
+[tool.ruff]
+# Python version target
+target-version = "py312"
+
+[project.scripts]
+start-server = "aitestmock.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# Exclude patterns
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "*.pyc",
+    ".pytest_cache",
+    "build",
+    "dist",
+    "*.egg-info",
+    ".mypy_cache",
+    ".ruff_cache",
+]
+
+[tool.ruff.lint]
+# Enable rule categories
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "ARG", # flake8-unused-arguments
+]
+
+# Disable specific rules
+ignore = [
+    "E501",   # Line too long (handled by formatter)
+    "B008",   # Do not perform function call in argument defaults
+    "B904",   # Use raise from within except
+    "ARG002", # Unused method argument (common in overrides)
+    "N805",   # First argument should be self/cls (pydantic validators)
+    "SIM208", # Use ternary operator - DISABLED: breaks SQLAlchemy expressions (not X → X == False)
+]
+
+# Allow autofix for all enabled rules
+fixable = ["ALL"]
+unfixable = []
+
+# Per-file ignores
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # Allow unused imports in __init__.py
+"src/alembic/**/*.py" = ["E402"]  # Allow imports not at top (alembic env.py)
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+force-single-line = false
+lines-after-imports = 2
+
+[tool.ruff.format]
+# Use double quotes for strings
+quote-style = "double"
+
+# Indent with spaces
+indent-style = "space"
+
+# Unix line endings
+line-ending = "lf"

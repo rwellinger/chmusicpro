@@ -1,0 +1,49 @@
+%% Storage Migration Architecture - Dual Storage Backend System
+flowchart TB
+    subgraph Frontend["Frontend (Angular)"]
+        UI[Image/Song UI]
+    end
+
+    subgraph Backend["Backend API (aiproxysrv)"]
+        Controller[Image/Song Controller]
+        Orchestrator[Image/Song Orchestrator]
+        StorageInterface[Storage Interface]
+
+        Controller --> Orchestrator
+        Orchestrator --> StorageInterface
+    end
+
+    subgraph StorageBackends["Storage Backends"]
+        direction TB
+        FSStorage["Filesystem Storage<br/>(Legacy)"]
+        S3Storage["S3 Storage<br/>(New Default)"]
+
+        StorageInterface -.Dual Support.-> FSStorage
+        StorageInterface -.Dual Support.-> S3Storage
+    end
+
+    subgraph Database["PostgreSQL"]
+        ImagesTable["generated_images<br/>- storage_backend<br/>- s3_key<br/>- file_path"]
+        ProjectFiles["project_files<br/>- storage_backend<br/>- s3_key<br/>- local_path"]
+    end
+
+    subgraph S3Compatible["S3-Compatible Storage"]
+        direction LR
+        MinIO["MinIO<br/>(Self-hosted)"]
+        AWS["AWS S3<br/>(Cloud)"]
+        Backblaze["Backblaze B2<br/>(Cloud)"]
+        Wasabi["Wasabi<br/>(Cloud)"]
+    end
+
+    UI --> Controller
+    Orchestrator --> Database
+    FSStorage -.Old Files.-> LocalDisk["/images/<br/>Local Filesystem"]
+    S3Storage --> MinIO
+    S3Storage --> AWS
+    S3Storage --> Backblaze
+    S3Storage --> Wasabi
+
+    style S3Storage fill:#90EE90
+    style FSStorage fill:#FFB6C1
+    style StorageInterface fill:#87CEEB
+    style MinIO fill:#FF6B6B

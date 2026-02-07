@@ -1,0 +1,95 @@
+flowchart TB
+    subgraph PRESENTATION["🖥️ Presentation Layer - Pages (17)"]
+        direction LR
+        AI_CHAT[💬 AI Chat<br/>Ollama]
+        OPENAI_CHAT[🤖 OpenAI Chat<br/>GPT]
+        LYRIC_CREATION[✍️ Lyric Creation<br/>Editor]
+        LYRIC_RULES[📜 Lyric Rules<br/>Regex Cleanup]
+        MUSIC_STYLES[🎼 Music Styles<br/>Templates]
+        EQUIPMENT_GALLERY[🎛️ Equipment Gallery<br/>Inventory]
+        EQUIPMENT_EDITOR[⚙️ Equipment Editor<br/>Create/Edit]
+        IMG_GEN[🖼️ Image Generator<br/>DALL-E]
+        IMG_VIEW[👁️ Image View<br/>Gallery]
+        TEXT_OVERLAY[🖼️ Text Overlay<br/>Image Editor]
+        SONG_GEN[🎵 Song Generator<br/>Mureka]
+        SONG_VIEW[🎧 Song View<br/>Library]
+        SONG_PROFILE[📊 Song Profile<br/>Mureka Account]
+        SKETCH_CREATOR[📝 Sketch Creator<br/>Draft Songs]
+        SKETCH_LIBRARY[📚 Sketch Library<br/>Manage Drafts]
+        USER_PROFILE[👤 User Profile<br/>Settings]
+        PROMPT_TEMPLATES[📋 Prompt Templates<br/>Reusable Prompts]
+    end
+
+    subgraph COMPONENT["🧩 Component Layer - Shared Components"]
+        direction LR
+        SIDE_MENU[🍔 Side Menu]
+        IMAGE_DETAIL[🖼️ Image Detail Panel]
+        SONG_DETAIL[🎵 Song Detail Panel]
+        LYRIC_ARCHITECT[🏗️ Lyric Architect Modal]
+        MUSIC_CHOOSER_MODAL[🎼 Music Style Chooser Modal]
+        MUSIC_CHOOSER_INLINE[🎶 Music Style Chooser Inline]
+        SEARCH_REPLACE[🔍 Search Replace Dialog]
+        PASSWORD_MODAL[🔐 Password Change Modal]
+        AUDIO_PLAYER[🎵 Audio Player]
+        PROGRESS[⏳ Progress Overlay]
+    end
+
+    subgraph SERVICE["⚙️ Service Layer"]
+        direction LR
+        subgraph BUSINESS["Business Services"]
+            IMG_SVC[🖼️ Image Service]
+            SONG_SVC[🎵 Song Service]
+            SKETCH_SVC[📝 Sketch Service]
+            EQUIPMENT_SVC[🎛️ Equipment Service]
+            CONV_SVC[💬 Conversation Service]
+            AUTH_SVC[🔐 Auth Service]
+            USER_SVC[👤 User Service]
+            CHAT_EXPORT[📤 Chat Export]
+            OPENAI_SVC[🤖 OpenAI Chat Service]
+        end
+        subgraph CONFIG["Configuration"]
+            API_CONFIG[🌐 API Config Service]
+            CHAT_SVC[💬 Chat Service]
+        end
+        subgraph UI_SERVICES["UI Services"]
+            LYRIC_ARCH_SVC[🏗️ Lyric Architecture Service]
+            PROGRESS_SVC[⏳ Progress Service]
+            NOTIFY_SVC[🔔 Notification Service]
+        end
+    end
+
+    subgraph INFRASTRUCTURE["🛠️ Infrastructure Layer"]
+        direction LR
+        MODELS[📊 Models]
+        PIPES[🔄 Pipes<br/>message-content.pipe]
+        GUARDS[🛡️ Guards<br/>Auth]
+        INTERCEPTORS[🔗 Interceptors<br/>JWT Injection]
+        AUTH[🔐 Auth Components<br/>Login]
+    end
+
+    subgraph EXTERNAL["🌐 External Systems"]
+        direction LR
+        BACKEND[🖥️ aiproxysrv API<br/>FastAPI]
+        OLLAMA[🦙 Ollama<br/>Local LLM]
+        OPENAI_API[🤖 OpenAI API<br/>DALL-E & GPT]
+        MUREKA_API[🎵 Mureka API<br/>Music Generation]
+    end
+
+    %% Layer Dependencies
+    PRESENTATION --> COMPONENT
+    COMPONENT --> SERVICE
+    SERVICE --> INFRASTRUCTURE
+    SERVICE --> EXTERNAL
+
+    %% Styling
+    classDef presentationStyle fill:#E8F5E8,stroke:#4CAF50,stroke-width:2px
+    classDef componentStyle fill:#E3F2FD,stroke:#2196F3,stroke-width:2px
+    classDef serviceStyle fill:#FFF3E0,stroke:#FF9800,stroke-width:2px
+    classDef infrastructureStyle fill:#FCE4EC,stroke:#E91E63,stroke-width:2px
+    classDef externalStyle fill:#F3E5F5,stroke:#9C27B0,stroke-width:2px
+
+    class AI_CHAT,OPENAI_CHAT,LYRIC_CREATION,LYRIC_RULES,MUSIC_STYLES,EQUIPMENT_GALLERY,EQUIPMENT_EDITOR,IMG_GEN,IMG_VIEW,TEXT_OVERLAY,SONG_GEN,SONG_VIEW,SONG_PROFILE,SKETCH_CREATOR,SKETCH_LIBRARY,USER_PROFILE,PROMPT_TEMPLATES presentationStyle
+    class SIDE_MENU,IMAGE_DETAIL,SONG_DETAIL,LYRIC_ARCHITECT,MUSIC_CHOOSER_MODAL,MUSIC_CHOOSER_INLINE,SEARCH_REPLACE,PASSWORD_MODAL,AUDIO_PLAYER,PROGRESS componentStyle
+    class IMG_SVC,SONG_SVC,SKETCH_SVC,EQUIPMENT_SVC,CONV_SVC,AUTH_SVC,USER_SVC,CHAT_EXPORT,OPENAI_SVC,API_CONFIG,CHAT_SVC,LYRIC_ARCH_SVC,PROGRESS_SVC,NOTIFY_SVC serviceStyle
+    class MODELS,PIPES,GUARDS,INTERCEPTORS,AUTH infrastructureStyle
+    class BACKEND,OLLAMA,OPENAI_API,MUREKA_API externalStyle

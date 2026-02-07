@@ -1,0 +1,170 @@
+<div class="music-style-prompt-container">
+    <mat-card class="music-style-prompt-card">
+        <mat-card-content>
+            <div class="prompt-header">
+                <div class="prompt-title">
+                    <h2>
+                        <i class="fas fa-sliders-h"></i>
+                        {{ 'musicStylePrompt.title' | translate }}
+                    </h2>
+                </div>
+                <div class="prompt-header-actions">
+                    <div *ngIf="isFromSketchCreator" class="sketch-navigation-buttons">
+                        <button
+                                type="button"
+                                (click)="cancelChanges()"
+                                class="cancel-button"
+                                [disabled]="isAnyOperationInProgress"
+                                [title]="'common.cancel' | translate">
+                            <i class="fas fa-times"></i>
+                            <span>{{ 'common.cancel' | translate }}</span>
+                        </button>
+                        <button
+                                type="button"
+                                (click)="applyChanges()"
+                                class="apply-button"
+                                [disabled]="isAnyOperationInProgress"
+                                [title]="'common.apply' | translate">
+                            <i class="fas fa-check"></i>
+                            <span>{{ 'common.apply' | translate }}</span>
+                        </button>
+                    </div>
+                    <div class="mode-badge" [class.auto-mode]="currentMode === 'auto'"
+                         [class.manual-mode]="currentMode === 'manual'">
+                        <i class="fas" [class.fa-sync-alt]="currentMode === 'auto'"
+                           [class.fa-edit]="currentMode === 'manual'"></i>
+                        <span>{{ 'musicStylePrompt.mode.' + currentMode | translate }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <form [formGroup]="promptForm">
+                <div class="form-group">
+                    <textarea
+                            id="prompt"
+                            formControlName="prompt"
+                            [placeholder]="'musicStylePrompt.placeholder' | translate"
+                            maxlength="1024"
+                            [disabled]="isAnyOperationInProgress"
+                            class="prompt-textarea">
+                    </textarea>
+                    <div class="char-count" *ngIf="characterCount > 0">
+                        {{ characterCount }} / 1024 {{ 'musicStylePrompt.charactersCount' | translate }}
+                    </div>
+                </div>
+
+                <!-- Inline Style Chooser -->
+                <app-music-style-chooser-inline
+                        [mode]="currentMode"
+                        [isInstrumental]="false"
+                        [isCollapsed]="isStyleChooserCollapsed"
+                        (styleChanged)="onStyleChanged($event)"
+                        (applyStyles)="onApplyStyles($event)"
+                        (collapseToggled)="onCollapseToggled($event)">
+                </app-music-style-chooser-inline>
+
+                <div class="info-notice" *ngIf="!isFromSketchCreator">
+                    <i class="fas fa-info-circle"></i>
+                    {{ 'musicStylePrompt.autoSaved' | translate }}
+                </div>
+
+                <div class="action-section">
+                    <div class="ai-actions">
+                        <!-- Enhancer Dropdown -->
+                        <div class="enhancer-dropdown-container">
+                            <button
+                                    type="button"
+                                    (click)="toggleEnhancerDropdown()"
+                                    [disabled]="isAnyOperationInProgress || !promptForm.get('prompt')?.value?.trim()"
+                                    class="ai-action-button">
+                                <i class="fas fa-wand-magic-sparkles" *ngIf="!isEnhancingPrompt"></i>
+                                <i class="fas fa-spinner fa-spin" *ngIf="isEnhancingPrompt"></i>
+                                <span>{{ 'musicStylePrompt.enhancePrompt' | translate }}</span>
+                                <i class="fas fa-chevron-down dropdown-chevron"></i>
+                            </button>
+                            <div class="dropdown-menu" *ngIf="showEnhancerDropdown"
+                                 (click)="$event.stopPropagation()">
+                                <button
+                                        type="button"
+                                        class="dropdown-item"
+                                        [disabled]="isAnyOperationInProgress"
+                                        (click)="selectEnhancerAction('standard')">
+                                    <i class="fas fa-wand-sparkles"></i>
+                                    <span>{{ 'musicStylePrompt.enhancer.standard' | translate }}</span>
+                                </button>
+                                <button
+                                        type="button"
+                                        class="dropdown-item"
+                                        [disabled]="isAnyOperationInProgress"
+                                        (click)="selectEnhancerAction('suno')">
+                                    <i class="fas fa-music"></i>
+                                    <span>{{ 'musicStylePrompt.enhancer.suno' | translate }}</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button
+                                type="button"
+                                (click)="translatePrompt()"
+                                [disabled]="isAnyOperationInProgress || !promptForm.get('prompt')?.value?.trim()"
+                                class="ai-action-button">
+                            <i class="fas fa-language" *ngIf="!isTranslatingPrompt"></i>
+                            <i class="fas fa-spinner fa-spin" *ngIf="isTranslatingPrompt"></i>
+                            <span>{{ 'musicStylePrompt.translateToEnglish' | translate }}</span>
+                        </button>
+                        <!-- Edit Dropdown -->
+                        <div class="edit-dropdown-container">
+                            <button
+                                    type="button"
+                                    (click)="toggleEditDropdown()"
+                                    [disabled]="isAnyOperationInProgress || !characterCount"
+                                    class="utility-button"
+                                    [title]="'musicStylePrompt.edit' | translate">
+                                <i class="fas fa-edit"></i>
+                                <span>{{ 'musicStylePrompt.edit' | translate }}</span>
+                                <i class="fas fa-chevron-down dropdown-chevron"></i>
+                            </button>
+                            <div class="dropdown-menu" *ngIf="showEditDropdown"
+                                 (click)="$event.stopPropagation()">
+                                <button
+                                        type="button"
+                                        class="dropdown-item"
+                                        [disabled]="isAnyOperationInProgress"
+                                        (click)="selectEditAction('searchReplace')">
+                                    <i class="fas fa-search"></i>
+                                    <span>{{ 'musicStylePrompt.searchReplace' | translate }}</span>
+                                </button>
+                                <button
+                                        type="button"
+                                        class="dropdown-item"
+                                        [disabled]="isAnyOperationInProgress || !characterCount"
+                                        (click)="copyPromptToClipboard(); showEditDropdown = false">
+                                    <i class="fas fa-copy"></i>
+                                    <span>{{ 'musicStylePrompt.copyToClipboard' | translate }}</span>
+                                </button>
+                                <button
+                                        type="button"
+                                        class="dropdown-item"
+                                        [disabled]="isAnyOperationInProgress || !canUndo"
+                                        (click)="selectEditAction('undo')">
+                                    <i class="fas fa-undo"></i>
+                                    <span>{{ 'musicStylePrompt.undoLastChange' | translate }}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="utility-actions">
+                        <button
+                                type="button"
+                                (click)="clearPrompt()"
+                                [disabled]="isAnyOperationInProgress || !characterCount"
+                                class="clear-button">
+                            <i class="fas fa-trash-alt"></i> {{ 'musicStylePrompt.resetButton' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+    </mat-card>
+</div>

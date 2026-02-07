@@ -1,0 +1,158 @@
+// ===== COMPONENT-SPECIFIC SCSS PARTIALS =====
+@use "variables" as *;
+@use "mixins" as *;
+
+// Loading States - Standardized
+.loading,
+.loading-message,
+#loading {
+  @include loading-state();
+  margin-top: $spacing-10;
+  font-size: $font-lg;
+}
+
+// Info Boxes - Standardized
+.info-box {
+  @include card-container($border-light, $background-light);
+  margin-bottom: $spacing-20;
+  
+  p {
+    margin: $spacing-xs 0;
+  }
+}
+
+.result-box {
+  @include card-container($border-standard, $background-white, 1rem);
+  font-size: $font-sm;
+  line-height: $line-height-normal;
+  
+  h3 {
+    margin-top: 0;
+    font-size: $font-xl;
+    color: $text-primary;
+  }
+  
+  p {
+    margin: 0.4rem 0;
+  }
+  
+  a {
+    color: $primary-color;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  pre {
+    background: #f8f8f8;
+    border: 1px solid #e1e1e1;
+    border-radius: $border-radius-sm;
+    padding: 0.5rem;
+    font-size: $font-sm;
+    font-family: $font-family-mono;
+    margin: 0.5rem 0;
+  }
+}
+
+// No Content Messages
+.no-images,
+.no-songs-message,
+.no-selection {
+  text-align: center;
+  color: $text-secondary;
+  font-style: italic;
+  padding: 40px 20px;
+  background-color: $background-light;
+  border-radius: $border-radius-md;
+  border: 1px solid $border-light;
+}
+
+// Pagination - Standardized
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: $spacing-20 0;
+  padding: $spacing-15;
+  background: $background-white;
+  border-radius: $border-radius-lg;
+  border: 1px solid $border-light;
+}
+
+.pagination-info,
+.page-info {
+  color: $text-muted;
+  font-size: $font-sm;
+  font-weight: $font-weight-medium;
+}
+
+// Download Links
+.download-link {
+  @include button-style($success-color);
+  display: inline-block;
+  text-decoration: none;
+  padding: 10px 20px;
+  
+  &:hover {
+    text-decoration: none;
+    color: $background-white;
+  }
+}
+
+// Controls Section - Standardized
+.controls {
+  margin: $spacing-20 0;
+  display: flex;
+  gap: $spacing-15;
+  align-items: center;
+}
+
+// Audio & Media Components - Standardized
+.audio-wrapper {
+  display: flex;
+  margin: $spacing-xl 0;
+  padding: $spacing-20;
+  justify-content: center;
+  align-items: center;
+  background-color: $background-light;
+  border-radius: $border-radius-xl;
+  border: 2px solid $primary-color;
+  text-align: center;
+  
+  h3 {
+    margin: 0 0 $spacing-15 0;
+    color: $primary-color;
+  }
+  
+  audio {
+    width: 100%;
+    max-width: 500px;
+  }
+}
+
+.stem-download {
+  display: flex;
+  margin: $spacing-xl 0;
+  padding: $spacing-20;
+  justify-content: center;
+  align-items: center;
+  background-color: #d4edda;
+  border-radius: $border-radius-xl;
+  border: 2px solid $success-color;
+  text-align: center;
+}
+
+// Utility Classes with Mixins
+.card-elevation-1 {
+  @include elevation(1);
+}
+
+.card-elevation-2 {
+  @include elevation(2);
+}
+
+.card-elevation-3 {
+  @include elevation(3);
+}

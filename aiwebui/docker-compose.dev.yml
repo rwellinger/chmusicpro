@@ -1,0 +1,10 @@
+# Development override - build locally instead of pulling from registry
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+services:
+  aiwebui-app:
+    build:
+      context: .
+      target: production
+    pull_policy: build
+    image: aiwebui-app:local

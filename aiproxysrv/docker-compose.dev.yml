@@ -1,0 +1,10 @@
+# Development override - build locally instead of pulling from registry
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+services:
+  aiproxy-app:
+    build:
+      context: .
+      target: app
+    pull_policy: build
+    image: aiproxysrv-app:local

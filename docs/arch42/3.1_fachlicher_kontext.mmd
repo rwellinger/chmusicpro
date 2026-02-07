@@ -1,0 +1,11 @@
+graph TB
+    User[Rob - Benutzer] --> WebUI[Angular WebUI]
+    WebUI --> AIProxy[AI Proxy Server]
+    AIProxy --> OpenAI[OpenAI DALL-E 3 API]
+    AIProxy --> Mureka[Mureka Song API]
+    AIProxy --> Ollama[Ollama LLM]
+    AIProxy -.->|Development/Testing| MockServer[AI Test Mock Server]
+    AIProxy --> DB[(PostgreSQL Database)]
+    AIProxy --> Redis[(Redis Cache/Queue)]
+
+    style MockServer fill:#f1f8e9,stroke:#4caf50,stroke-dasharray: 5 5

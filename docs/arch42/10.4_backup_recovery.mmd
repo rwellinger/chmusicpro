@@ -1,0 +1,11 @@
+flowchart TD
+    SCHEDULE[Cron Schedule] --> DUMP_DB[pg_dump postgres]
+    DUMP_DB --> COMPRESS[gzip backup]
+    COMPRESS --> STORE_LOCAL[Store in /backups]
+    STORE_LOCAL --> CLEANUP[Delete old backups >7d]
+
+    DISASTER([System Failure]) --> RESTORE_START[Start Recovery]
+    RESTORE_START --> RESTORE_DATA[Restore postgres-data volume]
+    RESTORE_DATA --> START_SERVICES[docker-compose up]
+    START_SERVICES --> VERIFY[Health Checks]
+    VERIFY --> COMPLETE([Recovery Complete])

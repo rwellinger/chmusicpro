@@ -1,0 +1,118 @@
+// ===== SCSS VARIABLES =====
+
+// Font Families
+$font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+$font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+
+// Font Sizes (rem-based, 14px = 0.875rem base)
+$font-xs: 0.75rem; // 12px
+$font-sm: 0.875rem; // 14px - Base
+$font-base: 1rem; // 16px
+$font-lg: 1.125rem; // 18px
+$font-xl: 1.25rem; // 20px
+$font-2xl: 1.5rem; // 24px
+$font-3xl: 1.875rem; // 30px
+$font-4xl: 2.25rem; // 36px
+
+// Font Weights
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Line Heights
+$line-height-tight: 1.3;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.6;
+
+// Component-specific Font Sizes
+$button-font-size: $font-sm;
+$button-large-font-size: $font-base;
+$input-font-size: $font-sm;
+$nav-font-size: $font-sm;
+
+// Colors
+$primary-color: #007bff;
+$primary-hover: #0056b3;
+$primary-active: #004085;
+
+$success-color: #28a745;
+$success-hover: #218838;
+
+$danger-color: #dc3545;
+$danger-alt: #f44336;
+$danger-hover: maroon;
+
+$info-color: #2196f3;
+$warning-color: #ff9800;
+
+$ai-color: #7354af;
+$ai-hover: #5e3d99;
+$ai-active: #4a2e7d;
+
+// S3/Storage Colors (Yellow/Brown theme)
+$storage-bg: #fef3c7;
+$storage-text: #92400e;
+$storage-hover-bg: #fde68a;
+
+$text-primary: #333;
+$text-muted: #6c757d;
+$text-secondary: #666;
+
+$background-body: #fafafa;
+$background-white: #fff;
+$background-light: #f8f9fa;
+$background-selected: #e3f2fd;
+
+$border-light: #e9ecef;
+$border-standard: #ddd;
+$border-darker: #dee2e6;
+
+// Spacing
+$spacing-xs: 0.25rem; // 4px
+$spacing-sm: 0.5rem; // 8px
+$spacing-md: 1rem; // 16px
+$spacing-lg: 1.5rem; // 24px
+$spacing-xl: 2rem; // 32px
+
+// Additional spacing values commonly used
+$spacing-2xs: 0.125rem; // 2px
+$spacing-6: 0.375rem; // 6px
+$spacing-10: 0.625rem; // 10px
+$spacing-12: 0.75rem; // 12px
+$spacing-15: 0.9375rem; // 15px
+$spacing-18: 1.125rem; // 18px
+$spacing-20: 1.25rem; // 20px
+
+// Button Size System
+$button-padding-sm: $spacing-6 $spacing-12;
+$button-padding-base: $spacing-sm $spacing-md;
+$button-padding-lg: $spacing-12 $spacing-20;
+
+$button-height-sm: 32px;
+$button-height-base: 36px;
+$button-height-lg: 44px;
+
+// Typography Scale for consistent headings
+$heading-h1: $font-2xl;
+$heading-h2: $font-xl;
+$heading-h3: $font-lg;
+$heading-h4: $font-base;
+$heading-h5: $font-sm;
+$heading-h6: $font-xs;
+
+// Border Radius
+$border-radius-sm: 4px;
+$border-radius-md: 5px;
+$border-radius-lg: 6px;
+$border-radius-xl: 8px;
+
+// Box Shadows
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
+$shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1);
+$shadow-focus: 0 0 0 3px rgba(0, 123, 255, 0.1);
+
+// Transitions
+$transition-fast: 0.2s ease;
+$transition-standard: all 0.2s ease;

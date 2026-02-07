@@ -1,0 +1,6 @@
+{
+  "error": "You exceeded your current quota, please check your billing details",
+  "message": "You exceeded your current quota, please check your billing details. Please buy more credits or upgrade your plan.",
+  "code": "quota_exceeded",
+  "type": "quota_limit"
+}

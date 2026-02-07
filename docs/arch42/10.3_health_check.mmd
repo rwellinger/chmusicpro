@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant Monitor
+    participant Nginx
+    participant API
+    participant DB
+    participant Redis
+    participant Celery
+
+    loop Every 30s
+        Monitor->>Nginx: GET /nginx_status
+        Nginx-->>Monitor: 200 OK
+
+        Monitor->>API: GET /api/v1/health
+        API->>DB: SELECT 1
+        DB-->>API: OK
+        API->>Redis: PING
+        Redis-->>API: PONG
+        API-->>Monitor: 200 OK
+
+        Monitor->>Celery: celery inspect ping
+        Celery-->>Monitor: pong
+    end
+
+    alt Service Down
+        Monitor->>Monitor: Log Alert
+        Monitor->>Monitor: Restart Container
+    end

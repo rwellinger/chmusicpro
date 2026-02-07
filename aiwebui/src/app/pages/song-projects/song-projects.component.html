@@ -1,0 +1,575 @@
+<div class="song-projects-container master-detail-layout">
+    <!-- Left Side: Project List -->
+    <div class="list-section">
+        <mat-card class="list-card">
+            <!-- List Header -->
+            <div class="list-header">
+                <div class="header-title">
+                    <div class="header-title-group">
+                        <h2>
+                            <i class="fas fa-folder-open"></i>
+                            {{ 'songProjects.list.title' | translate }}
+                        </h2>
+                        <div class="projects-count-badge" *ngIf="totalProjects > 0">
+                            {{ totalProjects }}
+                        </div>
+                    </div>
+                    <p class="subtitle">{{ 'songProjects.list.subtitle' | translate }}</p>
+                </div>
+                <button
+                        type="button"
+                        class="new-project-button"
+                        (click)="createNewProject()"
+                        [matTooltip]="'songProjects.list.actions.new' | translate"
+                >
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="filters-section">
+                <!-- Search -->
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input
+                            type="text"
+                            [placeholder]="'songProjects.list.search' | translate"
+                            [(ngModel)]="searchTerm"
+                            (ngModelChange)="onSearchChange($event)"
+                            class="search-input">
+                    <button type="button"
+                            class="clear-search-button"
+                            *ngIf="searchTerm"
+                            (click)="clearSearch()"
+                            [title]="'songProjects.list.clearSearch' | translate">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="status-filter">
+                    <button
+                            type="button"
+                            class="filter-btn"
+                            [class.active]="currentStatus === 'all'"
+                            (click)="onStatusChange('all')"
+                    >
+                        {{ 'songProjects.list.filters.all' | translate }}
+                    </button>
+                    <button
+                            type="button"
+                            class="filter-btn"
+                            [class.active]="currentStatus === 'new'"
+                            (click)="onStatusChange('new')"
+                    >
+                        {{ 'songProjects.list.filters.new' | translate }}
+                    </button>
+                    <button
+                            type="button"
+                            class="filter-btn"
+                            [class.active]="currentStatus === 'progress'"
+                            (click)="onStatusChange('progress')"
+                    >
+                        {{ 'songProjects.list.filters.progress' | translate }}
+                    </button>
+                    <button
+                            type="button"
+                            class="filter-btn"
+                            [class.active]="currentStatus === 'archived'"
+                            (click)="onStatusChange('archived')"
+                    >
+                        {{ 'songProjects.list.filters.archived' | translate }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div *ngIf="isLoading" class="loading-container">
+                <mat-spinner diameter="40"></mat-spinner>
+                <p>{{ 'songProjects.list.loading' | translate }}</p>
+            </div>
+
+            <!-- Project List -->
+            <div *ngIf="!isLoading" class="projects-list">
+                <!-- Empty State -->
+                <div *ngIf="projectList.length === 0" class="empty-state">
+                    <i class="fas fa-folder-open"></i>
+                    <p>{{ 'songProjects.list.empty' | translate }}</p>
+                </div>
+
+                <!-- Project Items -->
+                <div
+                        *ngFor="let project of projectList"
+                        class="project-item"
+                        [class.selected]="selectedProject?.id === project.id"
+                        (click)="selectProject(project)"
+                >
+                    <div class="project-item__header">
+                        <!-- Cover Image -->
+                        <div class="project-cover">
+                            <img *ngIf="getProjectCoverUrl(project)"
+                                 [src]="getProjectCoverUrl(project)"
+                                 [alt]="project.project_name"
+                                 class="cover-image">
+                            <div *ngIf="!getProjectCoverUrl(project)"
+                                 class="cover-placeholder"
+                                 [style.background-color]="getColorFromString(project.project_name)">
+                                <span class="initials">{{ getInitials(project.project_name) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="title-group">
+                            <h4>{{ project.project_name }}</h4>
+                            <span class="status-badge status-badge--{{ project.project_status }}">
+                {{ 'songProjects.status.' + project.project_status | translate }}
+              </span>
+                        </div>
+                    </div>
+
+                    <div class="project-item__tags" *ngIf="project.tags && project.tags.length > 0">
+                        <mat-chip-set>
+                            <mat-chip *ngFor="let tag of project.tags">{{ tag }}</mat-chip>
+                        </mat-chip-set>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" *ngIf="totalPages > 1">
+                <button
+                        class="pagination-btn"
+                        (click)="changePage(currentPage - 1)"
+                        [disabled]="currentPage === 0 || isLoading">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="pagination-info">
+          {{ 'songProjects.list.pagination.info' | translate: {current: currentPage + 1, total: totalPages} }}
+        </span>
+                <button
+                        class="pagination-btn"
+                        (click)="changePage(currentPage + 1)"
+                        [disabled]="currentPage >= totalPages - 1 || isLoading">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </mat-card>
+    </div>
+
+    <!-- Right Side: Project Detail -->
+    <div class="detail-section">
+        <mat-card class="detail-card">
+            <!-- Detail Loading State -->
+            <div *ngIf="isLoadingDetail" class="loading-container">
+                <mat-spinner diameter="40"></mat-spinner>
+                <p>{{ 'songProjects.editor.loading' | translate }}</p>
+            </div>
+
+            <!-- No Selection State -->
+            <div *ngIf="!selectedProject && !isLoadingDetail" class="empty-state">
+                <i class="fas fa-folder-open"></i>
+                <p>{{ 'songProjects.list.selectPrompt' | translate }}</p>
+            </div>
+
+            <!-- Project Details -->
+            <div *ngIf="selectedProject && !isLoadingDetail" class="detail-content">
+                <!-- Detail Header -->
+                <div class="detail-header">
+                    <div class="header-title">
+                        <!-- Project Cover (larger for detail view) -->
+                        <div class="project-cover-detail">
+                            <img *ngIf="getSelectedProjectCoverUrl()"
+                                 [src]="getSelectedProjectCoverUrl()"
+                                 [alt]="selectedProject.project_name"
+                                 class="cover-image">
+                            <div *ngIf="!getSelectedProjectCoverUrl()"
+                                 class="cover-placeholder"
+                                 [style.background-color]="getColorFromString(selectedProject.project_name)">
+                                <span class="initials">{{ getInitials(selectedProject.project_name) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="title-content">
+                            <i class="fas fa-folder-open"></i>
+                            <h2>{{ selectedProject.project_name }}</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <mat-tab-group class="project-tabs" [(selectedIndex)]="selectedTabIndex">
+                    <!-- Metadata Tab -->
+                    <mat-tab [label]="'songProjects.detail.tabs.metadata' | translate">
+                        <div class="tab-content">
+                            <!-- ID Row -->
+                            <div class="metadata-id-row">
+                                <div class="metadata-id-item">
+                                    <i class="fas fa-fingerprint meta-icon"></i>
+                                    <span class="meta-id" [title]="selectedProject.id">{{ selectedProject.id }}</span>
+                                    <button type="button"
+                                            class="copy-id-btn"
+                                            (click)="copyToClipboard(selectedProject.id)"
+                                            title="Copy ID">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="detail-field-row">
+                                <div class="detail-field">
+                                    <span class="field-label">{{ 'songProjects.detail.stats.totalFiles' | translate }}</span>
+                                    <div class="readonly-field">{{ selectedProject.total_files }}</div>
+                                </div>
+
+                                <div class="detail-field">
+                                    <span class="field-label">{{ 'songProjects.detail.stats.totalSize' | translate }}</span>
+                                    <div class="readonly-field">{{ formatFileSize(selectedProject.total_size_bytes) }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Tags -->
+                            <div class="detail-field" *ngIf="selectedProject.tags && selectedProject.tags.length > 0">
+                                <span class="field-label">{{ 'songProjects.editor.tags' | translate }}</span>
+                                <div class="readonly-field">
+                                    <mat-chip-set>
+                                        <mat-chip *ngFor="let tag of selectedProject.tags">{{ tag }}</mat-chip>
+                                    </mat-chip-set>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="detail-field" *ngIf="selectedProject.description">
+                                <span class="field-label">{{ 'songProjects.editor.description' | translate }}</span>
+                                <div class="readonly-field">{{ selectedProject.description }}</div>
+                            </div>
+
+                            <!-- All Assigned Sketches -->
+                            <div *ngIf="selectedProject.all_assigned_sketches?.length" class="assigned-assets-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-pencil-alt"></i>
+                                    {{ 'songProjects.detail.allAssignedSketches' | translate }}
+                                </h3>
+                                <div *ngFor="let sketch of selectedProject.all_assigned_sketches" class="asset-item">
+                                    <div class="asset-info">
+                                        <i class="fas"
+                                           [ngClass]="sketch.sketch_type === 'inspiration' ? 'fa-lightbulb' : 'fa-music'"></i>
+                                        <span class="asset-title">{{ sketch.title || sketch.prompt }}</span>
+                                        <span class="asset-badge">{{ sketch.workflow }}</span>
+                                    </div>
+                                    <button type="button" class="asset-action-button" (click)="openSketch(sketch)"
+                                            [matTooltip]="'songProjects.detail.actions.openSketch' | translate">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- All Assigned Images -->
+                            <div *ngIf="selectedProject.all_assigned_images?.length" class="assigned-assets-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-image"></i>
+                                    {{ 'songProjects.detail.allAssignedImages' | translate }}
+                                </h3>
+                                <div *ngFor="let image of selectedProject.all_assigned_images" class="asset-item">
+                                    <div class="asset-info">
+                                        <i class="fas fa-image"></i>
+                                        <span class="asset-title">{{ image.title || image.prompt || 'Untitled' }}</span>
+                                        <span *ngIf="image.composition"
+                                              class="asset-meta">{{ image.composition }}</span>
+                                        <span *ngIf="image.width && image.height" class="asset-meta">{{ image.width }}
+                                            x{{ image.height }}</span>
+                                    </div>
+                                    <button type="button" class="asset-action-button" (click)="openImage(image.id)"
+                                            [matTooltip]="'songProjects.detail.actions.openImage' | translate">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- All Assigned Songs -->
+                            <div *ngIf="selectedProject.all_assigned_songs?.length" class="assigned-assets-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-music"></i>
+                                    {{ 'songProjects.detail.allAssignedSongs' | translate }}
+                                </h3>
+                                <div *ngFor="let song of selectedProject.all_assigned_songs" class="asset-item">
+                                    <div class="asset-info">
+                                        <i class="fas fa-music"></i>
+                                        <span class="asset-title">{{ song.title || 'Untitled' }}</span>
+                                        <span class="asset-badge">{{ song.workflow }}</span>
+                                        <span *ngIf="song.file_type"
+                                              class="asset-meta">{{ song.file_type.toUpperCase() }}</span>
+                                        <span *ngIf="song.file_size_bytes"
+                                              class="asset-meta">{{ formatFileSize(song.file_size_bytes) }}</span>
+                                    </div>
+                                    <button type="button" class="asset-action-button" (click)="openSong(song)"
+                                            [matTooltip]="'songProjects.detail.actions.openSong' | translate">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="detail-field-row">
+                                <div class="detail-field">
+                                    <span class="field-label">{{ 'songProjects.detail.stats.created' | translate }}</span>
+                                    <div class="readonly-field">{{ selectedProject.created_at | date:'medium' }}</div>
+                                </div>
+
+                                <div class="detail-field">
+                                    <span class="field-label">{{ 'songProjects.detail.stats.updated' | translate }}</span>
+                                    <div class="readonly-field">{{ selectedProject.updated_at | date:'medium' }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-tab>
+
+                    <!-- Files & Folders Tab -->
+                    <mat-tab [label]="'songProjects.detail.tabs.filesAndFolders' | translate">
+                        <div class="tab-content">
+                            <!-- Folders Accordion -->
+                            <mat-accordion *ngIf="selectedProject.folders && selectedProject.folders.length > 0">
+                                <mat-expansion-panel *ngFor="let folder of selectedProject.folders">
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                            <i class="fas fa-folder"></i>
+                                            <span>{{ folder.folder_name }}</span>
+                                            <span class="file-count">({{ getFolderContentLabel(folder) }})</span>
+                                        </mat-panel-title>
+                                    </mat-expansion-panel-header>
+
+                                    <!-- Assigned Assets Sections -->
+                                    <div class="assigned-assets-container">
+                                        <!-- Assigned Songs -->
+                                        <div *ngIf="folder.assigned_songs && folder.assigned_songs.length > 0"
+                                             class="assigned-assets-section">
+                                            <h4 class="assets-section-title">
+                                                <i class="fas fa-music"></i>
+                                                {{ 'songProjects.detail.assignedSongs' | translate }}
+                                            </h4>
+                                            <div *ngFor="let song of folder.assigned_songs" class="asset-item">
+                                                <div class="asset-info">
+                                                    <i class="fas fa-music"></i>
+                                                    <span class="asset-title">{{ song.title || 'Untitled' }}</span>
+                                                    <span class="asset-badge">{{ song.workflow }}</span>
+                                                    <span *ngIf="song.file_type"
+                                                          class="asset-meta">{{ song.file_type.toUpperCase() }}</span>
+                                                    <span *ngIf="song.file_size_bytes"
+                                                          class="asset-meta">{{ formatFileSize(song.file_size_bytes) }}</span>
+                                                </div>
+                                                <button type="button" class="asset-action-button"
+                                                        (click)="openSong(song)"
+                                                        [matTooltip]="'songProjects.detail.actions.openSong' | translate">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Assigned Sketches -->
+                                        <div *ngIf="folder.assigned_sketches && folder.assigned_sketches.length > 0"
+                                             class="assigned-assets-section">
+                                            <h4 class="assets-section-title">
+                                                <i class="fas fa-pencil-alt"></i>
+                                                {{ 'songProjects.detail.assignedSketches' | translate }}
+                                            </h4>
+                                            <div *ngFor="let sketch of folder.assigned_sketches" class="asset-item">
+                                                <div class="asset-info">
+                                                    <i class="fas"
+                                                       [ngClass]="sketch.sketch_type === 'inspiration' ? 'fa-lightbulb' : 'fa-music'"></i>
+                                                    <span class="asset-title">{{ sketch.title || sketch.prompt }}</span>
+                                                    <span class="asset-badge">{{ sketch.workflow }}</span>
+                                                </div>
+                                                <button type="button" class="asset-action-button"
+                                                        (click)="openSketch(sketch)"
+                                                        [matTooltip]="'songProjects.detail.actions.openSketch' | translate">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Assigned Images -->
+                                        <div *ngIf="folder.assigned_images && folder.assigned_images.length > 0"
+                                             class="assigned-assets-section">
+                                            <h4 class="assets-section-title">
+                                                <i class="fas fa-image"></i>
+                                                {{ 'songProjects.detail.assignedImages' | translate }}
+                                            </h4>
+                                            <div *ngFor="let image of folder.assigned_images" class="asset-item">
+                                                <div class="asset-info">
+                                                    <i class="fas fa-image"></i>
+                                                    <span class="asset-title">{{ image.title || image.prompt || 'Untitled' }}</span>
+                                                    <span *ngIf="image.composition"
+                                                          class="asset-meta">{{ image.composition }}</span>
+                                                    <span *ngIf="image.width && image.height"
+                                                          class="asset-meta">{{ image.width }}x{{ image.height }}</span>
+                                                </div>
+                                                <button type="button" class="asset-action-button"
+                                                        (click)="openImage(image.id)"
+                                                        [matTooltip]="'songProjects.detail.actions.openImage' | translate">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Files in Folder -->
+                                    <div class="folder-files">
+                                        <!-- Upload & CLI Commands -->
+                                        <div class="folder-upload-section">
+                                            <button
+                                                    type="button"
+                                                    class="upload-button"
+                                                    (click)="uploadFile(folder)"
+                                                    [disabled]="selectedProject.project_status === 'archived'"
+                                                    [matTooltip]="selectedProject.project_status === 'archived' ? ('songProjects.warnings.uploadBlocked' | translate) : ''"
+                                            >
+                                                <i class="fas fa-upload"></i>
+                                                <span>{{ 'songProjects.detail.actions.uploadFile' | translate }}</span>
+                                            </button>
+                                            <button
+                                                    type="button"
+                                                    class="cli-commands-button"
+                                                    [matMenuTriggerFor]="cliMenu"
+                                                    [title]="'songProjects.detail.actions.cliCommands' | translate"
+                                            >
+                                                <i class="fas fa-code"></i>
+                                                <span>{{ 'songProjects.detail.actions.cliCommands' | translate }}</span>
+                                                <i class="fas fa-angle-down dropdown-icon"></i>
+                                            </button>
+                                            <mat-menu #cliMenu="matMenu">
+                                                <button
+                                                        mat-menu-item
+                                                        (click)="copyCLICommand(folder)"
+                                                        [disabled]="selectedProject.project_status === 'archived'"
+                                                        [matTooltip]="selectedProject.project_status === 'archived' ? ('songProjects.warnings.uploadBlocked' | translate) : ''"
+                                                >
+                                                    <i class="fas fa-upload"></i>
+                                                    <span>{{ 'songProjects.detail.actions.copyCLIUploadCommand' | translate }}</span>
+                                                </button>
+                                                <button mat-menu-item (click)="copyCLIDownloadCommand(folder)">
+                                                    <i class="fas fa-download"></i>
+                                                    <span>{{ 'songProjects.detail.actions.copyCLIDownloadCommand' | translate }}</span>
+                                                </button>
+                                                <button
+                                                        mat-menu-item
+                                                        (click)="copyCLIMirrorCommand(folder)"
+                                                        [disabled]="selectedProject.project_status === 'archived'"
+                                                        [matTooltip]="selectedProject.project_status === 'archived' ? ('songProjects.warnings.uploadBlocked' | translate) : ''"
+                                                >
+                                                    <i class="fas fa-sync-alt"></i>
+                                                    <span>{{ 'songProjects.detail.actions.copyCLIMirrorCommand' | translate }}</span>
+                                                </button>
+                                            </mat-menu>
+                                        </div>
+
+                                        <div *ngIf="!folder.files || folder.files.length === 0" class="empty-folder">
+                                            <p>{{ 'songProjects.detail.noFiles' | translate }}</p>
+                                        </div>
+
+                                        <div *ngFor="let file of folder.files" class="file-item">
+                                            <div class="file-info">
+                                                <i class="fas fa-file"></i>
+                                                <span class="filename"
+                                                      [title]="file.relative_path">{{ getFilePathInFolder(file.relative_path, folder.folder_name) }}</span>
+                                                <span class="filesize">{{ formatFileSize(file.file_size_bytes) }}</span>
+                                            </div>
+                                            <button
+                                                    *ngIf="file.download_url"
+                                                    type="button"
+                                                    class="file-download-button"
+                                                    (click)="downloadFile(file.download_url!)"
+                                            >
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </mat-expansion-panel>
+                            </mat-accordion>
+
+                            <div *ngIf="!selectedProject.folders || selectedProject.folders.length === 0"
+                                 class="empty-folder">
+                                <p>{{ 'songProjects.detail.noFiles' | translate }}</p>
+                            </div>
+
+                            <!-- Assigned Releases -->
+                            <div *ngIf="selectedProject.assigned_releases && selectedProject.assigned_releases.length > 0"
+                                 class="assigned-releases-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-compact-disc"></i>
+                                    {{ 'songProjects.detail.assignedReleases' | translate }}
+                                </h3>
+                                <div class="assigned-releases-list">
+                                    <div *ngFor="let release of selectedProject.assigned_releases" class="release-item">
+                                        <div class="release-info">
+                                            <i class="fas fa-compact-disc"></i>
+                                            <span class="release-name">{{ release.name }}</span>
+                                            <span class="release-badge">{{ release.type }}</span>
+                                            <span class="release-meta">{{ release.genre }}</span>
+                                            <span class="release-status"
+                                                  [class]="getStatusBadgeClass(release.status)">{{ release.status }}</span>
+                                        </div>
+                                        <button
+                                                type="button"
+                                                class="asset-action-button"
+                                                (click)="openRelease(release.id)"
+                                                [matTooltip]="'songProjects.detail.actions.viewRelease' | translate">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-tab>
+                </mat-tab-group>
+
+                <!-- Detail Actions -->
+                <div class="detail-actions">
+                    <button type="button" class="action-button refresh-button" (click)="refreshProject()">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>{{ 'common.refresh' | translate }}</span>
+                    </button>
+                    <button type="button" class="action-button complete-clone-button"
+                            (click)="copyCLICompleteCloneCommand()">
+                        <i class="fas fa-code"></i>
+                        <span>{{ 'songProjects.detail.copyCompleteClone' | translate }}</span>
+                    </button>
+                    <button
+                            type="button"
+                            class="action-button edit-button"
+                            (click)="openEditDialog()"
+                            [disabled]="selectedProject.project_status === 'archived'"
+                            [matTooltip]="selectedProject.project_status === 'archived' ? ('songProjects.warnings.editBlocked' | translate) : ''"
+                    >
+                        <i class="fas fa-edit"></i>
+                        <span>{{ 'songProjects.list.actions.edit' | translate }}</span>
+                    </button>
+                    <button
+                            type="button"
+                            class="action-button archive-button"
+                            (click)="toggleProjectStatus()"
+                            *ngIf="selectedProject.project_status !== 'archived'"
+                    >
+                        <i class="fas fa-archive"></i>
+                        <span>{{ 'songProjects.actions.archive' | translate }}</span>
+                    </button>
+                    <button
+                            type="button"
+                            class="action-button unarchive-button"
+                            (click)="toggleProjectStatus()"
+                            *ngIf="selectedProject.project_status === 'archived'"
+                    >
+                        <i class="fas fa-box-open"></i>
+                        <span>{{ 'songProjects.actions.unarchive' | translate }}</span>
+                    </button>
+                    <button
+                            type="button"
+                            class="action-button delete-button"
+                            (click)="deleteProject()"
+                            [disabled]="selectedProject.project_status === 'archived' || (selectedProject.assigned_releases && selectedProject.assigned_releases.length > 0)"
+                            [matTooltip]="selectedProject.assigned_releases && selectedProject.assigned_releases.length > 0 ? ('songProjects.warnings.deleteBlockedRelease' | translate:{count: selectedProject.assigned_releases.length}) : (selectedProject.project_status === 'archived' ? ('songProjects.warnings.deleteBlocked' | translate) : '')"
+                    >
+                        <i class="fas fa-trash"></i>
+                        <span>{{ 'songProjects.list.actions.delete' | translate }}</span>
+                    </button>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+</div>

@@ -1,0 +1,486 @@
+@use "sass:color";
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+.music-style-prompt-container {
+  height: 100vh;
+  overflow: hidden;
+  padding: $spacing-md;
+  background: $background-white;
+  display: flex;
+  justify-content: center;
+}
+
+.music-style-prompt-card {
+  max-width: 1600px;
+  width: 100%;
+  height: calc(100vh - 2rem);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  
+  mat-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    padding: $spacing-md;
+    
+    form {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: visible;
+    }
+  }
+}
+
+.prompt-header {
+  display: flex;
+  border-bottom: 1px solid #e9ecef;
+  padding: 0.9375rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+  flex-shrink: 0;
+  
+  .prompt-title {
+    margin: 0;
+    padding: 0;
+    
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-weight: 600;
+      line-height: 1.5;
+      font-size: 1.5rem;
+      margin: 0;
+      color: $text-primary;
+      
+      i {
+        color: $primary-color;
+      }
+    }
+  }
+  
+  .prompt-header-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+  
+  .sketch-navigation-buttons {
+    display: flex;
+    gap: $spacing-xs;
+    align-items: center;
+    
+    .cancel-button {
+      @include button-secondary('base');
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-weight: $font-weight-medium !important;
+      
+      i {
+        font-size: $font-base;
+      }
+      
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+    }
+    
+    .apply-button {
+      @include button-primary('base');
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-weight: $font-weight-medium !important;
+      
+      i {
+        font-size: $font-base;
+      }
+      
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+}
+
+.mode-badge {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-md;
+  font-size: $font-sm;
+  font-weight: $font-weight-semibold;
+  transition: all 0.2s ease;
+  
+  i {
+    font-size: $font-sm;
+  }
+  
+  &.auto-mode {
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
+    border: 1px solid rgba($primary-color, 0.3);
+    
+    i {
+      animation: spin 2s linear infinite;
+    }
+  }
+  
+  &.manual-mode {
+    background: rgba($warning-color, 0.1);
+    color: color.adjust($warning-color, $lightness: -10%);
+    border: 1px solid rgba($warning-color, 0.3);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-bottom: $spacing-10;
+}
+
+.prompt-textarea {
+  width: 100%;
+  flex: 1;
+  padding: $spacing-15;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-lg;
+  font-size: $font-base;
+  font-family: $font-family-base;
+  resize: none;
+  transition: $transition-fast;
+  box-sizing: border-box;
+  line-height: $line-height-relaxed;
+  overflow-y: auto;
+  
+  &:focus {
+    @include input-focus-state($primary-color);
+  }
+  
+  &:disabled {
+    background: $background-light;
+    color: $text-muted;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.char-count {
+  font-size: $font-sm;
+  color: $text-muted;
+  text-align: right;
+  margin-top: $spacing-xs;
+  font-style: italic;
+  flex-shrink: 0;
+}
+
+.info-notice {
+  display: flex;
+  align-items: center;
+  gap: $spacing-10;
+  margin-top: 2rem;
+  margin-bottom: $spacing-10;
+  padding: $spacing-10;
+  background: $background-light;
+  border-left: 4px solid $primary-color;
+  border-radius: $border-radius-sm;
+  font-size: $font-sm;
+  color: $text-muted;
+  flex-shrink: 0;
+  
+  i {
+    color: $primary-color;
+    font-size: $font-base;
+  }
+}
+
+.action-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-15;
+  flex-shrink: 0;
+  margin-top: 2rem;
+  overflow: visible;
+}
+
+.ai-actions {
+  display: flex;
+  gap: $spacing-10;
+  flex-wrap: wrap;
+  flex: 1;
+  overflow: visible;
+}
+
+.ai-action-button {
+  @include button-ai('base');
+  background-color: $ai-color !important;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-weight: $font-weight-medium !important;
+  
+  i {
+    font-size: $font-base;
+  }
+  
+  &:hover:not(:disabled) {
+    background-color: $ai-hover !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.utility-button {
+  @include button-primary('base');
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-weight: $font-weight-medium !important;
+  
+  i {
+    font-size: $font-base;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.utility-actions {
+  display: flex;
+  gap: $spacing-10;
+}
+
+.clear-button {
+  @include button-secondary('base');
+  font-weight: $font-weight-medium !important;
+  
+  i {
+    margin-right: $spacing-xs;
+  }
+}
+
+.edit-dropdown-container,
+.enhancer-dropdown-container {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+}
+
+.dropdown-chevron {
+  margin-left: 4px;
+  font-size: 0.75rem;
+}
+
+.dropdown-menu {
+  position: absolute;
+  bottom: calc(100% + $spacing-xs);
+  background: $background-white;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-lg;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 280px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: dropdown-fade-up 0.15s ease-out;
+}
+
+.edit-dropdown-container .dropdown-menu {
+  right: 0;
+}
+
+.enhancer-dropdown-container .dropdown-menu {
+  left: 0;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: $spacing-10 $spacing-15;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: $spacing-10;
+  font-size: $font-base;
+  text-align: left;
+  color: $text-primary;
+  cursor: pointer;
+  transition: $transition-fast;
+  font-family: $font-family-base;
+  
+  i {
+    font-size: 1.125rem;
+    color: $text-secondary;
+  }
+  
+  &:hover:not(:disabled) {
+    background: $background-light;
+    
+    i {
+      color: $primary-color;
+    }
+  }
+  
+  &:disabled {
+    color: $text-muted;
+    cursor: not-allowed;
+    opacity: 0.5;
+    
+    i {
+      color: $text-muted;
+    }
+    
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+
+@keyframes dropdown-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// iPad & Touch Device Optimizations (768px - 1024px)
+@media (max-width: 1024px) and (hover: none) {
+  .music-style-prompt-container {
+    padding: $spacing-sm;
+  }
+  
+  .music-style-prompt-card {
+    max-width: 100%;
+    height: calc(100vh - 1rem);
+  }
+  
+  // Larger textarea for comfortable editing
+  .prompt-textarea {
+    min-height: 200px;
+    font-size: 16px; // Prevent iOS zoom
+  }
+  
+  // Vertical stacking of action buttons
+  .action-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .ai-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+    
+    .ai-action-button,
+    .utility-button {
+      width: 100%;
+      height: 60px;
+      justify-content: center;
+      font-size: 1rem;
+    }
+  }
+  
+  .utility-actions {
+    width: 100%;
+    
+    .clear-button {
+      width: 100%;
+      height: 60px;
+      font-size: 1rem;
+    }
+  }
+  
+  // Header adjustments
+  .prompt-header {
+    padding: 0.75rem;
+    
+    .prompt-title h2 {
+      font-size: 1.25rem;
+    }
+    
+    .sketch-navigation-buttons {
+      flex-direction: column;
+      gap: 0.5rem;
+      width: 100%;
+      
+      .cancel-button,
+      .apply-button {
+        width: 100%;
+        height: 48px;
+      }
+    }
+  }
+}
+
+// Mobile devices (below 768px) - existing styles
+@media (max-width: 768px) {
+  .music-style-prompt-container {
+    padding: $spacing-xs;
+  }
+  
+  .music-style-prompt-card {
+    height: calc(100vh - 1rem);
+  }
+  
+  .prompt-header {
+    padding: $spacing-10;
+    margin-bottom: $spacing-sm;
+    
+    .prompt-title h2 {
+      font-size: 1.25rem;
+    }
+  }
+  
+  .action-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-10;
+  }
+  
+  .ai-actions {
+    flex-direction: column;
+    gap: $spacing-xs;
+    
+    .ai-action-button,
+    .utility-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  .utility-actions {
+    .clear-button {
+      width: 100%;
+    }
+  }
+}

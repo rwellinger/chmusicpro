@@ -1,0 +1,25 @@
+{
+  "id": "96735754059777",
+  "created_at": 1758805340,
+  "finished_at": 1758805404,
+  "model": "mureka-7.5",
+  "status": "succeeded",
+  "choices": [
+    {
+      "url": "https://cdn.mureka.ai/cos-prod/open/instrumental/20250925/92945101357057-VvScPzWEpC5XsdKriKvbHa.mp3",
+      "flac_url": "https://cdn.mureka.ai/cos-prod/open/instrumental/20250925/92945101357057-PE4dFZVkEBPmMY3upcA53B.flac",
+      "wav_url": "http://localhost:3080/static/audio/0001-01.wav",
+      "duration": 205510,
+      "id": "96735332532225"
+    },
+    {
+      "index": 1,
+      "url": "https://cdn.mureka.ai/cos-prod/open/instrumental/20250925/92945101357057-4Rhmy2hEt2ZbPPPRUxKGsh.mp3",
+      "flac_url": "https://cdn.mureka.ai/cos-prod/open/instrumental/20250925/92945101357057-QR94gKjFVKoj57f5UGZJ4Z.flac",
+      "wav_url": "http://localhost:3080/static/audio/0001-02.wav",
+      "duration": 228990,
+      "id": "96735332532226"
+    }
+  ],
+  "trace_id": "8d7e65e84fdf9598c7e16a57086369c0"
+}

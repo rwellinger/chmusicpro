@@ -1,0 +1,45 @@
+graph TB
+    subgraph "MacBook Air M4 - Development"
+        subgraph "Host Environment"
+            PYCHARM[PyCharm Pro ARM64]
+            PYTHON[Python 3.12.12 miniconda3<br/>mac_ki_service env]
+        end
+
+        subgraph "Docker colima"
+            DEV_PG[(PostgreSQL:5432)]
+            DEV_RD[Redis:6379]
+        end
+
+        subgraph "Local Services"
+            FLASK[Flask Dev Server<br/>src/server.py:5050]
+            CELERY_DEV[Celery Worker<br/>src/worker.py:6379]
+            ANGULAR[Angular Dev<br/>ng serve:4200]
+            MOCK[AI Test Mock<br/>aitestmock:8000]
+        end
+
+        subgraph "Mock External APIs (Cost Reduction)"
+            MOCK_OPENAI[Mock OpenAI<br/>DALL-E 3]
+            MOCK_MUREKA[Mock Mureka<br/>Song Generation]
+        end
+    end
+
+    PYCHARM --> PYTHON
+    PYTHON --> FLASK
+    PYTHON --> CELERY_DEV
+    FLASK --> DEV_PG
+    CELERY_DEV --> DEV_PG
+    CELERY_DEV --> DEV_RD
+
+    FLASK -.->|Optional| MOCK
+    CELERY_DEV -.->|Optional| MOCK
+    MOCK --> MOCK_OPENAI
+    MOCK --> MOCK_MUREKA
+
+    style PYCHARM fill:#e1f5fe
+    style PYTHON fill:#f3e5f5
+    style FLASK fill:#e8f5e8
+    style CELERY_DEV fill:#fff3e0
+    style ANGULAR fill:#ffebee
+    style MOCK fill:#f1f8e9
+    style MOCK_OPENAI fill:#fff8e1
+    style MOCK_MUREKA fill:#fff8e1

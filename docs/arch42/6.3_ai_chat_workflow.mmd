@@ -1,0 +1,91 @@
+sequenceDiagram
+    participant User
+    participant UI as Angular WebUI
+    participant API as Flask API
+    participant DB as PostgreSQL
+    participant Ollama as Ollama LLM
+
+    Note over User,Ollama: AI Chat Conversation Workflow
+
+    %% Create New Conversation
+    rect rgb(240, 248, 255)
+        Note over User,DB: 1. Create New Conversation
+        User->>UI: Create new conversation
+        UI->>User: Show new chat form
+        User->>UI: Enter title, select model, set system context
+        UI->>API: POST /api/v1/conversations
+        API->>DB: Insert conversation record
+        DB-->>API: Return conversation with ID
+        API-->>UI: Return conversation object
+        UI->>User: Display empty conversation
+    end
+
+    %% Send Message
+    rect rgb(255, 250, 240)
+        Note over User,Ollama: 2. Send Message & Get AI Response
+        User->>UI: Type message and send
+        UI->>User: Display user message (optimistic)
+        UI->>API: POST /api/v1/conversations/{id}/messages
+        API->>DB: Save user message
+        DB-->>API: Return saved message with ID
+
+        Note over API,Ollama: Build conversation context
+        API->>DB: Load conversation messages
+        DB-->>API: Return message history
+
+        API->>Ollama: POST /api/chat (with full context)
+        Note over Ollama: Process with system context<br/>and conversation history
+        Ollama-->>API: Return AI response
+
+        API->>DB: Save assistant message
+        DB-->>API: Return saved assistant message
+
+        Note over API,DB: Update token count
+        API->>DB: Update conversation.current_token_count
+
+        API-->>UI: Return user & assistant messages
+        UI->>User: Display assistant response
+    end
+
+    %% Load Existing Conversation
+    rect rgb(240, 255, 240)
+        Note over User,DB: 3. Load Existing Conversation
+        User->>UI: Select conversation from list
+        UI->>API: GET /api/v1/conversations/{id}
+        API->>DB: Query conversation + messages
+        DB-->>API: Return conversation with all messages
+        API-->>UI: Return conversation object
+        UI->>User: Display conversation history
+
+        Note over UI: Show token usage indicator<br/>and context window status
+    end
+
+    %% Update Conversation Title
+    rect rgb(255, 245, 245)
+        Note over User,DB: 4. Update Conversation Title
+        User->>UI: Click edit title
+        UI->>User: Show title input
+        User->>UI: Enter new title and save
+        UI->>API: PATCH /api/v1/conversations/{id}
+        API->>DB: Update conversation.title
+        DB-->>API: Return updated conversation
+        API-->>UI: Return updated conversation
+        UI->>User: Display updated title
+    end
+
+    %% Delete Conversation
+    rect rgb(255, 240, 245)
+        Note over User,DB: 5. Delete Conversation
+        User->>UI: Click delete conversation
+        UI->>User: Show confirmation dialog
+        User->>UI: Confirm deletion
+        UI->>API: DELETE /api/v1/conversations/{id}
+        API->>DB: Delete conversation (CASCADE to messages)
+        DB-->>API: Confirm deletion
+        API-->>UI: Return success
+        UI->>User: Remove from list, select next
+    end
+
+    %% Token Management
+    Note over UI,DB: Token Tracking & Context Window
+    Note over UI: Real-time token count display<br/>Progress bar with color indicators<br/>Warning at 90% capacity

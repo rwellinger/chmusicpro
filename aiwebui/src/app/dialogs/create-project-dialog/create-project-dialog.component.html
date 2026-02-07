@@ -1,0 +1,154 @@
+<h2 mat-dialog-title>
+    <i class="fas" [ngClass]="isEditMode ? 'fa-edit' : 'fa-folder-plus'"></i>
+    {{ (isEditMode ? 'songProjects.editor.editTitle' : 'songProjects.editor.createTitle') | translate }}
+</h2>
+
+<mat-dialog-content>
+    <p class="dialog-subtitle" *ngIf="!isEditMode">{{ 'songProjects.editor.createSubtitle' | translate }}</p>
+    <p class="dialog-subtitle" *ngIf="isEditMode">{{ 'songProjects.editor.editSubtitle' | translate }}</p>
+
+    <!-- Two-column layout when Advanced is open -->
+    <div class="dialog-layout" [class.has-advanced]="showAdvanced">
+        <!-- Left: Form -->
+        <div class="form-section">
+            <form [formGroup]="projectForm">
+                <!-- Project Name -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ 'songProjects.editor.projectName' | translate }}</mat-label>
+                    <input
+                            matInput
+                            formControlName="project_name"
+                            [placeholder]="'songProjects.editor.projectNameHint' | translate"
+                            maxlength="100"
+                    />
+                    <mat-error *ngIf="getFieldError('project_name')">
+                        {{ getFieldError('project_name') | translate }}
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Description (Optional) -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ 'songProjects.editor.description' | translate }}</mat-label>
+                    <textarea
+                            matInput
+                            formControlName="description"
+                            [placeholder]="'songProjects.editor.descriptionPlaceholder' | translate"
+                            rows="3"
+                            maxlength="2000"
+                    ></textarea>
+                </mat-form-field>
+
+                <!-- Tags (Optional) -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ 'songProjects.editor.tags' | translate }}</mat-label>
+                    <input
+                            matInput
+                            formControlName="tags"
+                            [placeholder]="'songProjects.editor.tagsHint' | translate"
+                    />
+                    <mat-hint>{{ 'songProjects.editor.tagsHint' | translate }}</mat-hint>
+                </mat-form-field>
+            </form>
+
+            <!-- Advanced Toggle Button (Edit Mode Only) -->
+            <button
+                    *ngIf="isEditMode"
+                    type="button"
+                    class="advanced-toggle-btn"
+                    (click)="toggleAdvanced()"
+            >
+                <i class="fas fa-cog"></i>
+                <span>{{ 'createProjectDialog.advanced.title' | translate }}</span>
+                <span class="assignments-count" *ngIf="totalAssignments > 0">({{ totalAssignments }})</span>
+                <i class="fas" [ngClass]="showAdvanced ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
+            </button>
+        </div>
+
+        <!-- Right: Advanced Section (visible when toggled) -->
+        <div class="advanced-section" *ngIf="showAdvanced">
+            <div class="advanced-header">
+                <i class="fas fa-cog"></i>
+                <span>{{ 'createProjectDialog.advanced.title' | translate }}</span>
+                <span class="assignments-count" *ngIf="totalAssignments > 0">({{ totalAssignments }})</span>
+            </div>
+
+            <div class="advanced-content">
+                <!-- Assigned Songs -->
+                <div class="assignment-category" *ngIf="assignedSongs.length > 0">
+                    <h4>
+                        <i class="fas fa-music"></i>
+                        {{ 'createProjectDialog.advanced.assignedSongs' | translate }} ({{ assignedSongs.length }})
+                    </h4>
+                    <div class="assignment-list">
+                        <div class="assignment-item" *ngFor="let song of assignedSongs">
+                            <span class="item-title">{{ getDisplayTitle(song) }}</span>
+                            <span class="item-badge workflow-badge">{{ song.workflow }}</span>
+                            <button type="button" class="unassign-btn" (click)="unassignSong(song)"
+                                    [title]="'createProjectDialog.advanced.unassign' | translate">
+                                <i class="fas fa-unlink"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assigned Sketches -->
+                <div class="assignment-category" *ngIf="assignedSketches.length > 0">
+                    <h4>
+                        <i class="fas fa-lightbulb"></i>
+                        {{ 'createProjectDialog.advanced.assignedSketches' | translate }} ({{ assignedSketches.length }}
+                        )
+                    </h4>
+                    <div class="assignment-list">
+                        <div class="assignment-item" *ngFor="let sketch of assignedSketches">
+                            <span class="item-title">{{ getDisplayTitle(sketch, 'prompt') }}</span>
+                            <span class="item-badge workflow-badge">{{ sketch.workflow }}</span>
+                            <button type="button" class="unassign-btn" (click)="unassignSketch(sketch)"
+                                    [title]="'createProjectDialog.advanced.unassign' | translate">
+                                <i class="fas fa-unlink"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assigned Images -->
+                <div class="assignment-category" *ngIf="assignedImages.length > 0">
+                    <h4>
+                        <i class="fas fa-image"></i>
+                        {{ 'createProjectDialog.advanced.assignedImages' | translate }} ({{ assignedImages.length }})
+                    </h4>
+                    <div class="assignment-list">
+                        <div class="assignment-item" *ngFor="let image of assignedImages">
+                            <span class="item-title">{{ getDisplayTitle(image, 'prompt') }}</span>
+                            <span class="item-badge" *ngIf="image.composition">{{ image.composition }}</span>
+                            <button type="button" class="unassign-btn" (click)="unassignImage(image)"
+                                    [title]="'createProjectDialog.advanced.unassign' | translate">
+                                <i class="fas fa-unlink"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Assignments Message -->
+                <div class="no-assignments" *ngIf="totalAssignments === 0">
+                    <i class="fas fa-info-circle"></i>
+                    <span>{{ 'createProjectDialog.advanced.noAssignments' | translate }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button type="button" class="cancel-button" (click)="onCancel()">
+        <span>{{ (hasUnassignedItems ? 'songProjects.editor.close' : 'songProjects.editor.cancel') | translate }}</span>
+    </button>
+    <button
+            type="button"
+            class="save-button"
+            (click)="onSubmit()"
+            [disabled]="projectForm.invalid"
+    >
+        <i class="fas fa-save"></i>
+        <span>{{ 'songProjects.editor.save' | translate }}</span>
+    </button>
+</mat-dialog-actions>

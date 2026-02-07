@@ -1,0 +1,381 @@
+@use "sass:color";
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+.equipment-editor-container {
+  height: 100%;
+  overflow: auto;
+  padding: $spacing-md;
+  background: $background-white;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  
+  // MacBook Air: Reduce container padding
+  @media (max-height: 1000px) {
+    padding: $spacing-sm;
+  }
+}
+
+.editor-card {
+  max-width: 1000px;
+  width: 100%;
+  height: auto;
+  min-height: 100%;
+  margin: 0 auto;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: $spacing-xs;
+  border-bottom: 1px solid $border-light;
+}
+
+.header-title {
+  flex: 1;
+  
+  h2 {
+    display: flex;
+    align-items: center;
+    padding: $spacing-xs;
+    gap: $spacing-sm;
+    margin: 0 0 $spacing-xs 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $text-primary;
+    
+    mat-icon {
+      color: $primary-color;
+    }
+  }
+  
+  .subtitle {
+    margin: 0;
+    color: $text-muted;
+    font-size: $font-sm;
+  }
+}
+
+.close-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: $spacing-xs;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  mat-icon {
+    color: $text-muted;
+  }
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    
+    mat-icon {
+      color: $text-primary;
+    }
+  }
+}
+
+.loading-state {
+  padding: $spacing-lg;
+  text-align: center;
+  color: $text-muted;
+}
+
+.form-content {
+  padding: $spacing-lg;
+  
+  // MacBook Air: Reduce form padding
+  @media (max-height: 1000px) {
+    padding: $spacing-sm $spacing-md;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: $spacing-md;
+  align-items: flex-start;
+  
+  // iPad/Tablet: Stack form rows vertically
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.form-row__type {
+  flex: 0 0 25%;
+  
+  @media (max-width: 1024px) {
+    flex: 1 1 100%;
+  }
+}
+
+.form-row__name {
+  flex: 1;
+  
+  @media (max-width: 1024px) {
+    flex: 1 1 100%;
+  }
+}
+
+.form-row__version {
+  flex: 0 0 20%;
+  
+  @media (max-width: 1024px) {
+    flex: 1 1 100%;
+  }
+}
+
+.form-row__half {
+  flex: 1;
+  
+  @media (max-width: 1024px) {
+    flex: 1 1 100%;
+  }
+}
+
+.form-section {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 1px solid $border-light;
+  
+  h3 {
+    margin: 0 0 $spacing-md 0;
+    font-size: $font-lg;
+    font-weight: 600;
+    color: $text-primary;
+  }
+  
+  // MacBook Air: Reduce section spacing
+  @media (max-height: 1000px) {
+    margin-top: $spacing-sm;
+    padding-top: $spacing-sm;
+    
+    h3 {
+      margin: 0 0 $spacing-xs 0;
+      font-size: $font-base;
+    }
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: $spacing-sm;
+  justify-content: flex-end;
+  padding: $spacing-sm;
+  border-top: 1px solid $border-light;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-lg;
+  border: 1px solid $border-light;
+  border-radius: 8px;
+  background-color: $background-white;
+  color: $text-primary;
+  font-size: $font-sm;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  &:not(:disabled):hover {
+    border-color: $primary-color;
+    background-color: rgba(25, 118, 210, 0.05);
+  }
+  
+  &.primary-button {
+    background-color: $primary-color;
+    color: white;
+    border-color: $primary-color;
+    
+    &:not(:disabled):hover {
+      background-color: color.adjust($primary-color, $lightness: -10%);
+    }
+  }
+  
+  &.secondary-button {
+    background-color: $background-light;
+    border-color: $border-light;
+    
+    &:not(:disabled):hover {
+      background-color: color.adjust($background-light, $lightness: -5%);
+    }
+  }
+}
+
+// Material Form Field Customization
+mat-form-field {
+  margin-bottom: $spacing-sm;
+  
+  &.full-width {
+    width: 100%;
+  }
+  
+  mat-label {
+    font-weight: 500;
+  }
+  
+  mat-hint {
+    font-size: 0.75rem;
+    color: $text-muted;
+  }
+  
+  mat-error {
+    font-size: 0.75rem;
+    color: #f44336;
+  }
+  
+  // MacBook Air: Reduce field spacing
+  @media (max-height: 1000px) {
+    margin-bottom: $spacing-xs;
+  }
+}
+
+// Material Select with Icons
+mat-select {
+  mat-option {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+// Password/License Key Toggle Button
+button[mat-icon-button] {
+  &[matSuffix] {
+    color: $text-muted;
+
+    &:hover {
+      color: $text-primary;
+    }
+  }
+}
+
+// Attachments Section
+.attachment-upload {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+
+  .upload-hint {
+    color: $text-muted;
+    font-size: $font-sm;
+  }
+}
+
+.attachments-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.attachment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm $spacing-md;
+  background-color: $background-light;
+  border-radius: 8px;
+  border: 1px solid $border-light;
+
+  &:hover {
+    border-color: $primary-color;
+    background-color: rgba(25, 118, 210, 0.02);
+  }
+}
+
+.attachment-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .attachment-icon {
+    color: $text-muted;
+  }
+}
+
+.attachment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .attachment-name {
+    font-weight: 500;
+    color: $text-primary;
+    word-break: break-all;
+  }
+
+  .attachment-meta {
+    font-size: $font-sm;
+    color: $text-muted;
+  }
+}
+
+.attachment-actions {
+  display: flex;
+  gap: $spacing-xs;
+
+  button {
+    color: $text-muted;
+
+    &:hover {
+      color: $primary-color;
+    }
+
+    &[color="warn"]:hover {
+      color: #f44336;
+    }
+  }
+}
+
+.attachments-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-lg;
+  color: $text-muted;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    opacity: 0.5;
+  }
+}

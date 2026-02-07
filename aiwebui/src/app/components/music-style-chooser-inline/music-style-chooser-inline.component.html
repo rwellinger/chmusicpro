@@ -1,0 +1,121 @@
+<div class="music-style-chooser-inline">
+    <!-- Header with Collapse Toggle -->
+    <div class="chooser-header" (click)="toggleCollapse()">
+        <h3 class="chooser-title">
+            <i class="fas fa-music"></i>
+            <span>{{ 'musicStyleChooser.title' | translate }}</span>
+        </h3>
+        <button type="button" class="collapse-btn"
+                [attr.aria-label]="isCollapsed ? ('musicStylePrompt.styleChooser.expand' | translate) : ('musicStylePrompt.styleChooser.collapse' | translate)">
+            <i class="fas" [class.fa-chevron-down]="isCollapsed" [class.fa-chevron-up]="!isCollapsed"></i>
+        </button>
+    </div>
+
+    <!-- Manual Mode Warning -->
+    <div class="mode-warning" *ngIf="mode === 'manual' && !isCollapsed">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ 'musicStylePrompt.mode.manualWarning' | translate }}</span>
+    </div>
+
+    <!-- Collapsible Content -->
+    <div class="chooser-content" *ngIf="!isCollapsed">
+        <div class="style-chooser-container">
+
+            <!-- Selection Summary -->
+            <div class="selection-summary"
+                 *ngIf="config.selectedStyles.length > 0 || config.selectedThemes.length > 0 || config.selectedInstruments.length > 0">
+                <small class="summary-label">{{ getSelectionSummary() }}</small>
+            </div>
+
+            <!-- Styles Section (Accordion) -->
+            <div class="category-accordion">
+                <div class="accordion-header" (click)="toggleCategory('styles')">
+                    <div class="accordion-title">
+                        <i class="fas fa-chevron-right accordion-icon"
+                           [class.expanded]="isCategoryExpanded('styles')"></i>
+                        <i class="fas fa-music category-icon"></i>
+                        <span>{{ 'musicStyleChooser.categories.styles' | translate }}</span>
+                        <span class="count-badge"
+                              *ngIf="getSelectedCount('styles') > 0">({{ getSelectedCount('styles') }})</span>
+                    </div>
+                </div>
+                <div class="accordion-content" *ngIf="isCategoryExpanded('styles')">
+                    <div class="tag-grid">
+                        <button
+                                *ngFor="let style of availableStyles"
+                                type="button"
+                                class="tag-button"
+                                [class.selected]="isStyleSelected(style)"
+                                (click)="toggleStyle(style)">
+                            {{ style }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instruments Section (Accordion) -->
+            <div class="category-accordion">
+                <div class="accordion-header" (click)="toggleCategory('instruments')">
+                    <div class="accordion-title">
+                        <i class="fas fa-chevron-right accordion-icon"
+                           [class.expanded]="isCategoryExpanded('instruments')"></i>
+                        <i class="fas fa-guitar category-icon"></i>
+                        <span>{{ 'musicStyleChooser.categories.instruments' | translate }}</span>
+                        <span class="count-badge"
+                              *ngIf="getSelectedCount('instruments') > 0">({{ getSelectedCount('instruments') }})</span>
+                    </div>
+                </div>
+                <div class="accordion-content" *ngIf="isCategoryExpanded('instruments')">
+                    <div class="tag-grid">
+                        <button
+                                *ngFor="let instrument of availableInstruments"
+                                type="button"
+                                class="tag-button"
+                                [class.selected]="isInstrumentSelected(instrument)"
+                                (click)="toggleInstrument(instrument)">
+                            {{ instrument }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Themes Section (Accordion) -->
+            <div class="category-accordion">
+                <div class="accordion-header" (click)="toggleCategory('themes')">
+                    <div class="accordion-title">
+                        <i class="fas fa-chevron-right accordion-icon"
+                           [class.expanded]="isCategoryExpanded('themes')"></i>
+                        <i class="fas fa-palette category-icon"></i>
+                        <span>{{ 'musicStyleChooser.categories.themes' | translate }}</span>
+                        <span class="count-badge"
+                              *ngIf="getSelectedCount('themes') > 0">({{ getSelectedCount('themes') }})</span>
+                    </div>
+                </div>
+                <div class="accordion-content" *ngIf="isCategoryExpanded('themes')">
+                    <div class="tag-grid">
+                        <button
+                                *ngFor="let theme of availableThemes"
+                                type="button"
+                                class="tag-button"
+                                [class.selected]="isThemeSelected(theme)"
+                                (click)="toggleTheme(theme)">
+                            {{ theme }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="chooser-actions" *ngIf="mode === 'manual'">
+                <button
+                        type="button"
+                        class="apply-btn"
+                        (click)="applyStylesClick()">
+                    <i class="fas fa-check"></i>
+                    {{ 'musicStylePrompt.styleChooser.applyButton' | translate }}
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

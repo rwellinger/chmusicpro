@@ -1,0 +1,46 @@
+<!-- Mobile Device Warning -->
+<div *ngIf="showMobileWarning" class="mobile-warning-screen">
+    <div class="mobile-warning-content">
+        <i class="fas fa-desktop mobile-warning-icon"></i>
+        <h1>{{ 'app.mobileWarning.title' | translate }}</h1>
+        <p class="warning-message">{{ 'app.mobileWarning.message' | translate }}</p>
+        <div class="supported-devices">
+            <div class="device-item">
+                <i class="fas fa-laptop"></i>
+                <span>{{ 'app.mobileWarning.devices.desktop' | translate }}</span>
+            </div>
+            <div class="device-item">
+                <i class="fas fa-tablet-alt"></i>
+                <span>{{ 'app.mobileWarning.devices.tablet' | translate }}</span>
+            </div>
+        </div>
+        <p class="hint">{{ 'app.mobileWarning.hint' | translate }}</p>
+    </div>
+</div>
+
+<!-- iPad Portrait Warning (Landscape Recommended) -->
+<div *ngIf="showLandscapeWarning" class="landscape-warning-screen">
+    <div class="landscape-warning-content">
+        <i class="fas fa-tablet-alt landscape-warning-icon"></i>
+        <i class="fas fa-sync-alt rotation-icon"></i>
+        <h1>{{ 'app.landscapeWarning.title' | translate }}</h1>
+        <p class="warning-message">{{ 'app.landscapeWarning.message' | translate }}</p>
+        <div class="rotation-hint">
+            <i class="fas fa-mobile-alt"></i>
+            <i class="fas fa-arrow-right"></i>
+            <i class="fas fa-tablet-alt"></i>
+        </div>
+        <p class="hint">{{ 'app.landscapeWarning.hint' | translate }}</p>
+    </div>
+</div>
+
+<!-- Main App (Hidden on Mobile/Portrait) -->
+<div *ngIf="!showMobileWarning && !showLandscapeWarning" class="app-layout">
+    <!-- Side Menu (20%) - Only show when authenticated -->
+    <app-side-menu *ngIf="(authState$ | async)?.isAuthenticated"></app-side-menu>
+
+    <!-- Main Content Area (80%) -->
+    <main class="main-content" [class.full-width]="!(authState$ | async)?.isAuthenticated">
+        <router-outlet/>
+    </main>
+</div>

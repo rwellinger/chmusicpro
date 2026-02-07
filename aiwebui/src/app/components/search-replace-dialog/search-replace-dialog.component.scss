@@ -1,0 +1,34 @@
+@use '../../../scss/variables' as *;
+
+.search-replace-dialog {
+  min-width: 400px;
+  
+  .search-replace-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 0;
+    
+    .full-width {
+      width: 100%;
+    }
+    
+    .preview-info {
+      padding: 8px 12px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+    }
+  }
+  
+  .apply-button {
+    background-color: $success-color !important;
+    color: white !important;
+    
+    &:hover:not(:disabled) {
+      background-color: $success-hover !important;
+    }
+  }
+}

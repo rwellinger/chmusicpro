@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json.schemastore.org/stylelintrc",
+  "extends": [
+    "stylelint-config-standard-scss"
+  ],
+  "plugins": [
+    "stylelint-scss"
+  ],
+  "rules": {
+    "comment-empty-line-before": null,
+    "declaration-empty-line-before": null,
+    "no-descending-specificity": null,
+    "selector-class-pattern": null,
+
+    "scss/at-import-partial-extension": null,
+    "scss/double-slash-comment-empty-line-before": null,
+    "scss/operator-no-newline-after": null,
+
+    "max-nesting-depth": [3, {
+      "severity": "warning",
+      "ignore": ["pseudo-classes"],
+      "ignoreAtRules": ["media", "supports", "include", "mixin"]
+    }],
+
+    "selector-max-compound-selectors": [4, {
+      "severity": "warning"
+    }],
+
+    "selector-max-specificity": ["0,4,0", {
+      "severity": "warning",
+      "ignoreSelectors": [":not", ":host", "::ng-deep"]
+    }]
+  },
+
+  "ignoreFiles": [
+    "**/*.css",
+    "**/node_modules/**",
+    "**/dist/**",
+    "src/styles.scss",
+    "src/scss/**/*.scss",
+    "src/app/**/*.scss"
+  ],
+
+  "overrides": [
+    {
+      "files": [
+        "**/src/app/pages/_NEW_*.scss",
+        "**/src/app/pages/*-new-*.scss",
+        "**/src/app/components/_NEW_*.scss"
+      ],
+      "rules": {
+        "max-nesting-depth": [3, {
+          "severity": "error",
+          "ignore": ["pseudo-classes", "pseudo-elements"],
+          "ignoreAtRules": ["media", "supports", "include", "mixin"],
+          "message": "❌ Max 3 Ebenen! Verwende BEM für eigene Elemente (max 2), Material-Overrides max 3."
+        }],
+
+        "selector-max-compound-selectors": [4, {
+          "severity": "error",
+          "message": "❌ Zu tief verschachtelt! Max 4 Selektoren im finalen CSS."
+        }],
+
+        "selector-class-pattern": [
+          "^[a-z]([a-z0-9-]+)?(__([a-z0-9]+-?)+)?(--([a-z0-9]+-?)+)?$|^mat-",
+          {
+            "severity": "error",
+            "message": "❌ Verwende BEM-Notation: .block__element--modifier (oder mat-* für Material)"
+          }
+        ],
+
+        "declaration-no-important": [true, {
+          "severity": "warning",
+          "message": "⚠️  !important sollte vermieden werden (nur als letztes Mittel)"
+        }]
+      }
+    },
+
+    {
+      "files": ["**/variables.scss", "**/_*.scss"],
+      "rules": {
+        "max-nesting-depth": null,
+        "selector-class-pattern": null
+      }
+    }
+  ]
+}

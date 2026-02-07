@@ -1,0 +1,209 @@
+@use "sass:color";
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-md;
+}
+
+.login-card {
+  @include card-container($border-light, $background-light, 2rem);
+  width: 100%;
+  max-width: 400px;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  
+  h1 {
+    @include heading(1);
+    color: $text-primary;
+    font-size: 1.8rem;
+    margin-bottom: $spacing-sm;
+  }
+  
+  p {
+    @include body-text('base');
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+.login-form {
+  .form-group {
+    margin-bottom: 1.5rem;
+    
+    label {
+      @include label-text();
+      color: $text-primary;
+    }
+    
+    input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid $border-standard;
+      border-radius: $border-radius-lg;
+      font-size: $font-base;
+      transition: $transition-standard;
+      box-sizing: border-box;
+      
+      &:focus {
+        @include input-focus-state($primary-color);
+      }
+      
+      &.invalid {
+        @include input-focus-state($danger-color);
+        border-color: $danger-color;
+      }
+      
+      &::placeholder {
+        color: $text-muted;
+      }
+    }
+    
+    .password-input-container {
+      position: relative;
+      display: flex;
+      
+      input {
+        flex: 1;
+        padding-right: 3rem;
+      }
+      
+      .password-toggle {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: $text-secondary;
+        font-size: 0.9rem;
+        padding: 0.25rem;
+        
+        &:hover {
+          color: $text-primary;
+        }
+        
+        .toggle-icon {
+          display: inline-block;
+        }
+      }
+    }
+    
+    .error-message {
+      color: $danger-color;
+      font-size: $font-xs;
+      margin-top: $spacing-sm;
+      display: block;
+    }
+  }
+  
+  .global-error {
+    background: color.adjust($danger-color, $lightness: 45%);
+    border: 1px solid $danger-color;
+    border-radius: $border-radius-sm;
+    padding: 0.75rem;
+    margin-bottom: $spacing-md;
+    color: color.adjust($danger-color, $lightness: -10%);
+    font-size: $font-sm;
+  }
+  
+  .login-button {
+    @include button-primary('lg');
+    width: 100%;
+    background: linear-gradient(135deg, color.adjust($primary-color, $lightness: -20%) 0%, color.adjust($primary-color, $lightness: -15%) 100%);
+    
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+    }
+    
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .loading-spinner {
+      display: inline-block;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid $border-light;
+  
+  p {
+    @include body-text('sm');
+    color: $text-secondary;
+    margin: 0;
+    line-height: $line-height-tight;
+  }
+  
+  .external-link {
+    color: $text-primary;
+    text-decoration: none;
+    transition: $transition-standard;
+    position: relative;
+    
+    &:hover {
+      color: $success-color;
+      background-color: rgba($success-color, 0.1);
+      text-decoration: none;
+      transform: translateY(-1px);
+      padding: 2px 4px;
+      border-radius: $border-radius-sm;
+    }
+  }
+}
+
+// Responsive design
+@include respond-to(small-mobile) {
+  .login-container {
+    padding: $spacing-sm;
+  }
+  
+  .login-card {
+    padding: $spacing-lg;
+  }
+  
+  .login-header h1 {
+    font-size: 1.6rem;
+  }
+}

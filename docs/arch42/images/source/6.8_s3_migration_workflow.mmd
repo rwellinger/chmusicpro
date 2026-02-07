@@ -1,0 +1,47 @@
+%% S3 Migration Workflow - Hybrid Storage Support
+sequenceDiagram
+    participant UI as Frontend UI
+    participant API as Image Orchestrator
+    participant DB as PostgreSQL
+    participant FSStorage as Filesystem Storage
+    participant S3Storage as S3 Storage (MinIO)
+
+    Note over UI,S3Storage: Upload New Image (S3 Default)
+
+    UI->>API: Upload Image
+    API->>S3Storage: upload(image_data, s3_key)
+    S3Storage-->>API: s3_key
+    API->>DB: Save Metadata<br/>(storage_backend='s3',<br/>s3_key='images/uuid.png')
+    DB-->>API: Image Record
+    API-->>UI: Success (s3_key)
+
+    Note over UI,S3Storage: Read Existing Image (Dual Backend Support)
+
+    UI->>API: GET /image/{id}
+    API->>DB: Load Image Metadata
+    DB-->>API: Image Record<br/>(storage_backend, s3_key)
+
+    alt Image in S3 (storage_backend='s3')
+        API->>S3Storage: download(s3_key)
+        S3Storage-->>API: image_data
+        API-->>UI: Pre-signed URL (1h TTL)
+    else Image in Filesystem (storage_backend='filesystem')
+        API->>FSStorage: read_file(file_path)
+        FSStorage-->>API: image_data
+        API-->>UI: Local URL
+    end
+
+    Note over UI,S3Storage: Text Overlay (Cross-Backend)
+
+    UI->>API: Apply Text Overlay (source_image_id)
+    API->>DB: Load Source Image
+    DB-->>API: source_image (storage_backend='filesystem')
+
+    API->>FSStorage: read_file(file_path)
+    FSStorage-->>API: source_image_data
+    API->>API: Apply Overlay (Pillow)
+    API->>S3Storage: upload(overlayed_image, new_s3_key)
+    S3Storage-->>API: new_s3_key
+    API->>DB: Save New Image<br/>(storage_backend='s3',<br/>s3_key='images/uuid_with_text.png')
+    DB-->>API: New Image Record
+    API-->>UI: Success

@@ -1,0 +1,67 @@
+[importlinter]
+root_package = src
+include_external_packages = True
+
+# ============================================================================
+# Three-Layer Architecture Validation
+# ============================================================================
+# Enforces separation between:
+# - Controllers (api.controllers) - HTTP layer
+# - Business Logic (business) - Orchestrators, Transformers, Normalizers
+# - Data Access (db) - Repositories/CRUD services
+# ============================================================================
+
+[importlinter:contract:controllers-no-direct-db]
+name = Controllers must go through business layer, not directly to DB
+type = forbidden
+source_modules =
+    src.api.controllers
+forbidden_modules =
+    src.db
+
+[importlinter:contract:db-no-business]
+name = DB layer must not import business logic
+type = forbidden
+source_modules =
+    src.db
+forbidden_modules =
+    src.business
+
+[importlinter:contract:transformers-pure-functions]
+name = Transformers/Normalizers must be pure (no SQLAlchemy)
+type = forbidden
+source_modules =
+    src.business
+forbidden_modules =
+    sqlalchemy
+# EXCEPTION: Orchestrators use TYPE_CHECKING imports for Session type hints
+# These imports are NOT executed at runtime (only for type checkers)
+# Pattern: if TYPE_CHECKING: from sqlalchemy.orm import Session
+ignore_imports =
+    src.business.compression_orchestrator -> sqlalchemy
+    src.business.prompt_template_orchestrator -> sqlalchemy
+    src.business.sketch_orchestrator -> sqlalchemy
+    src.business.song_project_orchestrator -> sqlalchemy
+    src.business.song_release_orchestrator -> sqlalchemy
+    src.business.workshop_orchestrator -> sqlalchemy
+
+[importlinter:contract:business-no-controllers]
+name = Business layer must not import controllers
+type = forbidden
+source_modules =
+    src.business
+forbidden_modules =
+    src.api.controllers
+
+# ============================================================================
+# Additional Architectural Rules
+# ============================================================================
+
+[importlinter:contract:schemas-no-business]
+name = Schemas must not depend on business logic
+type = forbidden
+source_modules =
+    src.schemas
+forbidden_modules =
+    src.business
+    src.db

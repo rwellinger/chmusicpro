@@ -1,0 +1,60 @@
+graph TB
+    subgraph "Frontend Layer"
+        UI[Angular WebUI]
+    end
+
+    subgraph "API Layer"
+        Proxy[Nginx Forward Proxy]
+        API[Flask API Server]
+    end
+
+    subgraph "Service Layer"
+        IMG[Image Controller]
+        SONG[Song Controller]
+        CHAT[Chat Controller]
+        CONV[Conversation Controller]
+        PROMPT[Prompt Controller]
+        REDIS[Redis Controller]
+    end
+
+    subgraph "Processing Layer"
+        CELERY[Celery Worker]
+        MUREKA[Mureka Handler]
+    end
+
+    subgraph "Data Layer"
+        PG[(PostgreSQL)]
+        RD[(Redis)]
+        FILES[File Storage]
+    end
+
+    subgraph "External APIs"
+        OPENAI[OpenAI DALL-E 3]
+        MRK[Mureka API]
+        OLLAMA[Ollama LLM]
+    end
+
+    UI --> Proxy
+    Proxy --> API
+    API --> IMG
+    API --> SONG
+    API --> CHAT
+    API --> CONV
+    API --> PROMPT
+    API --> REDIS
+
+    IMG --> OPENAI
+    SONG --> CELERY
+    CELERY --> MUREKA
+    MUREKA --> MRK
+    CHAT --> OLLAMA
+    CONV --> OLLAMA
+
+    API --> PG
+    API --> RD
+    PROMPT --> PG
+    CHAT --> PG
+    CHAT --> PROMPT
+    CONV --> PG
+    CELERY --> RD
+    IMG --> FILES

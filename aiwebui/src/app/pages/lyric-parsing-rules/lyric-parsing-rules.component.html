@@ -1,0 +1,208 @@
+<div class="lyric-parsing-rules-container">
+    <!-- Header -->
+    <div class="header">
+        <div class="header__title-group">
+            <h1>
+                <i class="fas fa-list-check"></i>
+                {{ 'lyricParsingRules.title' | translate }}
+            </h1>
+            <div class="rules-count-badge" *ngIf="rules.length > 0">
+                {{ (rules.length === 1 ? 'lyricParsingRules.header.countSingular' : 'lyricParsingRules.header.countPlural') | translate:{count: rules.length} }}
+            </div>
+        </div>
+        <button mat-raised-button color="primary" (click)="openCreateDialog()" [disabled]="isLoading">
+            <mat-icon>add</mat-icon>
+            {{ 'lyricParsingRules.actions.add' | translate }}
+        </button>
+    </div>
+
+    <!-- Rules Table -->
+    <mat-card class="table-card">
+        <table mat-table [dataSource]="rules" class="rules-table" cdkDropList (cdkDropListDropped)="onRuleDrop($event)">
+            <!-- Order Column (Drag Handle) -->
+            <ng-container matColumnDef="order">
+                <th mat-header-cell *matHeaderCellDef
+                    class="col-order">{{ 'lyricParsingRules.table.order' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let rule" class="col-order">
+                    <div class="drag-handle" cdkDragHandle>
+                        <i class="fas fa-grip-vertical"></i>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>{{ 'lyricParsingRules.table.name' | translate }}</th>
+                <td mat-cell *matCellDef="let rule">
+                    <div class="rule-name">
+                        {{ rule.name }}
+                        <small *ngIf="rule.description">{{ rule.description }}</small>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Type Column -->
+            <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef>{{ 'lyricParsingRules.table.type' | translate }}</th>
+                <td mat-cell *matCellDef="let rule">
+          <span class="type-badge" [class.type-cleanup]="rule.rule_type === 'cleanup'"
+                [class.type-section]="rule.rule_type === 'section'">
+            {{ 'lyricParsingRules.types.' + rule.rule_type | translate }}
+          </span>
+                </td>
+            </ng-container>
+
+            <!-- Pattern Column -->
+            <ng-container matColumnDef="pattern">
+                <th mat-header-cell *matHeaderCellDef>{{ 'lyricParsingRules.table.pattern' | translate }}</th>
+                <td mat-cell *matCellDef="let rule">
+                    <code class="pattern-code">{{ rule.pattern }}</code>
+                </td>
+            </ng-container>
+
+            <!-- Replacement Column -->
+            <ng-container matColumnDef="replacement">
+                <th mat-header-cell *matHeaderCellDef>{{ 'lyricParsingRules.table.replacement' | translate }}</th>
+                <td mat-cell *matCellDef="let rule">
+                    <code class="replacement-code">{{ rule.replacement || '(empty)' }}</code>
+                </td>
+            </ng-container>
+
+            <!-- Active Column -->
+            <ng-container matColumnDef="active">
+                <th mat-header-cell *matHeaderCellDef
+                    class="col-active">{{ 'lyricParsingRules.table.active' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let rule" class="col-active">
+                    <mat-slide-toggle [checked]="rule.active" (change)="toggleActive(rule)" [disabled]="isLoading">
+                    </mat-slide-toggle>
+                </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>{{ 'lyricParsingRules.table.actions' | translate }}</th>
+                <td mat-cell *matCellDef="let rule">
+                    <div class="action-buttons">
+                        <button mat-icon-button (click)="openEditDialog(rule)" [disabled]="isLoading"
+                                [matTooltip]="'lyricParsingRules.actions.edit' | translate">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="deleteRule(rule)" [disabled]="isLoading"
+                                [matTooltip]="'lyricParsingRules.actions.delete' | translate">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" cdkDrag></tr>
+        </table>
+
+        <!-- Empty State -->
+        <div *ngIf="rules.length === 0 && !isLoading" class="empty-state">
+            <mat-icon>rule</mat-icon>
+            <p>{{ 'lyricParsingRules.messages.noRules' | translate }}</p>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="loading-state">
+            <p>{{ 'lyricParsingRules.messages.loading' | translate }}</p>
+        </div>
+    </mat-card>
+
+    <!-- Create/Edit Dialog -->
+    <div class="dialog-overlay" *ngIf="showDialog" (click)="closeDialog()">
+        <mat-card class="dialog-card" (click)="$event.stopPropagation()">
+            <h2>{{ isEditing ? ('lyricParsingRules.dialog.editTitle' | translate) : ('lyricParsingRules.dialog.createTitle' | translate) }}</h2>
+
+            <form [formGroup]="ruleForm" (ngSubmit)="saveRule()">
+                <div class="form-layout">
+                    <!-- Left Column: Definition -->
+                    <div class="definition-column">
+                        <!-- Name -->
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{ 'lyricParsingRules.fields.name' | translate }}</mat-label>
+                            <input matInput formControlName="name"
+                                   [placeholder]="'lyricParsingRules.fields.namePlaceholder' | translate">
+                            <mat-error *ngIf="ruleForm.get('name')?.hasError('required')">
+                                {{ 'lyricParsingRules.errors.required' | translate }}
+                            </mat-error>
+                        </mat-form-field>
+
+                        <!-- Active Toggle -->
+                        <div class="toggle-field">
+                            <span class="toggle-field__label">{{ 'lyricParsingRules.fields.active' | translate }}</span>
+                            <mat-slide-toggle formControlName="active"></mat-slide-toggle>
+                        </div>
+
+                        <!-- Description -->
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{ 'lyricParsingRules.fields.description' | translate }}</mat-label>
+                            <textarea matInput formControlName="description" rows="2"
+                                      [placeholder]="'lyricParsingRules.fields.descriptionPlaceholder' | translate"></textarea>
+                        </mat-form-field>
+
+                        <!-- Type -->
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{ 'lyricParsingRules.fields.type' | translate }}</mat-label>
+                            <mat-select formControlName="rule_type">
+                                <mat-option value="cleanup">{{ 'lyricParsingRules.types.cleanup' | translate }}
+                                </mat-option>
+                                <mat-option value="section">{{ 'lyricParsingRules.types.section' | translate }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <!-- Pattern -->
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{ 'lyricParsingRules.fields.pattern' | translate }}</mat-label>
+                            <textarea matInput formControlName="pattern" rows="3"
+                                      [placeholder]="'lyricParsingRules.fields.patternPlaceholder' | translate"></textarea>
+                            <mat-error *ngIf="ruleForm.get('pattern')?.hasError('required')">
+                                {{ 'lyricParsingRules.errors.required' | translate }}
+                            </mat-error>
+                        </mat-form-field>
+
+                        <!-- Replacement -->
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{ 'lyricParsingRules.fields.replacement' | translate }}</mat-label>
+                            <textarea matInput formControlName="replacement" rows="2"
+                                      [placeholder]="'lyricParsingRules.fields.replacementPlaceholder' | translate"></textarea>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Right Column: Live Preview -->
+                    <div class="preview-column">
+                        <h3>{{ 'lyricParsingRules.preview.title' | translate }}</h3>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{ 'lyricParsingRules.preview.input' | translate }}</mat-label>
+                            <textarea matInput [(ngModel)]="previewInput" [ngModelOptions]="{standalone: true}"
+                                      rows="10"
+                                      (ngModelChange)="onPreviewInputChange()"
+                                      [placeholder]="'lyricParsingRules.preview.inputPlaceholder' | translate"></textarea>
+                        </mat-form-field>
+
+                        <div class="preview-diff-container">
+                            <div class="preview-diff-label">{{ 'lyricParsingRules.preview.diff' | translate }}</div>
+                            <div class="preview-diff-content" [innerHTML]="previewDiffHtml"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dialog Actions -->
+                <div class="dialog-actions">
+                    <button mat-button type="button" (click)="closeDialog()" [disabled]="isLoading">
+                        {{ 'common.cancel' | translate }}
+                    </button>
+                    <button mat-raised-button color="primary" type="submit" [disabled]="ruleForm.invalid || isLoading">
+                        {{ 'common.save' | translate }}
+                    </button>
+                </div>
+            </form>
+        </mat-card>
+    </div>
+</div>

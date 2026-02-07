@@ -1,0 +1,678 @@
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+/* ===== IMAGE GENERATOR CARD LAYOUT ===== */
+
+.image-generator-container {
+  height: 100vh;
+  overflow: hidden;
+  
+  .image-generator-header {
+    display: flex;
+    border-bottom: 1px solid #e9ecef;
+    padding: .9375rem;
+    justify-content: space-between;
+    align-items: center;
+    
+    .image-generator-title {
+      margin: 0;
+      padding: 0;
+      
+      h2 {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        font-weight: 600;
+        line-height: 1.5;
+        font-size: 1.25rem;
+        
+        i {
+          color: $primary-color;
+        }
+      }
+    }
+  }
+  
+  &.master-detail-layout {
+    display: grid;
+    grid-template-columns: 35fr 45fr;
+    gap: 0;
+  }
+  
+  .generator-grid {
+    display: contents;
+    
+    .image-creation-section {
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: $spacing-md;
+      border-right: 1px solid $border-light;
+    }
+    
+    .generated-image-section {
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: $spacing-md;
+    }
+    
+    .image-creation-card,
+    .generated-image-card {
+      height: calc(100vh - 2rem);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      
+      mat-card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        
+        mat-card-title {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 500;
+        }
+        
+        mat-card-subtitle {
+          color: rgba(255, 255, 255, 0.8);
+          margin: 0.5rem 0 0 0;
+          font-size: 0.9rem;
+        }
+      }
+      
+      mat-card-content {
+        padding: 1rem;
+        flex: 1;
+        overflow-y: auto;
+      }
+      
+      mat-card-actions {
+        padding: 1rem 1.5rem 1.5rem 1.5rem;
+        background: #f8f9fa;
+        
+        .cost-info {
+          margin: 0;
+          color: #6c757d;
+          font-size: 0.9rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          
+          i {
+            color: #007bff;
+          }
+        }
+      }
+    }
+    
+    .generated-image-card {
+      mat-card-content {
+        padding: 0;
+        height: calc(100% - 160px); // Increased for card actions
+        overflow: hidden;
+        
+        app-image-detail-panel {
+          display: block;
+          height: 100%;
+        }
+      }
+      
+      mat-card-actions {
+        padding: 1rem 1.5rem 1.5rem 1.5rem;
+        background: #f8f9fa;
+        
+        .detail-actions {
+          display: flex;
+          gap: 0.5rem;
+          align-items: center;
+        }
+        
+        button {
+          i {
+            margin-right: 8px;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* ===== FORM STYLING ===== */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.prompt-input-group {
+  display: flex;
+  gap: $spacing-10;
+  align-items: flex-start;
+}
+
+.title-input {
+  flex: 1;
+  padding: $spacing-10 $spacing-12;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-lg;
+  font-size: $font-base;
+  font-family: $font-family-base;
+  transition: $transition-fast;
+  box-sizing: border-box;
+  
+  &:focus {
+    @include input-focus-state($primary-color);
+  }
+}
+
+.title-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.char-counter {
+  font-size: $font-sm;
+  color: $text-muted;
+  text-align: right;
+  margin-top: $spacing-xs;
+}
+
+.hint-text {
+  font-size: $font-sm;
+  color: $text-muted;
+  text-align: left;
+  margin-top: $spacing-xs;
+}
+
+.form-group label {
+  @include label-text();
+}
+
+.prompt-input {
+  flex: 1;
+  min-height: 120px;
+  padding: $spacing-12;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-lg;
+  font-size: $font-base;
+  font-family: $font-family-base;
+  resize: vertical;
+  transition: $transition-fast;
+  box-sizing: border-box;
+}
+
+.prompt-input:focus {
+  @include input-focus-state($primary-color);
+}
+
+.size-select {
+  width: 40%;
+  padding: $spacing-10 $spacing-12;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-lg;
+  font-size: $font-base;
+  background: $background-white;
+  transition: $transition-fast;
+  box-sizing: border-box;
+}
+
+.size-select:focus {
+  @include input-focus-state($primary-color);
+}
+
+/* ===== STYLE PREFERENCES SECTION ===== */
+.style-preferences-section {
+  margin-top: $spacing-20;
+  padding-top: $spacing-20;
+  border-top: 1px solid $border-light;
+  
+  .section-title {
+    font-size: $font-lg;
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+    margin: 0 0 $spacing-15 0;
+    display: flex;
+    align-items: center;
+    gap: $spacing-10;
+    
+    i {
+      color: $primary-color;
+    }
+  }
+  
+  // Style Selectors Grid (2x2)
+  .style-selectors {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-15;
+    margin-bottom: $spacing-15;
+    
+    .style-field {
+      width: 100%;
+    }
+  }
+  
+  // Detail Level & Enhancement Quality (Side by Side)
+  .detail-enhancement-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-15;
+    margin-bottom: $spacing-15;
+  }
+}
+
+.button-group {
+  display: flex;
+  gap: $spacing-10;
+  margin-top: $spacing-20;
+}
+
+.create-button {
+  @include button-ai('base');
+  background-color: $ai-color !important;
+  flex: 1;
+  font-weight: $font-weight-medium !important;
+  
+  &:hover:not(:disabled) {
+    background-color: $ai-hover !important;
+  }
+}
+
+.reset-button {
+  @include button-secondary('base');
+  flex: 0 0 auto;
+  font-weight: $font-weight-medium !important;
+}
+
+
+.create-button i,
+.reset-button i {
+  margin-right: 8px;
+}
+
+.magic-icon-button {
+  @include button-ai('sm');
+  border-radius: 50% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $button-height-sm;
+  height: $button-height-sm;
+  margin-top: $spacing-xs;
+  flex-shrink: 0;
+  font-size: $font-lg;
+  
+  &:hover:not(:disabled) {
+    background-color: $ai-hover !important;
+    transform: scale(1.1);
+  }
+}
+
+.prompt-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + $spacing-xs);
+  right: 0;
+  background: $background-white;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-lg;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 220px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: dropdown-fade-in 0.15s ease-out;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: $spacing-10 $spacing-15;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: $spacing-10;
+  font-size: $font-base;
+  font-family: $font-family-base;
+  color: $text-primary;
+  cursor: pointer;
+  transition: $transition-fast;
+  text-align: left;
+  
+  &:hover:not(:disabled) {
+    background-color: $background-light;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  i {
+    width: 16px;
+    flex-shrink: 0;
+    color: $ai-color;
+  }
+  
+  span {
+    flex: 1;
+    font-weight: $font-weight-medium;
+  }
+  
+  .action-spinner {
+    margin-left: auto;
+    color: $ai-color;
+    font-size: $font-sm;
+  }
+}
+
+@keyframes dropdown-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== IMAGE RESULT STYLING ===== */
+.no-image {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-content {
+  text-align: center;
+  color: $text-muted;
+}
+
+.placeholder-icon {
+  font-size: $font-4xl;
+  margin-bottom: $spacing-20;
+  opacity: 0.3;
+}
+
+.image-result-section {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.image-result-section h2 {
+  @include heading(2);
+  border-bottom: 2px solid $primary-color;
+  padding-bottom: $spacing-10;
+}
+
+.image-info-compact {
+  margin-bottom: 20px;
+}
+
+.image-meta-info {
+  background-color: $background-light;
+  padding: $spacing-12;
+  border-radius: $border-radius-lg;
+}
+
+.image-meta-info p {
+  margin: $spacing-6 0;
+  color: $text-primary;
+  font-size: $font-base;
+}
+
+.image-actions {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+}
+
+.action-button {
+  @include button-size('base');
+  border: none;
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+  font-weight: $font-weight-medium;
+  transition: $transition-standard;
+}
+
+.download-btn {
+  @include button-success('base');
+}
+
+.preview-btn {
+  @include button-secondary('base');
+}
+
+.image-display {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.result-image {
+  max-width: 100%;
+  max-height: 200px;
+  width: auto;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.result-image:hover {
+  transform: scale(1.02);
+}
+
+/* ===== PROCESSING POPUP ===== */
+@include processing-popup();
+
+/* ===== MODAL STYLING ===== */
+.modal-overlay {
+  @include modal-overlay(0.8, 1500);
+}
+
+.modal-content {
+  @include modal-content();
+}
+
+.modal-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.close-button {
+  @include button-secondary('sm');
+}
+
+.modal-body {
+  padding: 20px;
+  text-align: center;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: 8px;
+}
+
+/* ===== RESPONSIVE - MacBook Air 13" M4 2025 ===== */
+@media (max-width: 1470px) {
+  .image-generator-container.master-detail-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    height: auto;
+  }
+  
+  .image-creation-section {
+    height: auto;
+    max-height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid $border-light;
+    padding: $spacing-sm;
+  }
+  
+  .generated-image-section {
+    height: auto;
+    max-height: 50vh;
+    padding: $spacing-sm;
+  }
+  
+  .image-creation-card,
+  .generated-image-card {
+    height: auto;
+  }
+}
+
+// iPad & Touch Device Optimizations
+@media (max-width: 1024px) and (hover: none) {
+  .image-generator-container {
+    padding: $spacing-sm;
+  }
+  
+  .generator-card {
+    max-width: 100%;
+    height: calc(100vh - 1rem);
+  }
+  
+  // Larger form inputs for touch
+  .form-input,
+  .form-textarea {
+    min-height: 44px;
+    font-size: 16px; // Prevent iOS zoom
+  }
+  
+  .prompt-input {
+    min-height: 120px;
+    font-size: 16px;
+  }
+  
+  // Vertical stacking of action buttons
+  .action-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .utility-actions,
+  .submit-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+  
+  // Full-width buttons with larger touch targets
+  .utility-button,
+  .generate-button,
+  .action-button {
+    width: 100%;
+    height: 60px;
+    font-size: 1rem;
+  }
+  
+  // Grid Position Selector - larger touch targets
+  .grid-position-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  // Style selectors - 2 columns on iPad
+  .style-selectors {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .image-generator-container {
+    padding: 1rem;
+    
+    .generator-grid {
+      gap: 1rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .image-generator-container {
+    padding: 1rem;
+    
+    .generator-grid {
+      gap: 1rem;
+      
+      .image-creation-card,
+      .generated-image-card {
+        mat-card-content {
+          padding: 0.75rem;
+        }
+      }
+    }
+  }
+  
+  .controls-content {
+    padding: 1rem;
+  }
+  
+  .image-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .action-button {
+    width: 100%;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .reset-button {
+    flex: 1;
+  }
+  
+  // Style Preferences Responsive
+  .style-preferences-section {
+    .style-selectors {
+      grid-template-columns: 1fr; // Single column on mobile
+      gap: $spacing-10;
+    }
+    
+    .detail-enhancement-row {
+      grid-template-columns: 1fr; // Stack vertically on mobile
+    }
+  }
+}
+
+// Responsive - MacBook Air 13" M4 2025 - Height (956px)
+@media (max-height: 1000px) {
+  .image-generator-container {
+    height: auto;
+    overflow: visible;
+  }
+  
+  .image-creation-section,
+  .generated-image-section {
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+  }
+  
+  .image-creation-card,
+  .generated-image-card {
+    height: auto;
+    max-height: none;
+  }
+}

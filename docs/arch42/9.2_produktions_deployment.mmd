@@ -1,0 +1,64 @@
+graph TB
+    subgraph "Production Server (Apple Silicon)"
+        subgraph "Docker Network: webui-network"
+            NGINX[Nginx Forward Proxy<br/>forward-proxy<br/>:80,:443<br/>Image: GHCR aiwebui-app]
+
+            subgraph "API Stack"
+                API_CONTAINER[AI Proxy Server<br/>aiproxysrv<br/>:5050<br/>Image: GHCR aiproxysrv-app]
+                WORKER_CONTAINER[Celery Worker<br/>celery-worker<br/>Image: GHCR celery-worker-app<br/>Health Check]
+            end
+
+            subgraph "Data Stack"
+                PROD_PG[(PostgreSQL 15<br/>postgres<br/>:5432<br/>Health Check)]
+                PROD_REDIS[(Redis Alpine<br/>redis<br/>:6379<br/>Health Check)]
+            end
+        end
+
+        subgraph "Host Services (Native)"
+            OLLAMA_HOST[Ollama<br/>:11434<br/>LLM Backend]
+        end
+
+        subgraph "Docker Volumes"
+            PG_VOL[postgres-data]
+            REDIS_VOL[redis-data]
+            IMG_VOL[images-data]
+        end
+
+        subgraph "Static Files"
+            STATIC[/usr/share/nginx/html/<br/>aiwebui/]
+        end
+    end
+
+    subgraph "NAS / S3 Storage"
+        MINIO_NAS[MinIO<br/>:9000 S3 API<br/>:9001 Console<br/>/volume1/minio-data]
+    end
+
+    subgraph "External Services"
+        OPENAI_EXT[OpenAI API<br/>DALL-E 3]
+        MUREKA_EXT[Mureka API<br/>Song Generation]
+    end
+
+    NGINX --> API_CONTAINER
+    NGINX --> STATIC
+    NGINX --> MINIO_NAS
+
+    API_CONTAINER --> PROD_PG
+    API_CONTAINER --> PROD_REDIS
+    API_CONTAINER --> OPENAI_EXT
+    API_CONTAINER --> OLLAMA_HOST
+    API_CONTAINER -->|S3 :9000| MINIO_NAS
+
+    WORKER_CONTAINER --> PROD_REDIS
+    WORKER_CONTAINER --> PROD_PG
+    WORKER_CONTAINER --> MUREKA_EXT
+    WORKER_CONTAINER -->|S3 :9000| MINIO_NAS
+
+    PROD_PG --> PG_VOL
+    PROD_REDIS --> REDIS_VOL
+
+    style NGINX fill:#e3f2fd
+    style API_CONTAINER fill:#e8f5e8
+    style WORKER_CONTAINER fill:#fff3e0
+    style PROD_PG fill:#fce4ec
+    style PROD_REDIS fill:#ffebee
+    style OLLAMA_HOST fill:#f3e5f5

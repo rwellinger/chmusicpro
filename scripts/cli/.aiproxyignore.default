@@ -1,0 +1,54 @@
+# AiProxy CLI - Global Ignore Patterns
+# Syntax like .gitignore (supports wildcards: *, ?, [])
+#
+# This file is located at: ~/.aiproxy/.aiproxyignore
+# You can also create .aiproxyignore in your upload directory for project-specific ignores
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon*
+._*
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+*.bak
+
+# Version control
+.git/
+.svn/
+.hg/
+.gitignore
+.gitattributes
+
+# IDE / Editor
+.vscode/
+.idea/
+*.sublime-*
+*.code-workspace
+
+# Build artifacts
+node_modules/
+dist/
+build/
+*.pyc
+__pycache__/
+.cache/
+
+# Logs
+*.log
+logs/
+
+# Environment files (may contain secrets!)
+.env
+.env.local
+*.secret

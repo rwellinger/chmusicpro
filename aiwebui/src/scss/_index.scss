@@ -1,0 +1,5 @@
+// Central SCSS module for @use imports
+// This file forwards all variables and mixins for component usage
+
+@forward "variables";
+@forward "mixins";

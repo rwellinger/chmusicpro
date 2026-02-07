@@ -1,0 +1,168 @@
+<div class="lyric-architect-modal">
+    <h2 mat-dialog-title>
+        <i class="fas fa-layer-group"></i>
+        {{ 'lyricArchitect.title' | translate }}
+    </h2>
+
+    <mat-dialog-content class="dialog-content">
+        <div class="architecture-container">
+
+            <!-- Left Side: Song Structure -->
+            <div class="song-structure-panel">
+                <h3>
+                    <i class="fas fa-list"></i>
+                    {{ 'lyricArchitect.panels.songStructure' | translate }}
+                </h3>
+
+                <div class="structure-preview" *ngIf="config.sections.length > 0">
+                    <small class="preview-label">{{ 'lyricArchitect.preview.label' | translate }}</small>
+                    <div class="preview-text">{{ getPreviewText() }}</div>
+                </div>
+
+                <div
+                        class="song-structure-list"
+                        cdkDropList
+                        #songList="cdkDropList"
+                        [cdkDropListData]="config.sections"
+                        [cdkDropListConnectedTo]="[availableList]"
+                        (cdkDropListDropped)="onSectionDrop($event)">
+
+                    <div
+                            *ngFor="let item of config.sections; let i = index; trackBy: trackBySectionId"
+                            class="section-item"
+                            cdkDrag>
+
+                        <div class="section-content">
+                            <!-- Desktop: Drag handle -->
+                            <div class="drag-handle" cdkDragHandle *ngIf="!isTouchDevice">
+                                <i class="fas fa-grip-vertical"></i>
+                            </div>
+
+                            <!-- Touch: Reorder buttons -->
+                            <div class="reorder-buttons" *ngIf="isTouchDevice">
+                                <button
+                                        type="button"
+                                        mat-icon-button
+                                        class="reorder-btn"
+                                        (click)="moveSectionUp(i)"
+                                        [disabled]="i === 0"
+                                        [title]="'lyricArchitect.structure.moveUp' | translate">
+                                    <mat-icon>arrow_upward</mat-icon>
+                                </button>
+                                <button
+                                        type="button"
+                                        mat-icon-button
+                                        class="reorder-btn"
+                                        (click)="moveSectionDown(i)"
+                                        [disabled]="i === config.sections.length - 1"
+                                        [title]="'lyricArchitect.structure.moveDown' | translate">
+                                    <mat-icon>arrow_downward</mat-icon>
+                                </button>
+                            </div>
+
+                            <div class="section-info">
+                                <div class="section-name">{{ item.displayName }}</div>
+                                <div class="section-description">
+                                    {{ getSectionDescription(item.section) }}
+                                </div>
+                            </div>
+
+                            <button
+                                    type="button"
+                                    class="remove-btn"
+                                    (click)="removeSection(item.id)"
+                                    [title]="'lyricArchitect.structure.removeSection' | translate">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div *ngIf="config.sections.length === 0" class="empty-structure">
+                        <i class="fas fa-arrow-left"></i>
+                        <p>{{ 'lyricArchitect.structure.empty' | translate }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Available Sections -->
+            <div class="available-sections-panel">
+                <h3>
+                    <i class="fas fa-puzzle-piece"></i>
+                    {{ 'lyricArchitect.panels.availableSections' | translate }}
+                </h3>
+
+                <div
+                        class="available-sections-list"
+                        cdkDropList
+                        #availableList="cdkDropList"
+                        [cdkDropListData]="availableSections"
+                        [cdkDropListConnectedTo]="[songList]"
+                        [cdkDropListEnterPredicate]="noReturnPredicate"
+                        (cdkDropListDropped)="onAvailableSectionDrop($event)">
+
+                    <div
+                            *ngFor="let sectionDef of availableSections"
+                            class="available-section-item"
+                            [class.disabled]="!canAddSection(sectionDef.section)"
+                            cdkDrag
+                            [cdkDragDisabled]="!canAddSection(sectionDef.section)">
+
+                        <div class="section-content">
+                            <div class="section-icon">
+                                <i class="fas" [class]="sectionDef.icon"></i>
+                            </div>
+
+                            <div class="section-info">
+                                <div class="section-name">{{ sectionDef.displayName }}</div>
+                                <div class="section-description">{{ sectionDef.description }}</div>
+                                <div class="section-usage"
+                                     *ngIf="!sectionDef.allowMultiple && getSectionCount(sectionDef.section) > 0">
+                                    {{ 'lyricArchitect.sections.alreadyAdded' | translate }}
+                                </div>
+                                <div class="section-usage"
+                                     *ngIf="sectionDef.allowMultiple && getSectionCount(sectionDef.section) > 0">
+                                    {{ (getSectionCount(sectionDef.section) === 1 ? 'lyricArchitect.sections.usedOnce' : 'lyricArchitect.sections.usedMultiple') | translate:{count: getSectionCount(sectionDef.section)} }}
+                                </div>
+                            </div>
+
+                            <div class="add-btn" *ngIf="canAddSection(sectionDef.section)">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <div class="dialog-actions">
+            <button
+                    type="button"
+                    mat-button
+                    class="reset-btn"
+                    (click)="reset()">
+                <i class="fas fa-undo"></i>
+                {{ 'lyricArchitect.buttons.reset' | translate }}
+            </button>
+
+            <div class="action-buttons">
+                <button
+                        type="button"
+                        mat-button
+                        (click)="cancel()">
+                    {{ 'common.cancel' | translate }}
+                </button>
+
+                <button
+                        type="button"
+                        mat-raised-button
+                        color="primary"
+                        (click)="save()">
+                    <i class="fas fa-save"></i>
+                    {{ 'lyricArchitect.buttons.apply' | translate }}
+                </button>
+            </div>
+        </div>
+    </mat-dialog-actions>
+</div>

@@ -1,0 +1,956 @@
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+.sketch-library-container {
+  height: 100vh;
+  overflow: hidden;
+  
+  &.master-detail-layout {
+    display: grid;
+    grid-template-columns: 35fr 65fr;
+    gap: 0;
+  }
+}
+
+// Left Side: List Section
+.list-section {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: $spacing-md;
+  border-right: 1px solid $border-light;
+  background-color: $background-light;
+}
+
+.list-card {
+  height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  
+  mat-card-content {
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-light;
+  
+  .header-title {
+    .header-title-group {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+    }
+    
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      margin: 0 0 $spacing-xs 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: $text-primary;
+      
+      i {
+        color: $primary-color;
+      }
+    }
+    
+    .sketches-count-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #1976d2;
+      background-color: #e3f2fd;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    
+    .subtitle {
+      margin: 0;
+      color: $text-muted;
+      font-size: $font-sm;
+    }
+  }
+}
+
+.filters-section {
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-light;
+}
+
+.search-box {
+  position: relative;
+  margin-bottom: $spacing-sm;
+  
+  i.fa-search {
+    position: absolute;
+    left: $spacing-sm;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-muted;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: $spacing-sm $spacing-sm $spacing-sm 2.5rem;
+    border: 1px solid $border-standard;
+    border-radius: 8px;
+    font-size: $font-sm;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+    }
+  }
+}
+
+.clear-search-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: $text-secondary;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 2;
+  
+  &:hover:not(:disabled) {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: $text-primary;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  i {
+    font-size: 12px;
+  }
+}
+
+.workflow-filter {
+  display: flex;
+  gap: $spacing-xs;
+  
+  .filter-btn {
+    flex: 1;
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid $border-standard;
+    background-color: $background-white;
+    border-radius: 8px;
+    font-size: $font-sm;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: $background-light;
+    }
+    
+    &.active {
+      background-color: $primary-color;
+      color: $background-white;
+      border-color: $primary-color;
+    }
+  }
+}
+
+.sketches-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-sm;
+}
+
+.sketch-item {
+  padding: $spacing-12;
+  margin-bottom: $spacing-6;
+  border: 1px solid $border-light;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: $background-white;
+  
+  &:hover {
+    border-color: $primary-color;
+    box-shadow: 0 2px 8px rgba($primary-color, 0.1);
+  }
+  
+  &.selected {
+    border-color: $primary-color;
+    background-color: rgba($primary-color, 0.05);
+  }
+  
+  .sketch-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-xs;
+    
+    .sketch-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 500;
+      color: $text-primary;
+    }
+    
+    .sketch-badges {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+  }
+  
+  .project-badge {
+    @include project-badge;
+  }
+  
+  .type-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 0.5rem;
+    font-size: 1rem;
+    
+    &.inspiration i {
+      color: #3b82f6; // Blue for inspiration
+    }
+    
+    &.song i {
+      color: #10b981; // Green for song
+    }
+  }
+  
+  .sketch-item-meta {
+    display: flex;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-xs;
+    flex-wrap: wrap;
+    
+    .meta-date {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: 0.75rem;
+      color: $text-muted;
+      
+      i {
+        font-size: 0.7rem;
+      }
+    }
+    
+    .meta-tags {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: 0.75rem;
+      color: $primary-color;
+      font-weight: 500;
+      
+      i {
+        font-size: 0.7rem;
+      }
+    }
+  }
+  
+  .sketch-item-preview {
+    font-size: 0.85rem;
+    color: $text-muted;
+    margin-top: $spacing-xs;
+    
+    p {
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+}
+
+.empty-state,
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl;
+  text-align: center;
+  color: $text-muted;
+  
+  i {
+    font-size: 3rem;
+    margin-bottom: $spacing-md;
+    color: $text-muted;
+    opacity: 0.5;
+  }
+  
+  p {
+    margin: 0 0 $spacing-md 0;
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  border-top: 1px solid $border-light;
+  
+  .pagination-btn {
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid $border-standard;
+    background-color: $background-white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover:not(:disabled) {
+      background-color: $primary-color;
+      color: $background-white;
+      border-color: $primary-color;
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  .pagination-info {
+    font-size: $font-sm;
+    color: $text-muted;
+  }
+}
+
+// Right Side: Detail Section
+.detail-section {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: $spacing-md;
+  background-color: $background-white;
+}
+
+.detail-card {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 2rem);
+  
+  mat-card-content {
+    padding: $spacing-lg;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  mat-card-actions {
+    padding: 0.75rem 1.5rem 1rem 1.5rem;
+    border-top: 1px solid $border-light;
+    background: #f8f9fa;
+    
+    .detail-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: flex-end;
+    }
+  }
+}
+
+.detail-header {
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid $border-light;
+  margin-bottom: $spacing-lg;
+  
+  .detail-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: $text-primary;
+      
+      .copy-icon-btn {
+        padding: $spacing-xs;
+        background: transparent;
+        border: none;
+        color: $text-muted;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-radius: 4px;
+        
+        &:hover {
+          color: $primary-color;
+          background-color: rgba($primary-color, 0.1);
+        }
+        
+        i {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+.detail-content {
+  .detail-section-block {
+    margin-bottom: $spacing-lg;
+    padding: $spacing-md;
+    background-color: $background-light;
+    border-radius: 12px;
+    
+    h3 {
+      margin: 0 0 $spacing-sm 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+  }
+  
+  .metadata-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: $spacing-sm;
+    
+    .metadata-item {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+      
+      .metadata-label {
+        font-size: 0.85rem;
+        color: $text-muted;
+        font-weight: 500;
+      }
+      
+      .metadata-value {
+        font-size: $font-sm;
+        color: $text-primary;
+      }
+    }
+  }
+  
+  .metadata-id-row {
+    margin-bottom: $spacing-md;
+    
+    .metadata-id-item {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      padding: $spacing-xs 0;
+      
+      .meta-icon {
+        color: $primary-color;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+      
+      .meta-id {
+        font-family: 'Courier New', monospace;
+        font-size: $font-sm;
+        color: $text-secondary;
+        background: $background-light;
+        padding: 6px 12px;
+        border-radius: $border-radius-sm;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+      }
+      
+      .copy-id-btn {
+        background: transparent;
+        border: none;
+        color: $text-secondary;
+        cursor: pointer;
+        padding: 6px 12px;
+        border-radius: $border-radius-sm;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        
+        &:hover {
+          background: $background-light;
+          color: $primary-color;
+        }
+        
+        i {
+          font-size: $font-base;
+        }
+      }
+    }
+  }
+  
+  .metadata-row {
+    display: flex;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-sm;
+    
+    .metadata-date-item {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      
+      .meta-icon {
+        color: $primary-color;
+        font-size: 0.9rem;
+      }
+      
+      .meta-value {
+        font-size: $font-sm;
+        color: $text-primary;
+      }
+    }
+    
+    .metadata-tags-item {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      
+      .meta-icon {
+        color: $primary-color;
+        font-size: 0.9rem;
+      }
+      
+      .meta-value {
+        font-size: $font-sm;
+        color: $text-primary;
+      }
+    }
+  }
+  
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-sm;
+    
+    h3 {
+      margin: 0;
+    }
+  }
+  
+  .copy-icon-btn {
+    padding: $spacing-xs;
+    background: transparent;
+    border: none;
+    color: $text-muted;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    
+    &:hover {
+      color: $primary-color;
+      background-color: rgba($primary-color, 0.1);
+    }
+    
+    i {
+      font-size: 0.9rem;
+    }
+  }
+  
+  .prompt-display {
+    padding: $spacing-md;
+    background-color: $background-light;
+    border-radius: 8px;
+    border: 1px solid $border-light;
+    font-size: $font-sm;
+    line-height: 1.6;
+    color: $text-primary;
+    min-height: 120px;
+  }
+  
+  .lyrics-display {
+    padding: $spacing-md;
+    background-color: $background-light;
+    border-radius: 8px;
+    border: 1px solid $border-light;
+    max-height: 580px;
+    overflow-y: auto;
+    
+    pre {
+      margin: 0;
+      font-family: 'Courier New', monospace;
+      font-size: $font-sm;
+      line-height: 1.6;
+      color: $text-primary;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  }
+  
+  .description-display {
+    padding: $spacing-md;
+    background-color: $background-light;
+    border-radius: 8px;
+    border: 1px solid $border-light;
+    max-height: 400px;
+    overflow-y: auto;
+    
+    pre {
+      margin: 0;
+      font-family: 'Courier New', monospace;
+      font-size: $font-sm;
+      line-height: 1.6;
+      color: $text-primary;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  }
+  
+  .description-short-display {
+    padding: $spacing-md;
+    background-color: $background-light;
+    border-radius: 8px;
+    border: 1px solid $border-light;
+    font-size: $font-sm;
+    line-height: 1.6;
+    color: $text-primary;
+  }
+  
+  .description-tags-display {
+    padding: $spacing-md;
+    background-color: $background-light;
+    border-radius: 8px;
+    border: 1px solid $border-light;
+    font-size: $font-sm;
+    line-height: 1.6;
+    color: $text-primary;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .empty-message {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-md;
+    background-color: $background-light;
+    border-radius: 8px;
+    color: $text-muted;
+    font-size: $font-sm;
+    
+    i {
+      font-size: 1.2rem;
+    }
+  }
+  
+  // Tab Styles (restored from git history)
+  .detail-tabs {
+    margin-top: $spacing-md;
+    
+    .tab-content {
+      padding: $spacing-md 0;
+    }
+    
+    // Material Tab Overrides
+    .mat-mdc-tab-labels {
+      margin-bottom: $spacing-sm;
+    }
+    
+    .mat-mdc-tab-label {
+      font-weight: 500;
+    }
+  }
+}
+
+.empty-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: $text-muted;
+  
+  i {
+    font-size: 4rem;
+    margin-bottom: $spacing-md;
+    opacity: 0.3;
+  }
+  
+  p {
+    font-size: 1.1rem;
+  }
+}
+
+// Workflow Badges
+.workflow-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  &.badge-draft {
+    background-color: #e3f2fd;
+    color: #1976d2;
+  }
+  
+  &.badge-used {
+    background-color: #e8f5e9;
+    color: #388e3c;
+  }
+  
+  &.badge-archived {
+    background-color: #f5f5f5;
+    color: #757575;
+  }
+}
+
+// Action Buttons - Using standard button mixins like lyric-creation
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-weight: $font-weight-medium !important;
+  
+  i {
+    font-size: $font-base;
+  }
+  
+  span {
+    display: inline-block;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.new-sketch-button {
+  @include button-primary('base');
+  min-width: auto !important;
+  width: 40px;
+  height: 40px;
+  padding: 0 !important;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  i {
+    font-size: $font-lg;
+    margin: 0;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.assign-button {
+  @include button-secondary('base');
+}
+
+.edit-button {
+  @include button-secondary('base');
+}
+
+.archive-button {
+  @include button-secondary('base');
+}
+
+.delete-button {
+  @include button-secondary('base');
+}
+
+.used-button {
+  @include button-secondary('base');
+}
+
+.draft-button {
+  @include button-secondary('base');
+}
+
+.duplicate-button {
+  @include button-secondary('base');
+}
+
+.cancel-modal-button {
+  @include button-secondary('base');
+}
+
+.confirm-delete-button {
+  @include button-danger('base');
+}
+
+// MacBook Air 13" M4 2025 - Responsive breakpoint
+@media (max-width: 1470px) {
+  .sketch-library-container.master-detail-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    height: auto;
+  }
+  
+  .list-section {
+    height: auto;
+    max-height: 50vh;
+    border-right: none;
+    border-bottom: 1px solid $border-light;
+    padding: $spacing-sm;
+  }
+  
+  .detail-section {
+    height: auto;
+    max-height: 50vh;
+    padding: $spacing-sm;
+  }
+  
+  .list-card,
+  .detail-card {
+    height: auto;
+  }
+}
+
+// iPad & Touch Device Optimizations
+@media (max-width: 1024px) and (hover: none) {
+  // Stack Master-Detail layout on iPad
+  .sketch-library-container.master-detail-layout {
+    grid-template-columns: 1fr; // Stack vertically
+    gap: 1rem;
+  }
+  
+  // Sections with adjusted heights
+  .list-section,
+  .detail-section {
+    height: auto;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  
+  // Larger touch targets for list items
+  .sketch-item {
+    min-height: 60px;
+    padding: 12px;
+    
+    &:active {
+      background: rgba($primary-color, 0.08);
+      transform: scale(0.99);
+    }
+  }
+  
+  // Full-width action buttons
+  .action-button,
+  .new-sketch-button {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 0.5rem;
+  }
+  
+  .edit-button {
+    width: 100%;
+    height: 60px;
+    margin-bottom: 0.5rem;
+  }
+  
+  // Adjust card heights
+  .list-card,
+  .detail-card {
+    height: auto;
+  }
+}
+
+// Modal
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: $background-white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  
+  .modal-header {
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid $border-light;
+    
+    h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: $text-primary;
+    }
+  }
+  
+  .modal-body {
+    padding: $spacing-lg;
+    
+    p {
+      margin: 0;
+      color: $text-primary;
+      line-height: 1.6;
+    }
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid $border-light;
+  }
+}
+
+// Responsive - MacBook Air 13" M4 2025 - Height (956px)
+@media (max-height: 1000px) {
+  .sketch-library-container {
+    height: auto;
+    overflow: visible;
+  }
+  
+  .list-section,
+  .detail-section {
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+  }
+  
+  .list-card,
+  .detail-card {
+    height: auto;
+    max-height: none;
+  }
+}

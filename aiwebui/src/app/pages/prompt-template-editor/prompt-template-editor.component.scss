@@ -1,0 +1,330 @@
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+// SCSS copied from lyric-creation.component.scss with renamed classes
+// (lyric-* → prompt-editor-*)
+
+.prompt-editor-container {
+  height: 100vh;
+  overflow: hidden;
+  padding: $spacing-md;
+  background: $background-white;
+  display: flex;
+  justify-content: center;
+}
+
+.prompt-editor-card {
+  max-width: 1600px;
+  width: 100%;
+  height: calc(100vh - 2rem);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  
+  mat-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    padding: $spacing-md;
+    
+    form {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: visible;
+    }
+  }
+}
+
+.prompt-editor-header {
+  display: flex;
+  border-bottom: 1px solid #e9ecef;
+  padding: 0.9375rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+  flex-shrink: 0;
+  
+  .prompt-editor-title {
+    margin: 0;
+    padding: 0;
+    
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-weight: 700;
+      line-height: 1.3;
+      font-size: 1.75rem;
+      margin: 0 0 $spacing-xs 0;
+      color: $text-primary;
+      
+      i {
+        color: $primary-color;
+        font-size: 1.5rem;
+      }
+    }
+    
+    .template-subtitle {
+      font-size: $font-sm;
+      color: $text-muted;
+      margin: 0;
+      font-style: italic;
+      font-weight: 400;
+    }
+  }
+  
+  .navigation-buttons {
+    display: flex;
+    gap: $spacing-sm;
+    align-items: center;
+    
+    .cancel-button {
+      @include button-secondary('base');
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-weight: $font-weight-medium !important;
+      
+      i {
+        font-size: $font-base;
+      }
+      
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+    }
+    
+    .apply-button {
+      @include button-primary('base');
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-weight: $font-weight-medium !important;
+      
+      i {
+        font-size: $font-base;
+      }
+      
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+}
+
+// Metadata Section
+.metadata-section {
+  flex-shrink: 0;
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  background: $background-light;
+  border-radius: $border-radius-lg;
+}
+
+.metadata-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.metadata-field {
+  display: flex;
+  flex-direction: column;
+  
+  label {
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: $spacing-xs;
+    font-size: $font-sm;
+  }
+  
+  .form-input {
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid $border-light;
+    border-radius: $border-radius-lg;
+    font-size: $font-base;
+    font-family: $font-family-base;
+    transition: $transition-fast;
+    
+    &:focus {
+      @include input-focus-state($primary-color);
+    }
+    
+    &:disabled {
+      background: $background-light;
+      color: $text-muted;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+  
+  .model-select,
+  .temperature-select {
+    width: 100%;
+    
+    mat-select {
+      font-size: $font-base;
+      font-family: $font-family-base;
+    }
+  }
+  
+  .field-hint {
+    font-size: $font-xs;
+    color: $text-muted;
+    margin-top: $spacing-xs;
+    line-height: 1.4;
+    font-style: italic;
+  }
+}
+
+// Temperature option styling (multi-line)
+.temperature-option {
+  display: flex;
+  flex-direction: column;
+  padding: $spacing-xs 0;
+}
+
+.temperature-option__label {
+  font-weight: 600;
+  color: $text-primary;
+  font-size: $font-base;
+  margin-bottom: 2px;
+}
+
+.temperature-option__description {
+  font-size: $font-xs;
+  color: $text-muted;
+  line-height: 1.3;
+}
+
+// Conditions Section (2-column layout)
+.conditions-section {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-lg;
+  overflow: hidden;
+  margin-bottom: $spacing-md;
+}
+
+.condition-group {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.condition-label {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-sm;
+  font-size: $font-base;
+  flex-shrink: 0;
+  
+  i {
+    color: $primary-color;
+    font-size: $font-sm;
+  }
+  
+  .required-indicator {
+    color: $danger-color;
+    margin-left: 2px;
+  }
+}
+
+.condition-textarea {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  padding: $spacing-15;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-lg;
+  font-size: $font-base;
+  font-family: 'Courier New', monospace;
+  resize: none;
+  transition: $transition-fast;
+  box-sizing: border-box;
+  line-height: $line-height-relaxed;
+  overflow-y: auto;
+  
+  &:focus {
+    @include input-focus-state($primary-color);
+  }
+  
+  &:disabled {
+    background: $background-light;
+    color: $text-muted;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.condition-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: $spacing-xs;
+  flex-shrink: 0;
+  gap: $spacing-sm;
+}
+
+.char-count {
+  font-size: $font-sm;
+  color: $text-muted;
+  font-style: italic;
+  flex: 1;
+}
+
+.improve-button {
+  @include button-ai('base');
+  background-color: $ai-color !important;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-weight: $font-weight-medium !important;
+  flex-shrink: 0;
+  
+  i {
+    font-size: $font-base;
+  }
+  
+  &:hover:not(:disabled) {
+    background-color: $ai-hover !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// MacBook Air 13" M4 2025 - Height adjustments
+@media (max-height: 1000px) {
+  .prompt-editor-card {
+    height: calc(100vh - 1.5rem);
+  }
+  
+  .prompt-editor-textarea {
+    max-height: 400px;
+  }
+  
+  .action-section {
+    padding: $spacing-sm;
+  }
+}

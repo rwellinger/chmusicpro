@@ -1,0 +1,68 @@
+// Touch Optimization for iPad and Touch Devices
+// Apple Human Interface Guidelines: Minimum touch target 44x44px
+// Reference: https://developer.apple.com/design/human-interface-guidelines/inputs
+
+// Touch Targets
+@media (hover: none) {
+  // Buttons - ensure minimum touch target size
+  button,
+  .clickable,
+  .mat-mdc-button,
+  .mat-mdc-icon-button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 16px;
+  }
+  
+  // List items - easier to tap
+  .sketch-item,
+  .song-item,
+  .image-item,
+  .template-item {
+    min-height: 60px;
+    padding: 12px;
+  }
+  
+  // Form inputs - prevent iOS zoom and improve usability
+  input,
+  textarea,
+  select {
+    min-height: 44px;
+    font-size: 16px; // Prevent iOS auto-zoom
+  }
+  
+  // Disable hover effects on touch devices
+  .sketch-item:hover,
+  .song-item:hover,
+  .image-item:hover,
+  .template-item:hover {
+    background: none;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  // Add active/pressed state instead of hover
+  .sketch-item:active,
+  .song-item:active,
+  .image-item:active,
+  .template-item:active {
+    background: rgba(0, 0, 0, 0.05);
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+  }
+  
+  // Remove hover effects from action buttons
+  .action-button:hover:not(:disabled),
+  .utility-button:hover:not(:disabled),
+  .submit-button:hover:not(:disabled) {
+    transform: none; // Disable hover lift effect on touch
+  }
+  
+  // Active state for buttons
+  .action-button:active:not(:disabled),
+  .utility-button:active:not(:disabled),
+  .submit-button:active:not(:disabled) {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+}

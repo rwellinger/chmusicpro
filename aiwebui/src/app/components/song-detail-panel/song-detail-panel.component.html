@@ -1,0 +1,328 @@
+<div class="song-details-panel">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+        <div class="placeholder-content">
+            <i class="fas fa-spinner fa-spin placeholder-icon"></i>
+            <p>{{ 'songDetailPanel.loading' | translate }}</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="loadingError && !isLoading" class="error-state">
+        <div class="placeholder-content">
+            <i class="fas fa-exclamation-triangle placeholder-icon error-icon"></i>
+            <p>{{ loadingError }}</p>
+        </div>
+    </div>
+
+    <!-- No Selection State -->
+    <div *ngIf="!song && !isLoading && !loadingError" class="no-selection">
+        <div class="placeholder-content">
+            <i [class]="placeholderIcon + ' placeholder-icon'"></i>
+            <p>{{ placeholderText }}</p>
+        </div>
+    </div>
+
+    <!-- Song Details Content -->
+    <div *ngIf="song" class="song-details-section">
+        <h2>{{ title }}</h2>
+
+        <div class="song-info-compact">
+            <!-- Editable Title Section -->
+            <div class="song-title-section" *ngIf="showEditTitle">
+                <div class="title-row" *ngIf="!editingTitle">
+                    <h3 class="song-title">{{ getDisplayTitle(song) }}</h3>
+                    <button type="button" class="edit-btn" (click)="startEditTitle()" [disabled]="isGenerating">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+                <div class="title-edit-row" *ngIf="editingTitle">
+                    <input type="text"
+                           class="title-input"
+                           [(ngModel)]="editTitleValue"
+                           (keyup.enter)="saveTitle()"
+                           (keyup.escape)="cancelEditTitle()"
+                           #titleInput>
+                    <button type="button" class="save-btn" (click)="saveTitle()">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button type="button" class="cancel-btn" (click)="cancelEditTitle()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Meta Info -->
+            <div class="song-meta-info">
+                <!-- ID Row (separate, full width) -->
+                <div class="meta-id-row" *ngIf="shouldShowMetaInfo('id') && song.id">
+                    <div class="meta-item-id">
+                        <i class="fas fa-fingerprint meta-icon"></i>
+                        <span class="meta-id" [title]="song.id">{{ song.id }}</span>
+                        <button type="button"
+                                class="copy-id-btn"
+                                (click)="copyToClipboard(song.id)"
+                                [title]="'songDetailPanel.copyId' | translate">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Other Meta Data Grid -->
+                <div class="meta-grid">
+                    <div class="meta-item" *ngIf="shouldShowMetaInfo('job_id') && song.job_id">
+                        <i class="fas fa-hashtag meta-icon"></i>
+                        <span class="meta-value">{{ song.job_id }}</span>
+                    </div>
+                    <div class="meta-item"
+                         *ngIf="shouldShowMetaInfo('status') && song.status && song.status.toLowerCase() !== 'success'">
+                        <i class="fas meta-icon"
+                           [class]="song.status.toLowerCase() === 'failure' || song.status.toLowerCase() === 'failed' ? 'fa-times-circle status-icon-failed' :
+                                   'fa-clock status-icon-' + song.status.toLowerCase()"></i>
+                        <span class="meta-value"
+                              [class]="'status-' + song.status.toLowerCase()">{{ song.status }}</span>
+                    </div>
+                    <div class="meta-item" *ngIf="shouldShowMetaInfo('model') && song.model">
+                        <i class="fas fa-robot meta-icon"></i>
+                        <span class="meta-value">{{ song.model }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas meta-icon"
+                           [class.fa-guitar]="song.is_instrumental === true"
+                           [class.fa-microphone]="song.is_instrumental !== true"></i>
+                        <span class="meta-value">{{ getSongTypeText(song) }}</span>
+                    </div>
+                    <div class="meta-item" *ngIf="shouldShowMetaInfo('completed') && song.completed_at">
+                        <i class="fas fa-calendar-check meta-icon"></i>
+                        <span class="meta-value">{{ formatDateDetailed(song.completed_at) }}</span>
+                    </div>
+                    <div class="meta-item"
+                         *ngIf="shouldShowMetaInfo('created') && song.created_at && song.completed_at">
+                        <i class="fas fa-clock meta-icon"></i>
+                        <span class="meta-value">{{ formatDuration(song.created_at, song.completed_at) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tags & Workflow Container -->
+            <div class="tags-workflow-container"
+                 [class.tags-editing]="editingTags"
+                 [class.workflow-editing]="editingWorkflow">
+                <!-- Tags Section -->
+                <div class="song-tags-section" *ngIf="showEditTags && !editingWorkflow">
+                    <div class="tags-row" *ngIf="!editingTags">
+                        <h3 class="tags-title">{{ 'songDetailPanel.tags.label' | translate }}</h3>
+                        <span class="tags-display">{{ getSelectedTagsDisplay() }}</span>
+                        <button type="button" class="edit-btn" (click)="startEditTags()" [disabled]="isGenerating">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                    <div class="tags-edit-section" *ngIf="editingTags">
+                        <div class="tags-edit-header">
+                            <h3 class="tags-title">{{ 'songDetailPanel.tags.editTitle' | translate }}</h3>
+                            <div class="tags-edit-buttons">
+                                <button type="button" class="save-btn" (click)="saveTags()">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button type="button" class="cancel-btn" (click)="cancelEditTags()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="tags-categories">
+                            <!-- Style Tags -->
+                            <div class="tag-category">
+                                <h4 class="category-title">{{ 'songDetailPanel.tags.styleCategory' | translate }}</h4>
+                                <div class="tag-checkboxes">
+                                    <label *ngFor="let tag of tagCategories.style" class="tag-checkbox">
+                                        <input type="checkbox"
+                                               [checked]="isTagSelected(tag)"
+                                               (change)="toggleTag(tag)">
+                                        <span class="checkmark"></span>
+                                        {{ tag }}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Theme Tags -->
+                            <div class="tag-category">
+                                <h4 class="category-title">{{ 'songDetailPanel.tags.themeCategory' | translate }}</h4>
+                                <div class="tag-checkboxes">
+                                    <label *ngFor="let tag of tagCategories.theme" class="tag-checkbox">
+                                        <input type="checkbox"
+                                               [checked]="isTagSelected(tag)"
+                                               (change)="toggleTag(tag)">
+                                        <span class="checkmark"></span>
+                                        {{ tag }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Workflow Section -->
+                <div class="song-workflow-section" *ngIf="showEditWorkflow && !editingTags">
+                    <div class="workflow-row" *ngIf="!editingWorkflow">
+                        <h3 class="workflow-title">{{ 'songDetailPanel.workflow.label' | translate }}</h3>
+                        <span class="workflow-display">{{ getWorkflowDisplay() }}</span>
+                        <button type="button" class="edit-btn" (click)="startEditWorkflow()" [disabled]="isGenerating">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                    <div class="workflow-edit-section" *ngIf="editingWorkflow">
+                        <div class="workflow-edit-header">
+                            <h3 class="workflow-title">{{ 'songDetailPanel.workflow.editTitle' | translate }}</h3>
+                            <div class="workflow-edit-buttons">
+                                <button type="button" class="save-btn" (click)="saveWorkflow()">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button type="button" class="cancel-btn" (click)="cancelEditWorkflow()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="workflow-options">
+                            <label *ngFor="let option of workflowOptions" class="workflow-option">
+                                <input type="radio"
+                                       name="workflow"
+                                       [value]="option.value"
+                                       [(ngModel)]="selectedWorkflow">
+                                <span class="option-label">{{ option.label }}</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Choices Table -->
+            <div class="song-choices" *ngIf="song.choices && song.choices.length > 0">
+                <h3>{{ 'songDetailPanel.choices.title' | translate }}</h3>
+                <table class="choices-table">
+                    <thead>
+                    <tr>
+                        <th>{{ 'songDetailPanel.choices.duration' | translate }}</th>
+                        <th>{{ 'songDetailPanel.choices.audioDownloads' | translate }}</th>
+                        <th>{{ 'songDetailPanel.choices.mp3File' | translate }}</th>
+                        <th>{{ 'songDetailPanel.choices.stems' | translate }}</th>
+                        <th *ngIf="showRating">{{ 'songDetailPanel.choices.rating' | translate }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let choice of song.choices; let i = index">
+                        <td>{{ choice.formattedDuration }}</td>
+                        <td>
+                            <button type="button"
+                                    *ngIf="choice.flac_url || choice.flac_s3_key"
+                                    (click)="onDownloadFlac(choice.id)"
+                                    class="download-flac-btn">
+                                <i class="fas fa-download"></i> {{ 'songDetailPanel.choices.downloadFlac' | translate }}
+                            </button>
+                            <button type="button"
+                                    *ngIf="choice.wav_url || choice.wav_s3_key"
+                                    (click)="onDownloadWav(choice.id)"
+                                    class="download-wav-btn">
+                                <i class="fas fa-download"></i> {{ 'songDetailPanel.choices.downloadWav' | translate }}
+                            </button>
+                            <span *ngIf="!choice.flac_url && !choice.flac_s3_key && !choice.wav_url && !choice.wav_s3_key"
+                                  class="not-available">{{ 'songDetailPanel.choices.notAvailable' | translate }}</span>
+                        </td>
+                        <td>
+                            <button type="button"
+                                    *ngIf="choice.mp3_url || choice.mp3_s3_key"
+                                    (click)="onPlayAudio(choice.id, choice.id, i + 1)"
+                                    [class.active]="currentlyPlayingId === choice.id">
+                                <i class="fas fa-music"></i>
+                                {{ currentlyPlayingId === choice.id ? ('songDetailPanel.choices.playing' | translate) : ('songDetailPanel.choices.play' | translate) }}
+                            </button>
+                            <span *ngIf="!choice.mp3_url && !choice.mp3_s3_key"
+                                  class="not-available">{{ 'songDetailPanel.choices.notAvailable' | translate }}</span>
+                        </td>
+                        <td>
+                            <button type="button"
+                                    *ngIf="choice.stem_url || choice.stem_s3_key"
+                                    (click)="onDownloadStems(choice.id)"
+                                    class="download-stems-btn">
+                                <i class="fas fa-download"></i> {{ 'songDetailPanel.choices.downloadStems' | translate }}
+                            </button>
+                            <span *ngIf="!choice.stem_url && !choice.stem_s3_key"
+                                  class="not-available">{{ 'songDetailPanel.choices.notAvailable' | translate }}</span>
+                        </td>
+                        <td *ngIf="showRating">
+                            <div class="rating-buttons">
+                                <button type="button"
+                                        class="rating-btn thumbs-up"
+                                        [class.active]="choice.rating === 1"
+                                        [class.inactive]="choice.rating === 0"
+                                        (click)="onUpdateRating(choice.id, choice.rating === 1 ? null : 1)"
+                                        [title]="'songDetailPanel.choices.thumbsUp' | translate">
+                                    <i class="fas fa-thumbs-up"></i>
+                                </button>
+                                <button type="button"
+                                        class="rating-btn thumbs-down"
+                                        [class.active]="choice.rating === 0"
+                                        [class.inactive]="choice.rating === 1"
+                                        (click)="onUpdateRating(choice.id, choice.rating === 0 ? null : 0)"
+                                        [title]="'songDetailPanel.choices.thumbsDown' | translate">
+                                    <i class="fas fa-thumbs-down"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Lyrics & Style Container -->
+            <div class="lyrics-style-container" *ngIf="song.lyrics || song.prompt">
+                <!-- Lyrics Section -->
+                <div class="song-lyrics" *ngIf="song.lyrics">
+                    <div class="lyrics-header">
+                        <h3>{{ 'songDetailPanel.lyrics.label' | translate }}</h3>
+                        <button type="button" class="copy-button" (click)="openLyricsDialog()">
+                            <i class="fas fa-expand-alt"></i> {{ 'songDetailPanel.lyrics.showButton' | translate }}
+                        </button>
+                    </div>
+                    <pre class="lyrics-content">{{ song.lyrics }}</pre>
+                    <div class="character-count">{{ song.lyrics.length }} {{ 'songDetailPanel.lyrics.characters' | translate }}</div>
+                </div>
+
+                <!-- Style Prompt -->
+                <div class="song-prompt" *ngIf="song.prompt">
+                    <h3>{{ 'songDetailPanel.prompt.label' | translate }}</h3>
+                    <p class="prompt-content">{{ song.prompt }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!song.choices || song.choices.length === 0" class="no-choices">
+            <p>{{ 'songDetailPanel.choices.noChoices' | translate }}</p>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Lyrics Dialog -->
+<div *ngIf="showLyricsDialog" class="lyrics-dialog-overlay" (click)="closeLyricsDialog()">
+    <div class="lyrics-dialog" (click)="$event.stopPropagation()">
+        <div class="lyrics-dialog-header">
+            <h3>{{ 'songDetailPanel.lyrics.dialogTitle' | translate:{title: getDisplayTitle(song)} }}</h3>
+            <button type="button" class="close-button" (click)="closeLyricsDialog()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="lyrics-dialog-content">
+            <textarea readonly class="lyrics-textarea" [value]="song.lyrics" #lyricsTextarea></textarea>
+        </div>
+        <div class="lyrics-dialog-actions">
+            <button type="button" class="copy-all-button" (click)="copyLyricsToClipboard()">
+                <i class="fas fa-copy"></i> {{ 'songDetailPanel.lyrics.copyAll' | translate }}
+            </button>
+            <button type="button" class="close-dialog-button" (click)="closeLyricsDialog()">
+                {{ 'common.close' | translate }}
+            </button>
+        </div>
+    </div>
+</div>

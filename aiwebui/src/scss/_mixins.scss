@@ -1,0 +1,748 @@
+// ===== SCSS MIXINS =====
+@use "sass:color";
+@use "variables" as *;
+
+// 1. Button Styling
+@mixin button-style($bg-color, $text-color: $background-white, $hover-bg: null, $disabled-bg: $text-muted) {
+  $hover-color: if($hover-bg, $hover-bg, color.adjust($bg-color, $lightness: -10%));
+  
+  background-color: $bg-color;
+  color: $text-color;
+  border: none;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  font-family: $font-family-base;
+  font-size: $button-font-size;
+  padding: 8px 16px;
+  transition: $transition-standard;
+  
+  &:hover:not(:disabled) {
+    background-color: $hover-color;
+    transform: translateY(-1px);
+  }
+  
+  &:disabled {
+    background-color: $disabled-bg;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+  }
+}
+
+// 1a. Button Size Variants
+@mixin button-size($size: 'base') {
+  @if $size == 'sm' {
+    padding: $button-padding-sm !important;
+    font-size: $button-font-size !important;
+    min-height: $button-height-sm;
+  } @else if $size == 'lg' {
+    padding: $button-padding-lg !important;
+    font-size: $button-large-font-size !important;
+    min-height: $button-height-lg;
+  } @else {
+    padding: $button-padding-base !important;
+    font-size: $button-font-size !important;
+    min-height: $button-height-base;
+  }
+}
+
+// 1b. Standard Button Variants
+@mixin button-primary($size: 'base') {
+  @include button-style($info-color, $background-white, $primary-hover);
+  @include button-size($size);
+}
+
+@mixin button-success($size: 'base') {
+  @include button-style($success-color, $background-white, $success-hover);
+  @include button-size($size);
+}
+
+@mixin button-danger($size: 'base') {
+  @include button-style($danger-color, $background-white, $danger-hover);
+  @include button-size($size);
+}
+
+@mixin button-secondary($size: 'base') {
+  @include button-style($text-muted, $background-white, #5a6268);
+  @include button-size($size);
+}
+
+@mixin button-ai($size: 'base') {
+  @include button-style($ai-color, $background-white, $ai-hover);
+  @include button-size($size);
+}
+
+@mixin button-storage($size: 'base') {
+  @include button-style($storage-bg, $storage-text, $storage-hover-bg);
+  @include button-size($size);
+}
+
+// 2. Card/Panel Container
+@mixin card-container($border-color: $border-light, $bg-color: $background-white, $padding: 15px) {
+  background: $bg-color;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-xl;
+  box-shadow: $shadow-sm;
+  padding: $padding;
+  transition: box-shadow $transition-fast ease;
+  
+  &:hover {
+    box-shadow: $shadow-lg;
+  }
+}
+
+// 3. Form Input Focus States
+@mixin input-focus-state($border-color: $primary-color) {
+  outline: none;
+  border-color: $border-color;
+  box-shadow: 0 0 0 3px rgba($border-color, 0.1);
+}
+
+// 4. Master-Detail Layout - Standardized for all view components
+@mixin master-detail-layout($gap: 20px, $master-width: 40%, $min-height: calc(100vh - 320px)) {
+  display: flex;
+  gap: $gap;
+  min-height: $min-height;
+  
+  .master-panel {
+    flex: 0 0 $master-width;
+  }
+  
+  .detail-panel {
+    flex: 1;
+  }
+  
+  @include respond-to(tablet) {
+    flex-direction: column;
+    height: auto;
+    
+    .master-panel,
+    .detail-panel {
+      flex: none;
+    }
+  }
+}
+
+// 4a. Generator Layout - Standardized for image-generator & song-generator
+@mixin generator-layout() {
+  @include master-detail-layout($spacing-20, 40%, calc(100vh - 320px));
+  
+  .controls-panel {
+    @include card-container($border-light, $background-white, 0);
+    flex: 0 0 40%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .result-panel {
+    @include card-container($border-light, $background-white, 0);
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .controls-content {
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+  }
+  
+  .controls-content h2 {
+    @include heading(2);
+    border-bottom: 2px solid $primary-color;
+    padding-bottom: $spacing-10;
+  }
+}
+
+// 4b. Detail Panel Layout - Standardized for image-detail-panel & song-detail-panel
+@mixin detail-panel-layout() {
+  @include card-container($border-light, $background-white, 0);
+  flex: 1;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  
+  .details-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: $spacing-15;
+    overflow-y: auto;
+    min-height: 0;
+  }
+  
+  .details-section h2 {
+    @include section-header($primary-color, $font-xl);
+  }
+  
+  .info-compact {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-10;
+    margin-bottom: $spacing-20;
+    flex: 1;
+    min-height: 0;
+  }
+  
+  .no-selection {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .placeholder-content {
+    text-align: center;
+    color: $text-muted;
+  }
+  
+  .placeholder-icon {
+    font-size: $font-4xl;
+    margin-bottom: $spacing-20;
+    opacity: 0.3;
+  }
+}
+
+// 5. Modern List Table Styling
+@mixin list-table-styling($header-bg: $primary-color, $header-color: $background-white) {
+  width: 100%;
+  border-collapse: collapse;
+  background: $background-white;
+  border-radius: 0; // Tables in containers don't need radius
+  box-shadow: none; // Container provides shadow
+  font-size: $font-sm;
+  
+  th {
+    position: sticky;
+    top: 0;
+    background: $header-bg;
+    color: $header-color;
+    font-weight: $font-weight-semibold;
+    font-size: $font-sm;
+    padding: $spacing-6 $spacing-sm;
+    text-align: left;
+    border: none;
+    z-index: 10;
+    
+    &.sortable-header {
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: $primary-hover;
+      }
+      
+      i {
+        margin-left: 5px;
+        font-size: $font-sm;
+      }
+    }
+    
+    &.checkbox-col {
+      width: 40px;
+      text-align: center;
+      padding: $spacing-sm 4px;
+    }
+  }
+  
+  td {
+    padding: $spacing-6 $spacing-sm;
+    border-bottom: 1px solid $border-light;
+    font-size: $font-sm;
+    vertical-align: top;
+    line-height: 1.3;
+    
+    &.checkbox-col {
+      width: 40px;
+      text-align: center;
+      padding: $spacing-sm 4px;
+      
+      input[type="checkbox"] {
+        transform: scale(1.1);
+        cursor: pointer;
+      }
+    }
+  }
+  
+  tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover:not(.selected) {
+      background-color: #f5f5f5;
+    }
+    
+    &.selected {
+      background-color: $background-selected !important;
+      border-left: 4px solid $primary-color;
+    }
+    
+    &.selection-selected {
+      background-color: #fff3cd !important;
+      border-left: 4px solid $warning-color !important;
+      
+      &:hover {
+        background-color: #ffeaa7 !important;
+      }
+    }
+  }
+  
+  // Responsive adjustments
+  @include respond-to(mobile) {
+    th, td {
+      padding: $spacing-6;
+      font-size: $font-sm;
+    }
+  }
+}
+
+// 5a. Legacy Table Styling - DEPRECATED: Use list-table-styling instead
+// Kept for backward compatibility only - will be removed in future versions
+
+// 6. Modal/Overlay - Standardized modal overlay for all components
+@mixin modal-overlay($bg-opacity: 0.7, $z-index: 1500, $blur: false) {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, $bg-opacity);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: $z-index;
+  
+  @if $blur {
+    backdrop-filter: blur(2px);
+  }
+}
+
+// 6a. Standard Modal Content
+@mixin modal-content($max-width: 90vw, $max-height: 90vh, $border-radius: $border-radius-xl) {
+  background: $background-white;
+  border-radius: $border-radius;
+  max-width: $max-width;
+  max-height: $max-height;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+// 6b. Processing Popup - Standardized for all generators
+@mixin processing-popup($max-width: 300px) {
+  .processing-overlay {
+    @include modal-overlay(0.7, 2000);
+  }
+  
+  .processing-content {
+    @include modal-content($max-width, auto, 12px);
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .processing-spinner i {
+    font-size: $font-3xl;
+    color: $primary-color;
+    margin-bottom: $spacing-20;
+  }
+  
+  .processing-content h3 {
+    @include heading(3);
+    margin-bottom: $spacing-10;
+  }
+  
+  .processing-content p {
+    @include body-text('base');
+    color: $text-muted;
+    margin: 0;
+  }
+}
+
+// 7. Section Header
+@mixin section-header($border-color: $primary-color, $font-size: $font-xl) {
+  color: $text-primary;
+  margin: 0 0 20px 0;
+  font-size: $font-size;
+  font-weight: $font-weight-semibold;
+  border-bottom: 2px solid $border-color;
+  padding-bottom: 10px;
+}
+
+// 8. Inline Edit Controls
+@mixin inline-edit-controls() {
+  .edit-btn, .save-btn, .cancel-btn {
+    background: none;
+    border: 2px solid $primary-color;
+    color: $primary-color;
+    padding: 6px 8px;
+    border-radius: $border-radius-sm;
+    cursor: pointer;
+    font-size: $font-sm;
+    transition: $transition-standard;
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &:hover:not(:disabled) {
+      background-color: $primary-color;
+      color: $background-white;
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  .cancel-btn {
+    border-color: $text-muted;
+    color: $text-muted;
+    
+    &:hover:not(:disabled) {
+      background-color: $text-muted;
+      color: $background-white;
+    }
+  }
+}
+
+// 9. Responsive Breakpoints
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == desktop-large {
+    @media (min-width: 1400px) {
+      @content;
+    }
+  }
+  @if $breakpoint == desktop {
+    @media (max-width: 1200px) {
+      @content;
+    }
+  }
+  @if $breakpoint == tablet {
+    @media (max-width: 1024px) {
+      @content;
+    }
+  }
+  @if $breakpoint == mobile {
+    @media (max-width: 768px) {
+      @content;
+    }
+  }
+  @if $breakpoint == small-mobile {
+    @media (max-width: 480px) {
+      @content;
+    }
+  }
+}
+
+// 10. Status Badge
+@mixin status-badge($bg-color, $text-color, $border-color: $bg-color) {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: $font-sm;
+  font-weight: $font-weight-medium;
+  background-color: $bg-color;
+  color: $text-color;
+  border: 1px solid $border-color;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// 11. Loading State
+@mixin loading-state($color: $primary-color, $bg-color: $background-light) {
+  background-color: $bg-color;
+  color: $color;
+  font-style: italic;
+  padding: 10px;
+  text-align: center;
+  border-radius: $border-radius-md;
+  border: 1px solid $border-light;
+  
+  &::after {
+    content: "...";
+    animation: loading-dots 1.5s infinite;
+  }
+}
+
+// 12. Box Shadow Utilities
+@mixin elevation($level: 1) {
+  @if $level == 1 {
+    box-shadow: $shadow-sm;
+  } @else if $level == 2 {
+    box-shadow: $shadow-md;
+  } @else if $level == 3 {
+    box-shadow: $shadow-lg;
+  } @else {
+    box-shadow: 0 #{$level * 2}px #{$level * 4}px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// 13. Modern List Container Layout
+@mixin list-container-layout() {
+  @include card-container($border-light, $background-white, 0);
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+  
+  .list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-20;
+    padding: $spacing-15 $spacing-15 $spacing-15 $spacing-15;
+    border-bottom: 1px solid $border-light;
+    
+    h2 {
+      margin: 0;
+      color: $text-primary;
+      font-size: $font-xl;
+      font-weight: $font-weight-semibold;
+    }
+  }
+  
+  .search-controls {
+    margin-bottom: 0;
+    margin-top: 0;
+    margin-left: $spacing-10;
+    margin-right: $spacing-10;
+    padding: $spacing-10;
+    background: $background-light;
+    border-radius: $border-radius-lg;
+    box-sizing: border-box;
+    
+    .search-input {
+      width: 100%;
+      padding: $spacing-xs $spacing-12;
+      border: 1px solid $border-light;
+      border-radius: $border-radius-sm;
+      font-size: $font-sm;
+      margin-bottom: 5px;
+      box-sizing: border-box;
+      
+      &:focus {
+        @include input-focus-state($primary-color);
+      }
+    }
+    
+    .search-hint {
+      color: $text-muted;
+      font-size: $font-sm;
+      font-style: italic;
+    }
+  }
+  
+  .list-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 $spacing-15 $spacing-15 0;
+    overflow-y: auto;
+    min-height: 0;
+    margin-bottom: 0;
+    
+    .result-table {
+      @include list-table-styling();
+      flex: 1;
+      overflow-y: auto;
+      max-height: 500px;
+      
+      @include respond-to(mobile) {
+        max-height: 300px;
+      }
+    }
+    
+    .pagination-container {
+      padding: $spacing-sm $spacing-15;
+      border-top: 1px solid $border-light;
+      background: $background-light;
+      margin-top: auto;
+      
+      .modern-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+      }
+    }
+    
+    .no-results-message, .loading-message {
+      padding: 40px;
+      text-align: center;
+      color: $text-muted;
+    }
+  }
+  
+  // Responsive adjustments
+  @include respond-to(tablet) {
+    flex: none;
+    height: 40vh;
+  }
+  
+  @include respond-to(mobile) {
+    height: 35vh;
+  }
+}
+
+// 14. Pagination Pills Styling
+@mixin pagination-pills-styling() {
+  .pagination-info-badge {
+    background: linear-gradient(135deg, $primary-color, $primary-hover);
+    color: $background-white;
+    padding: 2px $spacing-6;
+    border-radius: $border-radius-xl;
+    font-size: $font-sm;
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0, 123, 255, 0.3);
+    margin-right: $spacing-10;
+  }
+  
+  .pagination-pills {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    background: $background-white;
+    padding: 2px;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid $border-darker;
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .pagination-pill {
+    border: none;
+    background: transparent;
+    color: $text-muted;
+    padding: 4px $spacing-6;
+    border-radius: $border-radius-xl;
+    cursor: pointer;
+    font-size: $font-sm;
+    font-weight: 500;
+    transition: all 0.15s ease;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    
+    &:hover:not(.disabled) {
+      background: $border-light;
+      color: $primary-color;
+    }
+    
+    &.active {
+      background: $primary-color;
+      color: $background-white;
+      box-shadow: 0 1px 3px rgba(0, 123, 255, 0.3);
+    }
+    
+    &.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    
+    &.prev, &.next {
+      font-size: $font-sm;
+      width: 24px;
+      font-weight: bold;
+    }
+  }
+  
+  .pagination-ellipsis {
+    color: $text-muted;
+    font-weight: bold;
+    padding: 0 4px;
+    user-select: none;
+    font-size: $font-sm;
+  }
+}
+
+// 15. Typography System
+@mixin heading($level: 2) {
+  margin: 0 0 $spacing-15 0;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  line-height: $line-height-tight;
+  
+  @if $level == 1 {
+    font-size: $heading-h1;
+  } @else if $level == 2 {
+    font-size: $heading-h2;
+  } @else if $level == 3 {
+    font-size: $heading-h3;
+  } @else if $level == 4 {
+    font-size: $heading-h4;
+  } @else if $level == 5 {
+    font-size: $heading-h5;
+  } @else if $level == 6 {
+    font-size: $heading-h6;
+  }
+}
+
+@mixin body-text($size: 'base') {
+  color: $text-primary;
+  line-height: $line-height-normal;
+  
+  @if $size == 'sm' {
+    font-size: $font-sm;
+  } @else if $size == 'lg' {
+    font-size: $font-lg;
+  } @else {
+    font-size: $font-base;
+  }
+}
+
+@mixin label-text() {
+  display: block;
+  color: $text-primary;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-6;
+  font-size: $font-base;
+}
+
+// Animation for loading state
+@keyframes loading-dots {
+  0%, 20% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  80%, 100% {
+    opacity: 0;
+  }
+}
+
+// ===== PROJECT BADGE STYLING =====
+// Badge for showing project assignment in galleries
+@mixin project-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background-color: rgba($info-color, 0.1);
+  color: $info-color;
+  cursor: pointer;
+  transition: $transition-standard;
+  
+  i {
+    font-size: 0.75rem;
+  }
+  
+  &:hover {
+    background-color: $info-color;
+    color: $background-white;
+    transform: translateY(-1px);
+  }
+}

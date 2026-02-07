@@ -1,0 +1,726 @@
+@use "sass:color";
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+.lyric-creation-container {
+  height: 100vh;
+  overflow: hidden;
+  padding: $spacing-md;
+  background: $background-white;
+  display: flex;
+  justify-content: center;
+}
+
+.lyric-creation-card {
+  max-width: 1600px;
+  width: 100%;
+  height: calc(100vh - 2rem);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  
+  mat-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    padding: $spacing-md;
+    
+    form {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: visible;
+    }
+  }
+}
+
+.lyric-header {
+  display: flex;
+  border-bottom: 1px solid #e9ecef;
+  padding: 0.9375rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+  flex-shrink: 0;
+  
+  .lyric-title {
+    margin: 0;
+    padding: 0;
+    
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-weight: 600;
+      line-height: 1.5;
+      font-size: 1.5rem;
+      margin: 0;
+      color: $text-primary;
+      
+      i {
+        color: $primary-color;
+      }
+    }
+  }
+  
+  .sketch-navigation-buttons {
+    display: flex;
+    gap: $spacing-sm;
+    align-items: center;
+    
+    .cancel-button {
+      @include button-secondary('base');
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-weight: $font-weight-medium !important;
+      
+      i {
+        font-size: $font-base;
+      }
+      
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+    }
+    
+    .apply-button {
+      @include button-primary('base');
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-weight: $font-weight-medium !important;
+      
+      i {
+        font-size: $font-base;
+      }
+      
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+    }
+  }
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin-bottom: $spacing-10;
+}
+
+.lyrics-textarea {
+  width: 100%;
+  flex: 1;
+  padding: $spacing-15;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-lg;
+  font-size: $font-base;
+  font-family: $font-family-base;
+  resize: none;
+  transition: $transition-fast;
+  box-sizing: border-box;
+  line-height: $line-height-relaxed;
+  overflow-y: auto;
+  
+  &:focus {
+    @include input-focus-state($primary-color);
+  }
+  
+  &:disabled {
+    background: $background-light;
+    color: $text-muted;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.lyrics-char-count {
+  font-size: $font-sm;
+  color: $text-muted;
+  text-align: right;
+  margin-top: $spacing-xs;
+  font-style: italic;
+  flex-shrink: 0;
+}
+
+.info-notice {
+  display: flex;
+  align-items: center;
+  gap: $spacing-10;
+  margin-top: $spacing-10;
+  margin-bottom: $spacing-10;
+  padding: $spacing-10;
+  background: $background-light;
+  border-left: 4px solid $primary-color;
+  border-radius: $border-radius-sm;
+  font-size: $font-sm;
+  color: $text-muted;
+  flex-shrink: 0;
+  
+  i {
+    color: $primary-color;
+    font-size: $font-base;
+  }
+}
+
+.action-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-15;
+  flex-shrink: 0;
+  padding-top: $spacing-10;
+  overflow: visible;
+}
+
+.ai-actions {
+  display: flex;
+  gap: $spacing-10;
+  flex-wrap: wrap;
+  flex: 1;
+  overflow: visible;
+}
+
+.ai-action-button {
+  @include button-ai('base');
+  background-color: $ai-color !important;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-weight: $font-weight-medium !important;
+  
+  i {
+    font-size: $font-base;
+  }
+  
+  &:hover:not(:disabled) {
+    background-color: $ai-hover !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.utility-button {
+  @include button-primary('base');
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-weight: $font-weight-medium !important;
+  
+  i {
+    font-size: $font-base;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.utility-actions {
+  display: flex;
+  gap: $spacing-10;
+}
+
+.clear-button {
+  @include button-secondary('base');
+  font-weight: $font-weight-medium !important;
+  
+  i {
+    margin-right: $spacing-xs;
+  }
+}
+
+.edit-dropdown-container,
+.tools-dropdown-container {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+}
+
+.dropdown-chevron {
+  margin-left: 4px;
+  font-size: 0.75rem;
+}
+
+.dropdown-menu {
+  position: absolute;
+  bottom: calc(100% + $spacing-xs);
+  right: 0;
+  background: $background-white;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-lg;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 280px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: dropdown-fade-up 0.15s ease-out;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: $spacing-10 $spacing-15;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: $spacing-10;
+  font-size: $font-base;
+  font-family: $font-family-base;
+  color: $text-primary;
+  cursor: pointer;
+  transition: $transition-fast;
+  text-align: left;
+  
+  &:hover:not(:disabled) {
+    background-color: $background-light;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  i {
+    width: 16px;
+    flex-shrink: 0;
+    color: $ai-color;
+  }
+  
+  span {
+    flex: 1;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.dropdown-separator {
+  height: 1px;
+  background: $border-light;
+  margin: $spacing-xs 0;
+}
+
+@keyframes dropdown-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Section Editor Styles
+.section-editor-container {
+  display: flex;
+  gap: $spacing-md;
+  height: 100%;
+  overflow: hidden;
+}
+
+.section-navigator {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid $border-light;
+  padding-right: $spacing-md;
+  overflow: hidden;
+  
+  .navigator-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: $spacing-sm;
+    border-bottom: 2px solid $primary-color;
+    margin-bottom: $spacing-md;
+    
+    h3 {
+      margin: 0;
+      font-size: $font-lg;
+      color: $text-primary;
+    }
+    
+    .section-count {
+      background: $primary-color;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: $font-sm;
+      font-weight: $font-weight-bold;
+    }
+  }
+  
+  .section-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+}
+
+.section-card {
+  padding: $spacing-sm;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  transition: $transition-fast;
+  background: $background-white;
+  
+  &:hover {
+    border-color: $primary-color;
+    background: $background-light;
+    transform: translateX(4px);
+  }
+  
+  &.active {
+    border-color: $primary-color;
+    background: color.adjust($primary-color, $lightness: 45%);
+    box-shadow: 0 2px 8px rgba($primary-color, 0.2);
+    
+    .section-label {
+      color: $primary-color;
+      font-weight: $font-weight-bold;
+    }
+  }
+  
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+    margin-bottom: $spacing-xs;
+    
+    i {
+      color: $ai-color;
+      font-size: $font-sm;
+    }
+  }
+  
+  .section-preview {
+    font-size: $font-sm;
+    color: $text-muted;
+    line-height: $line-height-relaxed;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.section-workspace {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  
+  .workspace-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: $spacing-sm;
+    border-bottom: 2px solid $primary-color;
+    margin-bottom: $spacing-md;
+    
+    h3 {
+      margin: 0;
+      font-size: $font-lg;
+      color: $text-primary;
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      
+      i {
+        color: $primary-color;
+      }
+    }
+    
+    .workspace-actions {
+      display: flex;
+      gap: $spacing-xs;
+    }
+  }
+  
+  .workspace-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-bottom: $spacing-md;
+  }
+  
+  .section-textarea {
+    flex: 1;
+    width: 100%;
+    padding: $spacing-md;
+    border: 1px solid $border-light;
+    border-radius: $border-radius-lg;
+    font-size: $font-base;
+    font-family: $font-family-base;
+    resize: none;
+    overflow-y: auto;
+    line-height: $line-height-relaxed;
+    
+    &:focus {
+      @include input-focus-state($primary-color);
+    }
+    
+    &:disabled {
+      background: $background-light;
+      color: $text-muted;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+  
+  .section-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: $spacing-xs;
+    
+    .cleanup-button {
+      @include button-secondary('base');
+      font-weight: $font-weight-medium !important;
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      padding: $spacing-xs $spacing-sm;
+      font-size: $font-sm;
+      
+      i {
+        font-size: $font-sm;
+      }
+      
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+    }
+    
+    .section-char-count {
+      font-size: $font-sm;
+      color: $text-muted;
+      font-style: italic;
+    }
+  }
+  
+  .ai-instructions-group {
+    margin-top: $spacing-md;
+    padding: $spacing-sm $spacing-md;
+    background: linear-gradient(135deg, rgba($ai-color, 0.08) 0%, rgba($ai-color, 0.04) 100%);
+    border: 1px solid rgba($ai-color, 0.25);
+    border-radius: 8px;
+    border-left: 3px solid $ai-color;
+    
+    .ai-instructions-label {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: $font-sm;
+      font-weight: $font-weight-medium;
+      color: $ai-color;
+      margin-bottom: $spacing-xs;
+      
+      i {
+        font-size: $font-base;
+      }
+    }
+    
+    .ai-instructions-textarea {
+      width: 100%;
+      min-height: 60px;
+      padding: $spacing-sm;
+      border: 1px solid rgba($ai-color, 0.3);
+      border-radius: 6px;
+      font-size: $font-sm;
+      font-family: $font-family-base;
+      resize: vertical;
+      background: $background-white;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      
+      &:focus {
+        outline: none;
+        border-color: $ai-color;
+        box-shadow: 0 0 0 3px rgba($ai-color, 0.15);
+      }
+      
+      &::placeholder {
+        color: $text-muted;
+        font-style: italic;
+      }
+      
+      &:disabled {
+        background: $background-light;
+        cursor: not-allowed;
+      }
+    }
+  }
+  
+  .section-ai-actions {
+    display: flex;
+    gap: $spacing-sm;
+    padding-top: $spacing-md;
+    border-top: 1px solid $border-light;
+  }
+}
+
+.cancel-button {
+  @include button-secondary('base');
+  font-weight: $font-weight-medium !important;
+}
+
+.apply-button {
+  @include button-success('base');
+  background-color: $success-color !important;
+  font-weight: $font-weight-medium !important;
+  
+  &:hover:not(:disabled) {
+    background-color: $success-hover !important;
+  }
+}
+
+// MacBook Air 13" M4 2025 - Height adjustments
+@media (max-height: 1000px) {
+  .lyric-creation-card {
+    height: calc(100vh - 1.5rem);
+  }
+  
+  .lyric-textarea {
+    max-height: 400px;
+  }
+  
+  .action-section {
+    padding: $spacing-sm;
+  }
+}
+
+// iPad & Touch Device Optimizations
+@media (max-width: 1024px) and (hover: none) {
+  .lyric-creation-container {
+    padding: $spacing-sm;
+  }
+  
+  .lyric-creation-card {
+    max-width: 100%;
+    height: calc(100vh - 1rem);
+  }
+  
+  // Larger form inputs for touch
+  .lyric-textarea {
+    min-height: 300px;
+    font-size: 16px; // Prevent iOS zoom
+  }
+  
+  .form-input,
+  .form-textarea {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  
+  // Vertical stacking of action buttons
+  .action-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  
+  .utility-actions,
+  .submit-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+  
+  // Full-width buttons with larger touch targets
+  .utility-button,
+  .architecture-button,
+  .generate-button,
+  .save-button,
+  .clear-button {
+    width: 100%;
+    height: 60px;
+    font-size: 1rem;
+  }
+  
+  // Header adjustments
+  .lyric-header {
+    padding: 0.75rem;
+    
+    .lyric-title h2 {
+      font-size: 1.25rem;
+    }
+  }
+  
+  // Controls panel - not sticky on touch
+  .controls-panel {
+    position: static;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .lyric-creation-container {
+    padding: $spacing-xs;
+  }
+  
+  .lyric-creation-card {
+    height: calc(100vh - 1rem);
+  }
+  
+  .lyric-header {
+    padding: $spacing-10;
+    margin-bottom: $spacing-sm;
+    
+    .lyric-title h2 {
+      font-size: 1.25rem;
+    }
+  }
+  
+  .action-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-10;
+  }
+  
+  .ai-actions {
+    flex-direction: column;
+    gap: $spacing-xs;
+    
+    .ai-action-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  .utility-actions {
+    .clear-button {
+      width: 100%;
+    }
+  }
+  
+  // Section Editor Mobile
+  .section-editor-container {
+    flex-direction: column;
+  }
+  
+  .section-navigator,
+  .section-workspace {
+    width: 100%;
+  }
+  
+  .section-navigator {
+    border-right: none;
+    border-bottom: 1px solid $border-light;
+    padding-right: 0;
+    padding-bottom: $spacing-md;
+    max-height: 40vh;
+  }
+}

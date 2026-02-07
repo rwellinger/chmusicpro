@@ -1,0 +1,192 @@
+erDiagram
+    songs {
+        UUID id PK "Primary Key"
+        VARCHAR task_id UK "Celery Task ID"
+        VARCHAR job_id "MUREKA Job ID"
+        UUID sketch_id FK "Foreign Key to song_sketches (nullable)"
+        TEXT lyrics "Song lyrics input"
+        TEXT prompt "Style prompt"
+        VARCHAR model "Generation model (chirp-v3-5)"
+        VARCHAR title "User-defined title"
+        VARCHAR tags "User tags"
+        VARCHAR workflow "onWork, inUse, notUsed"
+        BOOLEAN is_instrumental "True for instrumental songs"
+        VARCHAR status "PENDING, PROGRESS, SUCCESS, FAILURE, CANCELLED"
+        TEXT progress_info "JSON progress details"
+        TEXT error_message "Error information"
+        TEXT mureka_response "Full MUREKA response JSON"
+        VARCHAR mureka_status "MUREKA-specific status"
+        TIMESTAMP created_at "Creation timestamp"
+        TIMESTAMP updated_at "Last update timestamp"
+        TIMESTAMP completed_at "Completion timestamp"
+    }
+
+    song_choices {
+        UUID id PK "Primary Key"
+        UUID song_id FK "Foreign Key to songs"
+        VARCHAR mureka_choice_id "MUREKA choice identifier"
+        INTEGER choice_index "Index in choices array"
+        VARCHAR mp3_url "MP3 file URL"
+        VARCHAR flac_url "FLAC file URL"
+        VARCHAR video_url "Video file URL"
+        VARCHAR image_url "Cover image URL"
+        FLOAT duration "Duration in milliseconds"
+        VARCHAR title "Choice title"
+        VARCHAR tags "Choice tags"
+        INTEGER rating "User rating (0=down, 1=up)"
+        TIMESTAMP created_at "Creation timestamp"
+        TIMESTAMP updated_at "Last update timestamp"
+    }
+
+    generated_images {
+        UUID id PK "Primary Key"
+        TEXT user_prompt "Original user input (before AI enhancement)"
+        TEXT prompt "AI-enhanced prompt (via Ollama)"
+        TEXT enhanced_prompt "Final prompt sent to DALL-E (Ollama + Styles)"
+        TEXT revised_prompt "DALL-E's revised prompt (returned by OpenAI)"
+        VARCHAR size "Image size (1024x1024)"
+        VARCHAR filename UK "Unique filename"
+        VARCHAR file_path "Local file path"
+        VARCHAR local_url "Local access URL"
+        VARCHAR model_used "Generation model (dall-e-3)"
+        VARCHAR prompt_hash "Prompt hash for deduplication"
+        VARCHAR title "User-defined title"
+        TEXT tags "User tags"
+        VARCHAR artistic_style "Artistic style: photorealistic, digital-art, oil-painting, etc."
+        TIMESTAMP created_at "Creation timestamp"
+        TIMESTAMP updated_at "Last update timestamp"
+    }
+
+    prompt_templates {
+        INTEGER id PK "Primary Key"
+        VARCHAR category "Template category (images, songs, lyrics)"
+        VARCHAR action "Template action (generate, enhance, translate)"
+        TEXT pre_condition "Text prepended to prompt"
+        TEXT post_condition "Text appended to prompt"
+        TEXT description "Template description"
+        VARCHAR version "Template version"
+        VARCHAR model "Ollama model hint"
+        FLOAT temperature "Ollama temperature (0.0-2.0)"
+        INTEGER max_tokens "Maximum tokens to generate"
+        BOOLEAN active "Template is active"
+        TIMESTAMP created_at "Creation timestamp"
+        TIMESTAMP updated_at "Last update timestamp"
+    }
+
+    conversations {
+        UUID id PK "Primary Key"
+        UUID user_id FK "Foreign Key to users"
+        VARCHAR title "Conversation title"
+        VARCHAR model "Ollama model used (e.g., llama3.2:3b)"
+        TEXT system_context "System prompt/context for AI behavior"
+        INTEGER context_window_size "Maximum context window size"
+        INTEGER current_token_count "Current total tokens used"
+        TIMESTAMP created_at "Creation timestamp"
+        TIMESTAMP updated_at "Last update timestamp"
+    }
+
+    messages {
+        UUID id PK "Primary Key"
+        UUID conversation_id FK "Foreign Key to conversations"
+        VARCHAR role "Message role: user, assistant, system"
+        TEXT content "Message content"
+        INTEGER token_count "Token count for this message"
+        TIMESTAMP created_at "Creation timestamp"
+    }
+
+    messages_archive {
+        UUID id PK "Primary Key"
+        UUID original_message_id "Original message ID before archiving"
+        UUID conversation_id FK "Foreign Key to conversations"
+        VARCHAR role "Message role: user, assistant, system"
+        TEXT content "Message content"
+        INTEGER token_count "Token count for this message"
+        TIMESTAMP original_created_at "Original creation timestamp"
+        TIMESTAMP archived_at "Archiving timestamp"
+        UUID summary_message_id "Reference to summary message"
+    }
+
+    users {
+        UUID id PK "Primary Key"
+        VARCHAR email UK "User email (unique)"
+        VARCHAR password_hash "BCrypt password hash"
+        VARCHAR first_name "First name"
+        VARCHAR last_name "Last name"
+        VARCHAR oauth_provider "OAuth provider (Google, GitHub, etc.)"
+        VARCHAR oauth_id "OAuth provider user ID"
+        BOOLEAN is_active "Account is active"
+        BOOLEAN is_verified "Email is verified"
+        TIMESTAMP created_at "Creation timestamp"
+        TIMESTAMP updated_at "Last update timestamp"
+        TIMESTAMP last_login "Last login timestamp"
+    }
+
+    song_sketches {
+        UUID id PK "Primary Key"
+        VARCHAR title "Sketch title (optional)"
+        TEXT lyrics "Lyric draft (optional)"
+        TEXT prompt "Music style prompt (required)"
+        VARCHAR tags "User-defined tags"
+        VARCHAR workflow "Workflow status: draft, used, archived"
+        TIMESTAMP created_at "Creation timestamp"
+        TIMESTAMP updated_at "Last update timestamp"
+    }
+
+    lyric_parsing_rules {
+        INTEGER id PK "Primary Key (auto-increment)"
+        VARCHAR name "Rule name"
+        TEXT description "Rule description"
+        TEXT pattern "Regex pattern to match"
+        TEXT replacement "Replacement text (base64 encoded)"
+        VARCHAR rule_type "Rule type: cleanup, section"
+        BOOLEAN active "Rule is active"
+        INTEGER order "Execution order"
+        TIMESTAMP created_at "Creation timestamp"
+        TIMESTAMP updated_at "Last update timestamp"
+    }
+
+    equipment {
+        UUID id PK "Primary Key"
+        UUID user_id FK "Foreign Key to users (CASCADE DELETE)"
+        VARCHAR type "Equipment type: Software, Plugin"
+        VARCHAR name "Equipment name (required)"
+        VARCHAR version "Software/Plugin version"
+        TEXT description "Detailed description"
+        VARCHAR software_tags "Comma-separated software tags"
+        VARCHAR plugin_tags "Comma-separated plugin tags"
+        VARCHAR manufacturer "Manufacturer name"
+        VARCHAR url "Manufacturer website URL"
+        VARCHAR username "Login username"
+        TEXT password_encrypted "Encrypted password (Fernet)"
+        VARCHAR license_management "License type: online, ilok, license_key, other"
+        TEXT license_key_encrypted "Encrypted license key (Fernet)"
+        TEXT license_description "License description for other type"
+        DATE purchase_date "Purchase date"
+        TEXT price_encrypted "Encrypted price with currency (Fernet)"
+        TEXT system_requirements "System requirements"
+        VARCHAR status "Status: active, trial, expired, archived"
+        TIMESTAMP created_at "Creation timestamp"
+        TIMESTAMP updated_at "Last update timestamp"
+    }
+
+    api_costs_monthly {
+        UUID id PK "Primary Key"
+        VARCHAR provider "API provider (openai, mureka)"
+        VARCHAR organization_id "Optional organization identifier"
+        INTEGER year "Year (e.g., 2025)"
+        INTEGER month "Month (1-12)"
+        DECIMAL total_cost "Total cost in USD"
+        DECIMAL image_cost "Cost for DALL-E image generation"
+        DECIMAL chat_cost "Cost for GPT chat completions"
+        JSONB line_items "Detailed breakdown by model"
+        BOOLEAN is_finalized "TRUE for past months (cached forever)"
+        TIMESTAMP last_updated_at "Last update timestamp (for TTL)"
+        TIMESTAMP created_at "Creation timestamp"
+    }
+
+    song_sketches ||--o{ songs : "used for generation"
+    songs ||--o{ song_choices : "has choices"
+    users ||--o{ conversations : "owns conversations"
+    users ||--o{ equipment : "owns equipment"
+    conversations ||--o{ messages : "contains messages"
+    conversations ||--o{ messages_archive : "has archived messages"

@@ -1,0 +1,257 @@
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+h2[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin: 0;
+  padding: $spacing-md;
+  color: $text-primary;
+  
+  i {
+    color: $primary-color;
+    font-size: $font-xl;
+  }
+}
+
+mat-dialog-content {
+  padding: $spacing-md $spacing-lg;
+}
+
+.dialog-subtitle {
+  margin: 0 0 $spacing-lg 0;
+  color: $text-secondary;
+  font-size: $font-sm;
+}
+
+// Two-column layout
+.dialog-layout {
+  display: flex;
+  gap: $spacing-lg;
+  transition: all 0.3s ease;
+}
+
+.form-section {
+  flex: 1;
+  min-width: 380px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: $spacing-md;
+}
+
+// Advanced Toggle Button
+.advanced-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  margin-top: $spacing-sm;
+  background-color: $background-light;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-md;
+  color: $text-secondary;
+  font-size: $font-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background-color: $background-selected;
+    border-color: $primary-color;
+    color: $primary-color;
+  }
+  
+  i:first-child {
+    color: $text-muted;
+  }
+  
+  i:last-child {
+    margin-left: auto;
+    font-size: $font-xs;
+  }
+  
+  .assignments-count {
+    color: $text-muted;
+    font-weight: normal;
+  }
+}
+
+mat-dialog-actions {
+  padding: $spacing-md $spacing-lg;
+  gap: $spacing-sm;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cancel-button {
+  @include button-secondary('base');
+}
+
+.save-button {
+  @include button-primary('base');
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  
+  i {
+    font-size: $font-sm;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Advanced Section (Right Panel)
+.advanced-section {
+  width: 350px;
+  min-width: 350px;
+  background-color: $background-light;
+  border-radius: $border-radius-md;
+  border: 1px solid $border-light;
+  display: flex;
+  flex-direction: column;
+  max-height: 350px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.advanced-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  border-bottom: 1px solid $border-light;
+  color: $text-secondary;
+  font-weight: $font-weight-medium;
+  font-size: $font-sm;
+  
+  i {
+    color: $text-muted;
+  }
+  
+  .assignments-count {
+    color: $text-muted;
+    font-weight: normal;
+  }
+}
+
+.advanced-content {
+  padding: $spacing-sm $spacing-md;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.assignment-category {
+  margin-bottom: $spacing-md;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    color: $text-primary;
+    font-size: $font-xs;
+    font-weight: $font-weight-semibold;
+    margin: 0 0 $spacing-xs 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    i {
+      color: $primary-color;
+      font-size: $font-xs;
+    }
+  }
+}
+
+.assignment-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2xs;
+}
+
+.assignment-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  background-color: $background-white;
+  border-radius: $border-radius-sm;
+  border: 1px solid $border-light;
+  
+  .item-title {
+    flex: 1;
+    font-size: $font-xs;
+    color: $text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .item-badge {
+    font-size: 10px;
+    padding: 1px $spacing-xs;
+    border-radius: $border-radius-sm;
+    background-color: rgba($primary-color, 0.1);
+    color: $primary-color;
+  }
+  
+  .workflow-badge {
+    text-transform: capitalize;
+  }
+  
+  .unassign-btn {
+    background: none;
+    border: none;
+    padding: $spacing-2xs;
+    cursor: pointer;
+    color: $text-muted;
+    transition: color $transition-fast;
+    border-radius: $border-radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &:hover {
+      color: $danger-color;
+      background-color: rgba($danger-color, 0.1);
+    }
+    
+    i {
+      font-size: $font-xs;
+    }
+  }
+}
+
+.no-assignments {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-lg $spacing-md;
+  color: $text-muted;
+  font-size: $font-xs;
+  text-align: center;
+  
+  i {
+    color: $info-color;
+    font-size: $font-lg;
+  }
+}

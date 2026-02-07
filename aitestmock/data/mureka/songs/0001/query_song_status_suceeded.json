@@ -1,0 +1,2009 @@
+{
+  "id": "94608690380802",
+  "created_at": 1757791339,
+  "finished_at": 1757791401,
+  "model": "mureka-7.5",
+  "status": "succeeded",
+  "choices": [
+    {
+      "url": "http://localhost:3080/static/audio/0001-01.mp3",
+      "flac_url": "http://localhost:3080/static/audio/0001-01.flac",
+      "wav_url": "http://localhost:3080/static/audio/0001-01.wav",
+      "duration": 178120,
+      "lyrics_sections": [
+        {
+          "section_type": "intro",
+          "start": 40,
+          "end": 40
+        },
+        {
+          "section_type": "verse",
+          "start": 17480,
+          "end": 32720,
+          "lines": [
+            {
+              "start": 17480,
+              "end": 20600,
+              "text": "Raindrops falling, like a loud drumbeat",
+              "words": [
+                {
+                  "start": 17480,
+                  "end": 18440,
+                  "text": "Raindrops "
+                },
+                {
+                  "start": 18440,
+                  "end": 18960,
+                  "text": "falling, "
+                },
+                {
+                  "start": 18960,
+                  "end": 19240,
+                  "text": "like "
+                },
+                {
+                  "start": 19240,
+                  "end": 19440,
+                  "text": "a "
+                },
+                {
+                  "start": 19440,
+                  "end": 20000,
+                  "text": "loud "
+                },
+                {
+                  "start": 20000,
+                  "end": 20600,
+                  "text": "drumbeat"
+                }
+              ]
+            },
+            {
+              "start": 21520,
+              "end": 25440,
+              "text": "Puddles splash beneath our dancing feet",
+              "words": [
+                {
+                  "start": 21520,
+                  "end": 22520,
+                  "text": "Puddles "
+                },
+                {
+                  "start": 22520,
+                  "end": 22840,
+                  "text": "splash "
+                },
+                {
+                  "start": 22840,
+                  "end": 23280,
+                  "text": "beneath "
+                },
+                {
+                  "start": 23280,
+                  "end": 23560,
+                  "text": "our "
+                },
+                {
+                  "start": 23560,
+                  "end": 24560,
+                  "text": "dancing "
+                },
+                {
+                  "start": 24560,
+                  "end": 25440,
+                  "text": "feet"
+                }
+              ]
+            },
+            {
+              "start": 25600,
+              "end": 28680,
+              "text": "Streetlights shimmer on the silver ground",
+              "words": [
+                {
+                  "start": 25600,
+                  "end": 26600,
+                  "text": "Streetlights "
+                },
+                {
+                  "start": 26600,
+                  "end": 27080,
+                  "text": "shimmer "
+                },
+                {
+                  "start": 27080,
+                  "end": 27360,
+                  "text": "on "
+                },
+                {
+                  "start": 27360,
+                  "end": 27640,
+                  "text": "the "
+                },
+                {
+                  "start": 27640,
+                  "end": 28600,
+                  "text": "silver "
+                },
+                {
+                  "start": 28600,
+                  "end": 28680,
+                  "text": "ground"
+                }
+              ]
+            },
+            {
+              "start": 29360,
+              "end": 32720,
+              "text": "Our shoes are soaked, but our joy’s unbound",
+              "words": [
+                {
+                  "start": 29360,
+                  "end": 29640,
+                  "text": "Our "
+                },
+                {
+                  "start": 29640,
+                  "end": 30160,
+                  "text": "shoes "
+                },
+                {
+                  "start": 30160,
+                  "end": 30640,
+                  "text": "are "
+                },
+                {
+                  "start": 30640,
+                  "end": 31160,
+                  "text": "soaked, "
+                },
+                {
+                  "start": 31160,
+                  "end": 31400,
+                  "text": "but "
+                },
+                {
+                  "start": 31400,
+                  "end": 31680,
+                  "text": "our "
+                },
+                {
+                  "start": 31680,
+                  "end": 32200,
+                  "text": "joy’s "
+                },
+                {
+                  "start": 32200,
+                  "end": 32720,
+                  "text": "unbound"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_type": "chorus",
+          "start": 34440,
+          "end": 58040,
+          "lines": [
+            {
+              "start": 34440,
+              "end": 37520,
+              "text": "We’re dancing in the rain tonight",
+              "words": [
+                {
+                  "start": 34440,
+                  "end": 34720,
+                  "text": "We’re "
+                },
+                {
+                  "start": 34720,
+                  "end": 35760,
+                  "text": "dancing "
+                },
+                {
+                  "start": 35760,
+                  "end": 36240,
+                  "text": "in "
+                },
+                {
+                  "start": 36240,
+                  "end": 36520,
+                  "text": "the "
+                },
+                {
+                  "start": 36520,
+                  "end": 37280,
+                  "text": "rain "
+                },
+                {
+                  "start": 37280,
+                  "end": 37520,
+                  "text": "tonight"
+                }
+              ]
+            },
+            {
+              "start": 38800,
+              "end": 42560,
+              "text": "No umbrella, just the pale moonlight",
+              "words": [
+                {
+                  "start": 38800,
+                  "end": 39320,
+                  "text": "No "
+                },
+                {
+                  "start": 39320,
+                  "end": 40320,
+                  "text": "umbrella, "
+                },
+                {
+                  "start": 40320,
+                  "end": 40560,
+                  "text": "just "
+                },
+                {
+                  "start": 40560,
+                  "end": 40800,
+                  "text": "the "
+                },
+                {
+                  "start": 40800,
+                  "end": 41320,
+                  "text": "pale "
+                },
+                {
+                  "start": 41360,
+                  "end": 42560,
+                  "text": "moonlight"
+                }
+              ]
+            },
+            {
+              "start": 42600,
+              "end": 46040,
+              "text": "Twisting, turning under skies so gray",
+              "words": [
+                {
+                  "start": 42600,
+                  "end": 43640,
+                  "text": "Twisting, "
+                },
+                {
+                  "start": 43640,
+                  "end": 44400,
+                  "text": "turning "
+                },
+                {
+                  "start": 44400,
+                  "end": 44920,
+                  "text": "under "
+                },
+                {
+                  "start": 44920,
+                  "end": 45400,
+                  "text": "skies "
+                },
+                {
+                  "start": 45400,
+                  "end": 45920,
+                  "text": "so "
+                },
+                {
+                  "start": 45920,
+                  "end": 46040,
+                  "text": "gray"
+                }
+              ]
+            },
+            {
+              "start": 46680,
+              "end": 58040,
+              "text": "This storm can’t wash our joy away",
+              "words": [
+                {
+                  "start": 46680,
+                  "end": 46960,
+                  "text": "This "
+                },
+                {
+                  "start": 46960,
+                  "end": 47480,
+                  "text": "storm "
+                },
+                {
+                  "start": 47480,
+                  "end": 47960,
+                  "text": "can’t "
+                },
+                {
+                  "start": 47960,
+                  "end": 48480,
+                  "text": "wash "
+                },
+                {
+                  "start": 48480,
+                  "end": 49000,
+                  "text": "our "
+                },
+                {
+                  "start": 49000,
+                  "end": 49720,
+                  "text": "joy "
+                },
+                {
+                  "start": 49720,
+                  "end": 58040,
+                  "text": "away"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_type": "verse",
+          "start": 58880,
+          "end": 73400,
+          "lines": [
+            {
+              "start": 58880,
+              "end": 62080,
+              "text": "Thunder claps like it’s keeping time",
+              "words": [
+                {
+                  "start": 58880,
+                  "end": 59160,
+                  "text": "Thunder "
+                },
+                {
+                  "start": 59160,
+                  "end": 59640,
+                  "text": "claps "
+                },
+                {
+                  "start": 59640,
+                  "end": 59880,
+                  "text": "like "
+                },
+                {
+                  "start": 59880,
+                  "end": 60160,
+                  "text": "it’s "
+                },
+                {
+                  "start": 60160,
+                  "end": 61160,
+                  "text": "keeping "
+                },
+                {
+                  "start": 61160,
+                  "end": 62080,
+                  "text": "time"
+                }
+              ]
+            },
+            {
+              "start": 62200,
+              "end": 65360,
+              "text": "Lightning strikes feel so divine",
+              "words": [
+                {
+                  "start": 62200,
+                  "end": 63200,
+                  "text": "Lightning "
+                },
+                {
+                  "start": 63200,
+                  "end": 63760,
+                  "text": "strikes "
+                },
+                {
+                  "start": 63760,
+                  "end": 64239,
+                  "text": "feel "
+                },
+                {
+                  "start": 64239,
+                  "end": 65239,
+                  "text": "so "
+                },
+                {
+                  "start": 65239,
+                  "end": 65360,
+                  "text": "divine"
+                }
+              ]
+            },
+            {
+              "start": 66000,
+              "end": 69360,
+              "text": "The rhythm’s wild, it won’t let go",
+              "words": [
+                {
+                  "start": 66000,
+                  "end": 66240,
+                  "text": "The "
+                },
+                {
+                  "start": 66280,
+                  "end": 67280,
+                  "text": "rhythm’s "
+                },
+                {
+                  "start": 67280,
+                  "end": 67800,
+                  "text": "wild, "
+                },
+                {
+                  "start": 67800,
+                  "end": 68280,
+                  "text": "it "
+                },
+                {
+                  "start": 68280,
+                  "end": 68800,
+                  "text": "won’t "
+                },
+                {
+                  "start": 68800,
+                  "end": 69320,
+                  "text": "let "
+                },
+                {
+                  "start": 69320,
+                  "end": 69360,
+                  "text": "go"
+                }
+              ]
+            },
+            {
+              "start": 69800,
+              "end": 73400,
+              "text": "But the beat still pulses in my soul",
+              "words": [
+                {
+                  "start": 69800,
+                  "end": 70080,
+                  "text": "But "
+                },
+                {
+                  "start": 70080,
+                  "end": 70320,
+                  "text": "the "
+                },
+                {
+                  "start": 70320,
+                  "end": 70840,
+                  "text": "beat "
+                },
+                {
+                  "start": 70840,
+                  "end": 71320,
+                  "text": "still "
+                },
+                {
+                  "start": 71320,
+                  "end": 72360,
+                  "text": "pulses "
+                },
+                {
+                  "start": 72360,
+                  "end": 72880,
+                  "text": "in "
+                },
+                {
+                  "start": 72880,
+                  "end": 73360,
+                  "text": "my "
+                },
+                {
+                  "start": 73360,
+                  "end": 73400,
+                  "text": "soul"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_type": "chorus",
+          "start": 75120,
+          "end": 94200,
+          "lines": [
+            {
+              "start": 75120,
+              "end": 79440,
+              "text": "We’re dancing in the rain tonight",
+              "words": [
+                {
+                  "start": 75120,
+                  "end": 75400,
+                  "text": "We’re "
+                },
+                {
+                  "start": 75400,
+                  "end": 76440,
+                  "text": "dancing "
+                },
+                {
+                  "start": 76440,
+                  "end": 76920,
+                  "text": "in "
+                },
+                {
+                  "start": 76920,
+                  "end": 77200,
+                  "text": "the "
+                },
+                {
+                  "start": 77200,
+                  "end": 77960,
+                  "text": "rain "
+                },
+                {
+                  "start": 77960,
+                  "end": 79440,
+                  "text": "tonight"
+                }
+              ]
+            },
+            {
+              "start": 79480,
+              "end": 83240,
+              "text": "No umbrella, just the pale moonlight",
+              "words": [
+                {
+                  "start": 79480,
+                  "end": 80000,
+                  "text": "No "
+                },
+                {
+                  "start": 80000,
+                  "end": 81000,
+                  "text": "umbrella, "
+                },
+                {
+                  "start": 81000,
+                  "end": 81280,
+                  "text": "just "
+                },
+                {
+                  "start": 81280,
+                  "end": 81480,
+                  "text": "the "
+                },
+                {
+                  "start": 81480,
+                  "end": 82000,
+                  "text": "pale "
+                },
+                {
+                  "start": 82040,
+                  "end": 83240,
+                  "text": "moonlight"
+                }
+              ]
+            },
+            {
+              "start": 83280,
+              "end": 86720,
+              "text": "Twisting, turning under skies so gray",
+              "words": [
+                {
+                  "start": 83280,
+                  "end": 84320,
+                  "text": "Twisting, "
+                },
+                {
+                  "start": 84320,
+                  "end": 85080,
+                  "text": "turning "
+                },
+                {
+                  "start": 85080,
+                  "end": 85320,
+                  "text": "under "
+                },
+                {
+                  "start": 85320,
+                  "end": 86080,
+                  "text": "skies "
+                },
+                {
+                  "start": 86080,
+                  "end": 86600,
+                  "text": "so "
+                },
+                {
+                  "start": 86600,
+                  "end": 86720,
+                  "text": "gray"
+                }
+              ]
+            },
+            {
+              "start": 87360,
+              "end": 94200,
+              "text": "This storm can’t wash our joy away",
+              "words": [
+                {
+                  "start": 87360,
+                  "end": 87640,
+                  "text": "This "
+                },
+                {
+                  "start": 87640,
+                  "end": 88120,
+                  "text": "storm "
+                },
+                {
+                  "start": 88120,
+                  "end": 88640,
+                  "text": "can’t "
+                },
+                {
+                  "start": 88640,
+                  "end": 89160,
+                  "text": "wash "
+                },
+                {
+                  "start": 89160,
+                  "end": 89640,
+                  "text": "our "
+                },
+                {
+                  "start": 89640,
+                  "end": 90400,
+                  "text": "joy "
+                },
+                {
+                  "start": 90400,
+                  "end": 94200,
+                  "text": "away"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_type": "bridge",
+          "start": 106680,
+          "end": 136680,
+          "lines": [
+            {
+              "start": 106680,
+              "end": 110720,
+              "text": "The world’s a blur, but we don’t care",
+              "words": [
+                {
+                  "start": 106680,
+                  "end": 106920,
+                  "text": "The "
+                },
+                {
+                  "start": 106920,
+                  "end": 107480,
+                  "text": "world’s "
+                },
+                {
+                  "start": 107480,
+                  "end": 107720,
+                  "text": "a "
+                },
+                {
+                  "start": 107720,
+                  "end": 108480,
+                  "text": "blur, "
+                },
+                {
+                  "start": 108480,
+                  "end": 109000,
+                  "text": "but "
+                },
+                {
+                  "start": 109000,
+                  "end": 109240,
+                  "text": "we "
+                },
+                {
+                  "start": 109240,
+                  "end": 109720,
+                  "text": "don’t "
+                },
+                {
+                  "start": 109720,
+                  "end": 110720,
+                  "text": "care"
+                }
+              ]
+            },
+            {
+              "start": 110760,
+              "end": 114760,
+              "text": "Wind in our faces, freedom in the air",
+              "words": [
+                {
+                  "start": 110760,
+                  "end": 111280,
+                  "text": "Wind "
+                },
+                {
+                  "start": 111280,
+                  "end": 111720,
+                  "text": "in "
+                },
+                {
+                  "start": 111720,
+                  "end": 112000,
+                  "text": "our "
+                },
+                {
+                  "start": 112000,
+                  "end": 112520,
+                  "text": "faces, "
+                },
+                {
+                  "start": 112520,
+                  "end": 113040,
+                  "text": "freedom "
+                },
+                {
+                  "start": 113040,
+                  "end": 113560,
+                  "text": "in "
+                },
+                {
+                  "start": 113560,
+                  "end": 113800,
+                  "text": "the "
+                },
+                {
+                  "start": 113800,
+                  "end": 114760,
+                  "text": "air"
+                }
+              ]
+            },
+            {
+              "start": 114800,
+              "end": 118600,
+              "text": "Laughter echoes in the pouring streams",
+              "words": [
+                {
+                  "start": 114800,
+                  "end": 115840,
+                  "text": "Laughter "
+                },
+                {
+                  "start": 115840,
+                  "end": 116640,
+                  "text": "echoes "
+                },
+                {
+                  "start": 116640,
+                  "end": 116880,
+                  "text": "in "
+                },
+                {
+                  "start": 116880,
+                  "end": 117120,
+                  "text": "the "
+                },
+                {
+                  "start": 117120,
+                  "end": 118120,
+                  "text": "pouring "
+                },
+                {
+                  "start": 118120,
+                  "end": 118600,
+                  "text": "streams"
+                }
+              ]
+            },
+            {
+              "start": 118640,
+              "end": 136680,
+              "text": "We live the moment, chasing dreams",
+              "words": [
+                {
+                  "start": 118640,
+                  "end": 118920,
+                  "text": "We "
+                },
+                {
+                  "start": 118920,
+                  "end": 119680,
+                  "text": "live "
+                },
+                {
+                  "start": 119680,
+                  "end": 119880,
+                  "text": "the "
+                },
+                {
+                  "start": 119880,
+                  "end": 120960,
+                  "text": "moment, "
+                },
+                {
+                  "start": 120960,
+                  "end": 122200,
+                  "text": "chasing "
+                },
+                {
+                  "start": 122200,
+                  "end": 136680,
+                  "text": "dreams"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_type": "chorus",
+          "start": 140240,
+          "end": 155520,
+          "lines": [
+            {
+              "start": 140240,
+              "end": 144440,
+              "text": "We’re dancing in the rain tonight",
+              "words": [
+                {
+                  "start": 140240,
+                  "end": 140520,
+                  "text": "We’re "
+                },
+                {
+                  "start": 140520,
+                  "end": 141560,
+                  "text": "dancing "
+                },
+                {
+                  "start": 141560,
+                  "end": 142040,
+                  "text": "in "
+                },
+                {
+                  "start": 142040,
+                  "end": 142280,
+                  "text": "the "
+                },
+                {
+                  "start": 142280,
+                  "end": 143040,
+                  "text": "rain "
+                },
+                {
+                  "start": 143040,
+                  "end": 144440,
+                  "text": "tonight"
+                }
+              ]
+            },
+            {
+              "start": 144560,
+              "end": 148320,
+              "text": "No umbrella, just the pale moonlight",
+              "words": [
+                {
+                  "start": 144560,
+                  "end": 145080,
+                  "text": "No "
+                },
+                {
+                  "start": 145080,
+                  "end": 146080,
+                  "text": "umbrella, "
+                },
+                {
+                  "start": 146080,
+                  "end": 146320,
+                  "text": "just "
+                },
+                {
+                  "start": 146320,
+                  "end": 146560,
+                  "text": "the "
+                },
+                {
+                  "start": 146560,
+                  "end": 147080,
+                  "text": "pale "
+                },
+                {
+                  "start": 147120,
+                  "end": 148320,
+                  "text": "moonlight"
+                }
+              ]
+            },
+            {
+              "start": 148360,
+              "end": 152440,
+              "text": "Twisting, turning under skies so gray",
+              "words": [
+                {
+                  "start": 148360,
+                  "end": 149360,
+                  "text": "Twisting, "
+                },
+                {
+                  "start": 149360,
+                  "end": 150160,
+                  "text": "turning "
+                },
+                {
+                  "start": 150160,
+                  "end": 150680,
+                  "text": "under "
+                },
+                {
+                  "start": 150680,
+                  "end": 151200,
+                  "text": "skies "
+                },
+                {
+                  "start": 151200,
+                  "end": 151640,
+                  "text": "so "
+                },
+                {
+                  "start": 151640,
+                  "end": 152440,
+                  "text": "gray"
+                }
+              ]
+            },
+            {
+              "start": 152680,
+              "end": 155520,
+              "text": "This storm can’t wash our joy away",
+              "words": [
+                {
+                  "start": 152680,
+                  "end": 152720,
+                  "text": "This "
+                },
+                {
+                  "start": 152720,
+                  "end": 153200,
+                  "text": "storm "
+                },
+                {
+                  "start": 153200,
+                  "end": 153720,
+                  "text": "can’t "
+                },
+                {
+                  "start": 153720,
+                  "end": 154240,
+                  "text": "wash "
+                },
+                {
+                  "start": 154240,
+                  "end": 154720,
+                  "text": "our "
+                },
+                {
+                  "start": 154720,
+                  "end": 155480,
+                  "text": "joy "
+                },
+                {
+                  "start": 155480,
+                  "end": 155520,
+                  "text": "away"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "id": "94608816144387"
+    },
+    {
+      "index": 1,
+      "url": "http://localhost:3080/static/audio/0001-02.mp3",
+      "flac_url": "http://localhost:3080/static/audio/0001-02.flac",
+      "wav_url": "http://localhost:3080/static/audio/0001-02.wav",
+      "duration": 144520,
+      "lyrics_sections": [
+        {
+          "section_type": "intro",
+          "start": 40,
+          "end": 40
+        },
+        {
+          "section_type": "verse",
+          "start": 9160,
+          "end": 24000,
+          "lines": [
+            {
+              "start": 9160,
+              "end": 12040,
+              "text": "Raindrops falling, like a loud drumbeat",
+              "words": [
+                {
+                  "start": 9160,
+                  "end": 10200,
+                  "text": "Raindrops "
+                },
+                {
+                  "start": 10200,
+                  "end": 10680,
+                  "text": "falling, "
+                },
+                {
+                  "start": 10680,
+                  "end": 10960,
+                  "text": "like "
+                },
+                {
+                  "start": 10960,
+                  "end": 11160,
+                  "text": "a "
+                },
+                {
+                  "start": 11160,
+                  "end": 11560,
+                  "text": "loud "
+                },
+                {
+                  "start": 11560,
+                  "end": 12040,
+                  "text": "drumbeat"
+                }
+              ]
+            },
+            {
+              "start": 13200,
+              "end": 17080,
+              "text": "Puddles splash beneath our dancing feet",
+              "words": [
+                {
+                  "start": 13200,
+                  "end": 13880,
+                  "text": "Puddles "
+                },
+                {
+                  "start": 13880,
+                  "end": 14440,
+                  "text": "splash "
+                },
+                {
+                  "start": 14440,
+                  "end": 14960,
+                  "text": "beneath "
+                },
+                {
+                  "start": 14960,
+                  "end": 15200,
+                  "text": "our "
+                },
+                {
+                  "start": 15200,
+                  "end": 15960,
+                  "text": "dancing "
+                },
+                {
+                  "start": 15960,
+                  "end": 17080,
+                  "text": "feet"
+                }
+              ]
+            },
+            {
+              "start": 17200,
+              "end": 20000,
+              "text": "Streetlights shimmer on the silver ground",
+              "words": [
+                {
+                  "start": 17200,
+                  "end": 18200,
+                  "text": "Streetlights "
+                },
+                {
+                  "start": 18200,
+                  "end": 18680,
+                  "text": "shimmer "
+                },
+                {
+                  "start": 18680,
+                  "end": 18960,
+                  "text": "on "
+                },
+                {
+                  "start": 18960,
+                  "end": 19200,
+                  "text": "the "
+                },
+                {
+                  "start": 19200,
+                  "end": 19960,
+                  "text": "silver "
+                },
+                {
+                  "start": 19960,
+                  "end": 20000,
+                  "text": "ground"
+                }
+              ]
+            },
+            {
+              "start": 20920,
+              "end": 24000,
+              "text": "Our shoes are soaked, but our joy’s unbound",
+              "words": [
+                {
+                  "start": 20920,
+                  "end": 21200,
+                  "text": "Our "
+                },
+                {
+                  "start": 21200,
+                  "end": 21560,
+                  "text": "shoes "
+                },
+                {
+                  "start": 21560,
+                  "end": 21960,
+                  "text": "are "
+                },
+                {
+                  "start": 21960,
+                  "end": 22440,
+                  "text": "soaked, "
+                },
+                {
+                  "start": 22440,
+                  "end": 22680,
+                  "text": "but "
+                },
+                {
+                  "start": 22680,
+                  "end": 22960,
+                  "text": "our "
+                },
+                {
+                  "start": 22960,
+                  "end": 23480,
+                  "text": "joy’s "
+                },
+                {
+                  "start": 23480,
+                  "end": 24000,
+                  "text": "unbound"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_type": "chorus",
+          "start": 24960,
+          "end": 40000,
+          "lines": [
+            {
+              "start": 24960,
+              "end": 27960,
+              "text": "We’re dancing in the rain tonight",
+              "words": [
+                {
+                  "start": 24960,
+                  "end": 25200,
+                  "text": "We’re "
+                },
+                {
+                  "start": 25200,
+                  "end": 26200,
+                  "text": "dancing "
+                },
+                {
+                  "start": 26200,
+                  "end": 26720,
+                  "text": "in "
+                },
+                {
+                  "start": 26720,
+                  "end": 26960,
+                  "text": "the "
+                },
+                {
+                  "start": 26960,
+                  "end": 27720,
+                  "text": "rain "
+                },
+                {
+                  "start": 27720,
+                  "end": 27960,
+                  "text": "tonight"
+                }
+              ]
+            },
+            {
+              "start": 28440,
+              "end": 32000,
+              "text": "No umbrella, just the pale moonlight",
+              "words": [
+                {
+                  "start": 28440,
+                  "end": 28680,
+                  "text": "No "
+                },
+                {
+                  "start": 28680,
+                  "end": 29960,
+                  "text": "umbrella, "
+                },
+                {
+                  "start": 29960,
+                  "end": 30680,
+                  "text": "just "
+                },
+                {
+                  "start": 30680,
+                  "end": 30960,
+                  "text": "the "
+                },
+                {
+                  "start": 30960,
+                  "end": 31400,
+                  "text": "pale "
+                },
+                {
+                  "start": 31440,
+                  "end": 32000,
+                  "text": "moonlight"
+                }
+              ]
+            },
+            {
+              "start": 33120,
+              "end": 36680,
+              "text": "Twisting, turning under skies so gray",
+              "words": [
+                {
+                  "start": 33120,
+                  "end": 34160,
+                  "text": "Twisting, "
+                },
+                {
+                  "start": 34160,
+                  "end": 34680,
+                  "text": "turning "
+                },
+                {
+                  "start": 34680,
+                  "end": 35200,
+                  "text": "under "
+                },
+                {
+                  "start": 35200,
+                  "end": 35720,
+                  "text": "skies "
+                },
+                {
+                  "start": 35720,
+                  "end": 36200,
+                  "text": "so "
+                },
+                {
+                  "start": 36200,
+                  "end": 36680,
+                  "text": "gray"
+                }
+              ]
+            },
+            {
+              "start": 36960,
+              "end": 40000,
+              "text": "This storm can’t wash our joy away",
+              "words": [
+                {
+                  "start": 36960,
+                  "end": 37200,
+                  "text": "This "
+                },
+                {
+                  "start": 37200,
+                  "end": 37720,
+                  "text": "storm "
+                },
+                {
+                  "start": 37720,
+                  "end": 38200,
+                  "text": "can’t "
+                },
+                {
+                  "start": 38200,
+                  "end": 38680,
+                  "text": "wash "
+                },
+                {
+                  "start": 38680,
+                  "end": 39200,
+                  "text": "our "
+                },
+                {
+                  "start": 39200,
+                  "end": 39280,
+                  "text": "joy "
+                },
+                {
+                  "start": 39280,
+                  "end": 40000,
+                  "text": "away"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_type": "verse",
+          "start": 41000,
+          "end": 63960,
+          "lines": [
+            {
+              "start": 41000,
+              "end": 53080,
+              "text": "Thunder claps like it’s keeping time",
+              "words": [
+                {
+                  "start": 41000,
+                  "end": 50200,
+                  "text": "Thunder "
+                },
+                {
+                  "start": 50200,
+                  "end": 50720,
+                  "text": "claps "
+                },
+                {
+                  "start": 50720,
+                  "end": 50920,
+                  "text": "like "
+                },
+                {
+                  "start": 50920,
+                  "end": 51200,
+                  "text": "it’s "
+                },
+                {
+                  "start": 51200,
+                  "end": 51960,
+                  "text": "keeping "
+                },
+                {
+                  "start": 51960,
+                  "end": 53080,
+                  "text": "time"
+                }
+              ]
+            },
+            {
+              "start": 53200,
+              "end": 56080,
+              "text": "Lightning strikes feel so divine",
+              "words": [
+                {
+                  "start": 53200,
+                  "end": 54000,
+                  "text": "Lightning "
+                },
+                {
+                  "start": 54000,
+                  "end": 54520,
+                  "text": "strikes "
+                },
+                {
+                  "start": 54520,
+                  "end": 54960,
+                  "text": "feel "
+                },
+                {
+                  "start": 54960,
+                  "end": 55960,
+                  "text": "so "
+                },
+                {
+                  "start": 55960,
+                  "end": 56080,
+                  "text": "divine"
+                }
+              ]
+            },
+            {
+              "start": 56960,
+              "end": 60000,
+              "text": "The rhythm’s wild, it won’t let go",
+              "words": [
+                {
+                  "start": 56960,
+                  "end": 57160,
+                  "text": "The "
+                },
+                {
+                  "start": 57200,
+                  "end": 57960,
+                  "text": "rhythm’s "
+                },
+                {
+                  "start": 57960,
+                  "end": 58480,
+                  "text": "wild, "
+                },
+                {
+                  "start": 58480,
+                  "end": 58960,
+                  "text": "it "
+                },
+                {
+                  "start": 58960,
+                  "end": 59480,
+                  "text": "won’t "
+                },
+                {
+                  "start": 59480,
+                  "end": 59960,
+                  "text": "let "
+                },
+                {
+                  "start": 59960,
+                  "end": 60000,
+                  "text": "go"
+                }
+              ]
+            },
+            {
+              "start": 60680,
+              "end": 63960,
+              "text": "But the beat still pulses in my soul",
+              "words": [
+                {
+                  "start": 60680,
+                  "end": 60920,
+                  "text": "But "
+                },
+                {
+                  "start": 60920,
+                  "end": 61240,
+                  "text": "the "
+                },
+                {
+                  "start": 61240,
+                  "end": 61720,
+                  "text": "beat "
+                },
+                {
+                  "start": 61720,
+                  "end": 62200,
+                  "text": "still "
+                },
+                {
+                  "start": 62200,
+                  "end": 63200,
+                  "text": "pulses "
+                },
+                {
+                  "start": 63200,
+                  "end": 63440,
+                  "text": "in "
+                },
+                {
+                  "start": 63440,
+                  "end": 63920,
+                  "text": "my "
+                },
+                {
+                  "start": 63920,
+                  "end": 63960,
+                  "text": "soul"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_type": "chorus",
+          "start": 64920,
+          "end": 80000,
+          "lines": [
+            {
+              "start": 64920,
+              "end": 68400,
+              "text": "We’re dancing in the rain tonight",
+              "words": [
+                {
+                  "start": 64920,
+                  "end": 65200,
+                  "text": "We’re "
+                },
+                {
+                  "start": 65200,
+                  "end": 66200,
+                  "text": "dancing "
+                },
+                {
+                  "start": 66200,
+                  "end": 66680,
+                  "text": "in "
+                },
+                {
+                  "start": 66680,
+                  "end": 66880,
+                  "text": "the "
+                },
+                {
+                  "start": 66880,
+                  "end": 67720,
+                  "text": "rain "
+                },
+                {
+                  "start": 67720,
+                  "end": 68400,
+                  "text": "tonight"
+                }
+              ]
+            },
+            {
+              "start": 68440,
+              "end": 73120,
+              "text": "No umbrella, just the pale moonlight",
+              "words": [
+                {
+                  "start": 68440,
+                  "end": 68680,
+                  "text": "No "
+                },
+                {
+                  "start": 68680,
+                  "end": 70000,
+                  "text": "umbrella, "
+                },
+                {
+                  "start": 70000,
+                  "end": 70680,
+                  "text": "just "
+                },
+                {
+                  "start": 70680,
+                  "end": 70920,
+                  "text": "the "
+                },
+                {
+                  "start": 70920,
+                  "end": 71400,
+                  "text": "pale "
+                },
+                {
+                  "start": 71440,
+                  "end": 73120,
+                  "text": "moonlight"
+                }
+              ]
+            },
+            {
+              "start": 73160,
+              "end": 76920,
+              "text": "Twisting, turning under skies so gray",
+              "words": [
+                {
+                  "start": 73160,
+                  "end": 74160,
+                  "text": "Twisting, "
+                },
+                {
+                  "start": 74160,
+                  "end": 74680,
+                  "text": "turning "
+                },
+                {
+                  "start": 74680,
+                  "end": 74960,
+                  "text": "under "
+                },
+                {
+                  "start": 74960,
+                  "end": 75680,
+                  "text": "skies "
+                },
+                {
+                  "start": 75680,
+                  "end": 76200,
+                  "text": "so "
+                },
+                {
+                  "start": 76200,
+                  "end": 76920,
+                  "text": "gray"
+                }
+              ]
+            },
+            {
+              "start": 76960,
+              "end": 80000,
+              "text": "This storm can’t wash our joy away",
+              "words": [
+                {
+                  "start": 76960,
+                  "end": 77200,
+                  "text": "This "
+                },
+                {
+                  "start": 77200,
+                  "end": 77680,
+                  "text": "storm "
+                },
+                {
+                  "start": 77680,
+                  "end": 78200,
+                  "text": "can’t "
+                },
+                {
+                  "start": 78200,
+                  "end": 78680,
+                  "text": "wash "
+                },
+                {
+                  "start": 78680,
+                  "end": 79200,
+                  "text": "our "
+                },
+                {
+                  "start": 79200,
+                  "end": 79280,
+                  "text": "joy "
+                },
+                {
+                  "start": 79280,
+                  "end": 80000,
+                  "text": "away"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_type": "bridge",
+          "start": 83960,
+          "end": 109920,
+          "lines": [
+            {
+              "start": 83960,
+              "end": 88160,
+              "text": "The world’s a blur, but we don’t care",
+              "words": [
+                {
+                  "start": 83960,
+                  "end": 84160,
+                  "text": "The "
+                },
+                {
+                  "start": 84160,
+                  "end": 84680,
+                  "text": "world’s "
+                },
+                {
+                  "start": 84680,
+                  "end": 84960,
+                  "text": "a "
+                },
+                {
+                  "start": 84960,
+                  "end": 85960,
+                  "text": "blur, "
+                },
+                {
+                  "start": 85960,
+                  "end": 86200,
+                  "text": "but "
+                },
+                {
+                  "start": 86200,
+                  "end": 86480,
+                  "text": "we "
+                },
+                {
+                  "start": 86480,
+                  "end": 86960,
+                  "text": "don’t "
+                },
+                {
+                  "start": 86960,
+                  "end": 88160,
+                  "text": "care"
+                }
+              ]
+            },
+            {
+              "start": 88200,
+              "end": 92160,
+              "text": "Wind in our faces, freedom in the air",
+              "words": [
+                {
+                  "start": 88200,
+                  "end": 88520,
+                  "text": "Wind "
+                },
+                {
+                  "start": 88520,
+                  "end": 88720,
+                  "text": "in "
+                },
+                {
+                  "start": 88720,
+                  "end": 88960,
+                  "text": "our "
+                },
+                {
+                  "start": 88960,
+                  "end": 89720,
+                  "text": "faces, "
+                },
+                {
+                  "start": 89720,
+                  "end": 90200,
+                  "text": "freedom "
+                },
+                {
+                  "start": 90200,
+                  "end": 90720,
+                  "text": "in "
+                },
+                {
+                  "start": 90720,
+                  "end": 90960,
+                  "text": "the "
+                },
+                {
+                  "start": 90960,
+                  "end": 92160,
+                  "text": "air"
+                }
+              ]
+            },
+            {
+              "start": 92200,
+              "end": 95600,
+              "text": "Laughter echoes in the pouring streams",
+              "words": [
+                {
+                  "start": 92200,
+                  "end": 92920,
+                  "text": "Laughter "
+                },
+                {
+                  "start": 92920,
+                  "end": 93480,
+                  "text": "echoes "
+                },
+                {
+                  "start": 93480,
+                  "end": 93960,
+                  "text": "in "
+                },
+                {
+                  "start": 93960,
+                  "end": 94160,
+                  "text": "the "
+                },
+                {
+                  "start": 94160,
+                  "end": 94960,
+                  "text": "pouring "
+                },
+                {
+                  "start": 94960,
+                  "end": 95600,
+                  "text": "streams"
+                }
+              ]
+            },
+            {
+              "start": 95920,
+              "end": 109920,
+              "text": "We live the moment, chasing dreams",
+              "words": [
+                {
+                  "start": 95920,
+                  "end": 96200,
+                  "text": "We "
+                },
+                {
+                  "start": 96200,
+                  "end": 96680,
+                  "text": "live "
+                },
+                {
+                  "start": 96680,
+                  "end": 96960,
+                  "text": "the "
+                },
+                {
+                  "start": 96960,
+                  "end": 98160,
+                  "text": "moment, "
+                },
+                {
+                  "start": 98160,
+                  "end": 98960,
+                  "text": "chasing "
+                },
+                {
+                  "start": 98960,
+                  "end": 109920,
+                  "text": "dreams"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "section_type": "chorus",
+          "start": 116960,
+          "end": 132960,
+          "lines": [
+            {
+              "start": 116960,
+              "end": 119760,
+              "text": "We’re dancing in the rain tonight",
+              "words": [
+                {
+                  "start": 116960,
+                  "end": 117200,
+                  "text": "We’re "
+                },
+                {
+                  "start": 117200,
+                  "end": 118200,
+                  "text": "dancing "
+                },
+                {
+                  "start": 118200,
+                  "end": 118680,
+                  "text": "in "
+                },
+                {
+                  "start": 118680,
+                  "end": 118960,
+                  "text": "the "
+                },
+                {
+                  "start": 118960,
+                  "end": 119720,
+                  "text": "rain "
+                },
+                {
+                  "start": 119720,
+                  "end": 119760,
+                  "text": "tonight"
+                }
+              ]
+            },
+            {
+              "start": 120440,
+              "end": 125120,
+              "text": "No umbrella, just the pale moonlight",
+              "words": [
+                {
+                  "start": 120440,
+                  "end": 120720,
+                  "text": "No "
+                },
+                {
+                  "start": 120720,
+                  "end": 121960,
+                  "text": "umbrella, "
+                },
+                {
+                  "start": 121960,
+                  "end": 122720,
+                  "text": "just "
+                },
+                {
+                  "start": 122720,
+                  "end": 122960,
+                  "text": "the "
+                },
+                {
+                  "start": 122960,
+                  "end": 123400,
+                  "text": "pale "
+                },
+                {
+                  "start": 123440,
+                  "end": 125120,
+                  "text": "moonlight"
+                }
+              ]
+            },
+            {
+              "start": 125160,
+              "end": 128320,
+              "text": "Twisting, turning under skies so gray",
+              "words": [
+                {
+                  "start": 125160,
+                  "end": 126680,
+                  "text": "Twisting, "
+                },
+                {
+                  "start": 126680,
+                  "end": 126920,
+                  "text": "turning "
+                },
+                {
+                  "start": 126920,
+                  "end": 127200,
+                  "text": "under "
+                },
+                {
+                  "start": 127200,
+                  "end": 127720,
+                  "text": "skies "
+                },
+                {
+                  "start": 127720,
+                  "end": 128199,
+                  "text": "so "
+                },
+                {
+                  "start": 128199,
+                  "end": 128320,
+                  "text": "gray"
+                }
+              ]
+            },
+            {
+              "start": 128920,
+              "end": 132960,
+              "text": "This storm can’t wash our joy away",
+              "words": [
+                {
+                  "start": 128920,
+                  "end": 129199,
+                  "text": "This "
+                },
+                {
+                  "start": 129199,
+                  "end": 129720,
+                  "text": "storm "
+                },
+                {
+                  "start": 129720,
+                  "end": 130199,
+                  "text": "can’t "
+                },
+                {
+                  "start": 130199,
+                  "end": 130680,
+                  "text": "wash "
+                },
+                {
+                  "start": 130680,
+                  "end": 131200,
+                  "text": "our "
+                },
+                {
+                  "start": 131200,
+                  "end": 132920,
+                  "text": "joy "
+                },
+                {
+                  "start": 132920,
+                  "end": 132960,
+                  "text": "away"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "id": "94608816144388"
+    }
+  ],
+  "trace_id": "81869a864fc0de3247a1d3387f39d269"
+}

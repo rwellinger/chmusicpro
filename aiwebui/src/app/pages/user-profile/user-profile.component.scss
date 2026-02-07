@@ -1,0 +1,651 @@
+@use "sass:color";
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+.user-profile-container {
+  height: 100vh;
+  overflow: hidden;
+  padding-bottom: 25px;
+  
+  &.master-detail-layout {
+    display: grid;
+    grid-template-columns: 35fr 45fr;
+    gap: 0;
+  }
+  
+  .page-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .profile-grid {
+    display: contents;
+    
+    .user-section,
+    .costs-section {
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: $spacing-md;
+    }
+    
+    .user-section {
+      border-right: 1px solid $border-light;
+    }
+    
+    .profile-card {
+      height: calc(100vh - 2rem);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      
+      mat-card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        
+        mat-card-title {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin: 0;
+          font-size: 1.25rem;
+          font-weight: 500;
+          
+          i {
+            font-size: 1.125rem;
+          }
+        }
+        
+        mat-card-subtitle {
+          color: rgba(255, 255, 255, 0.8);
+          margin: 0.5rem 0 0 0;
+          font-size: 0.9rem;
+        }
+      }
+      
+      mat-card-content {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      }
+      
+      mat-card-actions {
+        padding: 1rem 1.5rem 1.5rem 1.5rem;
+        background: $background-light;
+        
+        .action-buttons {
+          display: flex;
+          gap: 1rem;
+          align-items: center;
+          
+          button {
+            min-width: 120px;
+            
+            i {
+              margin-right: 0.5rem;
+            }
+            
+            .fa-spinner {
+              animation: spin 1s linear infinite;
+            }
+          }
+        }
+      }
+    }
+    
+    // User Section Specific Styles
+    .user-section {
+      .user-info {
+        .avatar-section {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+          margin-bottom: 2rem;
+          padding-bottom: 1.5rem;
+          border-bottom: 1px solid $border-light;
+          
+          .avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            flex-shrink: 0;
+          }
+          
+          .user-details {
+            flex-grow: 1;
+            
+            h3 {
+              margin: 0 0 0.5rem 0;
+              font-size: 1.5rem;
+              color: $text-primary;
+            }
+            
+            .email {
+              margin: 0 0 1rem 0;
+              color: $text-secondary;
+              font-size: 1rem;
+            }
+            
+            .badges {
+              display: flex;
+              gap: 0.75rem;
+              
+              .badge {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+                padding: 0.25rem 0.75rem;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 500;
+                background: $background-light;
+                color: $text-muted;
+                
+                &.active {
+                  background: color.adjust($success-color, $lightness: 45%);
+                  color: color.adjust($success-color, $lightness: -30%);
+                  
+                  i {
+                    color: $success-color;
+                  }
+                }
+                
+                &.verified {
+                  background: color.adjust($primary-color, $lightness: 40%);
+                  color: color.adjust($primary-color, $lightness: -35%);
+                  
+                  i {
+                    color: $primary-color;
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        .account-info {
+          margin-bottom: 2rem;
+          
+          .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid $border-light;
+            
+            &:last-child {
+              border-bottom: none;
+            }
+            
+            .label {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              font-weight: 500;
+              color: $text-primary;
+              
+              i {
+                width: 16px;
+                color: $text-muted;
+              }
+            }
+            
+            .value {
+              color: $text-primary;
+              font-weight: 400;
+            }
+          }
+        }
+        
+        .edit-form {
+          .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            
+            .half-width {
+              flex: 1;
+            }
+          }
+          
+          .full-width {
+            width: 100%;
+          }
+          
+          // Read-only mode styling
+          &.readonly-mode {
+            .readonly-field {
+              pointer-events: none;
+              
+              .mat-mdc-form-field {
+                background-color: $background-light;
+                border-radius: 4px;
+              }
+              
+              .mat-mdc-text-field-wrapper {
+                background-color: $background-light;
+              }
+              
+              .mdc-notched-outline {
+                .mdc-notched-outline__leading,
+                .mdc-notched-outline__notch,
+                .mdc-notched-outline__trailing {
+                  border-color: $border-light !important;
+                }
+              }
+            }
+          }
+          
+          .readonly-input {
+            background-color: $background-light;
+            cursor: default;
+            color: $text-primary;
+            
+            &:focus {
+              background-color: $background-light;
+              cursor: default;
+            }
+          }
+          
+          .readonly-icon {
+            color: $text-muted;
+            font-size: 1rem;
+            opacity: 0.6;
+          }
+          
+          .readonly-field {
+            .mat-mdc-form-field {
+              background-color: $background-light;
+              border-radius: 4px;
+              transition: all 0.3s ease;
+            }
+            
+            .mat-mdc-text-field-wrapper {
+              background-color: $background-light;
+            }
+            
+            &:hover .mat-mdc-form-field {
+              background-color: color.adjust($background-light, $lightness: -3%);
+            }
+          }
+          
+          // Edit mode styling
+          &:not(.readonly-mode) {
+            mat-form-field:not(.readonly-field) {
+              .mat-mdc-form-field {
+                background-color: white;
+                transition: all 0.3s ease;
+              }
+              
+              .mat-mdc-text-field-wrapper {
+                background-color: white;
+              }
+              
+              &:hover .mat-mdc-form-field {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+              }
+            }
+          }
+          
+          mat-form-field {
+            &.ng-invalid input[readonly] {
+              border-color: transparent;
+            }
+          }
+        }
+        
+        .settings-section {
+          margin-top: 2rem;
+          padding-top: 1.5rem;
+          border-top: 1px solid $border-light;
+          
+          .settings-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0 0 1.5rem 0;
+            color: $text-primary;
+            font-size: 1.1rem;
+            font-weight: 500;
+            
+            i {
+              color: $primary-color;
+              font-size: 1rem;
+            }
+          }
+          
+          .settings-form {
+            .form-row {
+              display: flex;
+              gap: 1rem;
+              margin-bottom: 1rem;
+              
+              .half-width {
+                flex: 1;
+              }
+            }
+            
+            .settings-actions {
+              display: flex;
+              justify-content: flex-end;
+              margin-top: 1rem;
+              padding-top: 1rem;
+              border-top: 1px solid $border-light;
+              
+              button {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+              }
+            }
+          }
+        }
+      }
+      
+      .loading-state {
+        text-align: center;
+        padding: 3rem 0;
+        color: $text-muted;
+        
+        i {
+          font-size: 2rem;
+          margin-bottom: 1rem;
+          animation: spin 1s linear infinite;
+        }
+        
+        p {
+          margin: 0;
+          font-size: 1.1rem;
+        }
+      }
+    }
+    
+    // API Costs Section (shared styles for both user-section and mureka-section)
+    .api-costs-section {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid $border-light;
+    }
+    
+    .api-costs-header {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid $border-light;
+    }
+    
+    .api-costs-avatar {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2.5rem;
+      flex-shrink: 0;
+    }
+    
+    .api-costs-header-text {
+      flex-grow: 1;
+      
+      h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+        color: $text-primary;
+      }
+      
+      p {
+        margin: 0;
+        color: $text-secondary;
+        font-size: 1rem;
+      }
+    }
+    
+    .api-costs-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .api-costs-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      font-size: 0.95rem;
+    }
+    
+    .api-costs-item.api-costs-total {
+      border-top: 2px solid $border-light;
+      margin-top: 0.5rem;
+      padding-top: 1rem;
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+    
+    .api-costs-total .api-costs-value {
+      color: $primary-color;
+      font-weight: 700;
+    }
+    
+    .api-costs-label {
+      color: $text-secondary;
+    }
+    
+    .api-costs-value {
+      color: $text-primary;
+      font-weight: 500;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive Design - MacBook Air 13" M4 2025 (1470px)
+@media (max-width: 1470px) {
+  .user-profile-container.master-detail-layout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    height: auto;
+  }
+  
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .user-section,
+  .costs-section {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: $spacing-sm;
+  }
+  
+  .profile-card,
+  .costs-card {
+    height: auto;
+  }
+}
+
+// iPad & Touch Device Optimizations
+@media (max-width: 1024px) and (hover: none) {
+  .user-profile-container {
+    padding: $spacing-sm;
+  }
+  
+  .profile-card {
+    max-width: 100%;
+  }
+  
+  // Larger form inputs for touch
+  .form-input,
+  .form-textarea,
+  .form-select {
+    min-height: 44px;
+    font-size: 16px; // Prevent iOS zoom
+  }
+  
+  // Full-width buttons with larger touch targets
+  .action-button,
+  .save-button,
+  .cancel-button,
+  .change-password-button {
+    width: 100%;
+    min-height: 60px;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  // Action buttons - vertical stack
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+    
+    button {
+      width: 100%;
+      min-height: 60px;
+    }
+  }
+  
+  // Form rows - vertical stack
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  // Settings toggles - larger touch targets
+  .mat-slide-toggle {
+    margin: 0.75rem 0;
+  }
+  
+  // Avatar section - vertical layout
+  .avatar-section {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .user-profile-container {
+    padding: 1rem;
+    
+    .page-header {
+      margin-bottom: 1.5rem;
+      
+      h1 {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .subtitle {
+        font-size: 1rem;
+      }
+    }
+    
+    .profile-grid {
+      gap: 1rem;
+      
+      .profile-card {
+        mat-card-content {
+          padding: 1.5rem;
+        }
+        
+        mat-card-actions {
+          padding: 1rem 1.5rem 1.5rem 1.5rem;
+          
+          .action-buttons {
+            flex-direction: column;
+            width: 100%;
+            
+            button {
+              width: 100%;
+              margin: 0.25rem 0;
+            }
+          }
+        }
+      }
+      
+      .user-section {
+        .user-info {
+          .avatar-section {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+            
+            .user-details {
+              .badges {
+                justify-content: center;
+              }
+            }
+          }
+          
+          .edit-form {
+            .form-row {
+              flex-direction: column;
+              gap: 0;
+            }
+          }
+          
+          .settings-section {
+            .settings-form {
+              .form-row {
+                flex-direction: column;
+                gap: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive - MacBook Air 13" M4 2025 - Height (956px)
+@media (max-height: 1000px) {
+  .user-profile-container {
+    height: auto;
+    overflow: visible;
+  }
+  
+  .profile-grid {
+    height: auto;
+    overflow: visible;
+  }
+  
+  .user-section,
+  .costs-section {
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+  }
+  
+  .profile-card,
+  .costs-card {
+    height: auto;
+    max-height: none;
+  }
+}
