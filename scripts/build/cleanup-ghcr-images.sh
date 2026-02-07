@@ -36,8 +36,8 @@ DRY_RUN=false
 
 # Images to clean up
 IMAGES=(
-    "aiwebui-app"
-    "aiproxysrv-app"
+    "chmusicproweb-app"
+    "chmusicprosrv-app"
     "celery-worker-app"
 )
 

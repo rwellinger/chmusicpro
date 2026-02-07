@@ -91,7 +91,7 @@ Track your music production software, plugins, and gear. Secure credential stora
 
 2. **Backend Setup**
    ```bash
-   cd aiproxysrv
+   cd chmusicprosrv
    conda create -n chmusicpro_py312 python=3.12
    conda activate chmusicpro_py312
    pip install -r requirements.txt
@@ -109,7 +109,7 @@ Track your music production software, plugins, and gear. Secure credential stora
 
 3. **Frontend Setup**
    ```bash
-   cd aiwebui
+   cd chmusicproweb
    npm install
    npm run dev
    ```
@@ -174,7 +174,7 @@ For detailed architecture documentation, see [docs/arch42/README.md](docs/arch42
 
 ```
 chmusicpro/
-├── aiproxysrv/          # Python Backend (FastAPI)
+├── chmusicprosrv/          # Python Backend (FastAPI)
 │   ├── src/
 │   │   ├── adapters/    # External API clients (OpenAI, Ollama)
 │   │   ├── api/         # Controllers & Routes
@@ -183,7 +183,7 @@ chmusicpro/
 │   │   └── celery_app/  # Async task processing
 │   └── fonts/           # Font files for text overlays
 │
-├── aiwebui/             # Angular 20 Frontend
+├── chmusicproweb/             # Angular 20 Frontend
 │   └── src/app/
 │       ├── pages/       # Feature pages
 │       ├── services/    # API services
@@ -192,7 +192,7 @@ chmusicpro/
 │
 ├── scripts/
 │   ├── build/           # Release & build automation
-│   ├── cli/             # CLI tool (aiproxy-cli)
+│   ├── cli/             # CLI tool (chmusicpro-cli)
 │   └── db/              # Database seeding
 │
 ├── forwardproxy/        # Nginx reverse proxy
@@ -214,13 +214,13 @@ The CLI tool integrates with your local DAW workflow:
 make install-cli
 
 # Login
-aiproxy-cli login
+chmusicpro-cli login
 
 # Clone project to local folder
-aiproxy-cli clone <project-id> ~/Music/Projects/ -d
+chmusicpro-cli clone <project-id> ~/Music/Projects/ -d
 
 # Mirror sync (local to cloud)
-aiproxy-cli mirror <project-id> <folder-id> ~/path --dry-run
+chmusicpro-cli mirror <project-id> <folder-id> ~/path --dry-run
 ```
 
 See [scripts/cli/README.md](scripts/cli/README.md) for full documentation.

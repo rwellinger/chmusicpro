@@ -21,7 +21,7 @@ For initial setup or development environments, you can also create users directl
 
 ### Prerequisites
 
-- aiproxysrv server must be running (`python server.py` or via Docker)
+- chmusicprosrv server must be running (`python server.py` or via Docker)
 - API accessible at `http://localhost:8000` (development) or your production URL
 
 ### Method 1: Using Swagger UI (Recommended for Development)

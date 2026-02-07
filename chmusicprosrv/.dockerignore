@@ -1,0 +1,38 @@
+# CRITICAL: Never include secrets in Docker images!
+.env
+.env*
+!.env_template
+alembic.ini
+
+README.md
+images
+docker-compose-postgres.yaml
+docker-compose.yml
+dockerfile
+.dockerignore
+
+# Ignoriere virtuelle Umgebungen
+venv/
+env/
+.claude
+env_template
+
+
+# Ignoriere temporäre Dateien und Verzeichnisse (z.B. von IDEs)
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+src/chmusicprosrv.egg-info
+dump.rdb
+
+# Ignoriere Versionskontrollsysteme
+.git
+.gitignore
+
+# Ignoriere die lokale .idea/App-Settings von JetBrains
+.idea/
+
+# Ignoriere Betriebssystem- und Editor-spezifische Dateien
+.DS_Store
+Thumbs.db

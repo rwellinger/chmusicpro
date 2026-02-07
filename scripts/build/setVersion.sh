@@ -8,8 +8,8 @@
 # Example: ./setVersion.sh 2.1.8
 #
 # Updates:
-# - aiproxysrv/pyproject.toml
-# - aiwebui/package.json
+# - chmusicprosrv/pyproject.toml
+# - chmusicproweb/package.json
 #
 # NOTE: Does NOT update production docker-compose.yml files
 #       (those are in separate deployment repo and updated manually)
@@ -28,8 +28,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # File paths
-AIPROXYSRV_TOML="$PROJECT_ROOT/aiproxysrv/pyproject.toml"
-AIWEBUI_PACKAGE="$PROJECT_ROOT/aiwebui/package.json"
+AIPROXYSRV_TOML="$PROJECT_ROOT/chmusicprosrv/pyproject.toml"
+AIWEBUI_PACKAGE="$PROJECT_ROOT/chmusicproweb/package.json"
 
 # Function to print usage
 usage() {
@@ -37,8 +37,8 @@ usage() {
     echo -e "${YELLOW}Example:${NC} $0 2.1.8"
     echo ""
     echo "Updates version in SOURCE files:"
-    echo "  - aiproxysrv/pyproject.toml"
-    echo "  - aiwebui/package.json"
+    echo "  - chmusicprosrv/pyproject.toml"
+    echo "  - chmusicproweb/package.json"
     echo ""
     echo "Production docker-compose.yml files are in separate deployment repo"
     echo "and must be updated manually after release."

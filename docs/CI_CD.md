@@ -34,9 +34,9 @@
 3. **Buildx:** Multi-platform Docker builds
 4. **Login GHCR:** Automatic via `GITHUB_TOKEN`
 5. **Build Images:** Parallel builds with layer caching
-   - `aiproxysrv-app` (backend)
+   - `chmusicprosrv-app` (backend)
    - `celery-worker-app` (worker)
-   - `aiwebui-app` (frontend)
+   - `chmusicproweb-app` (frontend)
 6. **Lint:** ESLint on Angular code (parallel job)
 
 ---
@@ -116,8 +116,8 @@ https://github.com/rwellinger?tab=packages
 
 **Falls GitHub Actions nicht verfügbar:**
 ```bash
-./scripts/build/build-and-push-aiproxysrv.sh v2.2.6
-./scripts/build/build-and-push-aiwebui.sh v2.2.6
+./scripts/build/build-and-push-chmusicprosrv.sh v2.2.6
+./scripts/build/build-and-push-chmusicproweb.sh v2.2.6
 ```
 
 ---
@@ -128,11 +128,11 @@ https://github.com/rwellinger?tab=packages
 
 1. **Local Testing:**
    ```bash
-   # From aiwebui/
+   # From chmusicproweb/
    npm run build:prod
    npm run lint
 
-   # From aiproxysrv/
+   # From chmusicprosrv/
    ruff check . --fix && ruff format .
    pytest -v -s
    ```
@@ -176,9 +176,9 @@ https://github.com/rwellinger?tab=packages
 
 ### GHCR Registry Structure
 ```
-ghcr.io/rwellinger/aiproxysrv-app:v2.2.6
+ghcr.io/rwellinger/chmusicprosrv-app:v2.2.6
 ghcr.io/rwellinger/celery-worker-app:v2.2.6
-ghcr.io/rwellinger/aiwebui-app:v2.2.6
+ghcr.io/rwellinger/chmusicproweb-app:v2.2.6
 ```
 
 ### Tag Strategies
@@ -189,16 +189,16 @@ ghcr.io/rwellinger/aiwebui-app:v2.2.6
 
 ## Local Build Scripts
 
-### Backend (aiproxysrv)
+### Backend (chmusicprosrv)
 ```bash
 # From project root
-./scripts/build/build-and-push-aiproxysrv.sh v2.2.6
+./scripts/build/build-and-push-chmusicprosrv.sh v2.2.6
 ```
 
-### Frontend (aiwebui)
+### Frontend (chmusicproweb)
 ```bash
 # From project root
-./scripts/build/build-and-push-aiwebui.sh v2.2.6
+./scripts/build/build-and-push-chmusicproweb.sh v2.2.6
 ```
 
 ### Full Release
@@ -250,7 +250,7 @@ ghcr.io/rwellinger/aiwebui-app:v2.2.6
 
 3. **Rollback database (if needed):**
    ```bash
-   # From aiproxysrv/ directory
+   # From chmusicprosrv/ directory
    alembic downgrade -1  # Downgrade one migration
    ```
 

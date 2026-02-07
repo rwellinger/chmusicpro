@@ -106,13 +106,13 @@ docker exec -it chmusicpro-postgres-1 psql -U aiuser -d aiproxy
 psql -h localhost -U aiuser -d aiproxy -W
 
 # Check credentials in .env
-cat aiproxysrv/.env_postgres
+cat chmusicprosrv/.env_postgres
 ```
 
 #### Database migration issues
 ```bash
-# From aiproxysrv directory
-# IMPORTANT: Run from aiproxysrv/ root (where alembic.ini is located)!
+# From chmusicprosrv directory
+# IMPORTANT: Run from chmusicprosrv/ root (where alembic.ini is located)!
 
 # Check current migration version
 alembic current
@@ -137,7 +137,7 @@ alembic revision --autogenerate -m "description"
 
 #### Worker not processing tasks
 ```bash
-# From aiproxysrv directory
+# From chmusicprosrv directory
 
 # Check if worker is running
 celery -A src.worker inspect active
@@ -177,7 +177,7 @@ docker exec -it chmusicpro-redis-1 redis-cli
 
 #### Server won't start
 ```bash
-# From aiproxysrv directory
+# From chmusicprosrv directory
 
 # Check if port is in use
 lsof -i :5050
@@ -220,7 +220,7 @@ open http://localhost:5050/docs
 
 #### Server won't start
 ```bash
-# From aiwebui directory
+# From chmusicproweb directory
 
 # Check Node version
 node --version  # Should be 18.x or 20.x
@@ -238,7 +238,7 @@ npm run dev -- --verbose
 
 #### Build errors
 ```bash
-# From aiwebui directory
+# From chmusicproweb directory
 
 # Clear Angular cache
 rm -rf .angular/cache
@@ -257,7 +257,7 @@ npm run lint
 
 #### Missing translations
 ```bash
-# From aiwebui directory
+# From chmusicproweb directory
 
 # Check translation files exist
 ls -la src/assets/i18n/
@@ -367,7 +367,7 @@ curl https://api.openai.com/v1/usage \
 #### Authentication errors
 ```bash
 # Verify API key in .env
-cat aiproxysrv/.env | grep OPENAI_API_KEY
+cat chmusicprosrv/.env | grep OPENAI_API_KEY
 
 # Test API key
 curl https://api.openai.com/v1/models \
@@ -408,7 +408,7 @@ tail -f ~/.ollama/logs/server.log
 
 **Diagnosis:**
 ```bash
-# From aiproxysrv directory
+# From chmusicprosrv directory
 
 # Check database query performance
 # Add logging in SQLAlchemy models:
@@ -478,7 +478,7 @@ finally:
 
 **Backend:**
 ```bash
-# From aiproxysrv directory
+# From chmusicprosrv directory
 # Edit .env
 DEBUG=true
 LOG_LEVEL=DEBUG
@@ -524,9 +524,9 @@ export const environment = {
       "request": "launch",
       "module": "uvicorn",
       "args": ["src.server:app", "--reload"],
-      "cwd": "${workspaceFolder}/aiproxysrv",
+      "cwd": "${workspaceFolder}/chmusicprosrv",
       "env": {
-        "PYTHONPATH": "${workspaceFolder}/aiproxysrv"
+        "PYTHONPATH": "${workspaceFolder}/chmusicprosrv"
       }
     }
   ]
@@ -544,7 +544,7 @@ export const environment = {
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:4200",
-      "webRoot": "${workspaceFolder}/aiwebui",
+      "webRoot": "${workspaceFolder}/chmusicproweb",
       "sourceMapPathOverrides": {
         "webpack:/*": "${webRoot}/*"
       }
@@ -578,7 +578,7 @@ docker compose up -d postgres
 # ... restore commands ...
 
 # 6. Apply migrations
-cd aiproxysrv
+cd chmusicprosrv
 alembic upgrade head
 
 # 7. Run seed scripts
@@ -594,14 +594,14 @@ cat scripts/db/seed_prompts.sql | docker exec -i postgres psql -U aiproxy -d aip
 # From project root
 docker compose down -v
 docker system prune -af --volumes
-rm -rf aiproxysrv/.angular/cache
-rm -rf aiwebui/node_modules
-rm -rf aiwebui/dist
+rm -rf chmusicprosrv/.angular/cache
+rm -rf chmusicproweb/node_modules
+rm -rf chmusicproweb/dist
 
 # Rebuild everything
 docker compose up -d postgres redis
-cd aiproxysrv && alembic upgrade head && cd ..
-cd aiwebui && npm install && npm run build:prod && cd ..
+cd chmusicprosrv && alembic upgrade head && cd ..
+cd chmusicproweb && npm install && npm run build:prod && cd ..
 docker compose up -d
 ```
 

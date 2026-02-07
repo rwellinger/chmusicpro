@@ -39,8 +39,8 @@ scp rob@<production-server>:/tmp/aiproxy_backup_*.sql ~/Desktop/
 
 ### SCHRITT 2: Alembic-Status auf Produktion prüfen
 ```bash
-# Im aiproxysrv Container
-docker exec -it chmusicpro-aiproxysrv-1 bash
+# Im chmusicprosrv Container
+docker exec -it chmusicpro-chmusicprosrv-1 bash
 cd /app
 alembic current
 alembic history | head -20
@@ -53,12 +53,12 @@ alembic history | head -20
 
 ### SCHRITT 3: Fehlende Migrationen anwenden
 ```bash
-# Im aiproxysrv Container (oder direkt im Docker Command)
-docker exec -it chmusicpro-aiproxysrv-1 alembic upgrade head
+# Im chmusicprosrv Container (oder direkt im Docker Command)
+docker exec -it chmusicpro-chmusicprosrv-1 alembic upgrade head
 
 # Oder als einzelne Steps:
-docker exec -it chmusicpro-aiproxysrv-1 alembic upgrade 234ea0f4b6c3
-docker exec -it chmusicpro-aiproxysrv-1 alembic upgrade d4641a241b98
+docker exec -it chmusicpro-chmusicprosrv-1 alembic upgrade 234ea0f4b6c3
+docker exec -it chmusicpro-chmusicprosrv-1 alembic upgrade d4641a241b98
 ```
 
 **Was passiert:**
@@ -71,7 +71,7 @@ docker exec -it chmusicpro-aiproxysrv-1 alembic upgrade d4641a241b98
 ### SCHRITT 4: Verifizierung
 ```bash
 # Alembic Version prüfen
-docker exec -it chmusicpro-aiproxysrv-1 alembic current
+docker exec -it chmusicpro-chmusicprosrv-1 alembic current
 
 # Sollte zeigen:
 # d4641a241b98 (head)
@@ -92,11 +92,11 @@ docker exec -it chmusicpro-postgres-1 psql -U aiuser -d aiproxy -c "SELECT COUNT
 ### SCHRITT 5: Backend-Container neu starten
 ```bash
 # Container neu starten, damit Model-Änderungen aktiv werden
-docker restart chmusicpro-aiproxysrv-1
+docker restart chmusicpro-chmusicprosrv-1
 docker restart chmusicpro-celery-worker-1
 
 # Logs prüfen
-docker logs -f chmusicpro-aiproxysrv-1
+docker logs -f chmusicpro-chmusicprosrv-1
 ```
 
 ### SCHRITT 6: Funktionstest
@@ -111,8 +111,8 @@ docker logs -f chmusicpro-aiproxysrv-1
 
 ### Option 1: Migration rückgängig machen
 ```bash
-docker exec -it chmusicpro-aiproxysrv-1 alembic downgrade 0f864573b58a
-docker restart chmusicpro-aiproxysrv-1
+docker exec -it chmusicpro-chmusicprosrv-1 alembic downgrade 0f864573b58a
+docker restart chmusicpro-chmusicprosrv-1
 ```
 
 **ABER ACHTUNG:** Das würde nur funktionieren, wenn der alte Code deployed wäre!
