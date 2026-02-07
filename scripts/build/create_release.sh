@@ -129,11 +129,11 @@ else
 fi
 
 # ══════════════════════════════════════════════════════════════
-# 4. QUALITY GATES - Backend (aiproxysrv)
+# 4. QUALITY GATES - Backend (chmusicprosrv)
 # ══════════════════════════════════════════════════════════════
-print_header "Quality Gates: Backend (aiproxysrv)"
+print_header "Quality Gates: Backend (chmusicprosrv)"
 
-cd "$PROJECT_DIR/aiproxysrv"
+cd "$PROJECT_DIR/chmusicprosrv"
 
 # Check Conda Environment
 print_info "Prüfe Conda Environment..."
@@ -150,8 +150,8 @@ if ! make lint-all > /dev/null 2>&1; then
     print_error "Backend Linting fehlgeschlagen!"
     echo ""
     echo "Fehler beheben mit:"
-    echo "  ${YELLOW}cd aiproxysrv && make lint-all${NC}"
-    echo "  ${YELLOW}cd aiproxysrv && make format${NC}"
+    echo "  ${YELLOW}cd chmusicprosrv && make lint-all${NC}"
+    echo "  ${YELLOW}cd chmusicprosrv && make format${NC}"
     exit 1
 fi
 print_success "Backend Linting bestanden (Ruff + Architecture + Format)"
@@ -162,17 +162,17 @@ if ! make test > /dev/null 2>&1; then
     print_error "Backend Tests fehlgeschlagen!"
     echo ""
     echo "Tests ausführen:"
-    echo "  ${YELLOW}cd aiproxysrv && make test${NC}"
+    echo "  ${YELLOW}cd chmusicprosrv && make test${NC}"
     exit 1
 fi
 print_success "Backend Tests bestanden"
 
 # ══════════════════════════════════════════════════════════════
-# 5. QUALITY GATES - Frontend (aiwebui)
+# 5. QUALITY GATES - Frontend (chmusicproweb)
 # ══════════════════════════════════════════════════════════════
-print_header "Quality Gates: Frontend (aiwebui)"
+print_header "Quality Gates: Frontend (chmusicproweb)"
 
-cd "$PROJECT_DIR/aiwebui"
+cd "$PROJECT_DIR/chmusicproweb"
 
 # Check Node.js Environment
 print_info "Prüfe Node.js Environment..."
@@ -180,7 +180,7 @@ if ! make check-node > /dev/null 2>&1; then
     print_error "Node.js Environment Check fehlgeschlagen!"
     echo ""
     echo "Details anzeigen:"
-    echo "  ${YELLOW}cd aiwebui && make check-node${NC}"
+    echo "  ${YELLOW}cd chmusicproweb && make check-node${NC}"
     exit 1
 fi
 print_success "Node.js environment OK"
@@ -191,8 +191,8 @@ if ! make lint-all > /dev/null 2>&1; then
     print_error "Frontend Linting fehlgeschlagen!"
     echo ""
     echo "Fehler beheben mit:"
-    echo "  ${YELLOW}cd aiwebui && make lint-all${NC}"
-    echo "  ${YELLOW}cd aiwebui && make lint-fix${NC}"
+    echo "  ${YELLOW}cd chmusicproweb && make lint-all${NC}"
+    echo "  ${YELLOW}cd chmusicproweb && make lint-fix${NC}"
     exit 1
 fi
 print_success "Frontend Linting bestanden"
@@ -203,7 +203,7 @@ if ! make test > /dev/null 2>&1; then
     print_error "Frontend Unit Tests fehlgeschlagen!"
     echo ""
     echo "Tests ausführen:"
-    echo "  ${YELLOW}cd aiwebui && make test${NC}"
+    echo "  ${YELLOW}cd chmusicproweb && make test${NC}"
     exit 1
 fi
 print_success "Frontend Unit Tests bestanden"
@@ -214,7 +214,7 @@ if ! make build-dev > /dev/null 2>&1; then
     print_error "Frontend Build fehlgeschlagen!"
     echo ""
     echo "Build-Fehler analysieren:"
-    echo "  ${YELLOW}cd aiwebui && make build-dev${NC}"
+    echo "  ${YELLOW}cd chmusicproweb && make build-dev${NC}"
     exit 1
 fi
 print_success "Frontend Build bestanden"
@@ -227,17 +227,17 @@ print_success "Alle Quality Gates bestanden! 🎉"
 cd "$PROJECT_DIR"
 print_info "Aktualisiere VERSION Files..."
 
-echo "${VERSION}" > "$PROJECT_DIR/aiproxysrv/VERSION"
-print_success "aiproxysrv/VERSION → ${VERSION}"
+echo "${VERSION}" > "$PROJECT_DIR/chmusicprosrv/VERSION"
+print_success "chmusicprosrv/VERSION → ${VERSION}"
 
-echo "${VERSION}" > "$PROJECT_DIR/aiwebui/VERSION"
-print_success "aiwebui/VERSION → ${VERSION}"
+echo "${VERSION}" > "$PROJECT_DIR/chmusicproweb/VERSION"
+print_success "chmusicproweb/VERSION → ${VERSION}"
 
 # ──────────────────────────────────────
 # 7. Änderungen committen
 # ──────────────────────────────────────
 print_info "Committe VERSION Updates..."
-git add aiproxysrv/VERSION aiwebui/VERSION
+git add chmusicprosrv/VERSION chmusicproweb/VERSION
 git commit -m "Bump version to ${VERSION}"
 print_success "VERSION Files committed"
 
@@ -271,9 +271,9 @@ if [ "$REMOTE_AVAILABLE" = true ]; then
     echo "  🔗 Build Status: ${BLUE}https://github.com/rwellinger/chmusicpro/actions${NC}"
     echo ""
     print_info "GitHub Actions wird folgende Images bauen und pushen:"
-    echo "  • ghcr.io/rwellinger/aiproxysrv-app:${VERSION}"
+    echo "  • ghcr.io/rwellinger/chmusicprosrv-app:${VERSION}"
     echo "  • ghcr.io/rwellinger/celery-worker-app:${VERSION}"
-    echo "  • ghcr.io/rwellinger/aiwebui-app:${VERSION}"
+    echo "  • ghcr.io/rwellinger/chmusicproweb-app:${VERSION}"
     echo ""
     print_info "Erwartete Build-Zeit: ~10-12 Minuten"
     echo ""
@@ -285,8 +285,8 @@ else
 fi
 
 print_warning "Manuelle Builds sind weiterhin möglich (Fallback):"
-echo "  ./scripts/build/build-and-push-aiproxysrv.sh ${VERSION}"
-echo "  ./scripts/build/build-and-push-aiwebui.sh ${VERSION}"
+echo "  ./scripts/build/build-and-push-chmusicprosrv.sh ${VERSION}"
+echo "  ./scripts/build/build-and-push-chmusicproweb.sh ${VERSION}"
 echo ""
 print_success "Release ${VERSION} erfolgreich erstellt!"
 echo ""
