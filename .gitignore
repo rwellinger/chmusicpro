@@ -2,7 +2,6 @@
 .vscode
 .claude
 .DS_Store
-VERSION
 package-lock.json
 package.json
 node_modules
