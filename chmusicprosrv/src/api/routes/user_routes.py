@@ -5,7 +5,7 @@ User Authentication and Management Routes
 from flask import Blueprint, jsonify, request
 from flask_pydantic import validate
 
-from api.auth_middleware import get_current_user_id, jwt_required
+from api.auth_middleware import admin_required, get_current_user_id, jwt_required
 from api.controllers.user_controller import UserController
 from schemas.user_schemas import (
     LoginRequest,
@@ -105,9 +105,10 @@ def change_password(body: PasswordChangeRequest):
 
 @api_user_v1.route("/password-reset", methods=["POST"])
 @jwt_required
+@admin_required
 @validate()
 def reset_password(body: PasswordResetRequest):
-    """Reset user password (admin function, requires JWT)"""
+    """Reset user password (admin function, requires JWT + admin role)"""
     try:
         response_data, status_code = user_controller.reset_password(body)
         return jsonify(response_data), status_code
@@ -117,8 +118,9 @@ def reset_password(body: PasswordResetRequest):
 
 @api_user_v1.route("/list", methods=["GET"])
 @jwt_required
+@admin_required
 def list_users():
-    """List all users (admin function, requires JWT)"""
+    """List all users (admin function, requires JWT + admin role)"""
     try:
         # Get pagination parameters
         skip = int(request.args.get("skip", 0))

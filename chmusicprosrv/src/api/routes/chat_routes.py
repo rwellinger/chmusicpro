@@ -7,7 +7,7 @@ import logging
 from flask import Blueprint, jsonify
 from flask_pydantic import validate
 
-from api.auth_middleware import jwt_required
+from api.auth_middleware import get_current_user_id, jwt_required
 from api.controllers.chat_controller import ChatController
 from config.settings import CHAT_DEBUG_LOGGING
 from schemas.chat_schemas import ChatErrorResponse, UnifiedChatRequest
@@ -62,6 +62,8 @@ def generate_unified(body: UnifiedChatRequest):
                 input_length=len(body.input_text),
             )
 
+        user_id = get_current_user_id()
+
         response_data, status_code = chat_controller.generate_chat(
             model=body.model,
             pre_condition=body.pre_condition,
@@ -72,6 +74,7 @@ def generate_unified(body: UnifiedChatRequest):
             user_instructions=body.user_instructions,
             category=body.category,
             action=body.action,
+            user_id=str(user_id) if user_id else None,
         )
         return jsonify(response_data), status_code
     except Exception as e:

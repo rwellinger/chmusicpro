@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from api.auth_middleware import jwt_required
+from api.auth_middleware import admin_required, jwt_required
 from api.controllers.lyric_parsing_rule_controller import LyricParsingRuleController
 from db.database import get_db
 from schemas.lyric_parsing_rule_schemas import (
@@ -19,6 +19,7 @@ api_lyric_parsing_rule_v1 = Blueprint("api_lyric_parsing_rule_v1", __name__, url
 
 @api_lyric_parsing_rule_v1.route("", methods=["GET"])
 @jwt_required
+@admin_required
 def get_all_rules():
     """
     Get all lyric parsing rules
@@ -44,6 +45,7 @@ def get_all_rules():
 
 @api_lyric_parsing_rule_v1.route("/<int:rule_id>", methods=["GET"])
 @jwt_required
+@admin_required
 def get_rule_by_id(rule_id: int):
     """
     Get a specific lyric parsing rule by ID
@@ -63,6 +65,7 @@ def get_rule_by_id(rule_id: int):
 
 @api_lyric_parsing_rule_v1.route("", methods=["POST"])
 @jwt_required
+@admin_required
 def create_rule():
     """
     Create a new lyric parsing rule
@@ -90,6 +93,7 @@ def create_rule():
 
 @api_lyric_parsing_rule_v1.route("/<int:rule_id>", methods=["PUT"])
 @jwt_required
+@admin_required
 def update_rule(rule_id: int):
     """
     Update an existing lyric parsing rule
@@ -117,6 +121,7 @@ def update_rule(rule_id: int):
 
 @api_lyric_parsing_rule_v1.route("/<int:rule_id>", methods=["DELETE"])
 @jwt_required
+@admin_required
 def delete_rule(rule_id: int):
     """
     Delete a lyric parsing rule
@@ -136,6 +141,7 @@ def delete_rule(rule_id: int):
 
 @api_lyric_parsing_rule_v1.route("/reorder", methods=["PATCH"])
 @jwt_required
+@admin_required
 def reorder_rules():
     """
     Reorder lyric parsing rules

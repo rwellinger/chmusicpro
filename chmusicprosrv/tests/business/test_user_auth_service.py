@@ -121,8 +121,19 @@ class TestUserAuthService:
 
         assert payload["user_id"] == user_id
         assert payload["email"] == email
+        assert payload["role"] == "user"  # Default role
         assert "iat" in payload  # Issued at
         assert "exp" in payload  # Expiration
+
+    def test_generate_jwt_token_contains_admin_role(self, auth_service):
+        """Test that JWT token contains admin role when specified"""
+        user_id = "123e4567-e89b-12d3-a456-426614174000"
+        email = "test@example.com"
+
+        token = auth_service.generate_jwt_token(user_id, email, role="admin")
+
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        assert payload["role"] == "admin"
 
     def test_generate_jwt_token_has_correct_expiration(self, auth_service):
         """Test that JWT token has correct expiration time"""

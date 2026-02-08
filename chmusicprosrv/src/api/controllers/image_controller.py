@@ -15,6 +15,7 @@ class ImageController:
 
     def generate_image(
         self,
+        user_id: str,
         prompt: str,
         size: str,
         title: str | None = None,
@@ -48,6 +49,7 @@ class ImageController:
 
         try:
             result = self.orchestrator.generate_image(
+                user_id=user_id,
                 prompt=prompt,
                 size=size,
                 title=title,
@@ -69,6 +71,7 @@ class ImageController:
 
     def get_images(
         self,
+        user_id: str,
         limit: int = 20,
         offset: int = 0,
         search: str = "",
@@ -90,7 +93,12 @@ class ImageController:
         """
         try:
             result = self.orchestrator.get_images_with_pagination(
-                limit=limit, offset=offset, search=search, sort_by=sort_by, sort_direction=sort_direction
+                user_id=user_id,
+                limit=limit,
+                offset=offset,
+                search=search,
+                sort_by=sort_by,
+                sort_direction=sort_direction,
             )
             return result, 200
 
@@ -101,7 +109,7 @@ class ImageController:
             logger.error(f"Unexpected error retrieving images: {type(e).__name__}: {e}")
             return {"error": "Internal server error"}, 500
 
-    def get_image_by_id(self, image_id: str) -> tuple[dict[str, Any], int]:
+    def get_image_by_id(self, user_id: str, image_id: str) -> tuple[dict[str, Any], int]:
         """
         Get single image by ID
 
@@ -112,7 +120,7 @@ class ImageController:
             Tuple of (response_data, status_code)
         """
         try:
-            result = self.orchestrator.get_image_details(image_id)
+            result = self.orchestrator.get_image_details(user_id, image_id)
 
             if result is None:
                 return {"error": "Image not found"}, 404
@@ -126,7 +134,7 @@ class ImageController:
             logger.error(f"Unexpected error retrieving image {image_id}: {type(e).__name__}: {e}")
             return {"error": "Internal server error"}, 500
 
-    def delete_image(self, image_id: str) -> tuple[dict[str, Any], int]:
+    def delete_image(self, user_id: str, image_id: str) -> tuple[dict[str, Any], int]:
         """
         Delete image by ID
 
@@ -137,7 +145,7 @@ class ImageController:
             Tuple of (response_data, status_code)
         """
         try:
-            success = self.orchestrator.delete_single_image(image_id)
+            success = self.orchestrator.delete_single_image(user_id, image_id)
 
             if not success:
                 return {"error": "Image not found"}, 404
@@ -151,7 +159,7 @@ class ImageController:
             logger.error(f"Unexpected error deleting image {image_id}: {type(e).__name__}: {e}")
             return {"error": "Internal server error"}, 500
 
-    def bulk_delete_images(self, image_ids: list[str]) -> tuple[dict[str, Any], int]:
+    def bulk_delete_images(self, user_id: str, image_ids: list[str]) -> tuple[dict[str, Any], int]:
         """
         Delete multiple images by IDs
 
@@ -168,7 +176,7 @@ class ImageController:
             return {"error": "Too many images (max 100 per request)"}, 400
 
         try:
-            result = self.orchestrator.bulk_delete_images(image_ids)
+            result = self.orchestrator.bulk_delete_images(user_id, image_ids)
 
             # Determine response status based on results
             summary = result["summary"]
@@ -188,7 +196,9 @@ class ImageController:
             logger.error(f"Unexpected error in bulk delete: {type(e).__name__}: {e}")
             return {"error": "Internal server error"}, 500
 
-    def update_image_metadata(self, image_id: str, title: str = None, tags: str = None) -> tuple[dict[str, Any], int]:
+    def update_image_metadata(
+        self, user_id: str, image_id: str, title: str = None, tags: str = None
+    ) -> tuple[dict[str, Any], int]:
         """
         Update image metadata (title and/or tags)
 
@@ -201,7 +211,7 @@ class ImageController:
             Tuple of (response_data, status_code)
         """
         try:
-            result = self.orchestrator.update_image_metadata(image_id, title, tags)
+            result = self.orchestrator.update_image_metadata(user_id, image_id, title, tags)
 
             if result is None:
                 return {"error": "Image not found"}, 404
@@ -215,7 +225,7 @@ class ImageController:
             logger.error(f"Unexpected error updating image {image_id}: {type(e).__name__}: {e}")
             return {"error": "Internal server error"}, 500
 
-    def get_images_for_text_overlay(self) -> tuple[dict[str, Any], int]:
+    def get_images_for_text_overlay(self, user_id: str) -> tuple[dict[str, Any], int]:
         """
         Get list of images suitable for text overlay
         - Only images with title
@@ -225,7 +235,7 @@ class ImageController:
             Tuple of (response_data, status_code)
         """
         try:
-            result = self.orchestrator.get_images_for_text_overlay()
+            result = self.orchestrator.get_images_for_text_overlay(user_id=user_id)
             return result, 200
 
         except ImageGenerationError as e:
@@ -285,6 +295,7 @@ class ImageController:
         try:
             # Delegate to orchestrator (3-layer architecture)
             result = self.orchestrator.add_text_overlay_to_image(
+                user_id=user_id,
                 source_image_id=image_id,
                 title=title,
                 artist=artist,
@@ -328,6 +339,7 @@ class ImageController:
 
     def assign_to_project(
         self,
+        user_id: str,
         image_id: str,
         project_id: str,
         folder_id: str | None = None,
@@ -345,6 +357,7 @@ class ImageController:
         """
         try:
             result = self.orchestrator.assign_image_to_project(
+                user_id=user_id,
                 image_id=image_id,
                 project_id=project_id,
                 folder_id=folder_id,
@@ -373,18 +386,19 @@ class ImageController:
             )
             return {"error": f"Internal server error: {str(e)}"}, 500
 
-    def get_projects_for_image(self, image_id: str) -> tuple[dict[str, Any], int]:
+    def get_projects_for_image(self, user_id: str, image_id: str) -> tuple[dict[str, Any], int]:
         """
         Get list of projects this image is assigned to.
 
         Args:
+            user_id: ID of the authenticated user
             image_id: Image UUID
 
         Returns:
             Tuple of (response_data, status_code)
         """
         try:
-            projects = ImageService.get_projects_for_image(image_id)
+            projects = ImageService.get_projects_for_image(image_id, user_id=user_id)
             return {"projects": projects}, 200
 
         except Exception as e:
@@ -393,11 +407,12 @@ class ImageController:
             )
             return {"error": f"Internal server error: {str(e)}"}, 500
 
-    def unassign_from_project(self, image_id: str, project_id: str) -> tuple[dict[str, Any], int]:
+    def unassign_from_project(self, user_id: str, image_id: str, project_id: str) -> tuple[dict[str, Any], int]:
         """
         Remove image from project (link only, image remains)
 
         Args:
+            user_id: ID of the authenticated user
             image_id: Image UUID
             project_id: Project UUID
 
@@ -405,7 +420,7 @@ class ImageController:
             Tuple of (response_data, status_code)
         """
         try:
-            result = self.orchestrator.unassign_image_from_project(image_id, project_id)
+            result = self.orchestrator.unassign_image_from_project(user_id, image_id, project_id)
 
             logger.info("Image unassigned from project", image_id=image_id, project_id=project_id)
 

@@ -22,6 +22,7 @@ class SketchOrchestrator:
     def create_sketch(
         self,
         db: Session,
+        user_id: str,
         title: str | None,
         lyrics: str | None,
         prompt: str,
@@ -71,7 +72,9 @@ class SketchOrchestrator:
             )
 
             # Repository: Create sketch with normalized data
-            sketch = sketch_service.create_sketch(db=db, sketch_type=sketch_type, workflow=workflow, **normalized_data)
+            sketch = sketch_service.create_sketch(
+                db=db, user_id=user_id, sketch_type=sketch_type, workflow=workflow, **normalized_data
+            )
 
             if not sketch:
                 raise SketchOrchestratorError("Failed to create sketch")
@@ -85,6 +88,7 @@ class SketchOrchestrator:
     def update_sketch(
         self,
         db: Session,
+        user_id: str,
         sketch_id: str | UUID,
         update_data: dict[str, Any],
     ) -> Any:
@@ -107,7 +111,7 @@ class SketchOrchestrator:
             normalized_data = SketchNormalizer.normalize_sketch_data(update_data)
 
             # Repository: Update sketch with normalized data
-            sketch = sketch_service.update_sketch(db=db, sketch_id=sketch_id, **normalized_data)
+            sketch = sketch_service.update_sketch(db=db, sketch_id=sketch_id, user_id=user_id, **normalized_data)
 
             if not sketch:
                 raise SketchOrchestratorError(f"Sketch not found with ID: {sketch_id}")
@@ -123,6 +127,7 @@ class SketchOrchestrator:
     def get_sketches_with_workflow_filter(
         self,
         db: Session,
+        user_id: str,
         limit: int = 20,
         offset: int = 0,
         search: str = "",
@@ -163,6 +168,7 @@ class SketchOrchestrator:
             # Repository: Get paginated sketches
             result = sketch_service.get_sketches_paginated(
                 db=db,
+                user_id=user_id,
                 limit=limit,
                 offset=offset,
                 search=search,
@@ -180,6 +186,7 @@ class SketchOrchestrator:
     def assign_to_project(
         self,
         db: Session,
+        user_id: str,
         sketch_id: str,
         project_id: str,
         folder_id: str | None = None,
@@ -221,6 +228,7 @@ class SketchOrchestrator:
             updated_sketch = sketch_service.update_sketch(
                 db=db,
                 sketch_id=sketch_id,
+                user_id=user_id,
                 project_id=project_id,
                 project_folder_id=folder_id,
             )
@@ -254,7 +262,7 @@ class SketchOrchestrator:
             )
             raise
 
-    def unassign_from_project(self, db: Session, sketch_id: str) -> dict | None:
+    def unassign_from_project(self, db: Session, user_id: str, sketch_id: str) -> dict | None:
         """
         Remove sketch from its assigned project (link only, sketch remains)
 
@@ -270,6 +278,7 @@ class SketchOrchestrator:
             updated_sketch = sketch_service.update_sketch(
                 db=db,
                 sketch_id=sketch_id,
+                user_id=user_id,
                 clear_project=True,
             )
 
@@ -297,6 +306,7 @@ class SketchOrchestrator:
     def duplicate_sketch(
         self,
         db: Session,
+        user_id: str,
         original_sketch_id: str | UUID,
         new_title_suffix: str | None = None,
     ) -> Any:
@@ -315,8 +325,8 @@ class SketchOrchestrator:
             SketchOrchestratorError: If duplication fails
         """
         try:
-            # Get original sketch
-            original = sketch_service.get_sketch_by_id(db, original_sketch_id)
+            # Get original sketch (with ownership check)
+            original = sketch_service.get_sketch_by_id(db, original_sketch_id, user_id=user_id)
             if not original:
                 raise SketchOrchestratorError(f"Original sketch not found: {original_sketch_id}")
 
@@ -330,6 +340,7 @@ class SketchOrchestrator:
             # Create duplicate via repository
             duplicate = sketch_service.duplicate_sketch(
                 db=db,
+                user_id=user_id,
                 original_sketch_id=original_sketch_id,
                 new_title=new_title,
                 new_lyrics=original.lyrics,

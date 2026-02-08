@@ -70,29 +70,31 @@ class UserAuthService:
             logger.warning("Password verification error", error=str(e))
             return False
 
-    def generate_jwt_token(self, user_id: str, email: str) -> str:
+    def generate_jwt_token(self, user_id: str, email: str, role: str = "user") -> str:
         """
         Generate JWT token for user authentication
 
         Args:
             user_id: User UUID as string
             email: User email address
+            role: User role (default "user")
 
         Returns:
             JWT token string
 
         Example:
             >>> auth_service = UserAuthService()
-            >>> token = auth_service.generate_jwt_token("123e4567-...", "user@example.com")
+            >>> token = auth_service.generate_jwt_token("123e4567-...", "user@example.com", "admin")
         """
         payload = {
             "user_id": str(user_id),
             "email": email,
+            "role": role,
             "iat": datetime.now(UTC),
             "exp": datetime.now(UTC) + timedelta(hours=self.jwt_expiration_hours),
         }
         token = jwt.encode(payload, self.jwt_secret, algorithm=self.jwt_algorithm)
-        logger.debug("JWT token generated", user_id=user_id, email=email)
+        logger.debug("JWT token generated", user_id=user_id, email=email, role=role)
         return token
 
     def verify_jwt_token(self, token: str) -> dict | None:

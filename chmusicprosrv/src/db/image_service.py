@@ -12,6 +12,7 @@ class ImageService:
 
     @staticmethod
     def save_generated_image(
+        user_id: str,
         prompt: str,
         size: str,
         filename: str,
@@ -38,6 +39,7 @@ class ImageService:
         db = SessionLocal()
         try:
             generated_image = GeneratedImage(
+                user_id=user_id,
                 user_prompt=user_prompt,
                 prompt=prompt,
                 enhanced_prompt=enhanced_prompt,
@@ -78,40 +80,54 @@ class ImageService:
             db.close()
 
     @staticmethod
-    def get_image_by_filename(filename: str) -> GeneratedImage | None:
+    def get_image_by_filename(filename: str, user_id: str | None = None) -> GeneratedImage | None:
         """Get image metadata by filename"""
         db = SessionLocal()
         try:
-            return db.query(GeneratedImage).filter(GeneratedImage.filename == filename).first()
+            query = db.query(GeneratedImage).filter(GeneratedImage.filename == filename)
+            if user_id:
+                query = query.filter(GeneratedImage.user_id == user_id)
+            return query.first()
         finally:
             db.close()
 
     @staticmethod
-    def get_images_by_prompt_hash(prompt_hash: str) -> list[GeneratedImage]:
+    def get_images_by_prompt_hash(prompt_hash: str, user_id: str | None = None) -> list[GeneratedImage]:
         """Get all images with the same prompt hash"""
         db = SessionLocal()
         try:
-            return db.query(GeneratedImage).filter(GeneratedImage.prompt_hash == prompt_hash).all()
+            query = db.query(GeneratedImage).filter(GeneratedImage.prompt_hash == prompt_hash)
+            if user_id:
+                query = query.filter(GeneratedImage.user_id == user_id)
+            return query.all()
         finally:
             db.close()
 
     @staticmethod
-    def get_recent_images(limit: int = 10) -> list[GeneratedImage]:
+    def get_recent_images(limit: int = 10, user_id: str | None = None) -> list[GeneratedImage]:
         """Get most recently generated images"""
         db = SessionLocal()
         try:
-            return db.query(GeneratedImage).order_by(GeneratedImage.created_at.desc()).limit(limit).all()
+            query = db.query(GeneratedImage)
+            if user_id:
+                query = query.filter(GeneratedImage.user_id == user_id)
+            return query.order_by(GeneratedImage.created_at.desc()).limit(limit).all()
         finally:
             db.close()
 
     @staticmethod
-    def get_recent_images_paginated(limit: int = 20, offset: int = 0) -> list[GeneratedImage]:
+    def get_recent_images_paginated(user_id: str, limit: int = 20, offset: int = 0) -> list[GeneratedImage]:
         """Get most recently generated images with pagination (deprecated - use get_images_paginated)"""
-        return ImageService.get_images_paginated(limit=limit, offset=offset)
+        return ImageService.get_images_paginated(user_id=user_id, limit=limit, offset=offset)
 
     @staticmethod
     def get_images_paginated(
-        limit: int = 20, offset: int = 0, search: str = "", sort_by: str = "created_at", sort_direction: str = "desc"
+        user_id: str,
+        limit: int = 20,
+        offset: int = 0,
+        search: str = "",
+        sort_by: str = "created_at",
+        sort_direction: str = "desc",
     ) -> list[GeneratedImage]:
         """Get images with pagination, search and sorting"""
         from sqlalchemy.orm import joinedload
@@ -119,6 +135,9 @@ class ImageService:
         db = SessionLocal()
         try:
             query = db.query(GeneratedImage).options(joinedload(GeneratedImage.project_references))
+
+            # Apply user filter
+            query = query.filter(GeneratedImage.user_id == user_id)
 
             # Apply search filter if provided
             if search:
@@ -156,11 +175,14 @@ class ImageService:
             db.close()
 
     @staticmethod
-    def get_total_images_count(search: str = "") -> int:
+    def get_total_images_count(user_id: str, search: str = "") -> int:
         """Get total count of generated images with optional search filter"""
         db = SessionLocal()
         try:
             query = db.query(GeneratedImage)
+
+            # Apply user filter
+            query = query.filter(GeneratedImage.user_id == user_id)
 
             # Apply search filter if provided
             if search:
@@ -180,21 +202,23 @@ class ImageService:
             db.close()
 
     @staticmethod
-    def get_image_by_id(image_id: str) -> GeneratedImage | None:
+    def get_image_by_id(image_id: str, user_id: str | None = None) -> GeneratedImage | None:
         """Get image metadata by ID"""
         db = SessionLocal()
         try:
-            return (
+            query = (
                 db.query(GeneratedImage)
                 .options(joinedload(GeneratedImage.project_references))
                 .filter(GeneratedImage.id == image_id)
-                .first()
             )
+            if user_id:
+                query = query.filter(GeneratedImage.user_id == user_id)
+            return query.first()
         finally:
             db.close()
 
     @staticmethod
-    def get_images_for_text_overlay() -> list[GeneratedImage]:
+    def get_images_for_text_overlay(user_id: str) -> list[GeneratedImage]:
         """
         Get images suitable for text overlay
         - Only images with title (not NULL and not empty)
@@ -211,6 +235,7 @@ class ImageService:
             query = (
                 db.query(GeneratedImage)
                 .options(joinedload(GeneratedImage.project_references))  # Eager load to prevent lazy load errors
+                .filter(GeneratedImage.user_id == user_id)
                 .filter(GeneratedImage.title.isnot(None))
                 .filter(GeneratedImage.title != "")
                 .filter(GeneratedImage.text_overlay_metadata.is_(None))  # Exclude overlay images
@@ -222,11 +247,14 @@ class ImageService:
             db.close()
 
     @staticmethod
-    def delete_image_metadata(image_id: str) -> bool:
+    def delete_image_metadata(image_id: str, user_id: str | None = None) -> bool:
         """Delete image metadata by ID"""
         db = SessionLocal()
         try:
-            image = db.query(GeneratedImage).filter(GeneratedImage.id == image_id).first()
+            query = db.query(GeneratedImage).filter(GeneratedImage.id == image_id)
+            if user_id:
+                query = query.filter(GeneratedImage.user_id == user_id)
+            image = query.first()
             if image:
                 db.delete(image)
                 db.commit()
@@ -250,11 +278,14 @@ class ImageService:
             db.close()
 
     @staticmethod
-    def update_image_metadata(image_id: str, title: str = None, tags: str = None) -> bool:
+    def update_image_metadata(image_id: str, title: str = None, tags: str = None, user_id: str | None = None) -> bool:
         """Update image metadata (title and/or tags) by ID"""
         db = SessionLocal()
         try:
-            image = db.query(GeneratedImage).filter(GeneratedImage.id == image_id).first()
+            query = db.query(GeneratedImage).filter(GeneratedImage.id == image_id)
+            if user_id:
+                query = query.filter(GeneratedImage.user_id == user_id)
+            image = query.first()
             if not image:
                 return False
 
@@ -288,7 +319,7 @@ class ImageService:
             db.close()
 
     @staticmethod
-    def get_projects_for_image(image_id: str) -> list[dict]:
+    def get_projects_for_image(image_id: str, user_id: str | None = None) -> list[dict]:
         """
         Get list of projects this image is assigned to.
         Returns list of dicts with project_id and project_name.
@@ -298,12 +329,14 @@ class ImageService:
         db = SessionLocal()
         try:
             # Query project_image_references joined with song_projects
-            references = (
+            query = (
                 db.query(ProjectImageReference, SongProject)
                 .join(SongProject, ProjectImageReference.project_id == SongProject.id)
                 .filter(ProjectImageReference.image_id == image_id)
-                .all()
             )
+            if user_id:
+                query = query.filter(SongProject.user_id == user_id)
+            references = query.all()
 
             projects = []
             for _ref, project in references:
@@ -321,6 +354,6 @@ class ImageService:
 
 
 # Standalone wrapper function for orchestrator imports
-def get_image_by_id(_db, image_id):
+def get_image_by_id(_db, image_id, user_id=None):
     """Wrapper function for ImageService.get_image_by_id (db parameter ignored, service uses own session)"""
-    return ImageService.get_image_by_id(image_id)
+    return ImageService.get_image_by_id(image_id, user_id=user_id)

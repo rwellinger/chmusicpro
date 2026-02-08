@@ -5,6 +5,8 @@ from typing import Any
 
 from adapters.ollama.api_client import OllamaAPIClient, OllamaAPIError
 from config.settings import CHAT_DEBUG_LOGGING
+from db.database import SessionLocal
+from db.usage_log_service import UsageLogService
 from utils.logger import logger
 
 
@@ -13,6 +15,7 @@ class ChatOrchestrator:
 
     def __init__(self):
         self.api_client = OllamaAPIClient()
+        self.usage_log_service = UsageLogService()
 
     def generate_chat(
         self,
@@ -25,11 +28,12 @@ class ChatOrchestrator:
         user_instructions: str = "",
         category: str | None = None,
         action: str | None = None,
+        user_id: str | None = None,
     ) -> tuple[dict[str, Any], int]:
         """
         Generate chat response with Ollama.
 
-        Orchestrates: OllamaAPIClient + prompt structuring
+        Orchestrates: OllamaAPIClient + prompt structuring + usage logging
 
         Args:
             model: Ollama model to use (e.g. "llama3.2:3b")
@@ -41,6 +45,7 @@ class ChatOrchestrator:
             user_instructions: Optional user-specific instructions (placed between prompt and post_condition)
             category: Template category for logging (optional)
             action: Template action for logging (optional)
+            user_id: User ID for usage tracking (optional)
 
         Returns:
             Tuple of (response_data, status_code)
@@ -125,6 +130,10 @@ class ChatOrchestrator:
             else:
                 logger.info("Ollama chat completed", category=category, action=action, model=model)
 
+            # Log usage for cost tracking (fire-and-forget, never block response)
+            if user_id:
+                self._log_usage(user_id, model, category, action, response_data)
+
             return cleaned_response, 200
 
         except OllamaAPIError as e:
@@ -148,6 +157,34 @@ class ChatOrchestrator:
                 stacktrace=traceback.format_exc(),
             )
             return {"error": f"Unexpected Error: {e}"}, 500
+
+    def _log_usage(
+        self,
+        user_id: str,
+        model: str,
+        category: str | None,
+        action: str | None,
+        response_data: dict[str, Any],
+    ) -> None:
+        """Log AI usage for cost tracking. Fire-and-forget, never raises."""
+        try:
+            db = SessionLocal()
+            try:
+                self.usage_log_service.create_log(
+                    db=db,
+                    user_id=user_id,
+                    endpoint="generate-unified",
+                    model=model,
+                    category=category,
+                    action=action,
+                    prompt_tokens=response_data.get("prompt_eval_count"),
+                    eval_tokens=response_data.get("eval_count"),
+                    total_duration_ns=response_data.get("total_duration"),
+                )
+            finally:
+                db.close()
+        except Exception as e:
+            logger.warning("Failed to log usage", error=str(e), user_id=user_id)
 
     def _clean_ollama_response(self, response_data: dict[str, Any]) -> dict[str, Any]:
         """Clean Ollama response by removing context field (post-processing)."""

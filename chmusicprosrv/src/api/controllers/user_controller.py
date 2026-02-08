@@ -108,8 +108,8 @@ class UserController:
             # Repository: Update last login timestamp
             self.user_service.update_last_login(db, str(user.id))
 
-            # Business logic: Generate JWT token
-            token = self.auth_service.generate_jwt_token(str(user.id), user.email)
+            # Business logic: Generate JWT token (include role for frontend admin checks)
+            token = self.auth_service.generate_jwt_token(str(user.id), user.email, user.role)
 
             # Create response
             user_response = UserResponse.model_validate(user)

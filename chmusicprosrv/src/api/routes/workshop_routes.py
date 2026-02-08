@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from api.auth_middleware import jwt_required
+from api.auth_middleware import get_current_user_id, jwt_required
 from api.controllers.workshop_controller import WorkshopController
 from db.database import get_db
 from schemas.workshop_schemas import WorkshopCreateRequest, WorkshopUpdateRequest
@@ -17,6 +17,10 @@ api_workshop_v1 = Blueprint("api_workshop_v1", __name__, url_prefix="/api/v1/wor
 @jwt_required
 def create_workshop():
     """Create a new workshop"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
         workshop_data = WorkshopCreateRequest.model_validate(request.json)
     except ValidationError as e:
@@ -24,7 +28,7 @@ def create_workshop():
 
     db: Session = next(get_db())
     try:
-        result, status_code = WorkshopController.create_workshop(db, workshop_data)
+        result, status_code = WorkshopController.create_workshop(db, str(user_id), workshop_data)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -34,6 +38,10 @@ def create_workshop():
 @jwt_required
 def list_workshops():
     """Get list of workshops with pagination, search and filtering"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
         limit = int(request.args.get("limit", 20))
         offset = int(request.args.get("offset", 0))
@@ -65,6 +73,7 @@ def list_workshops():
     try:
         result, status_code = WorkshopController.get_workshops(
             db=db,
+            user_id=str(user_id),
             limit=limit,
             offset=offset,
             search=search,
@@ -81,9 +90,13 @@ def list_workshops():
 @jwt_required
 def get_workshop(workshop_id: str):
     """Get a specific workshop by ID"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     db: Session = next(get_db())
     try:
-        result, status_code = WorkshopController.get_workshop_by_id(db, workshop_id)
+        result, status_code = WorkshopController.get_workshop_by_id(db, str(user_id), workshop_id)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -93,6 +106,10 @@ def get_workshop(workshop_id: str):
 @jwt_required
 def update_workshop(workshop_id: str):
     """Update an existing workshop"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
         update_data = WorkshopUpdateRequest.model_validate(request.json)
     except ValidationError as e:
@@ -100,7 +117,7 @@ def update_workshop(workshop_id: str):
 
     db: Session = next(get_db())
     try:
-        result, status_code = WorkshopController.update_workshop(db, workshop_id, update_data)
+        result, status_code = WorkshopController.update_workshop(db, str(user_id), workshop_id, update_data)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -110,9 +127,13 @@ def update_workshop(workshop_id: str):
 @jwt_required
 def delete_workshop(workshop_id: str):
     """Delete a workshop"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     db: Session = next(get_db())
     try:
-        result, status_code = WorkshopController.delete_workshop(db, workshop_id)
+        result, status_code = WorkshopController.delete_workshop(db, str(user_id), workshop_id)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -122,9 +143,13 @@ def delete_workshop(workshop_id: str):
 @jwt_required
 def export_to_sketch(workshop_id: str):
     """Export workshop content to a new SongSketch"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     db: Session = next(get_db())
     try:
-        result, status_code = WorkshopController.export_to_sketch(db, workshop_id)
+        result, status_code = WorkshopController.export_to_sketch(db, str(user_id), workshop_id)
         return jsonify(result), status_code
     finally:
         db.close()

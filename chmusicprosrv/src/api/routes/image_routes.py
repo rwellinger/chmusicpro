@@ -31,8 +31,13 @@ image_controller = ImageController()
 @validate()
 def generate(body: ImageGenerateRequest):
     """Generate image with DALL-E"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
         response_data, status_code = image_controller.generate_image(
+            user_id=str(user_id),
             prompt=body.prompt,
             size=body.size,
             title=body.title,
@@ -54,9 +59,18 @@ def generate(body: ImageGenerateRequest):
 @validate()
 def list_images(query: ImageListRequest):
     """Get list of generated images with pagination, search and sorting"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
         response_data, status_code = image_controller.get_images(
-            limit=query.limit, offset=query.offset, search=query.search, sort_by=query.sort, sort_direction=query.order
+            user_id=str(user_id),
+            limit=query.limit,
+            offset=query.offset,
+            search=query.search,
+            sort_by=query.sort,
+            sort_direction=query.order,
         )
         return jsonify(response_data), status_code
     except Exception as e:
@@ -68,8 +82,12 @@ def list_images(query: ImageListRequest):
 @jwt_required
 def list_images_for_text_overlay():
     """Get list of images suitable for text overlay (only images with title, album-cover first)"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
-        response_data, status_code = image_controller.get_images_for_text_overlay()
+        response_data, status_code = image_controller.get_images_for_text_overlay(user_id=str(user_id))
         return jsonify(response_data), status_code
     except Exception as e:
         error_response = ErrorResponse(error=str(e))
@@ -80,7 +98,17 @@ def list_images_for_text_overlay():
 @jwt_required
 def serve_image(filename):
     """Serve stored images from filesystem (backward compatibility)"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
+        from db.image_service import ImageService
+
+        image = ImageService.get_image_by_filename(filename, user_id=str(user_id))
+        if not image:
+            return jsonify({"error": "Image not found"}), 404
+
         logger.debug("Serving image", filename=filename)
         return send_from_directory(IMAGES_DIR, filename)
     except Exception as e:
@@ -98,6 +126,10 @@ def serve_image(filename):
 @jwt_required
 def serve_s3_image(image_id):
     """Serve S3-stored images via backend proxy (streams from S3)"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
         from adapters.s3.s3_proxy_service import s3_proxy_service
         from config.settings import S3_IMAGES_BUCKET
@@ -105,8 +137,8 @@ def serve_s3_image(image_id):
 
         logger.debug("Serving S3 image", image_id=image_id)
 
-        # Get image from DB
-        image = ImageService.get_image_by_id(image_id)
+        # Get image from DB (filtered by user_id)
+        image = ImageService.get_image_by_id(image_id, user_id=str(user_id))
         if not image:
             return jsonify({"error": "Image not found"}), 404
 
@@ -132,7 +164,11 @@ def serve_s3_image(image_id):
 @jwt_required
 def get_image(image_id):
     """Get single image by ID"""
-    response_data, status_code = image_controller.get_image_by_id(image_id)
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    response_data, status_code = image_controller.get_image_by_id(str(user_id), image_id)
 
     return jsonify(response_data), status_code
 
@@ -141,7 +177,11 @@ def get_image(image_id):
 @jwt_required
 def delete_image(image_id):
     """Delete image by ID"""
-    response_data, status_code = image_controller.delete_image(image_id)
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    response_data, status_code = image_controller.delete_image(str(user_id), image_id)
 
     return jsonify(response_data), status_code
 
@@ -150,6 +190,10 @@ def delete_image(image_id):
 @jwt_required
 def bulk_delete_images():
     """Delete multiple images by IDs"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     raw_json = request.get_json(silent=True)
 
     if not raw_json:
@@ -160,7 +204,7 @@ def bulk_delete_images():
     if not isinstance(image_ids, list):
         return jsonify({"error": "ids must be an array"}), 400
 
-    response_data, status_code = image_controller.bulk_delete_images(image_ids)
+    response_data, status_code = image_controller.bulk_delete_images(str(user_id), image_ids)
 
     return jsonify(response_data), status_code
 
@@ -170,8 +214,14 @@ def bulk_delete_images():
 @validate()
 def update_image_metadata(image_id: str, body: ImageUpdateRequest):
     """Update image metadata (title and/or tags)"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
-        response_data, status_code = image_controller.update_image_metadata(image_id, body.title, body.tags)
+        response_data, status_code = image_controller.update_image_metadata(
+            str(user_id), image_id, body.title, body.tags
+        )
         return jsonify(response_data), status_code
     except Exception as e:
         error_response = ErrorResponse(error=str(e))
@@ -183,9 +233,13 @@ def update_image_metadata(image_id: str, body: ImageUpdateRequest):
 @validate()
 def assign_to_project(image_id: str, body: AssignToProjectRequest):
     """Assign image to project"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
         response_data, status_code = image_controller.assign_to_project(
-            image_id, str(body.project_id), str(body.folder_id) if body.folder_id else None
+            str(user_id), image_id, str(body.project_id), str(body.folder_id) if body.folder_id else None
         )
         return jsonify(response_data), status_code
     except Exception as e:
@@ -197,8 +251,12 @@ def assign_to_project(image_id: str, body: AssignToProjectRequest):
 @jwt_required
 def unassign_from_project(image_id: str, project_id: str):
     """Remove image from project (link only, image remains)"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
-        response_data, status_code = image_controller.unassign_from_project(image_id, project_id)
+        response_data, status_code = image_controller.unassign_from_project(str(user_id), image_id, project_id)
         return jsonify(response_data), status_code
     except Exception as e:
         error_response = ErrorResponse(error=str(e))
@@ -209,8 +267,12 @@ def unassign_from_project(image_id: str, project_id: str):
 @jwt_required
 def get_projects_for_image(image_id: str):
     """Get list of projects this image is assigned to"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
-        response_data, status_code = image_controller.get_projects_for_image(image_id)
+        response_data, status_code = image_controller.get_projects_for_image(str(user_id), image_id)
         return jsonify(response_data), status_code
     except Exception as e:
         error_response = ErrorResponse(error=str(e))

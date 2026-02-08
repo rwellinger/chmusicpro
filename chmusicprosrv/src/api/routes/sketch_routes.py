@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from api.auth_middleware import jwt_required
+from api.auth_middleware import get_current_user_id, jwt_required
 from api.controllers.sketch_controller import SketchController
 from db.database import get_db
 from schemas.project_asset_schemas import AssignToProjectRequest
@@ -18,6 +18,10 @@ api_sketch_v1 = Blueprint("api_sketch_v1", __name__, url_prefix="/api/v1/sketche
 @jwt_required
 def create_sketch():
     """Create a new sketch"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
         sketch_data = SketchCreateRequest.model_validate(request.json)
     except ValidationError as e:
@@ -25,7 +29,7 @@ def create_sketch():
 
     db: Session = next(get_db())
     try:
-        result, status_code = SketchController.create_sketch(db, sketch_data)
+        result, status_code = SketchController.create_sketch(db, str(user_id), sketch_data)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -35,6 +39,10 @@ def create_sketch():
 @jwt_required
 def list_sketches():
     """Get list of sketches with pagination, search and filtering"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     # Parse query parameters
     try:
         limit = int(request.args.get("limit", 20))
@@ -76,6 +84,7 @@ def list_sketches():
     try:
         result, status_code = SketchController.get_sketches(
             db=db,
+            user_id=str(user_id),
             limit=limit,
             offset=offset,
             search=search,
@@ -93,9 +102,13 @@ def list_sketches():
 @jwt_required
 def get_sketch(sketch_id: str):
     """Get a specific sketch by ID"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     db: Session = next(get_db())
     try:
-        result, status_code = SketchController.get_sketch_by_id(db, sketch_id)
+        result, status_code = SketchController.get_sketch_by_id(db, str(user_id), sketch_id)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -105,6 +118,10 @@ def get_sketch(sketch_id: str):
 @jwt_required
 def update_sketch(sketch_id: str):
     """Update an existing sketch"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
         update_data = SketchUpdateRequest.model_validate(request.json)
     except ValidationError as e:
@@ -112,7 +129,7 @@ def update_sketch(sketch_id: str):
 
     db: Session = next(get_db())
     try:
-        result, status_code = SketchController.update_sketch(db, sketch_id, update_data)
+        result, status_code = SketchController.update_sketch(db, str(user_id), sketch_id, update_data)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -122,9 +139,13 @@ def update_sketch(sketch_id: str):
 @jwt_required
 def delete_sketch(sketch_id: str):
     """Delete a sketch"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     db: Session = next(get_db())
     try:
-        result, status_code = SketchController.delete_sketch(db, sketch_id)
+        result, status_code = SketchController.delete_sketch(db, str(user_id), sketch_id)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -141,6 +162,10 @@ def duplicate_sketch(sketch_id: str):
         "new_title_suffix": " (Copy 2)"  // Optional custom suffix
     }
     """
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
         # Parse request body (optional, defaults provided by schema)
         duplicate_data = SketchDuplicateRequest.model_validate(request.json or {})
@@ -149,7 +174,7 @@ def duplicate_sketch(sketch_id: str):
 
     db: Session = next(get_db())
     try:
-        result, status_code = SketchController.duplicate_sketch(db, sketch_id, duplicate_data)
+        result, status_code = SketchController.duplicate_sketch(db, str(user_id), sketch_id, duplicate_data)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -159,6 +184,10 @@ def duplicate_sketch(sketch_id: str):
 @jwt_required
 def assign_to_project(sketch_id: str):
     """Assign sketch to project"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     try:
         assign_data = AssignToProjectRequest.model_validate(request.json)
     except ValidationError as e:
@@ -167,7 +196,11 @@ def assign_to_project(sketch_id: str):
     db: Session = next(get_db())
     try:
         result, status_code = SketchController.assign_to_project(
-            db, sketch_id, str(assign_data.project_id), str(assign_data.folder_id) if assign_data.folder_id else None
+            db,
+            str(user_id),
+            sketch_id,
+            str(assign_data.project_id),
+            str(assign_data.folder_id) if assign_data.folder_id else None,
         )
         return jsonify(result), status_code
     finally:
@@ -178,9 +211,13 @@ def assign_to_project(sketch_id: str):
 @jwt_required
 def unassign_from_project(sketch_id: str):
     """Remove sketch from its assigned project (link only, sketch remains)"""
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
     db: Session = next(get_db())
     try:
-        result, status_code = SketchController.unassign_from_project(db, sketch_id)
+        result, status_code = SketchController.unassign_from_project(db, str(user_id), sketch_id)
         return jsonify(result), status_code
     finally:
         db.close()

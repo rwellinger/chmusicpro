@@ -31,6 +31,13 @@ class RuleType(StrEnum):
     SECTION = "section"
 
 
+class UserRole(StrEnum):
+    """Enum for user roles"""
+
+    USER = "user"
+    ADMIN = "admin"
+
+
 class SongSketch(Base):
     """Model for storing song concepts/drafts before generation"""
 
@@ -58,6 +65,9 @@ class SongSketch(Base):
     # Workflow status
     workflow = Column(String(50), nullable=False, default="draft", index=True)
 
+    # User ownership (JWT-based access control)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+
     # Project relationship (optional)
     project_id = Column(
         UUID(as_uuid=True), ForeignKey("song_projects.id", ondelete="SET NULL"), nullable=True, index=True
@@ -71,6 +81,7 @@ class SongSketch(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
+    user = relationship("User", back_populates="sketches")
     project = relationship("SongProject", back_populates="sketches")
     project_folder = relationship("ProjectFolder", foreign_keys=[project_folder_id])
 
@@ -87,6 +98,9 @@ class LyricWorkshop(Base):
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     title = Column(String(200), nullable=False)
+
+    # User ownership (JWT-based access control)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
     # Phase 1: Connect
     connect_topic = Column(Text, nullable=True)
@@ -112,6 +126,7 @@ class LyricWorkshop(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
+    user = relationship("User", back_populates="workshops")
     exported_sketch = relationship("SongSketch", foreign_keys=[exported_sketch_id])
 
     def __repr__(self):
@@ -125,6 +140,10 @@ class GeneratedImage(Base):
     __table_args__ = {"extend_existing": True}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+
+    # User ownership (JWT-based access control)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+
     user_prompt = Column(Text, nullable=True)  # Original user input (before AI enhancement)
     prompt = Column(Text, nullable=False)  # AI-enhanced prompt (Ollama)
     enhanced_prompt = Column(Text, nullable=True)  # Final prompt sent to DALL-E (Ollama + Styles)
@@ -150,7 +169,8 @@ class GeneratedImage(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    # Relationships (N:M via project_image_references)
+    # Relationships
+    user = relationship("User", back_populates="generated_images")
     project_references = relationship("ProjectImageReference", back_populates="image", cascade="all, delete-orphan")
 
     def __repr__(self):
@@ -205,6 +225,9 @@ class User(Base):
     oauth_provider = Column(String(50), nullable=True)  # 'google', 'github', etc.
     oauth_id = Column(String(255), nullable=True)  # OAuth provider user ID
 
+    # Role-based access control
+    role = Column(String(20), nullable=False, default="user", server_default="user")
+
     # Status and security
     is_active = Column(Boolean, default=True, nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
@@ -219,9 +242,46 @@ class User(Base):
     equipment = relationship("Equipment", back_populates="user", cascade="all, delete-orphan")
     song_projects = relationship("SongProject", back_populates="user", cascade="all, delete-orphan")
     song_releases = relationship("SongRelease", back_populates="user", cascade="all, delete-orphan")
+    sketches = relationship("SongSketch", back_populates="user", cascade="all, delete-orphan")
+    workshops = relationship("LyricWorkshop", back_populates="user", cascade="all, delete-orphan")
+    generated_images = relationship("GeneratedImage", back_populates="user", cascade="all, delete-orphan")
+    usage_logs = relationship("UsageLog", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f"<User(id={self.id}, email='{self.email}', active={self.is_active})>"
+        return f"<User(id={self.id}, email='{self.email}', role='{self.role}', active={self.is_active})>"
+
+
+class UsageLog(Base):
+    """Model for per-user AI usage tracking"""
+
+    __tablename__ = "usage_logs"
+    __table_args__ = {"extend_existing": True}
+
+    # Primary identifier
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+
+    # User reference
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+
+    # Request metadata
+    endpoint = Column(String(100), nullable=False)  # e.g. "generate-unified"
+    category = Column(String(50), nullable=True)  # Template category
+    action = Column(String(50), nullable=True)  # Template action
+    model = Column(String(100), nullable=False)  # AI model used
+
+    # Ollama metrics
+    prompt_tokens = Column(Integer, nullable=True)  # From Ollama prompt_eval_count
+    eval_tokens = Column(Integer, nullable=True)  # From Ollama eval_count
+    total_duration_ns = Column(BigInteger, nullable=True)  # From Ollama total_duration
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationships
+    user = relationship("User", back_populates="usage_logs")
+
+    def __repr__(self):
+        return f"<UsageLog(id={self.id}, user_id={self.user_id}, endpoint='{self.endpoint}', model='{self.model}')>"
 
 
 class Conversation(Base):

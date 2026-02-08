@@ -23,6 +23,7 @@ class WorkshopOrchestrator:
     def create_workshop(
         self,
         db: Session,
+        user_id: str,
         title: str,
         connect_topic: str | None = None,
         draft_language: str | None = "EN",
@@ -50,7 +51,7 @@ class WorkshopOrchestrator:
                 }
             )
 
-            workshop = workshop_service.create_workshop(db=db, **normalized_data)
+            workshop = workshop_service.create_workshop(db=db, user_id=user_id, **normalized_data)
 
             if not workshop:
                 raise WorkshopOrchestratorError("Failed to create workshop")
@@ -64,6 +65,7 @@ class WorkshopOrchestrator:
     def update_workshop(
         self,
         db: Session,
+        user_id: str,
         workshop_id: str | UUID,
         update_data: dict[str, Any],
     ) -> Any:
@@ -84,7 +86,9 @@ class WorkshopOrchestrator:
         try:
             normalized_data = WorkshopNormalizer.normalize_workshop_data(update_data)
 
-            workshop = workshop_service.update_workshop(db=db, workshop_id=workshop_id, **normalized_data)
+            workshop = workshop_service.update_workshop(
+                db=db, workshop_id=workshop_id, user_id=user_id, **normalized_data
+            )
 
             if not workshop:
                 raise WorkshopOrchestratorError(f"Workshop not found with ID: {workshop_id}")
@@ -99,7 +103,7 @@ class WorkshopOrchestrator:
             )
             raise WorkshopOrchestratorError(f"Failed to update workshop: {e}") from e
 
-    def export_to_sketch(self, db: Session, workshop_id: str | UUID) -> Any:
+    def export_to_sketch(self, db: Session, user_id: str, workshop_id: str | UUID) -> Any:
         """
         Export workshop content to a new SongSketch
 
@@ -116,13 +120,14 @@ class WorkshopOrchestrator:
             WorkshopOrchestratorError: If export fails
         """
         try:
-            workshop = workshop_service.get_workshop_by_id(db, workshop_id)
+            workshop = workshop_service.get_workshop_by_id(db, workshop_id, user_id=user_id)
             if not workshop:
                 raise WorkshopOrchestratorError(f"Workshop not found with ID: {workshop_id}")
 
-            # Create sketch from workshop data
+            # Create sketch from workshop data (inherits user_id)
             sketch = sketch_service.create_sketch(
                 db=db,
+                user_id=user_id,
                 title=workshop.title,
                 lyrics=workshop.shape_draft,
                 prompt=workshop.connect_topic or "workshop export",
@@ -138,6 +143,7 @@ class WorkshopOrchestrator:
             workshop_service.update_workshop(
                 db=db,
                 workshop_id=workshop_id,
+                user_id=user_id,
                 exported_sketch_id=str(sketch.id),
                 current_phase="completed",
             )

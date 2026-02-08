@@ -55,11 +55,28 @@ def jwt_required(f):
             # Set user info in Flask's g object for use in route handlers
             g.current_user_id = payload.get("user_id")
             g.current_user_email = payload.get("email")
+            g.current_user_role = user.role
 
             return f(*args, **kwargs)
         finally:
             # Always close the database connection to prevent pool exhaustion
             db.close()
+
+    return decorated_function
+
+
+def admin_required(f):
+    """
+    Decorator to require admin role for API endpoints.
+    Must be used AFTER @jwt_required (which sets g.current_user_role).
+    Returns 403 if user is not an admin.
+    """
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not hasattr(g, "current_user_role") or g.current_user_role != "admin":
+            return jsonify({"success": False, "error": "Admin access required"}), 403
+        return f(*args, **kwargs)
 
     return decorated_function
 
@@ -81,4 +98,14 @@ def get_current_user_id():
     """
     if hasattr(g, "current_user_id"):
         return g.current_user_id
+    return None
+
+
+def get_current_user_role():
+    """
+    Helper function to get current authenticated user role from Flask g object.
+    Returns role string or None if not authenticated.
+    """
+    if hasattr(g, "current_user_role"):
+        return g.current_user_role
     return None
