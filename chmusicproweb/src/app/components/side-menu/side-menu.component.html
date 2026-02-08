@@ -115,7 +115,7 @@
             </div>
         </div>
 
-        <div class="nav-group">
+        <div class="nav-group" *ngIf="isAdmin">
             <span class="group-label">
                 <i class="fas fa-cogs"></i>
                 {{ 'sideMenu.settings' | translate }}

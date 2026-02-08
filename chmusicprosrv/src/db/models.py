@@ -42,7 +42,6 @@ class SongSketch(Base):
     """Model for storing song concepts/drafts before generation"""
 
     __tablename__ = "song_sketches"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -93,7 +92,6 @@ class LyricWorkshop(Base):
     """Model for storing lyric workshop sessions with 3-phase process (Connect, Collect, Shape)"""
 
     __tablename__ = "lyric_workshops"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -137,7 +135,6 @@ class GeneratedImage(Base):
     """Model for storing generated image metadata"""
 
     __tablename__ = "generated_images"
-    __table_args__ = {"extend_existing": True}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
 
@@ -181,7 +178,6 @@ class PromptTemplate(Base):
     """Model for storing AI prompt templates for different categories and actions"""
 
     __tablename__ = "prompt_templates"
-    __table_args__ = {"extend_existing": True}
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     category = Column(String(50), nullable=False)
@@ -207,7 +203,6 @@ class User(Base):
     """Model for user authentication and management with OAuth2 preparation"""
 
     __tablename__ = "users"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -258,7 +253,6 @@ class UsageLog(Base):
     """Model for per-user AI usage tracking"""
 
     __tablename__ = "usage_logs"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -291,7 +285,6 @@ class RegistrationLog(Base):
     """Model for audit logging of user registrations (no passwords stored)"""
 
     __tablename__ = "registration_log"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -315,7 +308,6 @@ class Conversation(Base):
     """Model for storing AI chat conversations"""
 
     __tablename__ = "conversations"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -355,7 +347,6 @@ class Message(Base):
     """Model for storing individual messages in a conversation"""
 
     __tablename__ = "messages"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -385,7 +376,6 @@ class MessageArchive(Base):
     """Model for storing archived messages - used for compression without data loss"""
 
     __tablename__ = "messages_archive"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -417,7 +407,6 @@ class LyricParsingRule(Base):
     """Model for storing configurable lyric parsing rules (cleanup and section detection)"""
 
     __tablename__ = "lyric_parsing_rules"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -447,7 +436,6 @@ class ApiCostMonthly(Base):
     """Model for monthly API cost caching with TTL support"""
 
     __tablename__ = "api_costs_monthly"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -486,7 +474,6 @@ class Equipment(Base):
     """Model for storing software and plugin licenses with encrypted sensitive data"""
 
     __tablename__ = "equipment"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -545,7 +532,6 @@ class EquipmentAttachment(Base):
     """Model for equipment file attachments (license files, manuals, etc.)"""
 
     __tablename__ = "equipment_attachments"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -576,7 +562,6 @@ class SongProject(Base):
     """Model for song project management with S3 storage"""
 
     __tablename__ = "song_projects"
-    __table_args__ = {"extend_existing": True}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
@@ -615,7 +600,6 @@ class ProjectFolder(Base):
     """Model for project folder structure in S3"""
 
     __tablename__ = "project_folders"
-    __table_args__ = {"extend_existing": True}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     project_id = Column(
@@ -641,7 +625,6 @@ class ProjectFile(Base):
     """Model for files within song projects"""
 
     __tablename__ = "project_files"
-    __table_args__ = {"extend_existing": True}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     project_id = Column(
@@ -682,7 +665,6 @@ class ProjectImageReference(Base):
     """Model for N:M relationship between projects and images"""
 
     __tablename__ = "project_image_references"
-    __table_args__ = {"extend_existing": True}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     project_id = Column(
@@ -708,7 +690,6 @@ class SongRelease(Base):
     """Model for song release tracking (Single/Album)"""
 
     __tablename__ = "song_releases"
-    __table_args__ = {"extend_existing": True}
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -759,7 +740,6 @@ class ReleaseProjectReference(Base):
     """Model for N:M relationship between releases and song projects"""
 
     __tablename__ = "release_project_references"
-    __table_args__ = {"extend_existing": True}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     release_id = Column(

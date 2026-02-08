@@ -315,6 +315,8 @@ export class AuthService {
      * Store authentication data in cookies
      */
     private storeAuthData(token: string, user: User): void {
+        const isSecure = environment.production;
+
         // Store token for 24 hours (same as JWT expiration)
         this.cookieService.set(
             this.tokenKey,
@@ -322,7 +324,7 @@ export class AuthService {
             1, // 1 day
             "/", // path
             undefined, // domain
-            true, // secure
+            isSecure, // secure: true in prod (HTTPS), false in dev (HTTP)
             "Lax" // sameSite
         );
 
@@ -333,7 +335,7 @@ export class AuthService {
             1, // 1 day
             "/", // path
             undefined, // domain
-            true, // secure
+            isSecure, // secure: true in prod (HTTPS), false in dev (HTTP)
             "Lax" // sameSite
         );
     }

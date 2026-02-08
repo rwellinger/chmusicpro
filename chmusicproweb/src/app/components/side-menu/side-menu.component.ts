@@ -21,6 +21,7 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     currentUser: User | null = null;
     firstName = "Guest"; // Computed property to avoid method calls in template
     currentLang = "EN"; // Current language code
+    isAdmin = false;
 
     private destroy$ = new Subject<void>();
     private authService = inject(AuthService);
@@ -34,6 +35,7 @@ export class SideMenuComponent implements OnInit, OnDestroy {
             .subscribe(authState => {
                 this.authState = authState;
                 this.currentUser = authState.user;
+                this.isAdmin = authState.user?.role === "admin";
                 this.updateFirstName(); // Update computed property
             });
 
