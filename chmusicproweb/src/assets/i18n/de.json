@@ -105,6 +105,76 @@
     "logoutConfirm": "Möchtest du dich wirklich abmelden?",
     "password": "Passwort"
   },
+  "register": {
+    "title": "Konto erstellen",
+    "subtitle": "Swiss Music Production beitreten",
+    "steps": {
+      "step1": "Sprache",
+      "step2": "Person",
+      "step3": "Konto",
+      "step4": "AGB"
+    },
+    "step1": {
+      "title": "Sprache waehlen",
+      "subtitle": "Waehle deine bevorzugte Sprache fuer die Anwendung."
+    },
+    "step2": {
+      "title": "Persoenliche Informationen",
+      "subtitle": "Erzaehl uns etwas ueber dich (alle Felder optional).",
+      "firstName": "Vorname",
+      "firstNamePlaceholder": "Gib deinen Vornamen ein",
+      "lastName": "Nachname",
+      "lastNamePlaceholder": "Gib deinen Nachnamen ein",
+      "artistName": "Kuenstlername",
+      "artistNamePlaceholder": "z.B. thWelly",
+      "artistNameHint": "Wird fuer Album-Cover-Generierung verwendet (optional)"
+    },
+    "step3": {
+      "title": "Kontodaten",
+      "subtitle": "Erstelle deine Anmeldedaten.",
+      "email": "E-Mail-Adresse",
+      "emailPlaceholder": "deine@email.com",
+      "password": "Passwort",
+      "passwordPlaceholder": "Mindestens 8 Zeichen",
+      "confirmPassword": "Passwort bestaetigen",
+      "confirmPasswordPlaceholder": "Passwort wiederholen",
+      "strengthWeak": "Schwach",
+      "strengthMedium": "Mittel",
+      "strengthGood": "Gut",
+      "strengthStrong": "Stark"
+    },
+    "step4": {
+      "title": "Nutzungsbedingungen",
+      "subtitle": "Bitte lese und akzeptiere unsere Bedingungen.",
+      "termsTitle": "Nutzungsbedingungen",
+      "termsContent": "Mit der Erstellung eines Kontos erklaerst du dich einverstanden, diese Plattform verantwortungsvoll zu nutzen. Dies ist ein privates Musikproduktions-Tool. Alle generierten Inhalte (Texte, Bilder, Musik-Prompts) bleiben dein geistiges Eigentum. Die Plattform wird ohne Gewaehrleistung bereitgestellt. Wir behalten uns das Recht vor, Konten zu sperren, die gegen diese Bedingungen verstossen.",
+      "privacyTitle": "Datenschutz",
+      "privacyContent": "Wir erfassen deine E-Mail-Adresse fuer Authentifizierungszwecke. Deine persoenlichen Daten (Name, Kuenstlername) werden sicher gespeichert und nur innerhalb dieser Plattform verwendet. Wir geben deine Daten nicht an Dritte weiter. KI-generierte Inhalte koennen von externen Diensten (OpenAI, Ollama) verarbeitet werden. Du kannst jederzeit die Loeschung deines Kontos beantragen.",
+      "acceptTerms": "Ich akzeptiere die Nutzungsbedingungen und Datenschutzerklaerung"
+    },
+    "step5": {
+      "title": "Willkommen!",
+      "subtitle": "Dein Konto wurde erfolgreich erstellt.",
+      "emailHint": "Du bist jetzt angemeldet und kannst mit dem Musikmachen beginnen.",
+      "enterApp": "App starten"
+    },
+    "navigation": {
+      "back": "Zurueck",
+      "next": "Weiter",
+      "submit": "Konto erstellen",
+      "creating": "Wird erstellt..."
+    },
+    "errors": {
+      "required": "Dieses Feld ist erforderlich",
+      "emailInvalid": "Bitte gib eine gueltige E-Mail-Adresse ein",
+      "passwordTooShort": "Passwort muss mindestens 8 Zeichen lang sein",
+      "passwordMismatch": "Passwoerter stimmen nicht ueberein",
+      "emailExists": "Ein Konto mit dieser E-Mail-Adresse existiert bereits",
+      "captchaFailed": "CAPTCHA-Verifizierung fehlgeschlagen"
+    },
+    "backToLogin": "Bereits ein Konto?",
+    "loginLink": "Anmelden"
+  },
   "authInterceptor": {
     "sessionExpired": "Sitzung abgelaufen. Bitte melde dich erneut an.",
     "sessionTimeout": "Zeitüberschreitung bei der Sitzungsvalidierung. Bitte melde dich erneut an."

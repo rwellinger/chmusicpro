@@ -162,18 +162,25 @@ export class AuthService {
     }
 
     /**
-     * Register new user
+     * Register new user with auto-login
      */
     public register(userData: UserCreateRequest): Observable<UserCreateResponse> {
         this.updateAuthState({loading: true, error: null});
 
         return this.http.post<UserCreateResponse>(`${this.baseUrl}/api/v1/user/create`, userData)
             .pipe(
-                tap(() => {
-                    this.updateAuthState({
-                        loading: false,
-                        error: null
-                    });
+                tap(response => {
+                    if (response.success && response.token && response.user) {
+                        this.storeAuthData(response.token, response.user);
+                        this.updateAuthState({
+                            isAuthenticated: true,
+                            user: response.user,
+                            token: response.token,
+                            loading: false,
+                            error: null,
+                            lastValidated: Date.now()
+                        });
+                    }
                 }),
                 catchError(error => {
                     this.updateAuthState({

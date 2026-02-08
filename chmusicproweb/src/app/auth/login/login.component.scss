@@ -163,6 +163,27 @@
   }
 }
 
+.register-link {
+  text-align: center;
+  margin-top: 1.5rem;
+
+  p {
+    @include body-text('sm');
+    color: $text-secondary;
+    margin: 0;
+  }
+
+  a {
+    color: $primary-color;
+    text-decoration: none;
+    font-weight: $font-weight-medium;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 .login-footer {
   text-align: center;
   margin-top: 2rem;

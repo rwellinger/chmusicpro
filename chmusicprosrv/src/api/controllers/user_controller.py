@@ -10,8 +10,10 @@ Uses 3-Layer Architecture:
 from datetime import datetime, timedelta
 from typing import Any
 
+from business.recaptcha_service import RecaptchaService
 from business.user_auth_service import UserAuthService
 from db.database import SessionLocal
+from db.registration_log_service import RegistrationLogService
 from db.user_service import UserService
 from schemas.common_schemas import ErrorResponse
 from schemas.user_schemas import (
@@ -38,6 +40,8 @@ class UserController:
     def __init__(self):
         self.user_service = UserService()
         self.auth_service = UserAuthService()
+        self.recaptcha_service = RecaptchaService()
+        self.registration_log_service = RegistrationLogService()
 
     def _get_db(self):
         """Get database session"""
@@ -52,10 +56,21 @@ class UserController:
         """Format success response"""
         return response_model.model_dump(), status_code
 
-    def create_user(self, request: UserCreateRequest) -> tuple[dict[str, Any], int]:
-        """Create a new user"""
+    def create_user(
+        self,
+        request: UserCreateRequest,
+        remote_ip: str = None,
+        user_agent: str = None,
+    ) -> tuple[dict[str, Any], int]:
+        """Create a new user with optional reCAPTCHA verification and auto-login"""
         db = self._get_db()
         try:
+            # Business logic: Verify reCAPTCHA token (if provided)
+            if request.recaptcha_token:
+                captcha_ok, captcha_error = self.recaptcha_service.verify_token(request.recaptcha_token, remote_ip)
+                if not captcha_ok:
+                    return self._format_error_response(captcha_error or "CAPTCHA verification failed", 400)
+
             # Business logic: Validate password strength
             is_valid, error_msg = self.auth_service.validate_password_strength(request.password)
             if not is_valid:
@@ -71,14 +86,40 @@ class UserController:
                 password_hash=password_hash,
                 first_name=request.first_name,
                 last_name=request.last_name,
+                artist_name=request.artist_name,
+                preferred_language=request.preferred_language,
             )
 
             if not user:
                 return self._format_error_response("Failed to create user", 500)
 
+            # Business logic: Generate JWT token for auto-login
+            token = self.auth_service.generate_jwt_token(str(user.id), user.email, user.role)
+            user_response = UserResponse.model_validate(user)
+            expires_at = datetime.utcnow() + timedelta(hours=self.auth_service.jwt_expiration_hours)
+
+            # Repository: Log registration
+            try:
+                self.registration_log_service.create_log(
+                    db=db,
+                    email=request.email,
+                    first_name=request.first_name,
+                    last_name=request.last_name,
+                    preferred_language=request.preferred_language,
+                    ip_address=remote_ip,
+                    user_agent=user_agent,
+                )
+            except Exception as log_error:
+                logger.warning("Failed to create registration log", error=str(log_error))
+
             response = UserCreateResponse(
-                success=True, message="User created successfully", user_id=user.id, email=user.email
+                success=True,
+                message="User created successfully",
+                token=token,
+                user=user_response,
+                expires_at=expires_at,
             )
+            logger.info("User registered and auto-logged in", user_id=str(user.id), email=user.email)
             return self._format_success_response(response, 201)
 
         except ValueError as e:

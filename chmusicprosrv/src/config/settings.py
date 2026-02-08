@@ -115,6 +115,11 @@ JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = int(os.getenv("JWT_EXPIRATION_HOURS", "240"))
 
 # --------------------------------------------------
+# Google reCAPTCHA v2 Config
+# --------------------------------------------------
+RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY", "")
+
+# --------------------------------------------------
 # Encryption Config (Fernet symmetric encryption)
 # --------------------------------------------------
 # Generate key with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"

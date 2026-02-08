@@ -25,6 +25,8 @@ class UserService:
         password_hash: str,
         first_name: str = None,
         last_name: str = None,
+        artist_name: str = None,
+        preferred_language: str = "en",
     ) -> User | None:
         """
         Create a new user (expects hashed password)
@@ -35,6 +37,8 @@ class UserService:
             password_hash: Pre-hashed password from UserAuthService
             first_name: Optional first name
             last_name: Optional last name
+            artist_name: Optional artist name
+            preferred_language: Preferred language (default "en")
 
         Returns:
             Created User object or None
@@ -55,6 +59,8 @@ class UserService:
                 password_hash=password_hash,
                 first_name=first_name,
                 last_name=last_name,
+                artist_name=artist_name,
+                preferred_language=preferred_language,
                 is_active=True,
                 is_verified=False,
                 created_at=datetime.utcnow(),

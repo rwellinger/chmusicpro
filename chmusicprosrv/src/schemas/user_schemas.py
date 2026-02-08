@@ -25,6 +25,8 @@ class UserCreateRequest(UserBase):
     """Schema for creating a new user"""
 
     password: str = Field(..., min_length=4, max_length=128, description="User password")
+    preferred_language: str = Field("en", max_length=5, description="Preferred language")
+    recaptcha_token: str | None = Field(None, description="reCAPTCHA v2 token (optional in dev)")
 
     @field_validator("password")
     @classmethod
@@ -35,10 +37,11 @@ class UserCreateRequest(UserBase):
 
 
 class UserCreateResponse(BaseResponse):
-    """Response for user creation"""
+    """Response for user creation with auto-login"""
 
-    user_id: UUID = Field(..., description="Created user ID")
-    email: str = Field(..., description="User email")
+    token: str = Field(..., description="JWT authentication token")
+    user: "UserResponse" = Field(..., description="User information")
+    expires_at: datetime = Field(..., description="Token expiration time")
 
 
 # User Authentication
@@ -72,6 +75,7 @@ class UserResponse(BaseModel):
     first_name: str | None = Field(None, description="User first name")
     last_name: str | None = Field(None, description="User last name")
     artist_name: str | None = Field(None, description="Artist name for album covers")
+    preferred_language: str = Field("en", description="Preferred language")
     role: str = Field("user", description="User role (user or admin)")
     is_active: bool = Field(..., description="User active status")
     is_verified: bool = Field(..., description="User verification status")
@@ -157,3 +161,4 @@ class TokenValidationResponse(BaseModel):
 
 # Update forward references
 LoginResponse.model_rebuild()
+UserCreateResponse.model_rebuild()

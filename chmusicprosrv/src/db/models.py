@@ -221,6 +221,9 @@ class User(Base):
     last_name = Column(String(100), nullable=True)
     artist_name = Column(String(100), nullable=True)  # For album cover generation (e.g., "thWelly")
 
+    # User preferences
+    preferred_language = Column(String(5), nullable=False, default="en", server_default="en")
+
     # OAuth2 preparation (for future use)
     oauth_provider = Column(String(50), nullable=True)  # 'google', 'github', etc.
     oauth_id = Column(String(255), nullable=True)  # OAuth provider user ID
@@ -282,6 +285,30 @@ class UsageLog(Base):
 
     def __repr__(self):
         return f"<UsageLog(id={self.id}, user_id={self.user_id}, endpoint='{self.endpoint}', model='{self.model}')>"
+
+
+class RegistrationLog(Base):
+    """Model for audit logging of user registrations (no passwords stored)"""
+
+    __tablename__ = "registration_log"
+    __table_args__ = {"extend_existing": True}
+
+    # Primary identifier
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+
+    # Registration data
+    registered_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    first_name = Column(String(100), nullable=True)
+    last_name = Column(String(100), nullable=True)
+    email = Column(String(255), nullable=False)
+    preferred_language = Column(String(5), nullable=False, server_default="en")
+
+    # Request metadata
+    ip_address = Column(String(45), nullable=True)  # IPv4/IPv6
+    user_agent = Column(String(500), nullable=True)
+
+    def __repr__(self):
+        return f"<RegistrationLog(id={self.id}, email='{self.email}', registered_at={self.registered_at})>"
 
 
 class Conversation(Base):

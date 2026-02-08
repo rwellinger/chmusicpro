@@ -1,4 +1,5 @@
 export const environment = {
     production: true,
-    apiUrl: "https://macstudio/musicproapi"
+    apiUrl: "https://macstudio/musicproapi",
+    recaptchaSiteKey: ""
 };

@@ -8,6 +8,8 @@ export interface User {
     first_name?: string;
     last_name?: string;
     artist_name?: string;
+    preferred_language?: string;
+    role?: string;
     is_active: boolean;
     is_verified: boolean;
     created_at: string;
@@ -33,13 +35,17 @@ export interface UserCreateRequest {
     password: string;
     first_name?: string;
     last_name?: string;
+    artist_name?: string;
+    preferred_language?: string;
+    recaptcha_token?: string;
 }
 
 export interface UserCreateResponse {
     success: boolean;
     message?: string;
-    user_id: string;
-    email: string;
+    token: string;
+    user: User;
+    expires_at: string;
 }
 
 export interface UserUpdateRequest {

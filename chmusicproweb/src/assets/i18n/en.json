@@ -105,6 +105,76 @@
     "logoutConfirm": "Are you sure you want to logout?",
     "password": "Password"
   },
+  "register": {
+    "title": "Create Account",
+    "subtitle": "Join Swiss Music Production",
+    "steps": {
+      "step1": "Language",
+      "step2": "Personal",
+      "step3": "Account",
+      "step4": "Terms"
+    },
+    "step1": {
+      "title": "Choose Your Language",
+      "subtitle": "Select your preferred language for the application."
+    },
+    "step2": {
+      "title": "Personal Information",
+      "subtitle": "Tell us about yourself (all fields optional).",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Enter your last name",
+      "artistName": "Artist Name",
+      "artistNamePlaceholder": "e.g. thWelly",
+      "artistNameHint": "Used for album cover generation (optional)"
+    },
+    "step3": {
+      "title": "Account Details",
+      "subtitle": "Create your login credentials.",
+      "email": "Email Address",
+      "emailPlaceholder": "your@email.com",
+      "password": "Password",
+      "passwordPlaceholder": "At least 8 characters",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Repeat your password",
+      "strengthWeak": "Weak",
+      "strengthMedium": "Fair",
+      "strengthGood": "Good",
+      "strengthStrong": "Strong"
+    },
+    "step4": {
+      "title": "Terms & Conditions",
+      "subtitle": "Please review and accept our terms.",
+      "termsTitle": "Terms of Service",
+      "termsContent": "By creating an account, you agree to use this platform responsibly. This is a private music production tool. All generated content (lyrics, images, music prompts) remains your intellectual property. The platform is provided as-is without warranty. We reserve the right to suspend accounts that violate these terms.",
+      "privacyTitle": "Privacy Policy",
+      "privacyContent": "We collect your email address for authentication purposes. Your personal data (name, artist name) is stored securely and used only within this platform. We do not share your data with third parties. AI-generated content may be processed by external services (OpenAI, Ollama). You can request account deletion at any time.",
+      "acceptTerms": "I accept the Terms of Service and Privacy Policy"
+    },
+    "step5": {
+      "title": "Welcome!",
+      "subtitle": "Your account has been created successfully.",
+      "emailHint": "You are now logged in and ready to create music.",
+      "enterApp": "Enter the App"
+    },
+    "navigation": {
+      "back": "Back",
+      "next": "Next",
+      "submit": "Create Account",
+      "creating": "Creating..."
+    },
+    "errors": {
+      "required": "This field is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match",
+      "emailExists": "An account with this email already exists",
+      "captchaFailed": "CAPTCHA verification failed"
+    },
+    "backToLogin": "Already have an account?",
+    "loginLink": "Sign In"
+  },
   "authInterceptor": {
     "sessionExpired": "Session expired. Please log in again.",
     "sessionTimeout": "Session validation timeout. Please log in again."

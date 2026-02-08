@@ -26,9 +26,11 @@ user_controller = UserController()
 @api_user_v1.route("/create", methods=["POST"])
 @validate()
 def create_user(body: UserCreateRequest):
-    """Create a new user account"""
+    """Create a new user account with optional reCAPTCHA and auto-login"""
     try:
-        response_data, status_code = user_controller.create_user(body)
+        remote_ip = request.remote_addr
+        user_agent_str = request.headers.get("User-Agent")
+        response_data, status_code = user_controller.create_user(body, remote_ip=remote_ip, user_agent=user_agent_str)
         return jsonify(response_data), status_code
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
