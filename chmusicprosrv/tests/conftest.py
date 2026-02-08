@@ -107,35 +107,6 @@ def mock_requests_post(mocker):
 
 
 @pytest.fixture
-def sample_song_data():
-    """Sample song data for testing"""
-    return {
-        "task_id": "test-task-123",
-        "lyrics": "Test lyrics",
-        "prompt": "Test style prompt",
-        "model": "auto",
-        "status": "PENDING",
-        "is_instrumental": False,
-        "title": "Test Song",
-    }
-
-
-@pytest.fixture
-def sample_choice_data():
-    """Sample song choice data for testing"""
-    return {
-        "mureka_choice_id": "choice-123",
-        "choice_index": 0,
-        "mp3_url": "https://example.com/song.mp3",
-        "flac_url": "https://example.com/song.flac",
-        "duration": 180000.0,
-        "title": "Generated Song",
-        "tags": "rock,metal",
-        "rating": None,
-    }
-
-
-@pytest.fixture
 def sample_ollama_response():
     """Sample Ollama API response for testing"""
     return {

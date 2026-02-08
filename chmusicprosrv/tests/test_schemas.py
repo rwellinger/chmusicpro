@@ -6,11 +6,6 @@ from pydantic import ValidationError
 from src.schemas.chat_schemas import ChatRequest, UnifiedChatRequest
 from src.schemas.image_schemas import ImageGenerateRequest, ImageListRequest
 from src.schemas.prompt_schemas import PromptTemplateBase, PromptTemplateUpdate
-from src.schemas.song_schemas import (
-    SongListRequest,
-    SongResponse,
-    SongUpdateRequest,
-)
 from src.schemas.user_schemas import PasswordChangeRequest, PasswordResetRequest, UserCreateRequest
 
 
@@ -165,113 +160,6 @@ class TestPasswordResetRequest:
         with pytest.raises(ValidationError) as exc_info:
             PasswordResetRequest(**data)
         assert "at least 4 characters" in str(exc_info.value)
-
-
-# ========================================
-# Song Schemas Tests (6 validators)
-# ========================================
-
-
-class TestSongResponse:
-    """Test SongResponse validators."""
-
-    def test_valid_workflow(self):
-        """Valid workflow should pass validation."""
-        data = {
-            "id": "test-id",
-            "prompt": "test",
-            "status": "completed",
-            "workflow": "inUse",
-            "created_at": "2024-01-01T00:00:00Z",
-        }
-        response = SongResponse(**data)
-        assert response.workflow == "inUse"
-
-    def test_invalid_workflow(self):
-        """Invalid workflow should raise ValidationError."""
-        data = {
-            "id": "test-id",
-            "prompt": "test",
-            "status": "completed",
-            "workflow": "invalid-status",
-            "created_at": "2024-01-01T00:00:00Z",
-        }
-        with pytest.raises(ValidationError) as exc_info:
-            SongResponse(**data)
-        assert "workflow must be one of" in str(exc_info.value)
-
-
-class TestSongListRequest:
-    """Test SongListRequest validators."""
-
-    def test_valid_status(self):
-        """Valid status should pass validation."""
-        data = {"status": "completed"}
-        request = SongListRequest(**data)
-        assert request.status == "completed"
-
-    def test_invalid_status(self):
-        """Invalid status should raise ValidationError."""
-        data = {"status": "invalid-status"}
-        with pytest.raises(ValidationError) as exc_info:
-            SongListRequest(**data)
-        assert "status must be one of" in str(exc_info.value)
-
-    def test_valid_workflow(self):
-        """Valid workflow should pass validation."""
-        data = {"workflow": "notUsed"}
-        request = SongListRequest(**data)
-        assert request.workflow == "notUsed"
-
-    def test_invalid_workflow(self):
-        """Invalid workflow should raise ValidationError."""
-        data = {"workflow": "invalid"}
-        with pytest.raises(ValidationError) as exc_info:
-            SongListRequest(**data)
-        assert "workflow must be one of" in str(exc_info.value)
-
-    def test_valid_sort(self):
-        """Valid sort field should pass validation."""
-        data = {"sort": "rating"}
-        request = SongListRequest(**data)
-        assert request.sort == "rating"
-
-    def test_invalid_sort(self):
-        """Invalid sort field should raise ValidationError."""
-        data = {"sort": "invalid"}
-        with pytest.raises(ValidationError) as exc_info:
-            SongListRequest(**data)
-        assert "sort must be one of" in str(exc_info.value)
-
-    def test_valid_order(self):
-        """Valid order should pass validation."""
-        data = {"order": "desc"}
-        request = SongListRequest(**data)
-        assert request.order == "desc"
-
-    def test_invalid_order(self):
-        """Invalid order should raise ValidationError."""
-        data = {"order": "invalid"}
-        with pytest.raises(ValidationError) as exc_info:
-            SongListRequest(**data)
-        assert "order must be either asc or desc" in str(exc_info.value)
-
-
-class TestSongUpdateRequest:
-    """Test SongUpdateRequest validators."""
-
-    def test_valid_workflow(self):
-        """Valid workflow should pass validation."""
-        data = {"workflow": "onWork"}
-        request = SongUpdateRequest(**data)
-        assert request.workflow == "onWork"
-
-    def test_invalid_workflow(self):
-        """Invalid workflow should raise ValidationError."""
-        data = {"workflow": "invalid"}
-        with pytest.raises(ValidationError) as exc_info:
-            SongUpdateRequest(**data)
-        assert "workflow must be one of" in str(exc_info.value)
 
 
 # ========================================

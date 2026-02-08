@@ -284,29 +284,6 @@
                                 </div>
                             </div>
 
-                            <!-- All Assigned Songs -->
-                            <div *ngIf="selectedProject.all_assigned_songs?.length" class="assigned-assets-section">
-                                <h3 class="section-title">
-                                    <i class="fas fa-music"></i>
-                                    {{ 'songProjects.detail.allAssignedSongs' | translate }}
-                                </h3>
-                                <div *ngFor="let song of selectedProject.all_assigned_songs" class="asset-item">
-                                    <div class="asset-info">
-                                        <i class="fas fa-music"></i>
-                                        <span class="asset-title">{{ song.title || 'Untitled' }}</span>
-                                        <span class="asset-badge">{{ song.workflow }}</span>
-                                        <span *ngIf="song.file_type"
-                                              class="asset-meta">{{ song.file_type.toUpperCase() }}</span>
-                                        <span *ngIf="song.file_size_bytes"
-                                              class="asset-meta">{{ formatFileSize(song.file_size_bytes) }}</span>
-                                    </div>
-                                    <button type="button" class="asset-action-button" (click)="openSong(song)"
-                                            [matTooltip]="'songProjects.detail.actions.openSong' | translate">
-                                        <i class="fas fa-external-link-alt"></i>
-                                    </button>
-                                </div>
-                            </div>
-
                             <div class="detail-field-row">
                                 <div class="detail-field">
                                     <span class="field-label">{{ 'songProjects.detail.stats.created' | translate }}</span>
@@ -337,31 +314,6 @@
 
                                     <!-- Assigned Assets Sections -->
                                     <div class="assigned-assets-container">
-                                        <!-- Assigned Songs -->
-                                        <div *ngIf="folder.assigned_songs && folder.assigned_songs.length > 0"
-                                             class="assigned-assets-section">
-                                            <h4 class="assets-section-title">
-                                                <i class="fas fa-music"></i>
-                                                {{ 'songProjects.detail.assignedSongs' | translate }}
-                                            </h4>
-                                            <div *ngFor="let song of folder.assigned_songs" class="asset-item">
-                                                <div class="asset-info">
-                                                    <i class="fas fa-music"></i>
-                                                    <span class="asset-title">{{ song.title || 'Untitled' }}</span>
-                                                    <span class="asset-badge">{{ song.workflow }}</span>
-                                                    <span *ngIf="song.file_type"
-                                                          class="asset-meta">{{ song.file_type.toUpperCase() }}</span>
-                                                    <span *ngIf="song.file_size_bytes"
-                                                          class="asset-meta">{{ formatFileSize(song.file_size_bytes) }}</span>
-                                                </div>
-                                                <button type="button" class="asset-action-button"
-                                                        (click)="openSong(song)"
-                                                        [matTooltip]="'songProjects.detail.actions.openSong' | translate">
-                                                    <i class="fas fa-external-link-alt"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-
                                         <!-- Assigned Sketches -->
                                         <div *ngIf="folder.assigned_sketches && folder.assigned_sketches.length > 0"
                                              class="assigned-assets-section">

@@ -32,7 +32,6 @@ from business.song_project_transformer import (
     transform_project_to_response,
     transform_release_to_assigned_response,
     transform_sketch_to_assigned_response,
-    transform_song_to_assigned_response,
 )
 from db.song_project_service import song_project_service
 from utils.logger import logger
@@ -181,7 +180,7 @@ class SongProjectOrchestrator:
         self, db: Session, project_id: UUID, folders_data: list[dict[str, Any]]
     ) -> None:
         """
-        Load assigned assets (songs, sketches, images) for all folders (coordination only)
+        Load assigned assets (sketches, images) for all folders (coordination only)
 
         Args:
             db: Database session
@@ -189,16 +188,12 @@ class SongProjectOrchestrator:
             folders_data: List of folder dictionaries (will be modified in-place)
 
         Note:
-            This method modifies folders_data in-place by adding assigned_songs,
-            assigned_sketches, and assigned_images lists to each folder.
+            This method modifies folders_data in-place by adding
+            assigned_sketches and assigned_images lists to each folder.
         """
         try:
             for folder_data in folders_data:
                 folder_id = UUID(folder_data["id"])
-
-                # Load assigned songs from DB
-                songs = self.db_service.get_assigned_songs_for_folder(db, project_id, folder_id)
-                folder_data["assigned_songs"] = [transform_song_to_assigned_response(song) for song in songs]
 
                 # Load assigned sketches from DB
                 sketches = self.db_service.get_assigned_sketches_for_folder(db, project_id, folder_id)
@@ -213,7 +208,6 @@ class SongProjectOrchestrator:
                 logger.debug(
                     "Assigned assets loaded for folder",
                     folder_id=str(folder_id),
-                    songs_count=len(songs),
                     sketches_count=len(sketches),
                     images_count=len(images),
                 )
@@ -270,14 +264,10 @@ class SongProjectOrchestrator:
             response_data: Response dictionary (will be modified in-place)
 
         Note:
-            This method modifies response_data in-place by adding all_assigned_songs,
-            all_assigned_sketches, and all_assigned_images lists.
+            This method modifies response_data in-place by adding
+            all_assigned_sketches and all_assigned_images lists.
         """
         try:
-            # Load ALL assigned songs from DB
-            songs = self.db_service.get_all_assigned_songs_for_project(db, project_id)
-            response_data["all_assigned_songs"] = [transform_song_to_assigned_response(song) for song in songs]
-
             # Load ALL assigned sketches from DB
             sketches = self.db_service.get_all_assigned_sketches_for_project(db, project_id)
             response_data["all_assigned_sketches"] = [
@@ -291,7 +281,6 @@ class SongProjectOrchestrator:
             logger.debug(
                 "All assigned assets loaded for project",
                 project_id=str(project_id),
-                songs_count=len(songs),
                 sketches_count=len(sketches),
                 images_count=len(images),
             )
@@ -304,7 +293,6 @@ class SongProjectOrchestrator:
                 error_type=type(e).__name__,
             )
             # Don't fail the entire request, just log the error
-            response_data["all_assigned_songs"] = []
             response_data["all_assigned_sketches"] = []
             response_data["all_assigned_images"] = []
 

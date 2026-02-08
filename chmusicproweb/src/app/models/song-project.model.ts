@@ -49,15 +49,6 @@ export interface ProjectFile {
     updated_at: string; // ISO format
 }
 
-export interface AssignedSong {
-    id: string;
-    title: string | null;
-    workflow: string;
-    file_type?: string | null;
-    file_size_bytes?: number | null;
-    created_at: string | null;
-}
-
 export interface AssignedSketch {
     id: string;
     title: string | null;
@@ -92,7 +83,6 @@ export interface ProjectFolderWithFiles extends ProjectFolder {
 }
 
 export interface ProjectFolderWithAssets extends ProjectFolderWithFiles {
-    assigned_songs?: AssignedSong[];
     assigned_sketches?: AssignedSketch[];
     assigned_images?: AssignedImage[];
 }
@@ -103,7 +93,6 @@ export interface SongProjectDetail extends SongProject {
     folders: ProjectFolderWithAssets[];
     assigned_releases?: AssignedRelease[];
     // All assigned assets (regardless of folder) - for Metadata tab
-    all_assigned_songs?: AssignedSong[];
     all_assigned_sketches?: AssignedSketch[];
     all_assigned_images?: AssignedImage[];
 }

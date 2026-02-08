@@ -8,7 +8,6 @@ import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatTabsModule} from "@angular/material/tabs";
 import {filter, firstValueFrom, Subject, takeUntil} from "rxjs";
 
-import {SongService} from "../../services/business/song.service";
 import {SketchService} from "../../services/business/sketch.service";
 import {NotificationService} from "../../services/ui/notification.service";
 import {ChatService} from "../../services/config/chat.service";
@@ -59,7 +58,6 @@ export class SongSketchCreatorComponent implements OnInit, OnDestroy {
     private destroy$ = new Subject<void>();
     private fb = inject(FormBuilder);
     private router = inject(Router);
-    private songService = inject(SongService);
     private sketchService = inject(SketchService);
     private notificationService = inject(NotificationService);
     private translate = inject(TranslateService);

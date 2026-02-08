@@ -4,7 +4,7 @@ import {CommonModule} from "@angular/common";
 import {MatDialog} from "@angular/material/dialog";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {ActivatedRoute, Router} from "@angular/router";
-import {FormDataContext, SongService} from "../../services/business/song.service";
+import {SketchService} from "../../services/business/sketch.service";
 import {NotificationService} from "../../services/ui/notification.service";
 import {ChatService} from "../../services/config/chat.service";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
@@ -70,9 +70,6 @@ export class LyricCreationComponent implements OnInit {
         /^buildup$/i
     ];
 
-    // Context for form data storage (song-generator or sketch-creator)
-    private context: FormDataContext = "song-generator";
-
     // State from navigation (when called from sketch editor)
     private isFromSketch = false;
     private isEditMode = false;
@@ -81,7 +78,7 @@ export class LyricCreationComponent implements OnInit {
     private navigationState: any = null;
 
     private fb = inject(FormBuilder);
-    private songService = inject(SongService);
+    private sketchService = inject(SketchService);
     private notificationService = inject(NotificationService);
     private chatService = inject(ChatService);
     private progressService = inject(ProgressService);
@@ -159,10 +156,6 @@ export class LyricCreationComponent implements OnInit {
             this.isEditMode = this.navigationState["editMode"] || false;
             this.currentSketchId = this.navigationState["sketchId"] || null;
             this.sketchFormData = this.navigationState["formData"] || {};
-            this.context = "sketch-creator";
-        } else {
-            // Song generator mode
-            this.context = "song-generator";
         }
 
         this.lyricForm = this.fb.group({
@@ -174,13 +167,13 @@ export class LyricCreationComponent implements OnInit {
             // From sketch: load lyrics from router state
             this.lyricForm.patchValue({lyrics: this.sketchFormData.lyrics});
         } else if (!this.isFromSketch) {
-            // Song generator mode: load from localStorage
-            const savedData = this.songService.loadFormData(this.context);
+            // Standalone mode: load from localStorage
+            const savedData = this.sketchService.loadFormData();
             if (savedData.lyrics) {
                 this.lyricForm.patchValue({lyrics: savedData.lyrics});
             }
 
-            // Auto-save lyrics on changes (only for song generator)
+            // Auto-save lyrics on changes (only for standalone mode)
             this.lyricForm.valueChanges.subscribe(value => {
                 this.saveLyrics(value.lyrics);
             });
@@ -220,12 +213,11 @@ export class LyricCreationComponent implements OnInit {
     }
 
     private saveLyrics(lyrics: string): void {
-        // Load existing data from context-aware storage and update only lyrics
-        const existingData = this.songService.loadFormData(this.context);
-        this.songService.saveFormData({
+        const existingData = this.sketchService.loadFormData();
+        this.sketchService.saveFormData({
             ...existingData,
             lyrics: lyrics
-        }, this.context);
+        });
     }
 
     clearLyrics(): void {

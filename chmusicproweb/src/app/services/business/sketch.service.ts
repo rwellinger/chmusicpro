@@ -3,6 +3,14 @@ import {HttpClient} from "@angular/common/http";
 import {firstValueFrom, Observable} from "rxjs";
 import {ApiConfigService} from "../config/api-config.service";
 
+export interface SketchFormData {
+    lyrics?: string;
+    prompt?: string;
+    model?: string;
+    title?: string;
+    isInstrumental?: boolean;
+}
+
 /**
  * Song Sketch model interface
  */
@@ -142,5 +150,27 @@ export class SketchService {
         return firstValueFrom(
             this.http.delete(this.apiConfig.endpoints.sketch.unassignFromProject(sketchId))
         );
+    }
+
+    /**
+     * Load form data from localStorage
+     */
+    loadFormData(): SketchFormData {
+        const raw = localStorage.getItem("sketch-creator-form-data");
+        return raw ? JSON.parse(raw) : {};
+    }
+
+    /**
+     * Save form data to localStorage
+     */
+    saveFormData(data: SketchFormData): void {
+        localStorage.setItem("sketch-creator-form-data", JSON.stringify(data));
+    }
+
+    /**
+     * Clear form data from localStorage
+     */
+    clearFormData(): void {
+        localStorage.removeItem("sketch-creator-form-data");
     }
 }

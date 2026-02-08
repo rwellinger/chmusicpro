@@ -9,28 +9,6 @@ export class ApiConfigService {
 
     // API Endpoints
     readonly endpoints = {
-        song: {
-            list: (limit?: number, offset?: number, status?: string) => {
-                const params = new URLSearchParams();
-                if (limit !== undefined) params.append("limit", limit.toString());
-                if (offset !== undefined) params.append("offset", offset.toString());
-                if (status) params.append("status", status);
-                const query = params.toString();
-                return `${this.baseUrl}/api/v1/song/list${query ? "?" + query : ""}`;
-            },
-            detail: (songId: string) => `${this.baseUrl}/api/v1/song/${songId}`,
-            delete: (songId: string) => `${this.baseUrl}/api/v1/song/${songId}`,
-            update: (songId: string) => `${this.baseUrl}/api/v1/song/${songId}`,
-            updateChoiceRating: (choiceId: string) => `${this.baseUrl}/api/v1/song/choice/${choiceId}/rating`,
-            bulkDelete: `${this.baseUrl}/api/v1/song/bulk-delete`,
-            assignToProject: (songId: string) => `${this.baseUrl}/api/v1/song/${songId}/assign-to-project`,
-            unassignFromProject: (songId: string) => `${this.baseUrl}/api/v1/song/${songId}/unassign-from-project`,
-            // S3 Proxy endpoints (serves audio from S3)
-            choiceMp3: (choiceId: string) => `${this.baseUrl}/api/v1/song/choice/${choiceId}/mp3`,
-            choiceFlac: (choiceId: string) => `${this.baseUrl}/api/v1/song/choice/${choiceId}/flac`,
-            choiceWav: (choiceId: string) => `${this.baseUrl}/api/v1/song/choice/${choiceId}/wav`,
-            choiceStems: (choiceId: string) => `${this.baseUrl}/api/v1/song/choice/${choiceId}/stems`
-        },
         image: {
             generate: `${this.baseUrl}/api/v1/image/generate`,
             status: (taskId: string) => `${this.baseUrl}/api/v1/image/status/${taskId}`,

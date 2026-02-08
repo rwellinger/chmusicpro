@@ -4,7 +4,7 @@ import {CommonModule} from "@angular/common";
 import {MatDialog} from "@angular/material/dialog";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {ActivatedRoute, Router} from "@angular/router";
-import {FormDataContext, SongService} from "../../services/business/song.service";
+import {SketchService} from "../../services/business/sketch.service";
 import {NotificationService} from "../../services/ui/notification.service";
 import {ChatService} from "../../services/config/chat.service";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
@@ -33,9 +33,6 @@ export class MusicStylePromptComponent implements OnInit {
     currentMode: "auto" | "manual" = "auto";
     isStyleChooserCollapsed = false;
 
-    // Context for form data storage (song-generator or sketch-creator)
-    private context: FormDataContext = "song-generator";
-
     // State from navigation (when called from sketch editor)
     private isFromSketch = false;
     private isEditMode = false;
@@ -46,7 +43,7 @@ export class MusicStylePromptComponent implements OnInit {
     @ViewChild(MusicStyleChooserInlineComponent) styleChooser!: MusicStyleChooserInlineComponent;
 
     private fb = inject(FormBuilder);
-    private songService = inject(SongService);
+    private sketchService = inject(SketchService);
     private musicStyleService = inject(MusicStyleChooserService);
     private notificationService = inject(NotificationService);
     private chatService = inject(ChatService);
@@ -127,10 +124,6 @@ export class MusicStylePromptComponent implements OnInit {
             this.isEditMode = this.navigationState["editMode"] || false;
             this.currentSketchId = this.navigationState["sketchId"] || null;
             this.sketchFormData = this.navigationState["formData"] || {};
-            this.context = "sketch-creator";
-        } else {
-            // Song generator mode
-            this.context = "song-generator";
         }
 
         this.promptForm = this.fb.group({
@@ -161,13 +154,13 @@ export class MusicStylePromptComponent implements OnInit {
                 });
             }
         } else if (!this.isFromSketch) {
-            // Song generator mode: load from localStorage
-            const savedData = this.songService.loadFormData(this.context);
+            // Standalone mode: load from localStorage
+            const savedData = this.sketchService.loadFormData();
             if (savedData.prompt) {
                 this.promptForm.patchValue({prompt: savedData.prompt});
             }
 
-            // Auto-save prompt on changes (only for song generator)
+            // Auto-save prompt on changes (only for standalone mode)
             this.promptForm.valueChanges.subscribe(value => {
                 this.savePrompt(value.prompt);
             });
@@ -190,12 +183,11 @@ export class MusicStylePromptComponent implements OnInit {
     }
 
     private savePrompt(prompt: string): void {
-        // Load existing data from context-aware storage and update only prompt
-        const existingData = this.songService.loadFormData(this.context);
-        this.songService.saveFormData({
+        const existingData = this.sketchService.loadFormData();
+        this.sketchService.saveFormData({
             ...existingData,
             prompt: prompt
-        }, this.context);
+        });
     }
 
     clearPrompt(): void {

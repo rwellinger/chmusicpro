@@ -146,13 +146,11 @@
     "advanced": {
       "title": "Assignments",
       "hint": "Here you can manage the assignments of elements to this project. Removing only removes the assignment - the elements themselves are preserved.",
-      "assignedSongs": "Assigned Songs",
       "assignedSketches": "Assigned Sketches",
       "assignedImages": "Assigned Images",
       "noAssignments": "No assignments",
       "unassign": "Remove assignment",
       "confirmUnassign": "Remove the assignment of {{type}} \"{{name}}\"? The element itself will be preserved.",
-      "typeSong": "Song",
       "typeSketch": "Sketch",
       "typeImage": "Image",
       "unassignSuccess": "Assignment successfully removed",
@@ -809,74 +807,6 @@
     "textWorkshop": "Text Workshop",
     "workshopLibrary": "Workshop Library"
   },
-  "songDetailPanel": {
-    "choices": {
-      "audioDownloads": "Audio Downloads",
-      "downloadFlac": "FLAC",
-      "downloadWav": "WAV",
-      "downloadStems": "Download Stems",
-      "duration": "Duration",
-      "mp3File": "MP3 File",
-      "noChoices": "No song choices available for this song.",
-      "notAvailable": "N/A",
-      "play": "Play",
-      "playing": "Playing",
-      "rating": "Rating",
-      "stems": "Stems",
-      "thumbsDown": "Thumbs Down",
-      "thumbsUp": "Thumbs Up",
-      "title": "Song Choices:"
-    },
-    "copyId": "Copy ID to clipboard",
-    "errors": {
-      "copyFailed": "Failed to copy to clipboard",
-      "loadSong": "Failed to load song",
-      "loadSongDetails": "Error loading song details",
-      "updateRating": "Error updating rating",
-      "updateTags": "Error updating tags",
-      "updateTitle": "Error updating title",
-      "updateWorkflow": "Error updating workflow"
-    },
-    "idCopied": "ID copied to clipboard!",
-    "loading": "Loading song details...",
-    "lyrics": {
-      "characters": "characters",
-      "copyAll": "Copy All",
-      "dialogTitle": "Lyrics - {{title}}",
-      "label": "Lyrics:",
-      "showButton": "Show Lyrics"
-    },
-    "prompt": {
-      "label": "Style Prompt:"
-    },
-    "selectSong": "Select a song from the list to view details",
-    "tags": {
-      "editTitle": "Edit Tags:",
-      "label": "Tags:",
-      "noTags": "No tags",
-      "styleCategory": "Style",
-      "themeCategory": "Theme"
-    },
-    "title": {
-      "cancel": "Cancel",
-      "edit": "Edit",
-      "save": "Save"
-    },
-    "type": {
-      "instrumental": "Instrumental",
-      "withVocals": "With Vocals"
-    },
-    "untitled": "Untitled Song",
-    "workflow": {
-      "editTitle": "Edit Workflow:",
-      "fail": "Fail",
-      "inUse": "In Use",
-      "label": "Workflow:",
-      "noWorkflow": "No Workflow",
-      "notUsed": "Not Used",
-      "onWork": "On Work"
-    }
-  },
   "musicStylePrompt": {
     "title": "Music Style Prompt",
     "backToSketch": "Back to Sketch",
@@ -886,7 +816,13 @@
     "cleared": "Prompt and style selection cleared",
     "changesApplied": "Changes applied successfully",
     "changesCancelled": "Changes discarded",
-    "styleChooser": "Style Chooser",
+    "styleChooser": {
+      "title": "Style Chooser",
+      "preview": "Preview",
+      "applyButton": "Apply Styles & Switch to Auto-Mode",
+      "collapse": "Collapse",
+      "expand": "Expand"
+    },
     "enhancePrompt": "Enhance Prompt",
     "translateToEnglish": "Translate to English",
     "resetButton": "Clear",
@@ -907,13 +843,6 @@
       "manualWarning": "Manual-Mode active: Style changes will overwrite your edited prompt",
       "applyConfirm": "This will overwrite your current prompt. Continue?",
       "stylesApplied": "Music styles applied and switched to Auto-Mode"
-    },
-    "styleChooser": {
-      "title": "Style Chooser",
-      "preview": "Preview",
-      "applyButton": "Apply Styles & Switch to Auto-Mode",
-      "collapse": "Collapse",
-      "expand": "Expand"
     },
     "errors": {
       "promptRequired": "Please enter a music style prompt",
@@ -941,118 +870,6 @@
       "matchesFound": "{{count}} matches found",
       "noMatches": "No matches found",
       "applied": "Replaced {{count}} occurrences"
-    }
-  },
-  "songView": {
-    "actions": {
-      "assignToProject": "Assign to Project",
-      "unassignFromProject": "Remove from Project",
-      "close": "Close",
-      "copyAll": "Copy All",
-      "copyLyrics": "Copy Lyrics",
-      "delete": "Delete",
-      "deleteCount": "Delete ({{count}})",
-      "deselectAll": "Deselect All",
-      "downloadFlac": "Download FLAC",
-      "downloadMp3": "Download MP3",
-      "downloadStems": "Download Stems",
-      "exitSelect": "Exit Select",
-      "newSong": "New Song",
-      "playAudio": "Play Audio",
-      "playPause": "Play/Pause",
-      "refresh": "Refresh",
-      "selectAll": "Select All",
-      "selectMode": "Select Mode",
-      "stop": "Stop"
-    },
-    "bulkDelete": {
-      "completed": "Bulk delete completed: {{deleted}} deleted",
-      "errors": "{{count}} errors",
-      "notFound": "{{count}} not found"
-    },
-    "confirmations": {
-      "bulkDelete": "Are you sure you want to delete {{count}} selected song(s)?",
-      "unassignFromProject": "Remove song \"{{song}}\" from project \"{{project}}\"? The song itself will be preserved."
-    },
-    "header": {
-      "count": "{{count}} songs"
-    },
-    "dialogs": {
-      "lyricsTitle": "Lyrics - {{title}}",
-      "stylePromptTitle": "Style Prompt - {{title}}"
-    },
-    "errors": {
-      "cannotDeleteProtected": "Cannot delete songs with {{workflow}} workflow: {{songs}}",
-      "cannotSelectProtected": "Cannot select songs with {{workflow}} workflow for deletion",
-      "cannotDeleteAssigned": "Cannot delete song assigned to project '{{project}}'",
-      "copyFailed": "Failed to copy to clipboard",
-      "copyLyricsFailed": "Failed to copy lyrics to clipboard",
-      "deletingSongs": "Error deleting songs: {{error}}",
-      "loadingMore": "Error loading more songs: {{error}}",
-      "loadingSongs": "Error loading songs: {{error}}",
-      "noSongsSelected": "No songs selected for deletion",
-      "updatingRating": "Error updating rating: {{error}}",
-      "updatingTags": "Error updating tags: {{error}}",
-      "updatingTitle": "Error updating title: {{error}}",
-      "updatingWorkflow": "Error updating workflow: {{error}}",
-      "unassigningFromProject": "Error removing from project: {{error}}"
-    },
-    "filters": {
-      "all": "All",
-      "fail": "Fail",
-      "inUse": "In Use",
-      "notUsed": "Not Used",
-      "onWork": "On Work"
-    },
-    "library": {
-      "clearSearch": "Clear search",
-      "header": "Available Songs",
-      "searchPlaceholder": "Search in titles, lyrics & tags...",
-      "songsCount": "{{count}} songs",
-      "subtitle": "Manage your generated songs"
-    },
-    "messages": {
-      "adjustSearch": "Try adjusting your search term or clear the search to see all songs.",
-      "loadingSongs": "Loading songs...",
-      "noLyrics": "No lyrics",
-      "noLyricsAvailable": "No lyrics available",
-      "noSearchResults": "No songs match your search criteria.",
-      "noSongSelected": "No song selected",
-      "noSongsInDb": "No songs found in the database.",
-      "noStylePrompt": "No style prompt available",
-      "noTags": "No tags",
-      "selectSongPlaceholder": "Select a song from the list to view details",
-      "unknownSong": "Unknown Song",
-      "untitled": "Untitled",
-      "untitledSong": "Untitled Song",
-      "unassignedFromProject": "Song successfully removed from project"
-    },
-    "noSongs": "No songs found",
-    "pagination": {
-      "info": "Page {{current}} of {{total}}",
-      "itemsPerPage": "Items per page:",
-      "of": "of"
-    },
-    "placeholderText": "Your generated song will appear here",
-    "table": {
-      "actions": "Actions",
-      "created": "Created",
-      "model": "Model",
-      "rating": "Rating",
-      "status": "Status",
-      "title": "Title",
-      "workflow": "Workflow"
-    },
-    "title": "Song Library",
-    "tooltips": {
-      "cannotDelete": "Cannot delete this song",
-      "cannotDeleteInUse": "Cannot delete songs with In Use workflow",
-      "cannotDeleteOnWork": "Cannot delete songs with On Work workflow",
-      "cannotDeleteProject": "Cannot delete - assigned to project '{{project}}'",
-      "inUseNoDelete": "This song is In Use and cannot be deleted",
-      "instrumental": "Instrumental",
-      "onWorkNoDelete": "This song is On Work and cannot be deleted",
-      "withVocals": "With Vocals"
     }
   },
   "userProfile": {
@@ -1106,7 +923,6 @@
     "lastNamePlaceholder": "Enter last name",
     "loadingProfile": "Loading profile...",
     "memberSince": "Member since:",
-    "murekaAccount": "Song Profile",
     "notVerified": "Not verified",
     "notifications": {
       "imageListLimitUpdated": "Picture list limit updated",
@@ -1114,8 +930,7 @@
       "promptListLimitUpdated": "Prompt list limit updated",
       "sketchListLimitUpdated": "Sketch list limit updated",
       "equipmentListLimitUpdated": "Equipment list limit updated",
-      "settingsReset": "Settings reset to defaults",
-      "songListLimitUpdated": "Song list limit updated"
+      "settingsReset": "Settings reset to defaults"
     },
     "refreshButton": "Refresh",
     "resetToDefaults": "Reset to Defaults",
@@ -1762,17 +1577,14 @@
       "folders": "Folders",
       "files": "Files",
       "noFiles": "No files in this folder",
-      "assignedSongs": "Assigned Songs",
       "assignedSketches": "Assigned Sketches",
       "assignedImages": "Assigned Pictures",
       "assignedReleases": "Assigned Releases",
-      "allAssignedSongs": "Assigned Songs",
       "allAssignedSketches": "Assigned Sketches",
       "allAssignedImages": "Assigned Pictures",
       "noAssignedAssets": "No assigned assets in this folder",
       "folderContent": {
         "images": "{{count}} pictures",
-        "songs": "{{count}} songs",
         "sketches": "{{count}} sketches",
         "assets": "{{count}} assets",
         "assetsAndFiles": "{{assetCount}} assets, {{fileCount}} files",
@@ -1798,7 +1610,6 @@
         "editProject": "Edit Project",
         "deleteProject": "Delete Project",
         "backToList": "Back to Projects",
-        "openSong": "Open Song",
         "openSketch": "Open Sketch",
         "openImage": "Open Picture",
         "viewRelease": "View Release"

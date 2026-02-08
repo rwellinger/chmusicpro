@@ -6,8 +6,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
-import {AssignedImage, AssignedSketch, AssignedSong} from "../../models/song-project.model";
-import {SongService} from "../../services/business/song.service";
+import {AssignedImage, AssignedSketch} from "../../models/song-project.model";
 import {SketchService} from "../../services/business/sketch.service";
 import {ImageService} from "../../services/business/image.service";
 import {NotificationService} from "../../services/ui/notification.service";
@@ -18,7 +17,6 @@ export interface ProjectDialogData {
     description?: string;
     tags?: string[];
     // Assigned elements (only for edit mode)
-    all_assigned_songs?: AssignedSong[];
     all_assigned_sketches?: AssignedSketch[];
     all_assigned_images?: AssignedImage[];
 }
@@ -44,17 +42,15 @@ export class CreateProjectDialogComponent implements OnInit {
     showAdvanced: boolean = false;
 
     // Assigned elements (copy to allow local modifications)
-    assignedSongs: AssignedSong[] = [];
     assignedSketches: AssignedSketch[] = [];
     assignedImages: AssignedImage[] = [];
 
     // Track unassigned items (for reporting back to parent)
-    unassignedItems: { type: "song" | "sketch" | "image"; id: string }[] = [];
+    unassignedItems: { type: "sketch" | "image"; id: string }[] = [];
 
     private fb = inject(FormBuilder);
     private dialogRef = inject(MatDialogRef<CreateProjectDialogComponent>);
     public data = inject<ProjectDialogData | null>(MAT_DIALOG_DATA);
-    private songService = inject(SongService);
     private sketchService = inject(SketchService);
     private imageService = inject(ImageService);
     private translate = inject(TranslateService);
@@ -65,8 +61,7 @@ export class CreateProjectDialogComponent implements OnInit {
     }
 
     get hasAssignments(): boolean {
-        return this.assignedSongs.length > 0 ||
-            this.assignedSketches.length > 0 ||
+        return this.assignedSketches.length > 0 ||
             this.assignedImages.length > 0;
     }
 
@@ -75,8 +70,7 @@ export class CreateProjectDialogComponent implements OnInit {
     }
 
     get totalAssignments(): number {
-        return this.assignedSongs.length +
-            this.assignedSketches.length +
+        return this.assignedSketches.length +
             this.assignedImages.length;
     }
 
@@ -89,7 +83,6 @@ export class CreateProjectDialogComponent implements OnInit {
 
         // Initialize assigned elements (copy to allow local modifications)
         if (this.isEditMode && this.data) {
-            this.assignedSongs = [...(this.data.all_assigned_songs || [])];
             this.assignedSketches = [...(this.data.all_assigned_sketches || [])];
             this.assignedImages = [...(this.data.all_assigned_images || [])];
         }
@@ -153,33 +146,6 @@ export class CreateProjectDialogComponent implements OnInit {
     }
 
     /**
-     * Unassign a song from this project
-     */
-    async unassignSong(song: AssignedSong): Promise<void> {
-        const confirmation = confirm(
-            this.translate.instant("createProjectDialog.advanced.confirmUnassign", {
-                type: this.translate.instant("createProjectDialog.advanced.typeSong"),
-                name: song.title || "Untitled"
-            })
-        );
-
-        if (!confirmation) return;
-
-        try {
-            await this.songService.unassignFromProject(song.id);
-            this.assignedSongs = this.assignedSongs.filter(s => s.id !== song.id);
-            this.unassignedItems.push({type: "song", id: song.id});
-            this.notificationService.success(
-                this.translate.instant("createProjectDialog.advanced.unassignSuccess")
-            );
-        } catch (error: any) {
-            this.notificationService.error(
-                this.translate.instant("createProjectDialog.advanced.unassignError") + ": " + error.message
-            );
-        }
-    }
-
-    /**
      * Unassign a sketch from this project
      */
     async unassignSketch(sketch: AssignedSketch): Promise<void> {
@@ -238,7 +204,7 @@ export class CreateProjectDialogComponent implements OnInit {
     /**
      * Get display title for an element
      */
-    getDisplayTitle(item: AssignedSong | AssignedSketch | AssignedImage, fallbackField?: string): string {
+    getDisplayTitle(item: AssignedSketch | AssignedImage, fallbackField?: string): string {
         if (item.title && item.title.trim()) {
             return item.title.trim();
         }

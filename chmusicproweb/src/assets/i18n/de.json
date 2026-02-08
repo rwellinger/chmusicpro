@@ -146,13 +146,11 @@
     "advanced": {
       "title": "Zuweisungen",
       "hint": "Hier kannst du die Zuweisungen von Elementen zu diesem Projekt verwalten. Das Entfernen löscht nur die Zuweisung - die Elemente selbst bleiben erhalten.",
-      "assignedSongs": "Zugewiesene Songs",
       "assignedSketches": "Zugewiesene Sketches",
       "assignedImages": "Zugewiesene Bilder",
       "noAssignments": "Keine Zuweisungen vorhanden",
       "unassign": "Zuweisung entfernen",
       "confirmUnassign": "Soll die Zuweisung von {{type}} \"{{name}}\" entfernt werden? Das Element selbst bleibt erhalten.",
-      "typeSong": "Song",
       "typeSketch": "Sketch",
       "typeImage": "Bild",
       "unassignSuccess": "Zuweisung erfolgreich entfernt",
@@ -809,74 +807,6 @@
     "textWorkshop": "Text Workshop",
     "workshopLibrary": "Workshop-Bibliothek"
   },
-  "songDetailPanel": {
-    "choices": {
-      "audioDownloads": "Audio-Downloads",
-      "downloadFlac": "FLAC",
-      "downloadWav": "WAV",
-      "downloadStems": "Stems herunterladen",
-      "duration": "Dauer",
-      "mp3File": "MP3-Datei",
-      "noChoices": "Für diesen Song sind keine Song-Auswahl verfügbar.",
-      "notAvailable": "N/V",
-      "play": "Abspielen",
-      "playing": "Spielt ab",
-      "rating": "Bewertung",
-      "stems": "Stems",
-      "thumbsDown": "Daumen runter",
-      "thumbsUp": "Daumen hoch",
-      "title": "Song-Auswahl:"
-    },
-    "copyId": "ID in Zwischenablage kopieren",
-    "errors": {
-      "copyFailed": "Fehler beim Kopieren in die Zwischenablage",
-      "loadSong": "Fehler beim Laden des Songs",
-      "loadSongDetails": "Fehler beim Laden der Song-Details",
-      "updateRating": "Fehler beim Aktualisieren der Bewertung",
-      "updateTags": "Fehler beim Aktualisieren der Tags",
-      "updateTitle": "Fehler beim Aktualisieren des Titels",
-      "updateWorkflow": "Fehler beim Aktualisieren des Workflows"
-    },
-    "idCopied": "ID in Zwischenablage kopiert!",
-    "loading": "Lade Song-Details...",
-    "lyrics": {
-      "characters": "Zeichen",
-      "copyAll": "Alles kopieren",
-      "dialogTitle": "Songtext - {{title}}",
-      "label": "Songtext:",
-      "showButton": "Songtext anzeigen"
-    },
-    "prompt": {
-      "label": "Stil-Prompt:"
-    },
-    "selectSong": "Wähle einen Song aus der Liste, um Details anzuzeigen",
-    "tags": {
-      "editTitle": "Tags bearbeiten:",
-      "label": "Tags:",
-      "noTags": "Keine Tags",
-      "styleCategory": "Stil",
-      "themeCategory": "Thema"
-    },
-    "title": {
-      "cancel": "Abbrechen",
-      "edit": "Bearbeiten",
-      "save": "Speichern"
-    },
-    "type": {
-      "instrumental": "Instrumental",
-      "withVocals": "Mit Gesang"
-    },
-    "untitled": "Unbenannter Song",
-    "workflow": {
-      "editTitle": "Workflow bearbeiten:",
-      "fail": "Fehlgeschlagen",
-      "inUse": "In Verwendung",
-      "label": "Workflow:",
-      "noWorkflow": "Kein Workflow",
-      "notUsed": "Nicht verwendet",
-      "onWork": "In Arbeit"
-    }
-  },
   "musicStylePrompt": {
     "title": "Music Style Prompt",
     "backToSketch": "Zurück zur Skizze",
@@ -886,7 +816,13 @@
     "cleared": "Prompt und Stil-Auswahl gelöscht",
     "changesApplied": "Änderungen übernommen",
     "changesCancelled": "Änderungen verworfen",
-    "styleChooser": "Stil-Auswahl",
+    "styleChooser": {
+      "title": "Stil-Auswahl",
+      "preview": "Vorschau",
+      "applyButton": "Stile anwenden & zu Auto-Modus wechseln",
+      "collapse": "Einklappen",
+      "expand": "Ausklappen"
+    },
     "enhancePrompt": "Prompt verbessern",
     "translateToEnglish": "Ins Englische übersetzen",
     "resetButton": "Löschen",
@@ -907,13 +843,6 @@
       "manualWarning": "Manuell-Modus aktiv: Stil-Änderungen überschreiben deinen bearbeiteten Prompt",
       "applyConfirm": "Dies überschreibt deinen aktuellen Prompt. Fortfahren?",
       "stylesApplied": "Musikstile angewandt und zu Auto-Modus gewechselt"
-    },
-    "styleChooser": {
-      "title": "Stil-Auswahl",
-      "preview": "Vorschau",
-      "applyButton": "Stile anwenden & zu Auto-Modus wechseln",
-      "collapse": "Einklappen",
-      "expand": "Ausklappen"
     },
     "errors": {
       "promptRequired": "Bitte gib einen Musikstil-Prompt ein",
@@ -941,118 +870,6 @@
       "matchesFound": "{{count}} Treffer gefunden",
       "noMatches": "Keine Treffer gefunden",
       "applied": "{{count}} Vorkommen ersetzt"
-    }
-  },
-  "songView": {
-    "actions": {
-      "assignToProject": "Zu Projekt zuweisen",
-      "unassignFromProject": "Vom Projekt entfernen",
-      "close": "Schließen",
-      "copyAll": "Alles kopieren",
-      "copyLyrics": "Text kopieren",
-      "delete": "Löschen",
-      "deleteCount": "Löschen ({{count}})",
-      "deselectAll": "Alle abwählen",
-      "downloadFlac": "FLAC herunterladen",
-      "downloadMp3": "MP3 herunterladen",
-      "downloadStems": "Stems herunterladen",
-      "exitSelect": "Auswahl beenden",
-      "newSong": "Neuer Song",
-      "playAudio": "Audio abspielen",
-      "playPause": "Abspielen/Pause",
-      "refresh": "Aktualisieren",
-      "selectAll": "Alle auswählen",
-      "selectMode": "Auswahlmodus",
-      "stop": "Stopp"
-    },
-    "bulkDelete": {
-      "completed": "Massenlöschung abgeschlossen: {{deleted}} gelöscht",
-      "errors": "{{count}} Fehler",
-      "notFound": "{{count}} nicht gefunden"
-    },
-    "confirmations": {
-      "bulkDelete": "Möchtest du wirklich {{count}} ausgewählte(n) Song(s) löschen?",
-      "unassignFromProject": "Soll der Song \"{{song}}\" vom Projekt \"{{project}}\" entfernt werden? Der Song selbst bleibt erhalten."
-    },
-    "header": {
-      "count": "{{count}} Songs"
-    },
-    "dialogs": {
-      "lyricsTitle": "Songtext - {{title}}",
-      "stylePromptTitle": "Stil-Prompt - {{title}}"
-    },
-    "errors": {
-      "cannotDeleteProtected": "Songs mit {{workflow}}-Workflow können nicht gelöscht werden: {{songs}}",
-      "cannotSelectProtected": "Songs mit {{workflow}}-Workflow können nicht zum Löschen ausgewählt werden",
-      "cannotDeleteAssigned": "Song kann nicht geloescht werden - zugewiesen an Projekt '{{project}}'",
-      "copyFailed": "Fehler beim Kopieren in die Zwischenablage",
-      "copyLyricsFailed": "Fehler beim Kopieren des Songtextes in die Zwischenablage",
-      "deletingSongs": "Fehler beim Löschen der Songs: {{error}}",
-      "loadingMore": "Fehler beim Laden weiterer Songs: {{error}}",
-      "loadingSongs": "Fehler beim Laden der Songs: {{error}}",
-      "noSongsSelected": "Keine Songs zum Löschen ausgewählt",
-      "updatingRating": "Fehler beim Aktualisieren der Bewertung: {{error}}",
-      "updatingTags": "Fehler beim Aktualisieren der Tags: {{error}}",
-      "updatingTitle": "Fehler beim Aktualisieren des Titels: {{error}}",
-      "updatingWorkflow": "Fehler beim Aktualisieren des Workflows: {{error}}",
-      "unassigningFromProject": "Fehler beim Entfernen aus dem Projekt: {{error}}"
-    },
-    "filters": {
-      "all": "Alle",
-      "fail": "Fehlgeschlagen",
-      "inUse": "In Verwendung",
-      "notUsed": "Nicht verwendet",
-      "onWork": "In Arbeit"
-    },
-    "library": {
-      "clearSearch": "Suche löschen",
-      "header": "Verfügbare Songs",
-      "searchPlaceholder": "Suche in Titel, Text & Tags...",
-      "songsCount": "{{count}} Songs",
-      "subtitle": "Verwalte deine generierten Songs"
-    },
-    "messages": {
-      "adjustSearch": "Versuche deinen Suchbegriff anzupassen oder lösche die Suche, um alle Songs zu sehen.",
-      "loadingSongs": "Lade Songs...",
-      "noLyrics": "Kein Songtext",
-      "noLyricsAvailable": "Kein Songtext verfügbar",
-      "noSearchResults": "Keine Songs entsprechen deinen Suchkriterien.",
-      "noSongSelected": "Kein Song ausgewählt",
-      "noSongsInDb": "Keine Songs in der Datenbank gefunden.",
-      "noStylePrompt": "Kein Stil-Prompt verfügbar",
-      "noTags": "Keine Tags",
-      "selectSongPlaceholder": "Wähle einen Song aus der Liste, um Details anzuzeigen",
-      "unknownSong": "Unbekannter Song",
-      "untitled": "Unbenannt",
-      "untitledSong": "Unbenannter Song",
-      "unassignedFromProject": "Song erfolgreich vom Projekt entfernt"
-    },
-    "noSongs": "Keine Songs gefunden",
-    "pagination": {
-      "info": "Seite {{current}} von {{total}}",
-      "itemsPerPage": "Einträge pro Seite:",
-      "of": "von"
-    },
-    "placeholderText": "Dein generierter Song erscheint hier",
-    "table": {
-      "actions": "Aktionen",
-      "created": "Erstellt",
-      "model": "Modell",
-      "rating": "Bewertung",
-      "status": "Status",
-      "title": "Titel",
-      "workflow": "Workflow"
-    },
-    "title": "Song-Bibliothek",
-    "tooltips": {
-      "cannotDelete": "Dieser Song kann nicht gelöscht werden",
-      "cannotDeleteInUse": "Songs mit In Verwendung-Workflow können nicht gelöscht werden",
-      "cannotDeleteOnWork": "Songs mit In Arbeit-Workflow können nicht gelöscht werden",
-      "cannotDeleteProject": "Kann nicht geloescht werden - zugewiesen an Projekt '{{project}}'",
-      "inUseNoDelete": "Dieser Song ist in Verwendung und kann nicht gelöscht werden",
-      "instrumental": "Instrumental",
-      "onWorkNoDelete": "Dieser Song ist in Arbeit und kann nicht gelöscht werden",
-      "withVocals": "Mit Gesang"
     }
   },
   "userProfile": {
@@ -1106,7 +923,6 @@
     "lastNamePlaceholder": "Nachname eingeben",
     "loadingProfile": "Profil wird geladen...",
     "memberSince": "Mitglied seit:",
-    "murekaAccount": "Song-Profil",
     "notVerified": "Nicht verifiziert",
     "notifications": {
       "imageListLimitUpdated": "Bild-Listen-Limit aktualisiert",
@@ -1114,8 +930,7 @@
       "promptListLimitUpdated": "Prompt-Listen-Limit aktualisiert",
       "sketchListLimitUpdated": "Sketch-Listen-Limit aktualisiert",
       "equipmentListLimitUpdated": "Equipment-Listen-Limit aktualisiert",
-      "settingsReset": "Einstellungen auf Standard zurückgesetzt",
-      "songListLimitUpdated": "Song-Listen-Limit aktualisiert"
+      "settingsReset": "Einstellungen auf Standard zurückgesetzt"
     },
     "refreshButton": "Aktualisieren",
     "resetToDefaults": "Auf Standard zurücksetzen",
@@ -1762,17 +1577,14 @@
       "folders": "Ordner",
       "files": "Dateien",
       "noFiles": "Keine Dateien in diesem Ordner",
-      "assignedSongs": "Zugewiesene Songs",
       "assignedSketches": "Zugewiesene Sketches",
       "assignedImages": "Zugewiesene Bilder",
       "assignedReleases": "Zugewiesene Releases",
-      "allAssignedSongs": "Zugewiesene Songs",
       "allAssignedSketches": "Zugewiesene Sketches",
       "allAssignedImages": "Zugewiesene Bilder",
       "noAssignedAssets": "Keine zugewiesenen Assets in diesem Ordner",
       "folderContent": {
         "images": "{{count}} Bilder",
-        "songs": "{{count}} Songs",
         "sketches": "{{count}} Sketches",
         "assets": "{{count}} Assets",
         "assetsAndFiles": "{{assetCount}} Assets, {{fileCount}} Dateien",
@@ -1798,7 +1610,6 @@
         "editProject": "Projekt bearbeiten",
         "deleteProject": "Projekt löschen",
         "backToList": "Zurück zu Projekten",
-        "openSong": "Song öffnen",
         "openSketch": "Sketch öffnen",
         "openImage": "Bild öffnen",
         "viewRelease": "Release anzeigen"

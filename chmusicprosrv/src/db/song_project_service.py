@@ -721,41 +721,6 @@ class SongProjectService:
             )
             return None
 
-    def get_assigned_songs_for_folder(self, db: Session, project_id: UUID, folder_id: UUID) -> list[Any]:
-        """
-        Get all assigned songs for a project folder (CRUD only)
-
-        Args:
-            db: Database session
-            project_id: Project UUID
-            folder_id: Folder UUID
-
-        Returns:
-            List of Song instances
-        """
-        try:
-            from db.models import Song
-
-            songs = (
-                db.query(Song)
-                .filter(Song.project_id == project_id, Song.project_folder_id == folder_id)
-                .order_by(Song.created_at.desc())
-                .all()
-            )
-            logger.debug(
-                "Assigned songs retrieved", project_id=str(project_id), folder_id=str(folder_id), count=len(songs)
-            )
-            return songs
-        except SQLAlchemyError as e:
-            logger.error(
-                "Failed to get assigned songs",
-                error=str(e),
-                error_type=type(e).__name__,
-                project_id=str(project_id),
-                folder_id=str(folder_id),
-            )
-            return []
-
     def get_assigned_sketches_for_folder(self, db: Session, project_id: UUID, folder_id: UUID) -> list[Any]:
         """
         Get all assigned sketches for a project folder (CRUD only)
@@ -824,32 +789,6 @@ class SongProjectService:
                 error_type=type(e).__name__,
                 project_id=str(project_id),
                 folder_id=str(folder_id),
-            )
-            return []
-
-    def get_all_assigned_songs_for_project(self, db: Session, project_id: UUID) -> list[Any]:
-        """
-        Get ALL assigned songs for a project (regardless of folder assignment)
-
-        Args:
-            db: Database session
-            project_id: Project UUID
-
-        Returns:
-            List of Song instances
-        """
-        try:
-            from db.models import Song
-
-            songs = db.query(Song).filter(Song.project_id == project_id).order_by(Song.created_at.desc()).all()
-            logger.debug("All assigned songs retrieved", project_id=str(project_id), count=len(songs))
-            return songs
-        except SQLAlchemyError as e:
-            logger.error(
-                "Failed to get all assigned songs",
-                error=str(e),
-                error_type=type(e).__name__,
-                project_id=str(project_id),
             )
             return []
 

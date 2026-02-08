@@ -24,16 +24,6 @@ from sqlalchemy.sql import func
 from db.database import Base
 
 
-class SongStatus(StrEnum):
-    """Enum for song generation status"""
-
-    PENDING = "PENDING"
-    PROGRESS = "PROGRESS"
-    SUCCESS = "SUCCESS"
-    FAILURE = "FAILURE"
-    CANCELLED = "CANCELLED"
-
-
 class RuleType(StrEnum):
     """Enum for lyric parsing rule types"""
 
@@ -81,7 +71,6 @@ class SongSketch(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
-    songs = relationship("Song", back_populates="sketch")
     project = relationship("SongProject", back_populates="sketches")
     project_folder = relationship("ProjectFolder", foreign_keys=[project_folder_id])
 
@@ -127,111 +116,6 @@ class LyricWorkshop(Base):
 
     def __repr__(self):
         return f"<LyricWorkshop(id={self.id}, title='{self.title}', phase='{self.current_phase}')>"
-
-
-class Song(Base):
-    """Model for storing song generation data and results"""
-
-    __tablename__ = "songs"
-    __table_args__ = {"extend_existing": True}
-
-    # Primary identifiers
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    task_id = Column(String(255), nullable=False, unique=True, index=True)  # Celery Task ID
-    job_id = Column(String(255), nullable=True, index=True)  # External Job ID (legacy)
-
-    # Input parameters
-    lyrics = Column(Text, nullable=False)
-    prompt = Column(Text, nullable=False)  # Style prompt
-    model = Column(String(100), nullable=True, default="auto")
-
-    # User editable metadata
-    title = Column(String(500), nullable=True)
-    tags = Column(String(1000), nullable=True)
-    workflow = Column(String(50), nullable=True)  # onWork, inUse, notUsed, or NULL
-    is_instrumental = Column(Boolean, nullable=True, default=False)  # True for instrumental songs
-
-    # Sketch relationship (optional - song can be created from sketch or directly)
-    sketch_id = Column(UUID(as_uuid=True), ForeignKey("song_sketches.id"), nullable=True, index=True)
-
-    # Project relationship (optional)
-    project_id = Column(
-        UUID(as_uuid=True), ForeignKey("song_projects.id", ondelete="SET NULL"), nullable=True, index=True
-    )
-    project_folder_id = Column(
-        UUID(as_uuid=True), ForeignKey("project_folders.id", ondelete="SET NULL"), nullable=True, index=True
-    )
-
-    # Status tracking
-    status = Column(String(50), nullable=False, default="PENDING")  # PENDING, PROGRESS, SUCCESS, FAILURE, CANCELLED
-    progress_info = Column(Text, nullable=True)  # JSON string for progress details
-    error_message = Column(Text, nullable=True)
-
-    # Relationships
-    choices = relationship(
-        "SongChoice", back_populates="song", cascade="all, delete-orphan", order_by="SongChoice.choice_index"
-    )
-    sketch = relationship("SongSketch", back_populates="songs")
-    project = relationship("SongProject", back_populates="songs")
-    project_folder = relationship("ProjectFolder", foreign_keys=[project_folder_id])
-
-    # Legacy response data
-    mureka_response = Column(Text, nullable=True)  # Legacy JSON response (kept for backward compatibility)
-    mureka_status = Column(String(100), nullable=True)
-
-    # Timestamps
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    completed_at = Column(DateTime(timezone=True), nullable=True)
-
-    def __repr__(self):
-        return f"<Song(id={self.id}, task_id='{self.task_id}', status='{self.status}', choices={len(self.choices) if self.choices else 0})>"
-
-
-class SongChoice(Base):
-    """Model for storing individual song choice results"""
-
-    __tablename__ = "song_choices"
-    __table_args__ = {"extend_existing": True}
-
-    # Primary identifiers
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    song_id = Column(UUID(as_uuid=True), ForeignKey("songs.id"), nullable=False, index=True)
-
-    # Legacy choice data
-    mureka_choice_id = Column(String(255), nullable=True)  # Legacy choice ID
-    choice_index = Column(Integer, nullable=True)  # Index in choices array
-
-    # URLs and files (legacy - kept for backward compatibility)
-    mp3_url = Column(String(1000), nullable=True)
-    flac_url = Column(String(1000), nullable=True)
-    wav_url = Column(String(1000), nullable=True)  # WAV audio URL
-    video_url = Column(String(1000), nullable=True)  # Falls verfügbar
-    image_url = Column(String(1000), nullable=True)  # Cover image
-    stem_url = Column(String(1000), nullable=True)  # Stems ZIP file URL
-
-    # S3 storage keys (new - for lazy migration pattern)
-    mp3_s3_key = Column(String(500), nullable=True)  # S3 key for MP3 audio file
-    flac_s3_key = Column(String(500), nullable=True)  # S3 key for FLAC audio file
-    wav_s3_key = Column(String(500), nullable=True)  # S3 key for WAV audio file
-    stem_s3_key = Column(String(500), nullable=True)  # S3 key for stems ZIP file
-
-    # Metadata
-    duration = Column(Float, nullable=True)  # Duration in milliseconds
-    title = Column(String(500), nullable=True)
-    tags = Column(String(1000), nullable=True)  # Comma-separated
-    rating = Column(Integer, nullable=True)  # User rating: NULL=not set, 0=thumbs down, 1=thumbs up
-
-    # Timestamps
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    stem_generated_at = Column(DateTime(timezone=True), nullable=True)  # When stems were generated
-
-    # Relation back to song
-    song = relationship("Song", back_populates="choices")
-
-    def __repr__(self):
-        return f"<SongChoice(id={self.id}, song_id={self.song_id}, choice_index={self.choice_index}, duration={self.duration})>"
 
 
 class GeneratedImage(Base):
@@ -633,7 +517,6 @@ class SongProject(Base):
     )
     files = relationship("ProjectFile", back_populates="project", cascade="all, delete-orphan")
     sketches = relationship("SongSketch", back_populates="project")
-    songs = relationship("Song", back_populates="project")
     image_references = relationship("ProjectImageReference", back_populates="project", cascade="all, delete-orphan")
     release_references = relationship("ReleaseProjectReference", back_populates="project", cascade="all, delete-orphan")
 

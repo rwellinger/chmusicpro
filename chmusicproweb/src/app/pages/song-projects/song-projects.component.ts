@@ -21,7 +21,7 @@ import {UserSettingsService} from "../../services/user-settings.service";
 import {ApiConfigService} from "../../services/config/api-config.service";
 import {ResourceBlobService} from "../../services/ui/resource-blob.service";
 import {CreateProjectDialogComponent} from "../../dialogs/create-project-dialog/create-project-dialog.component";
-import {AssignedSketch, AssignedSong, SongProjectDetail, SongProjectListItem} from "../../models/song-project.model";
+import {AssignedSketch, SongProjectDetail, SongProjectListItem} from "../../models/song-project.model";
 import {getColorFromString, getInitials} from "../../services/utils/cover-utils";
 
 @Component({
@@ -583,19 +583,6 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Navigate to Song View with song ID in state.
-     * Passes targetWorkflow to switch to archived tab if song is archived.
-     */
-    openSong(song: AssignedSong): void {
-        this.router.navigate(["/songview"], {
-            state: {
-                selectedSongId: song.id,
-                targetWorkflow: song.workflow === "archived" ? "archived" : "all"
-            }
-        });
-    }
-
-    /**
      * Navigate to Sketch Library with sketch ID in state.
      * Passes targetWorkflow to switch to archived tab if sketch is archived.
      */
@@ -622,23 +609,17 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
      */
     getFolderContentLabel(folder: any): string {
         const fileCount = folder.files?.length || 0;
-        const songCount = folder.assigned_songs?.length || 0;
         const sketchCount = folder.assigned_sketches?.length || 0;
         const imageCount = folder.assigned_images?.length || 0;
-        const totalAssets = songCount + sketchCount + imageCount;
+        const totalAssets = sketchCount + imageCount;
 
         // Only images (specific type)
-        if (totalAssets > 0 && fileCount === 0 && songCount === 0 && sketchCount === 0 && imageCount > 0) {
+        if (totalAssets > 0 && fileCount === 0 && sketchCount === 0 && imageCount > 0) {
             return this.translate.instant("songProjects.detail.folderContent.images", {count: imageCount});
         }
 
-        // Only songs (specific type)
-        if (totalAssets > 0 && fileCount === 0 && songCount > 0 && sketchCount === 0 && imageCount === 0) {
-            return this.translate.instant("songProjects.detail.folderContent.songs", {count: songCount});
-        }
-
         // Only sketches (specific type)
-        if (totalAssets > 0 && fileCount === 0 && songCount === 0 && sketchCount > 0 && imageCount === 0) {
+        if (totalAssets > 0 && fileCount === 0 && sketchCount > 0 && imageCount === 0) {
             return this.translate.instant("songProjects.detail.folderContent.sketches", {count: sketchCount});
         }
 
@@ -679,7 +660,6 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
                 description: this.selectedProject.description,
                 tags: this.selectedProject.tags,
                 // Pass assigned elements for Advanced section
-                all_assigned_songs: this.selectedProject.all_assigned_songs,
                 all_assigned_sketches: this.selectedProject.all_assigned_sketches,
                 all_assigned_images: this.selectedProject.all_assigned_images
             }

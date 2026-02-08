@@ -346,40 +346,6 @@ def calculate_file_hash(file_data: bytes) -> str:
     return hashlib.sha256(file_data).hexdigest()
 
 
-def transform_song_to_assigned_response(song: Any) -> dict[str, Any]:  # pragma: no cover
-    """
-    Transform Song DB model to assigned song API response format (pure function)
-
-    NOTE: No unit tests - Simple attribute mapper without business logic.
-    Testing would only verify mock setup, not real behavior (CLAUDE.md rule).
-
-    Args:
-        song: Song DB model instance
-
-    Returns:
-        Dictionary with song data for API response
-
-    Examples:
-        >>> class MockSong:
-        ...     id = "abc-123"
-        ...     title = "Summer Vibes"
-        ...     workflow = "final"
-        ...     file_type = "flac"
-        ...     file_size_bytes = 3355443
-        ...     created_at = None
-        >>> transform_song_to_assigned_response(MockSong())
-        {'id': 'abc-123', 'title': 'Summer Vibes', 'workflow': 'final', 'file_type': 'flac', 'file_size_bytes': 3355443, 'created_at': None}
-    """
-    return {
-        "id": str(song.id),
-        "title": song.title,
-        "workflow": song.workflow if hasattr(song, "workflow") else None,
-        "file_type": song.file_type if hasattr(song, "file_type") else None,
-        "file_size_bytes": song.file_size_bytes if hasattr(song, "file_size_bytes") else None,
-        "created_at": song.created_at.isoformat() if song.created_at else None,
-    }
-
-
 def transform_sketch_to_assigned_response(sketch: Any) -> dict[str, Any]:  # pragma: no cover
     """
     Transform SongSketch DB model to assigned sketch API response format (pure function)

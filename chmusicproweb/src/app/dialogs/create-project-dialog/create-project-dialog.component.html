@@ -73,24 +73,6 @@
             </div>
 
             <div class="advanced-content">
-                <!-- Assigned Songs -->
-                <div class="assignment-category" *ngIf="assignedSongs.length > 0">
-                    <h4>
-                        <i class="fas fa-music"></i>
-                        {{ 'createProjectDialog.advanced.assignedSongs' | translate }} ({{ assignedSongs.length }})
-                    </h4>
-                    <div class="assignment-list">
-                        <div class="assignment-item" *ngFor="let song of assignedSongs">
-                            <span class="item-title">{{ getDisplayTitle(song) }}</span>
-                            <span class="item-badge workflow-badge">{{ song.workflow }}</span>
-                            <button type="button" class="unassign-btn" (click)="unassignSong(song)"
-                                    [title]="'createProjectDialog.advanced.unassign' | translate">
-                                <i class="fas fa-unlink"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Assigned Sketches -->
                 <div class="assignment-category" *ngIf="assignedSketches.length > 0">
                     <h4>

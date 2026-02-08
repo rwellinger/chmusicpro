@@ -29,7 +29,6 @@ from .routes.prompt_routes import api_prompt_v1
 from .routes.sketch_routes import api_sketch_v1
 from .routes.song_project_routes import api_song_projects_v1
 from .routes.song_release_routes import api_song_releases_v1
-from .routes.song_routes import api_song_v1
 from .routes.user_routes import api_user_v1
 from .routes.workshop_routes import api_workshop_v1
 
@@ -182,16 +181,6 @@ def create_app():
                 ProjectResponse,
                 ProjectUpdateRequest,
             )
-            from schemas.song_schemas import (
-                ChoiceRatingUpdateRequest,
-                ChoiceRatingUpdateResponse,
-                SongDeleteResponse,
-                SongListRequest,
-                SongListResponse,
-                SongResponse,
-                SongUpdateRequest,
-                SongUpdateResponse,
-            )
             from schemas.user_schemas import (
                 LoginRequest,
                 LoginResponse,
@@ -220,15 +209,6 @@ def create_app():
                 ("ImageUpdateRequest", ImageUpdateRequest),
                 ("ImageUpdateResponse", ImageUpdateResponse),
                 ("ImageDeleteResponse", ImageDeleteResponse),
-                # Song schemas
-                ("SongResponse", SongResponse),
-                ("SongListRequest", SongListRequest),
-                ("SongListResponse", SongListResponse),
-                ("SongUpdateRequest", SongUpdateRequest),
-                ("SongUpdateResponse", SongUpdateResponse),
-                ("SongDeleteResponse", SongDeleteResponse),
-                ("ChoiceRatingUpdateRequest", ChoiceRatingUpdateRequest),
-                ("ChoiceRatingUpdateResponse", ChoiceRatingUpdateResponse),
                 # Chat schemas
                 ("ChatRequest", ChatRequest),
                 ("ChatResponse", ChatResponse),
@@ -319,7 +299,6 @@ def create_app():
                 # Tag mapping for cleaner organization
                 tag_mapping = {
                     "api_image_v1": "Images",
-                    "api_song_v1": "Songs",
                     "api_song_projects_v1": "Song Projects",
                     "api_song_releases_v1": "Song Releases",
                     "api_sketch_v1": "Sketches",
@@ -343,7 +322,6 @@ def create_app():
                     if not rule.endpoint.startswith(
                         (
                             "api_image_v1",
-                            "api_song_v1",
                             "api_song_projects_v1",
                             "api_song_releases_v1",
                             "api_sketch_v1",
@@ -572,7 +550,6 @@ def create_app():
     app.register_blueprint(api_v1)
     app.register_blueprint(api_health_v1)
     app.register_blueprint(api_image_v1)
-    app.register_blueprint(api_song_v1)
     app.register_blueprint(api_song_projects_v1)
     app.register_blueprint(api_song_releases_v1)
     app.register_blueprint(api_sketch_v1)

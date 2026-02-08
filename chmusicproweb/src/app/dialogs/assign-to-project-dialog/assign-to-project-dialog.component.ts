@@ -9,14 +9,13 @@ import {TranslateModule} from "@ngx-translate/core";
 import {firstValueFrom} from "rxjs";
 
 import {SongProjectService} from "../../services/business/song-project.service";
-import {SongService} from "../../services/business/song.service";
 import {ImageService} from "../../services/business/image.service";
 import {SketchService} from "../../services/business/sketch.service";
 import {SongReleaseService} from "../../services/business/song-release.service";
 import {ReleaseType} from "../../models/song-release.model";
 
 export interface AssignToProjectDialogData {
-    assetType: "image" | "song" | "sketch" | "release";
+    assetType: "image" | "sketch" | "release";
     assetId: string;
     releaseType?: ReleaseType; // For release: SINGLE or ALBUM
     currentProjectIds?: string[]; // For release: already assigned projects
@@ -63,7 +62,6 @@ export class AssignToProjectDialogComponent implements OnInit {
     private dialogRef = inject(MatDialogRef<AssignToProjectDialogComponent>);
     protected data = inject<AssignToProjectDialogData>(MAT_DIALOG_DATA);
     private projectService = inject(SongProjectService);
-    private songService = inject(SongService);
     private imageService = inject(ImageService);
     private sketchService = inject(SketchService);
     private releaseService = inject(SongReleaseService);
@@ -149,7 +147,7 @@ export class AssignToProjectDialogComponent implements OnInit {
             return !this.selectedProjectId;
         }
 
-        // For non-release assets (song, image, sketch): only project is required, folder is optional
+        // For non-release assets (image, sketch): only project is required, folder is optional
         return !this.selectedProjectId;
     }
 
@@ -188,13 +186,6 @@ export class AssignToProjectDialogComponent implements OnInit {
         try {
             // Call the appropriate service based on asset type
             switch (this.data.assetType) {
-                case "song":
-                    await this.songService.assignToProject(
-                        this.data.assetId,
-                        this.selectedProjectId!,
-                        this.selectedFolderId || undefined
-                    );
-                    break;
                 case "image":
                     await this.imageService.assignToProject(
                         this.data.assetId,

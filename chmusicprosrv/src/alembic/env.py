@@ -13,8 +13,6 @@ from db.models import (  # noqa: F401
     Message,
     MessageArchive,
     PromptTemplate,
-    Song,
-    SongChoice,
     SongSketch,
     User,
 )
