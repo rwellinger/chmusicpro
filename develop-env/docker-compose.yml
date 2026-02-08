@@ -8,10 +8,11 @@ services:
     env_file: .env
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-chmusicpro.sh
     networks:
       - thwelly-net
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U aiproxy -d aiproxysrv" ]
+      test: [ "CMD-SHELL", "pg_isready -U chmusicpro -d chmusicpro" ]
       interval: 10s
       timeout: 5s
       retries: 3

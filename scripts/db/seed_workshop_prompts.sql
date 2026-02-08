@@ -5,7 +5,7 @@
 -- (Connect, Collect, Shape phases with AI assistants)
 --
 -- Usage (Docker):
---   cat scripts/db/seed_workshop_prompts.sql | docker exec -i postgres psql -U aiproxy -d aiproxysrv
+--   cat scripts/db/seed_workshop_prompts.sql | docker exec -i postgres psql -U chmusicpro -d chmusicpro
 --
 -- Prerequisite: seed_prompts.sql must be run first (creates upsert_prompt_template function)
 -- ============================================================

@@ -6,10 +6,10 @@
 -- This script seeds/updates all production prompt templates
 --
 -- Usage (PostgreSQL):
---   psql -h localhost -U aiproxy -d aiproxysrv -f seed_prompts.sql
+--   psql -h localhost -U chmusicpro -d chmusicpro -f seed_prompts.sql
 --
 -- Usage (Docker):
---   cat seed_prompts.sql | docker exec -i postgres psql -U aiproxy -d aiproxysrv
+--   cat seed_prompts.sql | docker exec -i postgres psql -U chmusicpro -d chmusicpro
 --
 -- ============================================================
 

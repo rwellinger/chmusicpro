@@ -5,10 +5,10 @@
 -- prompt conditions using AI (Ollama/OpenAI).
 --
 -- Usage (PostgreSQL):
---   psql -h localhost -U aiproxy -d aiproxysrv -f seed_prompts_improve_condition.sql
+--   psql -h localhost -U chmusicpro -d chmusicpro -f seed_prompts_improve_condition.sql
 --
 -- Usage (Docker):
---   cat scripts/db/seed_prompts_improve_condition.sql | docker exec -i postgres psql -U aiproxy -d aiproxysrv
+--   cat scripts/db/seed_prompts_improve_condition.sql | docker exec -i postgres psql -U chmusicpro -d chmusicpro
 --
 -- ============================================================
 

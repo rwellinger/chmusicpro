@@ -125,9 +125,9 @@ ENCRYPTION_SECRET_KEY = os.getenv("ENCRYPTION_SECRET_KEY", "")
 # --------------------------------------------------
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://aiproxy:aiproxy123@localhost:5432/aiproxysrv"
+    "postgresql://chmusicpro:chmusicpro123@localhost:5432/chmusicpro"
     if DEBUG
-    else "postgresql://aiproxy:aiproxy123@postgres:5432/aiproxysrv",
+    else "postgresql://chmusicpro:chmusicpro123@postgres:5432/chmusicpro",
 )
 DATABASE_ECHO = os.getenv("DATABASE_ECHO", "false").lower() == "true"
 

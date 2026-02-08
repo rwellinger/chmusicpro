@@ -5,10 +5,10 @@
 -- This script seeds/updates regex-based lyric cleanup and section detection rules
 --
 -- Usage (PostgreSQL):
---   psql -h localhost -U aiuser -d aiproxy -f seed_lyric_parsing_rules.sql
+--   psql -h localhost -U chmusicpro -d chmusicpro -f seed_lyric_parsing_rules.sql
 --
 -- Usage (Docker):
---   cat seed_lyric_parsing_rules.sql | docker exec -i chmusicpro-postgres-1 psql -U aiuser -d aiproxy
+--   cat seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U chmusicpro -d chmusicpro
 --
 -- NOTE: All replacement values are Base64-encoded for safe storage
 -- ============================================================

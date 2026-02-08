@@ -196,8 +196,8 @@ make test                      # pytest
 
 ```bash
 # From project root (chmusicpro/)
-cat scripts/db/seed_prompts.sql | docker exec -i postgres psql -U aiproxy -d chmusicprosrv
-cat scripts/db/seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U aiproxy -d chmusicprosrv
+cat scripts/db/seed_prompts.sql | docker exec -i postgres psql -U chmusicpro -d chmusicpro
+cat scripts/db/seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U chmusicpro -d chmusicpro
 ```
 
 **DB Credentials:** See `.env` file (not committed to repository)

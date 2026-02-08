@@ -26,7 +26,7 @@ usage() {
     echo "Usage: $0 <backup-file.sql.gz>"
     echo ""
     echo "Example:"
-    echo "  $0 /volumeUSB1/usbshare/backup/postgres/20250124_213000_aiproxysrv_full.sql.gz"
+    echo "  $0 /volumeUSB1/usbshare/backup/postgres/20250124_213000_chmusicpro_full.sql.gz"
     echo ""
     exit 1
 }

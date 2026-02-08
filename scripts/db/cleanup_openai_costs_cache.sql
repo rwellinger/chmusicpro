@@ -14,7 +14,7 @@
 -- SAFE TO RUN MULTIPLE TIMES (idempotent)
 --
 -- Usage (PyCharm SSH or local):
---   psql -h YOUR_HOST -U aiproxy -d aiproxysrv -f scripts/db/cleanup_openai_costs_cache.sql
+--   psql -h YOUR_HOST -U chmusicpro -d chmusicpro -f scripts/db/cleanup_openai_costs_cache.sql
 --
 -- ============================================================
 

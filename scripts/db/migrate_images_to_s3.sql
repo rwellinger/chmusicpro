@@ -11,7 +11,7 @@
 --   4. IMPORTANT: Use original filename from 'filename' column (NOT UUID!)
 --
 -- Execution:
---   cat scripts/db/migrate_images_to_s3.sql | docker exec -i postgres psql -U aiproxy -d aiproxysrv
+--   cat scripts/db/migrate_images_to_s3.sql | docker exec -i postgres psql -U chmusicpro -d chmusicpro
 --
 -- Rollback (if needed):
 --   UPDATE generated_images

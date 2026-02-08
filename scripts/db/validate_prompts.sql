@@ -5,10 +5,10 @@
 -- pre_condition + post_condition content.
 --
 -- Usage (PostgreSQL Docker):
---   cat validate_prompts.sql | docker exec -i postgres psql -U aiproxy -d aiproxysrv
+--   cat validate_prompts.sql | docker exec -i postgres psql -U chmusicpro -d chmusicpro
 --
 -- Usage (SSH Tunnel to PROD):
---   psql -h localhost -p 5432 -U aiproxy -d aiproxysrv -f validate_prompts.sql
+--   psql -h localhost -p 5432 -U chmusicpro -d chmusicpro -f validate_prompts.sql
 --
 -- This script is READ-ONLY - it makes no changes to the database.
 -- ============================================================

@@ -22,7 +22,7 @@
 -- 4. Fill in the VALUES below with your data
 --
 -- Usage (PyCharm SSH or local):
---   psql -h YOUR_HOST -U aiproxy -d aiproxysrv -f seed_openai_costs_historical.sql
+--   psql -h YOUR_HOST -U chmusicpro -d chmusicpro -f seed_openai_costs_historical.sql
 --
 -- ============================================================
 

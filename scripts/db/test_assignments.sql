@@ -1,6 +1,6 @@
 -- Test Script: Check Project Assignments
 -- Run after manual UI testing with:
--- cat scripts/test_assignments.sql | docker exec -i postgres psql -U aiproxy -d aiproxysrv
+-- cat scripts/test_assignments.sql | docker exec -i postgres psql -U chmusicpro -d chmusicpro
 
 -- 1. Check Song Assignment (1:1 relationship)
 SELECT
