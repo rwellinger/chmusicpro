@@ -24,4 +24,43 @@
             </div>
         }
     </div>
+
+    @if (isLoadingRecent) {
+        <div class="recent-work-loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>{{ 'dashboard.recentWork.loading' | translate }}</span>
+        </div>
+    } @else if (recentCategories.length > 0) {
+        <div class="recent-work-section">
+            <div class="recent-work-header">
+                <h2>{{ 'dashboard.recentWork.title' | translate }}</h2>
+                <p class="subtitle">{{ 'dashboard.recentWork.subtitle' | translate }}</p>
+            </div>
+
+            @for (category of recentCategories; track category.titleKey) {
+                <div class="recent-category">
+                    <h3 class="category-title">
+                        <i class="fas {{ category.icon }}"></i>
+                        {{ category.titleKey | translate }}
+                    </h3>
+                    <div class="recent-items-row">
+                        @for (item of category.items; track item.id) {
+                            <div class="recent-item-card" (click)="onRecentItemClick(item)">
+                                <div class="recent-item-icon" [style.background-color]="item.iconColor + '15'" [style.color]="item.iconColor">
+                                    <i class="fas {{ item.icon }}"></i>
+                                </div>
+                                <div class="recent-item-content">
+                                    <span class="recent-item-title">{{ item.title }}</span>
+                                    <span class="recent-item-subtitle">{{ item.subtitle }}</span>
+                                </div>
+                                @if (item.updatedAt) {
+                                    <span class="recent-item-date">{{ formatRelativeDate(item.updatedAt) }}</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>

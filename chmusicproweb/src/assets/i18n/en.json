@@ -52,6 +52,20 @@
         "title": "Promotion",
         "description": "Marketing, AI videos and social media"
       }
+    },
+    "recentWork": {
+      "title": "Recent Work",
+      "subtitle": "Continue where you left off",
+      "loading": "Loading recent work...",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "daysAgo": "{{days}}d ago",
+      "categories": {
+        "workshops": "Lyric Creation",
+        "coverArts": "Cover Arts",
+        "projects": "Projects",
+        "distribution": "Distribution"
+      }
     }
   },
   "aiChat": {

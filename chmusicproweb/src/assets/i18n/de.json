@@ -52,6 +52,20 @@
         "title": "Promotion",
         "description": "Marketing, KI-Videos und Social Media"
       }
+    },
+    "recentWork": {
+      "title": "Letzte Arbeiten",
+      "subtitle": "Mach weiter, wo du aufgehoert hast",
+      "loading": "Lade letzte Arbeiten...",
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "daysAgo": "vor {{days}} T.",
+      "categories": {
+        "workshops": "Songtext erstellen",
+        "coverArts": "Cover Arts",
+        "projects": "Projekte",
+        "distribution": "Distribution"
+      }
     }
   },
   "aiChat": {
