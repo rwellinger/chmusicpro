@@ -110,6 +110,83 @@ class OllamaAPIClient:
             )
             raise OllamaAPIError(f"Invalid API response format: {e}")
 
+    def chat(self, model: str, messages: list[dict[str, str]]) -> dict[str, Any]:
+        """
+        Send chat request to Ollama API (multi-turn conversation).
+
+        Args:
+            model: Ollama model name (e.g., "llama3.2:3b")
+            messages: List of messages with role and content
+
+        Returns:
+            Ollama API response JSON
+
+        Raises:
+            OllamaAPIError: If API call fails
+        """
+        api_url = f"{self.base_url}/api/chat"
+        payload = {"model": model, "messages": messages, "stream": False}
+
+        if CHAT_DEBUG_LOGGING:
+            logger.debug("Ollama Chat API Request Details", api_url=api_url, full_payload=payload)
+        else:
+            logger.debug("Calling Ollama Chat API", api_url=api_url, model=model)
+
+        try:
+            resp = requests.post(api_url, json=payload, timeout=self.timeout)
+
+            if CHAT_DEBUG_LOGGING:
+                logger.debug("Ollama Chat API response received", status_code=resp.status_code)
+
+            resp.raise_for_status()
+
+        except requests.exceptions.Timeout:
+            logger.error("Ollama API timeout", url=self.base_url)
+            raise OllamaAPIError("Ollama API timeout")
+
+        except requests.exceptions.ConnectionError:
+            logger.error("Ollama API connection failed", url=self.base_url)
+            raise OllamaAPIError("Cannot connect to Ollama API")
+
+        except requests.exceptions.RequestException as e:
+            logger.error(
+                "Ollama API Network Error", error_type=type(e).__name__, error=str(e), stacktrace=traceback.format_exc()
+            )
+            raise OllamaAPIError(f"Network Error: {e}")
+
+        except Exception as e:
+            logger.error(
+                "Unexpected Ollama API error",
+                error_type=type(e).__name__,
+                error=str(e),
+                stacktrace=traceback.format_exc(),
+            )
+            raise OllamaAPIError(f"Unexpected Error: {e}")
+
+        if resp.status_code != 200:
+            logger.error("Ollama API Error Response", status_code=resp.status_code, response_text=resp.text)
+            try:
+                error_data = resp.json()
+                raise OllamaAPIError(error_data)
+            except ValueError:
+                raise OllamaAPIError(f"HTTP {resp.status_code}: {resp.text}")
+
+        try:
+            resp_json = resp.json()
+
+            if CHAT_DEBUG_LOGGING:
+                logger.debug("Ollama Chat API raw response parsed", response_keys=list(resp_json.keys()))
+
+            return resp_json
+        except ValueError as e:
+            logger.error(
+                "Error parsing Ollama Chat API response",
+                error=str(e),
+                response_text=resp.text,
+                stacktrace=traceback.format_exc(),
+            )
+            raise OllamaAPIError(f"Invalid API response format: {e}")
+
     def get_tags(self) -> dict[str, Any]:
         """
         Get available Ollama models from server.

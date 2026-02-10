@@ -5,10 +5,10 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-import requests
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from adapters.ollama.api_client import OllamaAPIClient, OllamaAPIError
 from api.controllers.claude_chat_controller import ClaudeAPIError as ClaudeError
 from api.controllers.claude_chat_controller import ClaudeChatController
 from api.controllers.openai_chat_controller import OpenAIAPIError as OpenAIError
@@ -17,7 +17,7 @@ from config.model_context_windows import (
     get_context_window_size,
     get_external_provider_context_window,
 )
-from config.settings import CLAUDE_MAX_TOKENS, OLLAMA_TIMEOUT, OLLAMA_URL, OPENAI_MAX_TOKENS
+from config.settings import CLAUDE_MAX_TOKENS, OPENAI_MAX_TOKENS
 from db.models import Conversation, Message, MessageArchive
 from schemas.conversation_schemas import (
     ConversationCreate,
@@ -606,7 +606,7 @@ class ConversationController:
 
     def _call_ollama_chat_api(self, model: str, messages: list[dict[str, str]]) -> tuple[str, int, int]:
         """
-        Call Ollama chat API.
+        Call Ollama chat API via OllamaAPIClient.
 
         Args:
             model: Model name
@@ -618,49 +618,20 @@ class ConversationController:
         Raises:
             OllamaAPIError: If API call fails
         """
-        api_url = f"{OLLAMA_URL}/api/chat"
-        logger.debug("Calling Ollama chat API", api_url=api_url, model=model)
+        api_client = OllamaAPIClient()
+        resp_json = api_client.chat(model, messages)
 
-        payload = {
-            "model": model,
-            "messages": messages,
-            "stream": False,
-        }
+        # Extract assistant message
+        if "message" in resp_json and "content" in resp_json["message"]:
+            content = resp_json["message"]["content"]
+            prompt_eval_count = resp_json.get("prompt_eval_count", 0)
+            eval_count = resp_json.get("eval_count", 0)
 
-        try:
-            resp = requests.post(
-                api_url,
-                json=payload,
-                timeout=OLLAMA_TIMEOUT,
-            )
-            resp.raise_for_status()
+            logger.debug("Token counts extracted", prompt_tokens=prompt_eval_count, response_tokens=eval_count)
 
-            resp_json = resp.json()
-            logger.debug("Ollama chat API response received")
-
-            # Extract assistant message
-            if "message" in resp_json and "content" in resp_json["message"]:
-                content = resp_json["message"]["content"]
-                prompt_eval_count = resp_json.get("prompt_eval_count", 0)
-                eval_count = resp_json.get("eval_count", 0)
-
-                logger.debug("Token counts extracted", prompt_tokens=prompt_eval_count, response_tokens=eval_count)
-
-                return content, prompt_eval_count, eval_count
-            else:
-                raise OllamaAPIError("Invalid API response format")
-
-        except requests.exceptions.RequestException as e:
-            logger.error("Ollama API Network Error", error=str(e))
-            raise OllamaAPIError(f"Network Error: {e}")
-        except Exception as e:
-            logger.error(
-                "Unexpected Ollama API error",
-                error_type=type(e).__name__,
-                error=str(e),
-                stacktrace=traceback.format_exc(),
-            )
-            raise OllamaAPIError(f"Unexpected Error: {e}")
+            return content, prompt_eval_count, eval_count
+        else:
+            raise OllamaAPIError("Invalid API response format")
 
     def _call_openai_chat_api(self, model: str, messages: list[dict[str, str]]) -> tuple[str, int, int]:
         """
@@ -773,9 +744,3 @@ class ConversationController:
             enhanced.insert(0, {"role": "system", "content": model_context})
 
         return enhanced
-
-
-class OllamaAPIError(Exception):
-    """Custom exception for Ollama API errors."""
-
-    pass
