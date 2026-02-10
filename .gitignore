@@ -40,3 +40,4 @@ dump.rdb
 /chmusicprosrv/.coverage
 /docs/gotobusiness.md
 /forwardproxy/
+/chmusicprosrv/.env_dev
