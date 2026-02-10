@@ -1,0 +1,107 @@
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+.dashboard-container {
+  padding: $spacing-xl;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: $spacing-xl;
+
+  h1 {
+    @include heading(1);
+    margin-bottom: $spacing-xs;
+  }
+
+  .subtitle {
+    @include body-text('base');
+    color: $text-muted;
+    margin: 0;
+  }
+}
+
+.tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-lg;
+
+  @include respond-to(desktop) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include respond-to(tablet) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-to(mobile) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tile {
+  @include card-container();
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: $spacing-xl $spacing-lg;
+  cursor: pointer;
+  position: relative;
+  transition: transform $transition-fast, box-shadow $transition-fast;
+
+  &:hover:not(.disabled) {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    &:hover {
+      box-shadow: $shadow-sm;
+      transform: none;
+    }
+  }
+}
+
+.tile-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-md;
+
+  i {
+    font-size: $font-2xl;
+  }
+}
+
+.tile-content {
+  h3 {
+    @include heading(3);
+    margin-bottom: $spacing-xs;
+  }
+
+  p {
+    @include body-text('sm');
+    color: $text-muted;
+    margin: 0;
+  }
+}
+
+.coming-soon-badge {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  background: $background-light;
+  color: $text-muted;
+  font-size: $font-xs;
+  padding: 2px $spacing-sm;
+  border-radius: $border-radius-sm;
+  font-weight: $font-weight-medium;
+}

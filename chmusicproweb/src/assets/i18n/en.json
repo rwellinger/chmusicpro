@@ -15,6 +15,45 @@
       "hint": "This application is optimized for landscape orientation."
     }
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Your music production workflow at a glance",
+    "comingSoon": "Coming soon",
+    "tiles": {
+      "workshop": {
+        "title": "Lyric Creation",
+        "description": "Begin a new songwriting session"
+      },
+      "project": {
+        "title": "Manage Projects",
+        "description": "Organize your song projects"
+      },
+      "composition": {
+        "title": "Composition",
+        "description": "Arrange, prepare and set up your song"
+      },
+      "cover": {
+        "title": "Cover Art",
+        "description": "Generate album artwork with AI"
+      },
+      "mixing": {
+        "title": "Mixing Session",
+        "description": "Mix and balance your tracks"
+      },
+      "mastering": {
+        "title": "Mastering Session",
+        "description": "Finalize your master audio"
+      },
+      "distribute": {
+        "title": "Distribution",
+        "description": "Prepare release for DistroKid, Ditto Music etc."
+      },
+      "promote": {
+        "title": "Promotion",
+        "description": "Marketing, AI videos and social media"
+      }
+    }
+  },
   "aiChat": {
     "actions": {
       "archive": "Archive",
@@ -852,6 +891,7 @@
   "sideMenu": {
     "aiChat": "AI Chat",
     "brandName": "Swiss Music Production",
+    "dashboard": "Dashboard",
     "createImage": "Create",
     "equipment": "Equipment",
     "equipmentGallery": "Gallery",

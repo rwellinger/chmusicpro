@@ -14,6 +14,15 @@
     <nav class="nav-section">
 
         <div class="nav-group">
+            <div class="group-items">
+                <a routerLink="/dashboard" routerLinkActive="active">
+                    <i class="fas fa-th-large"></i>
+                    {{ 'sideMenu.dashboard' | translate }}
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-group">
             <span class="group-label">
                 <i class="fas fa-robot"></i>
                 {{ 'sideMenu.aiChat' | translate }}

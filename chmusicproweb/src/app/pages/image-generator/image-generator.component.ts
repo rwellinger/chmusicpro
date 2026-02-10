@@ -2,6 +2,7 @@ import {Component, HostListener, inject, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {CommonModule} from "@angular/common";
 import {HttpClient} from "@angular/common/http";
+import {ActivatedRoute} from "@angular/router";
 import {firstValueFrom} from "rxjs";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {ResourceBlobService} from "../../services/ui/resource-blob.service";
@@ -134,6 +135,7 @@ export class ImageGeneratorComponent implements OnInit {
     private resourceBlobService = inject(ResourceBlobService);
     private translate = inject(TranslateService);
     private userService = inject(UserService);
+    private route = inject(ActivatedRoute);
 
     ngOnInit() {
         this.promptForm = this.fb.group({
@@ -204,6 +206,12 @@ export class ImageGeneratorComponent implements OnInit {
                 this.notificationService.info(this.translate.instant("imageGenerator.albumCoverRequiresTitle"));
             }
         });
+
+        // Pre-select composition from query param (e.g., from dashboard)
+        const compositionParam = this.route.snapshot.queryParamMap.get("composition");
+        if (compositionParam === "album-cover") {
+            this.composition.setValue("album-cover");
+        }
     }
 
     /**

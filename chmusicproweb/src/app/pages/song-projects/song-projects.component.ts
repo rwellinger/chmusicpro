@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy, OnInit} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {FormsModule} from "@angular/forms";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {debounceTime, distinctUntilChanged, firstValueFrom, Subject, takeUntil} from "rxjs";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {MatCardModule} from "@angular/material/card";
@@ -82,6 +82,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     private dialog = inject(MatDialog);
     private settingsService = inject(UserSettingsService);
     private apiConfig = inject(ApiConfigService);
+    private route = inject(ActivatedRoute);
     private resourceBlobService = inject(ResourceBlobService);
 
     // Navigation state (must be captured in constructor)
@@ -125,6 +126,13 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
             } else if (this.projectList.length > 0 && !this.selectedProject) {
                 // Auto-select first project if no navigation state
                 this.selectProject(this.projectList[0]);
+            }
+        });
+
+        // Auto-open create dialog if requested via query param (e.g., from dashboard)
+        this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+            if (params["action"] === "create") {
+                this.createNewProject();
             }
         });
     }

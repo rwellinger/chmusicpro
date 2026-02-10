@@ -15,6 +15,45 @@
       "hint": "Diese Anwendung ist für Querformat optimiert."
     }
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Dein Musikproduktions-Workflow auf einen Blick",
+    "comingSoon": "Demnächst",
+    "tiles": {
+      "workshop": {
+        "title": "Songtext erstellen",
+        "description": "Starte eine neue Songwriting-Session"
+      },
+      "project": {
+        "title": "Projekte verwalten",
+        "description": "Song-Projekte organisieren"
+      },
+      "composition": {
+        "title": "Komposition",
+        "description": "Song arrangieren und vorbereiten"
+      },
+      "cover": {
+        "title": "Cover Art",
+        "description": "Album-Artwork mit KI generieren"
+      },
+      "mixing": {
+        "title": "Mixing Session",
+        "description": "Tracks mischen und abmischen"
+      },
+      "mastering": {
+        "title": "Mastering Session",
+        "description": "Master-Audio finalisieren"
+      },
+      "distribute": {
+        "title": "Distribution",
+        "description": "Release für DistroKid, Ditto Music etc. vorbereiten"
+      },
+      "promote": {
+        "title": "Promotion",
+        "description": "Marketing, KI-Videos und Social Media"
+      }
+    }
+  },
   "aiChat": {
     "actions": {
       "archive": "Archivieren",
@@ -852,6 +891,7 @@
   "sideMenu": {
     "aiChat": "KI Chat",
     "brandName": "Swiss Music Production",
+    "dashboard": "Dashboard",
     "createImage": "Erstellen",
     "equipment": "Equipment",
     "equipmentGallery": "Galerie",
