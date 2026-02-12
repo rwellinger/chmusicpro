@@ -108,25 +108,52 @@ def admin_required(f):
     return decorated_function
 
 
-def domain_role_required(*allowed_roles):
+def domain_role_required(*allowed_roles, domain_type=None):
     """
     Decorator to require specific domain roles for API endpoints.
     Must be used AFTER @jwt_required (which sets g.current_domain_role).
     Returns 403 if user's domain role is not in allowed_roles.
 
+    Args:
+        *allowed_roles: Role strings that are permitted (e.g. "owner", "admin")
+        domain_type: Optional DomainType enum value. When set, checks user's role
+                     in that specific domain type (e.g. SYSTEM, KI_TEMPLATES)
+                     instead of the active domain role from JWT.
+
     Usage:
-        @api.route("/admin-action")
-        @jwt_required
+        # Check active domain role:
         @domain_role_required("owner", "admin")
-        def admin_action():
-            ...
+
+        # Check role in a specific domain type:
+        @domain_role_required("owner", "admin", domain_type=DomainType.SYSTEM)
     """
 
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            domain_role = getattr(g, "current_domain_role", None)
-            if domain_role not in allowed_roles:
+            if domain_type is not None:
+                # Check role in a specific domain type (e.g. System, KI Templates)
+                user_id = getattr(g, "current_user_id", None)
+                if not user_id:
+                    return jsonify({"success": False, "error": "Insufficient domain permissions"}), 403
+
+                from db.database import get_db
+                from db.domain_service import DomainService
+
+                domain_svc = DomainService()
+                db = next(get_db())
+                try:
+                    domain = domain_svc.get_reserved_domain(db, domain_type)
+                    if not domain:
+                        return jsonify({"success": False, "error": "Insufficient domain permissions"}), 403
+                    role = domain_svc.get_user_role_in_domain(db, str(domain.id), str(user_id))
+                finally:
+                    db.close()
+            else:
+                # Check active domain role from JWT
+                role = getattr(g, "current_domain_role", None)
+
+            if role not in allowed_roles:
                 return jsonify({"success": False, "error": "Insufficient domain permissions"}), 403
             return f(*args, **kwargs)
 

@@ -4,8 +4,9 @@ OpenAI Cost API Routes - OpenAI Admin Cost Tracking
 
 from flask import Blueprint, jsonify
 
-from api.auth_middleware import admin_required, get_current_user_id, jwt_required
+from api.auth_middleware import domain_role_required, get_current_user_id, jwt_required
 from api.controllers.openai_cost_controller import OpenAICostController
+from db.models import DomainType
 
 
 api_openai_costs_v1 = Blueprint("api_openai_costs_v1", __name__, url_prefix="/api/v1/openai/costs")
@@ -16,7 +17,7 @@ cost_controller = OpenAICostController()
 
 @api_openai_costs_v1.route("/current", methods=["GET"])
 @jwt_required
-@admin_required
+@domain_role_required("admin", "owner", domain_type=DomainType.SYSTEM)
 def get_openai_current_month():
     """Get OpenAI costs for current month (cached with TTL)"""
     user_id = get_current_user_id()
@@ -29,7 +30,7 @@ def get_openai_current_month():
 
 @api_openai_costs_v1.route("/all-time", methods=["GET"])
 @jwt_required
-@admin_required
+@domain_role_required("admin", "owner", domain_type=DomainType.SYSTEM)
 def get_openai_all_time():
     """Get OpenAI all-time aggregated costs across all months"""
     user_id = get_current_user_id()
@@ -42,7 +43,7 @@ def get_openai_all_time():
 
 @api_openai_costs_v1.route("/<int:year>/<int:month>", methods=["GET"])
 @jwt_required
-@admin_required
+@domain_role_required("admin", "owner", domain_type=DomainType.SYSTEM)
 def get_openai_month(year: int, month: int):
     """Get OpenAI costs for specific month (cached forever for past months)"""
     user_id = get_current_user_id()

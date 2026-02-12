@@ -5,8 +5,9 @@ User Authentication and Management Routes
 from flask import Blueprint, jsonify, request
 from flask_pydantic import validate
 
-from api.auth_middleware import admin_required, get_current_user_id, jwt_required
+from api.auth_middleware import domain_role_required, get_current_user_id, jwt_required
 from api.controllers.user_controller import UserController
+from db.models import DomainType
 from schemas.user_schemas import (
     LoginRequest,
     PasswordChangeRequest,
@@ -107,7 +108,7 @@ def change_password(body: PasswordChangeRequest):
 
 @api_user_v1.route("/password-reset", methods=["POST"])
 @jwt_required
-@admin_required
+@domain_role_required("admin", "owner", domain_type=DomainType.SYSTEM)
 @validate()
 def reset_password(body: PasswordResetRequest):
     """Reset user password (admin function, requires JWT + admin role)"""
@@ -120,7 +121,7 @@ def reset_password(body: PasswordResetRequest):
 
 @api_user_v1.route("/list", methods=["GET"])
 @jwt_required
-@admin_required
+@domain_role_required("admin", "owner", domain_type=DomainType.SYSTEM)
 def list_users():
     """List all users (admin function, requires JWT + admin role)"""
     try:
