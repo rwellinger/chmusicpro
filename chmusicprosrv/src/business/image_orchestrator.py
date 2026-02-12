@@ -37,6 +37,7 @@ class ImageOrchestrator:
     def generate_image(
         self,
         user_id: str,
+        domain_id: str,
         prompt: str,
         size: str,
         title: str | None = None,
@@ -107,6 +108,7 @@ class ImageOrchestrator:
             # Save metadata to database and get the generated image record
             generated_image = self._save_image_metadata(
                 user_id=user_id,
+                domain_id=domain_id,
                 user_prompt=user_prompt,
                 prompt=prompt,  # Ollama-enhanced prompt
                 enhanced_prompt=enhanced_prompt if enhanced_prompt != prompt else None,
@@ -152,7 +154,7 @@ class ImageOrchestrator:
 
     def get_images_with_pagination(
         self,
-        user_id: str,
+        domain_id: str,
         limit: int = 20,
         offset: int = 0,
         search: str = "",
@@ -163,6 +165,7 @@ class ImageOrchestrator:
         Get paginated list of images with search and sorting
 
         Args:
+            domain_id: Domain UUID for tenant filtering
             limit: Number of images to return
             offset: Number of images to skip
             search: Search term for filtering
@@ -174,14 +177,14 @@ class ImageOrchestrator:
         """
         try:
             images = ImageService.get_images_paginated(
-                user_id=user_id,
+                domain_id=domain_id,
                 limit=limit,
                 offset=offset,
                 search=search,
                 sort_by=sort_by,
                 sort_direction=sort_direction,
             )
-            total_count = ImageService.get_total_images_count(user_id=user_id, search=search)
+            total_count = ImageService.get_total_images_count(domain_id=domain_id, search=search)
 
             # Transform to API response format
             image_list = [self._transform_image_to_api_format(image) for image in images]
@@ -200,7 +203,7 @@ class ImageOrchestrator:
             logger.error("Error retrieving images", error=str(e))
             raise ImageGenerationError(f"Failed to retrieve images: {e}") from e
 
-    def get_images_for_text_overlay(self, user_id: str) -> dict[str, Any]:
+    def get_images_for_text_overlay(self, domain_id: str) -> dict[str, Any]:
         """
         Get list of images suitable for text overlay
         - Only images with title (not NULL and not empty)
@@ -211,7 +214,7 @@ class ImageOrchestrator:
             Dict containing filtered and sorted images
         """
         try:
-            images = ImageService.get_images_for_text_overlay(user_id=user_id)
+            images = ImageService.get_images_for_text_overlay(domain_id=domain_id)
 
             # Transform to API response format
             image_list = [self._transform_image_to_api_format(image) for image in images]
@@ -222,18 +225,19 @@ class ImageOrchestrator:
             logger.error("Error retrieving images for text overlay", error=str(e))
             raise ImageGenerationError(f"Failed to retrieve images for text overlay: {e}") from e
 
-    def get_image_details(self, user_id: str, image_id: str) -> dict[str, Any] | None:
+    def get_image_details(self, domain_id: str, image_id: str) -> dict[str, Any] | None:
         """
         Get detailed information for a single image
 
         Args:
+            domain_id: Domain UUID for tenant filtering
             image_id: ID of the image
 
         Returns:
             Dict containing image details or None if not found
         """
         try:
-            image = ImageService.get_image_by_id(image_id, user_id=user_id)
+            image = ImageService.get_image_by_id(image_id, domain_id=domain_id)
             if not image:
                 return None
 
@@ -243,11 +247,12 @@ class ImageOrchestrator:
             logger.error("Error retrieving image", image_id=image_id, error=str(e))
             raise ImageGenerationError(f"Failed to retrieve image: {e}") from e
 
-    def delete_single_image(self, user_id: str, image_id: str) -> bool:
+    def delete_single_image(self, domain_id: str, image_id: str) -> bool:
         """
         Delete a single image including files and metadata
 
         Args:
+            domain_id: Domain UUID for tenant filtering
             image_id: ID of the image to delete
 
         Returns:
@@ -257,7 +262,7 @@ class ImageOrchestrator:
             ImageGenerationError: If deletion fails
         """
         try:
-            image = ImageService.get_image_by_id(image_id, user_id=user_id)
+            image = ImageService.get_image_by_id(image_id, domain_id=domain_id)
             if not image:
                 return False
 
@@ -285,11 +290,12 @@ class ImageOrchestrator:
             logger.error("Error deleting image", image_id=image_id, error_type=type(e).__name__, error=str(e))
             raise ImageGenerationError(f"Failed to delete image: {e}") from e
 
-    def bulk_delete_images(self, user_id: str, image_ids: list[str]) -> dict[str, Any]:
+    def bulk_delete_images(self, domain_id: str, image_ids: list[str]) -> dict[str, Any]:
         """
         Delete multiple images with detailed results
 
         Args:
+            domain_id: Domain UUID for tenant filtering
             image_ids: List of image IDs to delete
 
         Returns:
@@ -307,8 +313,8 @@ class ImageOrchestrator:
         delete_results = []
         for image_id in image_ids:
             try:
-                # Check if image exists (with ownership)
-                image = ImageService.get_image_by_id(image_id, user_id=user_id)
+                # Check if image exists (with domain ownership)
+                image = ImageService.get_image_by_id(image_id, domain_id=domain_id)
                 if not image:
                     delete_results.append(DeleteResult(image_id, "not_found"))
                     continue
@@ -344,12 +350,13 @@ class ImageOrchestrator:
         return response
 
     def update_image_metadata(
-        self, user_id: str, image_id: str, title: str = None, tags: str = None
+        self, domain_id: str, image_id: str, title: str = None, tags: str = None
     ) -> dict[str, Any] | None:
         """
         Update image metadata
 
         Args:
+            domain_id: Domain UUID for tenant filtering
             image_id: ID of the image to update
             title: Optional new title
             tags: Optional tags (comma-separated string)
@@ -358,20 +365,20 @@ class ImageOrchestrator:
             Updated image data or None if not found
         """
         try:
-            # Check if image exists (with ownership)
-            image = ImageService.get_image_by_id(image_id, user_id=user_id)
+            # Check if image exists (with domain ownership)
+            image = ImageService.get_image_by_id(image_id, domain_id=domain_id)
             if not image:
                 return None
 
             # Update metadata
-            success = ImageService.update_image_metadata(image_id, title, tags, user_id=user_id)
+            success = ImageService.update_image_metadata(image_id, title, tags, domain_id=domain_id)
             if not success:
                 raise ImageGenerationError("Failed to update image metadata")
 
             logger.info("Image metadata updated successfully", image_id=image_id)
 
             # Return updated image data
-            updated_image = ImageService.get_image_by_id(image_id, user_id=user_id)
+            updated_image = ImageService.get_image_by_id(image_id, domain_id=domain_id)
             return self._transform_image_to_api_format(updated_image, include_file_path=True) if updated_image else None
 
         except Exception as e:
@@ -381,6 +388,7 @@ class ImageOrchestrator:
     def add_text_overlay_to_image(
         self,
         user_id: str,
+        domain_id: str,
         source_image_id: str,
         title: str,
         artist: str | None = None,
@@ -431,8 +439,8 @@ class ImageOrchestrator:
         from infrastructure.image_file_service import ImageFileService
 
         try:
-            # Get source image from DB (with ownership check)
-            source_image = ImageService.get_image_by_id(source_image_id, user_id=user_id)
+            # Get source image from DB (with domain ownership check)
+            source_image = ImageService.get_image_by_id(source_image_id, domain_id=domain_id)
             if not source_image:
                 raise ImageGenerationError(f"Source image not found: {source_image_id}")
 
@@ -575,6 +583,7 @@ class ImageOrchestrator:
             # === REPOSITORY LAYER: Create new DB record ===
             new_image = ImageService.save_generated_image(
                 user_id=user_id,
+                domain_id=domain_id,
                 prompt=source_image.prompt,
                 size=source_image.size,
                 filename=output_filename,
@@ -670,6 +679,7 @@ class ImageOrchestrator:
     def _save_image_metadata(
         self,
         user_id: str,
+        domain_id: str,
         prompt: str,
         size: str,
         filename: str,
@@ -691,6 +701,7 @@ class ImageOrchestrator:
 
         return ImageService.save_generated_image(
             user_id=user_id,
+            domain_id=domain_id,
             user_prompt=user_prompt,
             prompt=prompt,
             enhanced_prompt=enhanced_prompt,
@@ -724,7 +735,7 @@ class ImageOrchestrator:
 
     def assign_image_to_project(
         self,
-        user_id: str,
+        domain_id: str,
         image_id: str,
         project_id: str,
         folder_id: str | None = None,
@@ -733,6 +744,7 @@ class ImageOrchestrator:
         Assign an image to a project (N:M relationship)
 
         Args:
+            domain_id: Domain UUID for tenant filtering
             image_id: Image UUID
             project_id: Project UUID
             folder_id: Optional folder UUID
@@ -753,8 +765,8 @@ class ImageOrchestrator:
         db = next(get_db())
 
         try:
-            # Validate image exists (with ownership check)
-            image = get_image_by_id(db, UUID(image_id), user_id=user_id)
+            # Validate image exists (with domain ownership check)
+            image = get_image_by_id(db, UUID(image_id), domain_id=domain_id)
             if not image:
                 raise ValueError(f"Image not found: {image_id}")
 
@@ -799,7 +811,7 @@ class ImageOrchestrator:
         finally:
             db.close()
 
-    def unassign_image_from_project(self, user_id: str, image_id: str, project_id: str) -> dict[str, Any]:
+    def unassign_image_from_project(self, domain_id: str, image_id: str, project_id: str) -> dict[str, Any]:
         """
         Remove image from project (link only, image remains)
 

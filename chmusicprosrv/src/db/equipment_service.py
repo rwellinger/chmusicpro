@@ -62,38 +62,38 @@ class EquipmentService:
             )
             return None
 
-    def get_equipment_by_id(self, db: Session, equipment_id: str, user_id: str) -> Equipment | None:
+    def get_equipment_by_id(self, db: Session, equipment_id: str, domain_id: str) -> Equipment | None:
         """
-        Get equipment by ID (user-scoped for security).
+        Get equipment by ID (domain-scoped for security).
 
         Args:
             db: Database session
             equipment_id: Equipment UUID
-            user_id: User UUID (JWT)
+            domain_id: Domain UUID (from JWT)
 
         Returns:
             Equipment object or None if not found
 
         Example:
-            equipment = equipment_service.get_equipment_by_id(db, equipment_id, user_id)
+            equipment = equipment_service.get_equipment_by_id(db, equipment_id, domain_id)
         """
         try:
             equipment = (
                 db.query(Equipment)
-                .filter(Equipment.id == uuid.UUID(equipment_id), Equipment.user_id == uuid.UUID(user_id))
+                .filter(Equipment.id == uuid.UUID(equipment_id), Equipment.domain_id == uuid.UUID(domain_id))
                 .first()
             )
             if equipment:
-                logger.debug("Equipment retrieved", equipment_id=equipment_id, user_id=user_id)
+                logger.debug("Equipment retrieved", equipment_id=equipment_id, domain_id=domain_id)
             return equipment
         except Exception as e:
-            logger.error("Failed to get equipment", error=str(e), equipment_id=equipment_id, user_id=user_id)
+            logger.error("Failed to get equipment", error=str(e), equipment_id=equipment_id, domain_id=domain_id)
             return None
 
     def get_equipment_paginated(
         self,
         db: Session,
-        user_id: str,
+        domain_id: str,
         limit: int = 20,
         offset: int = 0,
         type_filter: str | None = None,
@@ -105,7 +105,7 @@ class EquipmentService:
 
         Args:
             db: Database session
-            user_id: User UUID (JWT)
+            domain_id: Domain UUID (from JWT)
             limit: Items per page (max 100)
             offset: Pagination offset
             type_filter: Filter by type ('Software' | 'Plugin')
@@ -117,12 +117,12 @@ class EquipmentService:
 
         Example:
             result = equipment_service.get_equipment_paginated(
-                db, user_id, limit=20, offset=0, type_filter='Software', search='Logic'
+                db, domain_id, limit=20, offset=0, type_filter='Software', search='Logic'
             )
             # {'data': [...], 'pagination': {'total': 42, 'limit': 20, 'offset': 0, 'has_more': True}}
         """
         try:
-            query = db.query(Equipment).filter(Equipment.user_id == uuid.UUID(user_id))
+            query = db.query(Equipment).filter(Equipment.domain_id == uuid.UUID(domain_id))
 
             # Apply filters
             if type_filter:
@@ -151,7 +151,7 @@ class EquipmentService:
                 total=total,
                 limit=limit,
                 offset=offset,
-                user_id=user_id,
+                domain_id=domain_id,
                 type_filter=type_filter,
                 status_filter=status_filter,
                 search=search,
@@ -162,17 +162,17 @@ class EquipmentService:
                 "pagination": {"total": total, "limit": limit, "offset": offset, "has_more": (offset + limit) < total},
             }
         except Exception as e:
-            logger.error("Failed to get equipment list", error=str(e), user_id=user_id)
+            logger.error("Failed to get equipment list", error=str(e), domain_id=domain_id)
             return {"data": [], "pagination": {"total": 0, "limit": limit, "offset": offset, "has_more": False}}
 
-    def update_equipment(self, db: Session, equipment_id: str, user_id: str, update_data: dict) -> Equipment | None:
+    def update_equipment(self, db: Session, equipment_id: str, domain_id: str, update_data: dict) -> Equipment | None:
         """
-        Update equipment (user-scoped for security).
+        Update equipment (domain-scoped for security).
 
         Args:
             db: Database session
             equipment_id: Equipment UUID
-            user_id: User UUID (JWT)
+            domain_id: Domain UUID (from JWT)
             update_data: Dict with fields to update (including encrypted fields)
 
         Returns:
@@ -180,13 +180,13 @@ class EquipmentService:
 
         Example:
             equipment = equipment_service.update_equipment(
-                db, equipment_id, user_id, {'name': 'New Name', 'status': 'archived'}
+                db, equipment_id, domain_id, {'name': 'New Name', 'status': 'archived'}
             )
         """
         try:
-            equipment = self.get_equipment_by_id(db, equipment_id, user_id)
+            equipment = self.get_equipment_by_id(db, equipment_id, domain_id)
             if not equipment:
-                logger.warning("Equipment not found for update", equipment_id=equipment_id, user_id=user_id)
+                logger.warning("Equipment not found for update", equipment_id=equipment_id, domain_id=domain_id)
                 return None
 
             # Update fields
@@ -199,43 +199,43 @@ class EquipmentService:
             logger.debug(
                 "Equipment updated",
                 equipment_id=equipment_id,
-                user_id=user_id,
+                domain_id=domain_id,
                 fields_updated=list(update_data.keys()),
             )
             return equipment
         except Exception as e:
             db.rollback()
-            logger.error("Failed to update equipment", error=str(e), equipment_id=equipment_id, user_id=user_id)
+            logger.error("Failed to update equipment", error=str(e), equipment_id=equipment_id, domain_id=domain_id)
             return None
 
-    def delete_equipment(self, db: Session, equipment_id: str, user_id: str) -> bool:
+    def delete_equipment(self, db: Session, equipment_id: str, domain_id: str) -> bool:
         """
-        Delete equipment (user-scoped for security).
+        Delete equipment (domain-scoped for security).
 
         Args:
             db: Database session
             equipment_id: Equipment UUID
-            user_id: User UUID (JWT)
+            domain_id: Domain UUID (from JWT)
 
         Returns:
             True if deleted, False if not found or error
 
         Example:
-            success = equipment_service.delete_equipment(db, equipment_id, user_id)
+            success = equipment_service.delete_equipment(db, equipment_id, domain_id)
         """
         try:
-            equipment = self.get_equipment_by_id(db, equipment_id, user_id)
+            equipment = self.get_equipment_by_id(db, equipment_id, domain_id)
             if not equipment:
-                logger.warning("Equipment not found for deletion", equipment_id=equipment_id, user_id=user_id)
+                logger.warning("Equipment not found for deletion", equipment_id=equipment_id, domain_id=domain_id)
                 return False
 
             db.delete(equipment)
             db.commit()
-            logger.info("Equipment deleted", equipment_id=equipment_id, user_id=user_id, name=equipment.name)
+            logger.info("Equipment deleted", equipment_id=equipment_id, domain_id=domain_id, name=equipment.name)
             return True
         except Exception as e:
             db.rollback()
-            logger.error("Failed to delete equipment", error=str(e), equipment_id=equipment_id, user_id=user_id)
+            logger.error("Failed to delete equipment", error=str(e), equipment_id=equipment_id, domain_id=domain_id)
             return False
 
 

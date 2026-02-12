@@ -10,6 +10,7 @@ Uses 3-Layer Architecture:
 from datetime import datetime, timedelta
 from typing import Any
 
+from business.domain_orchestrator import DomainOrchestrator
 from business.recaptcha_service import RecaptchaService
 from business.user_auth_service import UserAuthService
 from db.database import SessionLocal
@@ -42,6 +43,7 @@ class UserController:
         self.auth_service = UserAuthService()
         self.recaptcha_service = RecaptchaService()
         self.registration_log_service = RegistrationLogService()
+        self.domain_orchestrator = DomainOrchestrator()
 
     def _get_db(self):
         """Get database session"""
@@ -93,8 +95,18 @@ class UserController:
             if not user:
                 return self._format_error_response("Failed to create user", 500)
 
-            # Business logic: Generate JWT token for auto-login
-            token = self.auth_service.generate_jwt_token(str(user.id), user.email, user.role)
+            # Domain: Create personal domain with memberships (System + KI Templates)
+            personal_domain = self.domain_orchestrator.create_personal_domain_for_user(db, str(user.id), user.email)
+            db.commit()
+
+            # Business logic: Generate JWT token for auto-login (with domain)
+            token = self.auth_service.generate_jwt_token(
+                str(user.id),
+                user.email,
+                user.role,
+                active_domain_id=str(personal_domain.id),
+                domain_role="owner",
+            )
             user_response = UserResponse.model_validate(user)
             expires_at = datetime.utcnow() + timedelta(hours=self.auth_service.jwt_expiration_hours)
 
@@ -149,8 +161,24 @@ class UserController:
             # Repository: Update last login timestamp
             self.user_service.update_last_login(db, str(user.id))
 
-            # Business logic: Generate JWT token (include role for frontend admin checks)
-            token = self.auth_service.generate_jwt_token(str(user.id), user.email, user.role)
+            # Domain: Resolve active domain for JWT
+            active_domain_id = None
+            domain_role = None
+            try:
+                domain, d_role = self.domain_orchestrator.resolve_active_domain(db, str(user.id))
+                active_domain_id = str(domain.id)
+                domain_role = d_role
+            except Exception as domain_err:
+                logger.warning("Could not resolve domain for login", error=str(domain_err), user_id=str(user.id))
+
+            # Business logic: Generate JWT token (include role + domain for frontend)
+            token = self.auth_service.generate_jwt_token(
+                str(user.id),
+                user.email,
+                user.role,
+                active_domain_id=active_domain_id,
+                domain_role=domain_role,
+            )
 
             # Create response
             user_response = UserResponse.model_validate(user)

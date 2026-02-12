@@ -23,6 +23,7 @@ class EquipmentAttachmentService:
         db: Session,
         equipment_id: UUID,
         user_id: UUID,
+        domain_id: UUID,
         filename: str,
         s3_key: str,
         file_size: int,
@@ -33,6 +34,7 @@ class EquipmentAttachmentService:
             attachment = EquipmentAttachment(
                 equipment_id=equipment_id,
                 user_id=user_id,
+                domain_id=domain_id,
                 filename=filename,
                 s3_key=s3_key,
                 file_size=file_size,
@@ -48,14 +50,16 @@ class EquipmentAttachmentService:
             logger.error("Failed to create attachment", error=str(e), filename=filename)
             return None
 
-    def get_attachments_by_equipment(self, db: Session, equipment_id: UUID, user_id: UUID) -> list[EquipmentAttachment]:
-        """Get all attachments for equipment (user-scoped)."""
+    def get_attachments_by_equipment(
+        self, db: Session, equipment_id: UUID, domain_id: UUID
+    ) -> list[EquipmentAttachment]:
+        """Get all attachments for equipment (domain-scoped)."""
         try:
             attachments = (
                 db.query(EquipmentAttachment)
                 .filter(
                     EquipmentAttachment.equipment_id == equipment_id,
-                    EquipmentAttachment.user_id == user_id,
+                    EquipmentAttachment.domain_id == domain_id,
                 )
                 .order_by(EquipmentAttachment.uploaded_at.desc())
                 .all()
@@ -65,14 +69,14 @@ class EquipmentAttachmentService:
             logger.error("Failed to get attachments", error=str(e), equipment_id=str(equipment_id))
             return []
 
-    def get_attachment_by_id(self, db: Session, attachment_id: UUID, user_id: UUID) -> EquipmentAttachment | None:
-        """Get attachment by ID (user-scoped for security)."""
+    def get_attachment_by_id(self, db: Session, attachment_id: UUID, domain_id: UUID) -> EquipmentAttachment | None:
+        """Get attachment by ID (domain-scoped for security)."""
         try:
             attachment = (
                 db.query(EquipmentAttachment)
                 .filter(
                     EquipmentAttachment.id == attachment_id,
-                    EquipmentAttachment.user_id == user_id,
+                    EquipmentAttachment.domain_id == domain_id,
                 )
                 .first()
             )
@@ -81,10 +85,10 @@ class EquipmentAttachmentService:
             logger.error("Failed to get attachment", error=str(e), attachment_id=str(attachment_id))
             return None
 
-    def delete_attachment(self, db: Session, attachment_id: UUID, user_id: UUID) -> bool:
-        """Delete attachment (user-scoped)."""
+    def delete_attachment(self, db: Session, attachment_id: UUID, domain_id: UUID) -> bool:
+        """Delete attachment (domain-scoped)."""
         try:
-            attachment = self.get_attachment_by_id(db, attachment_id, user_id)
+            attachment = self.get_attachment_by_id(db, attachment_id, domain_id)
             if not attachment:
                 return False
 
@@ -97,10 +101,12 @@ class EquipmentAttachmentService:
             logger.error("Failed to delete attachment", error=str(e), attachment_id=str(attachment_id))
             return False
 
-    def update_s3_key(self, db: Session, attachment_id: UUID, user_id: UUID, s3_key: str) -> EquipmentAttachment | None:
+    def update_s3_key(
+        self, db: Session, attachment_id: UUID, domain_id: UUID, s3_key: str
+    ) -> EquipmentAttachment | None:
         """Update S3 key after upload."""
         try:
-            attachment = self.get_attachment_by_id(db, attachment_id, user_id)
+            attachment = self.get_attachment_by_id(db, attachment_id, domain_id)
             if not attachment:
                 return None
 

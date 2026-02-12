@@ -20,6 +20,7 @@ class WorkshopService:
         self,
         db: Session,
         user_id: str,
+        domain_id: str,
         title: str,
         connect_topic: str | None = None,
         draft_language: str | None = "EN",
@@ -38,6 +39,7 @@ class WorkshopService:
         try:
             workshop = LyricWorkshop(
                 user_id=user_id,
+                domain_id=domain_id,
                 title=title,
                 connect_topic=connect_topic,
                 draft_language=draft_language,
@@ -63,7 +65,7 @@ class WorkshopService:
             return None
 
     def get_workshop_by_id(
-        self, db: Session, workshop_id: str | UUID, user_id: str | None = None
+        self, db: Session, workshop_id: str | UUID, domain_id: str | None = None
     ) -> LyricWorkshop | None:
         """
         Get workshop by ID
@@ -71,15 +73,15 @@ class WorkshopService:
         Args:
             db: Database session
             workshop_id: UUID of the workshop
-            user_id: UUID of the user (for ownership filter)
+            domain_id: UUID of the domain (for tenant filter)
 
         Returns:
             LyricWorkshop instance if found, None otherwise
         """
         try:
             query = db.query(LyricWorkshop).filter(LyricWorkshop.id == workshop_id)
-            if user_id:
-                query = query.filter(LyricWorkshop.user_id == user_id)
+            if domain_id:
+                query = query.filter(LyricWorkshop.domain_id == domain_id)
             workshop = query.first()
             if workshop:
                 logger.debug("Workshop retrieved", workshop_id=str(workshop_id))
@@ -95,7 +97,7 @@ class WorkshopService:
     def get_workshops_paginated(
         self,
         db: Session,
-        user_id: str,
+        domain_id: str,
         limit: int = 20,
         offset: int = 0,
         search: str = "",
@@ -121,8 +123,8 @@ class WorkshopService:
         try:
             query = db.query(LyricWorkshop)
 
-            # Apply user filter
-            query = query.filter(LyricWorkshop.user_id == user_id)
+            # Apply domain filter (tenant isolation)
+            query = query.filter(LyricWorkshop.domain_id == domain_id)
 
             # Apply phase filter
             if phase:
@@ -187,7 +189,7 @@ class WorkshopService:
         self,
         db: Session,
         workshop_id: str | UUID,
-        user_id: str | None = None,
+        domain_id: str | None = None,
         title: str | None = None,
         connect_topic: str | None = None,
         connect_inspirations: str | None = None,
@@ -214,8 +216,8 @@ class WorkshopService:
         """
         try:
             query = db.query(LyricWorkshop).filter(LyricWorkshop.id == workshop_id)
-            if user_id:
-                query = query.filter(LyricWorkshop.user_id == user_id)
+            if domain_id:
+                query = query.filter(LyricWorkshop.domain_id == domain_id)
             workshop = query.first()
             if not workshop:
                 logger.warning("Workshop not found for update", workshop_id=str(workshop_id))
@@ -285,22 +287,22 @@ class WorkshopService:
             )
             return None
 
-    def delete_workshop(self, db: Session, workshop_id: str | UUID, user_id: str | None = None) -> bool:
+    def delete_workshop(self, db: Session, workshop_id: str | UUID, domain_id: str | None = None) -> bool:
         """
         Delete a workshop by ID
 
         Args:
             db: Database session
             workshop_id: UUID of the workshop
-            user_id: UUID of the user (for ownership filter)
+            domain_id: UUID of the domain (for tenant filter)
 
         Returns:
             True if successful, False otherwise
         """
         try:
             query = db.query(LyricWorkshop).filter(LyricWorkshop.id == workshop_id)
-            if user_id:
-                query = query.filter(LyricWorkshop.user_id == user_id)
+            if domain_id:
+                query = query.filter(LyricWorkshop.domain_id == domain_id)
             workshop = query.first()
             if workshop:
                 db.delete(workshop)

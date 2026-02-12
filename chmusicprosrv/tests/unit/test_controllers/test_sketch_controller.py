@@ -14,6 +14,7 @@ from schemas.sketch_schemas import SketchUpdateRequest
 
 
 TEST_USER_ID = str(uuid4())
+TEST_DOMAIN_ID = str(uuid4())
 
 
 @pytest.mark.unit
@@ -24,14 +25,14 @@ class TestSketchControllerGetById:
         """Test getting non-existent sketch"""
         mock_db_session.query.return_value.filter.return_value.first.return_value = None
 
-        result, status_code = SketchController.get_sketch_by_id(mock_db_session, TEST_USER_ID, str(uuid4()))
+        result, status_code = SketchController.get_sketch_by_id(mock_db_session, TEST_DOMAIN_ID, str(uuid4()))
 
         assert status_code == 404
         assert "error" in result
 
     def test_get_sketch_by_id_invalid_uuid(self, mock_db_session):
         """Test getting sketch with invalid UUID"""
-        result, status_code = SketchController.get_sketch_by_id(mock_db_session, TEST_USER_ID, "invalid-uuid")
+        result, status_code = SketchController.get_sketch_by_id(mock_db_session, TEST_DOMAIN_ID, "invalid-uuid")
 
         assert status_code == 400
         assert "error" in result
@@ -48,7 +49,7 @@ class TestSketchControllerUpdate:
         update_data = SketchUpdateRequest(title="New Title")
 
         result, status_code = SketchController.update_sketch(
-            db=mock_db_session, user_id=TEST_USER_ID, sketch_id=str(uuid4()), update_data=update_data
+            db=mock_db_session, domain_id=TEST_DOMAIN_ID, sketch_id=str(uuid4()), update_data=update_data
         )
 
         assert status_code == 404
@@ -59,7 +60,7 @@ class TestSketchControllerUpdate:
         update_data = SketchUpdateRequest(title="New Title")
 
         result, status_code = SketchController.update_sketch(
-            db=mock_db_session, user_id=TEST_USER_ID, sketch_id="invalid-uuid", update_data=update_data
+            db=mock_db_session, domain_id=TEST_DOMAIN_ID, sketch_id="invalid-uuid", update_data=update_data
         )
 
         assert status_code == 400
@@ -77,7 +78,7 @@ class TestSketchControllerDelete:
 
         mock_db_session.query.return_value.filter.return_value.first.return_value = mock_sketch
 
-        result, status_code = SketchController.delete_sketch(mock_db_session, TEST_USER_ID, str(mock_sketch.id))
+        result, status_code = SketchController.delete_sketch(mock_db_session, TEST_DOMAIN_ID, str(mock_sketch.id))
 
         assert status_code == 200
         assert "message" in result
@@ -88,14 +89,14 @@ class TestSketchControllerDelete:
         """Test deleting non-existent sketch"""
         mock_db_session.query.return_value.filter.return_value.first.return_value = None
 
-        result, status_code = SketchController.delete_sketch(mock_db_session, TEST_USER_ID, str(uuid4()))
+        result, status_code = SketchController.delete_sketch(mock_db_session, TEST_DOMAIN_ID, str(uuid4()))
 
         assert status_code == 404
         assert "error" in result
 
     def test_delete_sketch_invalid_uuid(self, mock_db_session):
         """Test deleting sketch with invalid UUID"""
-        result, status_code = SketchController.delete_sketch(mock_db_session, TEST_USER_ID, "invalid-uuid")
+        result, status_code = SketchController.delete_sketch(mock_db_session, TEST_DOMAIN_ID, "invalid-uuid")
 
         assert status_code == 400
         assert "error" in result

@@ -25,7 +25,7 @@ from uuid import UUID
 from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 
-from api.auth_middleware import get_current_user_id, jwt_required
+from api.auth_middleware import get_current_domain_id, get_current_user_id, jwt_required
 from api.controllers.equipment_controller import (
     EquipmentController,
     EquipmentCreateRequest,
@@ -66,6 +66,7 @@ def create_equipment():
         }
     """
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -76,7 +77,7 @@ def create_equipment():
 
     db: Session = next(get_db())
     try:
-        result, status_code = EquipmentController.create_equipment(db, str(user_id), equipment_data)
+        result, status_code = EquipmentController.create_equipment(db, str(user_id), str(domain_id), equipment_data)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -112,6 +113,7 @@ def list_equipment():
         GET /api/v1/equipment?limit=20&offset=0&type=Software&search=Logic
     """
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -130,7 +132,7 @@ def list_equipment():
     db: Session = next(get_db())
     try:
         result, status_code = EquipmentController.list_equipment(
-            db, str(user_id), limit, offset, type_filter, status_filter, search
+            db, str(domain_id), limit, offset, type_filter, status_filter, search
         )
         return jsonify(result), status_code
     finally:
@@ -157,12 +159,13 @@ def get_equipment(equipment_id: str):
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     db: Session = next(get_db())
     try:
-        result, status_code = EquipmentController.get_equipment(db, equipment_id, str(user_id))
+        result, status_code = EquipmentController.get_equipment(db, equipment_id, str(domain_id))
         return jsonify(result), status_code
     finally:
         db.close()
@@ -195,6 +198,7 @@ def update_equipment(equipment_id: str):
         }
     """
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -205,7 +209,7 @@ def update_equipment(equipment_id: str):
 
     db: Session = next(get_db())
     try:
-        result, status_code = EquipmentController.update_equipment(db, equipment_id, str(user_id), update_data)
+        result, status_code = EquipmentController.update_equipment(db, equipment_id, str(domain_id), update_data)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -231,12 +235,13 @@ def delete_equipment(equipment_id: str):
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     db: Session = next(get_db())
     try:
-        result, status_code = EquipmentController.delete_equipment(db, equipment_id, str(user_id))
+        result, status_code = EquipmentController.delete_equipment(db, equipment_id, str(domain_id))
         return jsonify(result), status_code
     finally:
         db.close()
@@ -269,6 +274,7 @@ def upload_attachment(equipment_id: str):
         Form Data: file=@license.pdf
     """
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -287,7 +293,9 @@ def upload_attachment(equipment_id: str):
         try:
             from business.equipment_orchestrator import equipment_orchestrator
 
-            result, error = equipment_orchestrator.upload_attachment(db, equipment_id, user_id, file_data, filename)
+            result, error = equipment_orchestrator.upload_attachment(
+                db, equipment_id, str(user_id), str(domain_id), file_data, filename
+            )
 
             if error:
                 return jsonify({"error": error}), 400
@@ -316,6 +324,7 @@ def list_attachments(equipment_id: str):
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -323,7 +332,7 @@ def list_attachments(equipment_id: str):
 
     db: Session = next(get_db())
     try:
-        attachments = equipment_attachment_service.get_attachments_by_equipment(db, UUID(equipment_id), UUID(user_id))
+        attachments = equipment_attachment_service.get_attachments_by_equipment(db, UUID(equipment_id), UUID(domain_id))
 
         result = [
             {
@@ -360,6 +369,7 @@ def download_attachment(equipment_id: str, attachment_id: str):  # noqa: ARG001
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -371,7 +381,7 @@ def download_attachment(equipment_id: str, attachment_id: str):  # noqa: ARG001
         db: Session = next(get_db())
         try:
             # Get attachment
-            attachment = equipment_attachment_service.get_attachment_by_id(db, UUID(attachment_id), UUID(user_id))
+            attachment = equipment_attachment_service.get_attachment_by_id(db, UUID(attachment_id), UUID(domain_id))
 
             if not attachment:
                 return jsonify({"error": "Attachment not found"}), 404
@@ -406,6 +416,7 @@ def delete_attachment(equipment_id: str, attachment_id: str):  # noqa: ARG001
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -413,7 +424,7 @@ def delete_attachment(equipment_id: str, attachment_id: str):  # noqa: ARG001
     try:
         from business.equipment_orchestrator import equipment_orchestrator
 
-        success = equipment_orchestrator.delete_attachment_with_cleanup(db, attachment_id, user_id)
+        success = equipment_orchestrator.delete_attachment_with_cleanup(db, attachment_id, str(domain_id))
 
         if not success:
             return jsonify({"error": "Attachment not found"}), 404

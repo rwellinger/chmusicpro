@@ -7,7 +7,7 @@ import traceback
 from flask import Blueprint, jsonify, request, send_from_directory
 from flask_pydantic import validate
 
-from api.auth_middleware import get_current_user_id, jwt_required
+from api.auth_middleware import get_current_domain_id, get_current_user_id, jwt_required
 from api.controllers.image_controller import ImageController
 from config.settings import IMAGES_DIR
 from schemas.common_schemas import ErrorResponse
@@ -32,12 +32,14 @@ image_controller = ImageController()
 def generate(body: ImageGenerateRequest):
     """Generate image with DALL-E"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
         response_data, status_code = image_controller.generate_image(
             user_id=str(user_id),
+            domain_id=str(domain_id),
             prompt=body.prompt,
             size=body.size,
             title=body.title,
@@ -60,12 +62,13 @@ def generate(body: ImageGenerateRequest):
 def list_images(query: ImageListRequest):
     """Get list of generated images with pagination, search and sorting"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
         response_data, status_code = image_controller.get_images(
-            user_id=str(user_id),
+            domain_id=str(domain_id),
             limit=query.limit,
             offset=query.offset,
             search=query.search,
@@ -83,11 +86,12 @@ def list_images(query: ImageListRequest):
 def list_images_for_text_overlay():
     """Get list of images suitable for text overlay (only images with title, album-cover first)"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        response_data, status_code = image_controller.get_images_for_text_overlay(user_id=str(user_id))
+        response_data, status_code = image_controller.get_images_for_text_overlay(domain_id=str(domain_id))
         return jsonify(response_data), status_code
     except Exception as e:
         error_response = ErrorResponse(error=str(e))
@@ -99,13 +103,14 @@ def list_images_for_text_overlay():
 def serve_image(filename):
     """Serve stored images from filesystem (backward compatibility)"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
         from db.image_service import ImageService
 
-        image = ImageService.get_image_by_filename(filename, user_id=str(user_id))
+        image = ImageService.get_image_by_filename(filename, domain_id=str(domain_id))
         if not image:
             return jsonify({"error": "Image not found"}), 404
 
@@ -127,6 +132,7 @@ def serve_image(filename):
 def serve_s3_image(image_id):
     """Serve S3-stored images via backend proxy (streams from S3)"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -137,8 +143,8 @@ def serve_s3_image(image_id):
 
         logger.debug("Serving S3 image", image_id=image_id)
 
-        # Get image from DB (filtered by user_id)
-        image = ImageService.get_image_by_id(image_id, user_id=str(user_id))
+        # Get image from DB (filtered by domain_id)
+        image = ImageService.get_image_by_id(image_id, domain_id=str(domain_id))
         if not image:
             return jsonify({"error": "Image not found"}), 404
 
@@ -165,10 +171,11 @@ def serve_s3_image(image_id):
 def get_image(image_id):
     """Get single image by ID"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
-    response_data, status_code = image_controller.get_image_by_id(str(user_id), image_id)
+    response_data, status_code = image_controller.get_image_by_id(str(domain_id), image_id)
 
     return jsonify(response_data), status_code
 
@@ -178,10 +185,11 @@ def get_image(image_id):
 def delete_image(image_id):
     """Delete image by ID"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
-    response_data, status_code = image_controller.delete_image(str(user_id), image_id)
+    response_data, status_code = image_controller.delete_image(str(domain_id), image_id)
 
     return jsonify(response_data), status_code
 
@@ -191,6 +199,7 @@ def delete_image(image_id):
 def bulk_delete_images():
     """Delete multiple images by IDs"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -204,7 +213,7 @@ def bulk_delete_images():
     if not isinstance(image_ids, list):
         return jsonify({"error": "ids must be an array"}), 400
 
-    response_data, status_code = image_controller.bulk_delete_images(str(user_id), image_ids)
+    response_data, status_code = image_controller.bulk_delete_images(str(domain_id), image_ids)
 
     return jsonify(response_data), status_code
 
@@ -215,12 +224,13 @@ def bulk_delete_images():
 def update_image_metadata(image_id: str, body: ImageUpdateRequest):
     """Update image metadata (title and/or tags)"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
         response_data, status_code = image_controller.update_image_metadata(
-            str(user_id), image_id, body.title, body.tags
+            str(domain_id), image_id, body.title, body.tags
         )
         return jsonify(response_data), status_code
     except Exception as e:
@@ -234,12 +244,13 @@ def update_image_metadata(image_id: str, body: ImageUpdateRequest):
 def assign_to_project(image_id: str, body: AssignToProjectRequest):
     """Assign image to project"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
         response_data, status_code = image_controller.assign_to_project(
-            str(user_id), image_id, str(body.project_id), str(body.folder_id) if body.folder_id else None
+            str(domain_id), image_id, str(body.project_id), str(body.folder_id) if body.folder_id else None
         )
         return jsonify(response_data), status_code
     except Exception as e:
@@ -252,11 +263,12 @@ def assign_to_project(image_id: str, body: AssignToProjectRequest):
 def unassign_from_project(image_id: str, project_id: str):
     """Remove image from project (link only, image remains)"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        response_data, status_code = image_controller.unassign_from_project(str(user_id), image_id, project_id)
+        response_data, status_code = image_controller.unassign_from_project(str(domain_id), image_id, project_id)
         return jsonify(response_data), status_code
     except Exception as e:
         error_response = ErrorResponse(error=str(e))
@@ -268,11 +280,12 @@ def unassign_from_project(image_id: str, project_id: str):
 def get_projects_for_image(image_id: str):
     """Get list of projects this image is assigned to"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        response_data, status_code = image_controller.get_projects_for_image(str(user_id), image_id)
+        response_data, status_code = image_controller.get_projects_for_image(str(domain_id), image_id)
         return jsonify(response_data), status_code
     except Exception as e:
         error_response = ErrorResponse(error=str(e))
@@ -284,6 +297,7 @@ def get_projects_for_image(image_id: str):
 def add_text_overlay():
     """Add text overlay to existing image"""
     user_id = get_current_user_id()
+    domain_id = get_current_domain_id()
 
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
@@ -323,6 +337,7 @@ def add_text_overlay():
     response_data, status_code = image_controller.add_text_overlay(
         image_id=image_id,
         user_id=str(user_id),
+        domain_id=str(domain_id),
         title=title,
         artist=artist,
         font_style=font_style,

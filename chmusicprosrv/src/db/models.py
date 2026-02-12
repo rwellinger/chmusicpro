@@ -1,7 +1,7 @@
 """Database models"""
 
 import uuid
-from enum import StrEnum
+from enum import IntEnum, StrEnum
 
 from sqlalchemy import (
     ARRAY,
@@ -16,6 +16,7 @@ from sqlalchemy import (
     Numeric,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSON, JSONB, UUID
 from sqlalchemy.orm import relationship
@@ -36,6 +37,66 @@ class UserRole(StrEnum):
 
     USER = "user"
     ADMIN = "admin"
+
+
+class DomainType(IntEnum):
+    """Enum for domain types (multi-tenancy)"""
+
+    SYSTEM = 0
+    KI_TEMPLATES = 1
+    USER = 2
+    COMPANY = 3
+    PRODUCER = 4
+
+
+class DomainRole(StrEnum):
+    """Enum for domain membership roles"""
+
+    OWNER = "owner"
+    ADMIN = "admin"
+    MEMBER = "member"
+    VIEWER = "viewer"
+
+
+class Domain(Base):
+    """Model for multi-tenancy domains (tenants)"""
+
+    __tablename__ = "domains"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    type = Column(Integer, nullable=False, index=True)
+    name = Column(String(200), nullable=False, unique=True)
+    description = Column(Text, nullable=True)
+    is_active = Column(Boolean, nullable=False, default=True, server_default="true")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Relationships
+    memberships = relationship("DomainMembership", back_populates="domain", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Domain(id={self.id}, type={self.type}, name='{self.name}')>"
+
+
+class DomainMembership(Base):
+    """Model for user-domain memberships with per-domain roles"""
+
+    __tablename__ = "domain_memberships"
+    __table_args__ = (UniqueConstraint("domain_id", "user_id", name="uq_domain_user"),)
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    role = Column(String(20), nullable=False, default=DomainRole.MEMBER, server_default=DomainRole.MEMBER)
+    is_default = Column(Boolean, nullable=False, default=False, server_default="false")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationships
+    domain = relationship("Domain", back_populates="memberships")
+    user = relationship("User", back_populates="domain_memberships")
+
+    def __repr__(self):
+        return f"<DomainMembership(domain_id={self.domain_id}, user_id={self.user_id}, role='{self.role}')>"
 
 
 class SongSketch(Base):
@@ -64,7 +125,10 @@ class SongSketch(Base):
     # Workflow status
     workflow = Column(String(50), nullable=False, default="draft", index=True)
 
-    # User ownership (JWT-based access control)
+    # Domain ownership (multi-tenancy)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id"), nullable=False, index=True)
+
+    # User reference (created_by / audit trail)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
     # Project relationship (optional)
@@ -80,6 +144,7 @@ class SongSketch(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
+    domain = relationship("Domain")
     user = relationship("User", back_populates="sketches")
     project = relationship("SongProject", back_populates="sketches")
     project_folder = relationship("ProjectFolder", foreign_keys=[project_folder_id])
@@ -97,7 +162,10 @@ class LyricWorkshop(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     title = Column(String(200), nullable=False)
 
-    # User ownership (JWT-based access control)
+    # Domain ownership (multi-tenancy)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id"), nullable=False, index=True)
+
+    # User reference (created_by / audit trail)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
     # Phase 1: Connect
@@ -124,6 +192,7 @@ class LyricWorkshop(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
+    domain = relationship("Domain")
     user = relationship("User", back_populates="workshops")
     exported_sketch = relationship("SongSketch", foreign_keys=[exported_sketch_id])
 
@@ -138,7 +207,10 @@ class GeneratedImage(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
 
-    # User ownership (JWT-based access control)
+    # Domain ownership (multi-tenancy)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id"), nullable=False, index=True)
+
+    # User reference (created_by / audit trail)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
     user_prompt = Column(Text, nullable=True)  # Original user input (before AI enhancement)
@@ -167,6 +239,7 @@ class GeneratedImage(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
+    domain = relationship("Domain")
     user = relationship("User", back_populates="generated_images")
     project_references = relationship("ProjectImageReference", back_populates="image", cascade="all, delete-orphan")
 
@@ -180,6 +253,10 @@ class PromptTemplate(Base):
     __tablename__ = "prompt_templates"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+
+    # Domain ownership (multi-tenancy: belongs to KI Templates domain)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id"), nullable=True, index=True)
+
     category = Column(String(50), nullable=False)
     action = Column(String(50), nullable=False)
     pre_condition = Column(Text, nullable=False)
@@ -192,6 +269,9 @@ class PromptTemplate(Base):
     active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Relationships
+    domain = relationship("Domain")
 
     def __repr__(self):
         return (
@@ -236,6 +316,7 @@ class User(Base):
     last_login = Column(DateTime(timezone=True), nullable=True)
 
     # Relationships
+    domain_memberships = relationship("DomainMembership", back_populates="user", cascade="all, delete-orphan")
     conversations = relationship("Conversation", back_populates="user", cascade="all, delete-orphan")
     equipment = relationship("Equipment", back_populates="user", cascade="all, delete-orphan")
     song_projects = relationship("SongProject", back_populates="user", cascade="all, delete-orphan")
@@ -311,6 +392,11 @@ class Conversation(Base):
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+
+    # Domain ownership (multi-tenancy)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id"), nullable=False, index=True)
+
+    # User reference (created_by / audit trail)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
 
     # Conversation metadata
@@ -334,6 +420,7 @@ class Conversation(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
+    domain = relationship("Domain")
     user = relationship("User", back_populates="conversations")
     messages = relationship(
         "Message", back_populates="conversation", cascade="all, delete-orphan", order_by="Message.created_at"
@@ -411,6 +498,9 @@ class LyricParsingRule(Base):
     # Primary identifier
     id = Column(Integer, primary_key=True, autoincrement=True)
 
+    # Domain ownership (multi-tenancy: belongs to System domain)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id"), nullable=True, index=True)
+
     # Rule metadata
     name = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
@@ -427,6 +517,9 @@ class LyricParsingRule(Base):
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Relationships
+    domain = relationship("Domain")
 
     def __repr__(self):
         return f"<LyricParsingRule(id={self.id}, name='{self.name}', type='{self.rule_type}', active={self.active}, order={self.order})>"
@@ -513,7 +606,10 @@ class Equipment(Base):
         String(50), nullable=False, default="active", index=True
     )  # 'active' | 'trial' | 'expired' | 'archived'
 
-    # User ownership (JWT-based access control)
+    # Domain ownership (multi-tenancy)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id"), nullable=False, index=True)
+
+    # User reference (created_by / audit trail)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
 
     # Timestamps
@@ -521,6 +617,7 @@ class Equipment(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
+    domain = relationship("Domain")
     user = relationship("User", back_populates="equipment")
     attachments = relationship("EquipmentAttachment", back_populates="equipment", cascade="all, delete-orphan")
 
@@ -540,6 +637,11 @@ class EquipmentAttachment(Base):
     equipment_id = Column(
         UUID(as_uuid=True), ForeignKey("equipment.id", ondelete="CASCADE"), nullable=False, index=True
     )
+
+    # Domain ownership (multi-tenancy)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id"), nullable=False, index=True)
+
+    # User reference (created_by / audit trail)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
     # File metadata
@@ -552,6 +654,7 @@ class EquipmentAttachment(Base):
     uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
+    domain = relationship("Domain")
     equipment = relationship("Equipment", back_populates="attachments")
 
     def __repr__(self):
@@ -564,7 +667,13 @@ class SongProject(Base):
     __tablename__ = "song_projects"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+
+    # Domain ownership (multi-tenancy)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id"), nullable=False, index=True)
+
+    # User reference (created_by / audit trail)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+
     project_name = Column(String(255), nullable=False)
 
     # Storage
@@ -583,6 +692,7 @@ class SongProject(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relationships
+    domain = relationship("Domain")
     user = relationship("User", back_populates="song_projects")
     folders = relationship(
         "ProjectFolder", back_populates="project", cascade="all, delete-orphan", order_by="ProjectFolder.folder_name"
@@ -693,6 +803,11 @@ class SongRelease(Base):
 
     # Primary identifier
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+
+    # Domain ownership (multi-tenancy)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id"), nullable=False, index=True)
+
+    # User reference (created_by / audit trail)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
     # Core fields
@@ -729,6 +844,7 @@ class SongRelease(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     # Relationships
+    domain = relationship("Domain")
     user = relationship("User", back_populates="song_releases")
     project_references = relationship("ReleaseProjectReference", back_populates="release", cascade="all, delete-orphan")
 

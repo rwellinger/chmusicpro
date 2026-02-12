@@ -22,7 +22,9 @@ class SketchController:
     """Controller for sketch operations"""
 
     @staticmethod
-    def create_sketch(db: Session, user_id: str, sketch_data: SketchCreateRequest) -> tuple[dict[str, Any], int]:
+    def create_sketch(
+        db: Session, user_id: str, domain_id: str, sketch_data: SketchCreateRequest
+    ) -> tuple[dict[str, Any], int]:
         """
         Create a new sketch (uses business layer for normalization)
 
@@ -38,6 +40,7 @@ class SketchController:
             sketch = sketch_orchestrator.create_sketch(
                 db=db,
                 user_id=user_id,
+                domain_id=domain_id,
                 title=sketch_data.title,
                 lyrics=sketch_data.lyrics,
                 prompt=sketch_data.prompt,
@@ -58,7 +61,7 @@ class SketchController:
     @staticmethod
     def get_sketches(
         db: Session,
-        user_id: str,
+        domain_id: str,
         limit: int = 20,
         offset: int = 0,
         search: str = "",
@@ -86,7 +89,7 @@ class SketchController:
         try:
             result = sketch_service.get_sketches_paginated(
                 db=db,
-                user_id=user_id,
+                domain_id=domain_id,
                 limit=limit,
                 offset=offset,
                 search=search,
@@ -132,7 +135,7 @@ class SketchController:
             return {"error": f"Failed to retrieve sketches: {str(e)}"}, 500
 
     @staticmethod
-    def get_sketch_by_id(db: Session, user_id: str, sketch_id: str) -> tuple[dict[str, Any], int]:
+    def get_sketch_by_id(db: Session, domain_id: str, sketch_id: str) -> tuple[dict[str, Any], int]:
         """
         Get a specific sketch by ID
 
@@ -150,7 +153,7 @@ class SketchController:
             except ValueError:
                 return {"error": "Invalid sketch ID format"}, 400
 
-            sketch = sketch_service.get_sketch_by_id(db, sketch_id, user_id=user_id)
+            sketch = sketch_service.get_sketch_by_id(db, sketch_id, domain_id=domain_id)
 
             if not sketch:
                 return {"error": f"Sketch not found with ID: {sketch_id}"}, 404
@@ -164,7 +167,7 @@ class SketchController:
 
     @staticmethod
     def update_sketch(
-        db: Session, user_id: str, sketch_id: str, update_data: SketchUpdateRequest
+        db: Session, domain_id: str, sketch_id: str, update_data: SketchUpdateRequest
     ) -> tuple[dict[str, Any], int]:
         """
         Update an existing sketch (uses business layer for normalization)
@@ -194,7 +197,7 @@ class SketchController:
 
             sketch_orchestrator = SketchOrchestrator()
             sketch = sketch_orchestrator.update_sketch(
-                db=db, user_id=user_id, sketch_id=sketch_id, update_data=update_dict
+                db=db, domain_id=domain_id, sketch_id=sketch_id, update_data=update_dict
             )
 
             response = SketchResponse.model_validate(sketch)
@@ -210,7 +213,7 @@ class SketchController:
             return {"error": f"Failed to update sketch: {str(e)}"}, 500
 
     @staticmethod
-    def delete_sketch(db: Session, user_id: str, sketch_id: str) -> tuple[dict[str, Any], int]:
+    def delete_sketch(db: Session, domain_id: str, sketch_id: str) -> tuple[dict[str, Any], int]:
         """
         Delete a sketch
 
@@ -228,7 +231,7 @@ class SketchController:
             except ValueError:
                 return {"error": "Invalid sketch ID format"}, 400
 
-            success = sketch_service.delete_sketch(db, sketch_id, user_id=user_id)
+            success = sketch_service.delete_sketch(db, sketch_id, domain_id=domain_id)
 
             if not success:
                 return {"error": f"Sketch not found with ID: {sketch_id}"}, 404
@@ -243,6 +246,7 @@ class SketchController:
     def duplicate_sketch(
         db: Session,
         user_id: str,
+        domain_id: str,
         sketch_id: str,
         duplicate_data: SketchDuplicateRequest,
     ) -> tuple[dict[str, Any], int]:
@@ -268,6 +272,7 @@ class SketchController:
             duplicate = orchestrator.duplicate_sketch(
                 db=db,
                 user_id=user_id,
+                domain_id=domain_id,
                 original_sketch_id=sketch_id,
                 new_title_suffix=duplicate_data.new_title_suffix,
             )
@@ -287,7 +292,7 @@ class SketchController:
     @staticmethod
     def assign_to_project(
         db: Session,
-        user_id: str,
+        domain_id: str,
         sketch_id: str,
         project_id: str,
         folder_id: str | None = None,
@@ -317,7 +322,7 @@ class SketchController:
             orchestrator = SketchOrchestrator()
             result = orchestrator.assign_to_project(
                 db=db,
-                user_id=user_id,
+                domain_id=domain_id,
                 sketch_id=sketch_id,
                 project_id=project_id,
                 folder_id=folder_id,
@@ -349,7 +354,7 @@ class SketchController:
             return {"error": f"Failed to assign sketch to project: {str(e)}"}, 500
 
     @staticmethod
-    def unassign_from_project(db: Session, user_id: str, sketch_id: str) -> tuple[dict[str, Any], int]:
+    def unassign_from_project(db: Session, domain_id: str, sketch_id: str) -> tuple[dict[str, Any], int]:
         """
         Remove sketch from its assigned project (link only, sketch remains)
 
@@ -368,7 +373,7 @@ class SketchController:
                 return {"error": "Invalid sketch ID format"}, 400
 
             orchestrator = SketchOrchestrator()
-            result = orchestrator.unassign_from_project(db=db, user_id=user_id, sketch_id=sketch_id)
+            result = orchestrator.unassign_from_project(db=db, domain_id=domain_id, sketch_id=sketch_id)
 
             if not result:
                 return {"error": "Sketch not found"}, 404

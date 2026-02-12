@@ -45,19 +45,20 @@ class EquipmentOrchestrator:
             self._storage = get_storage(bucket=S3_EQUIPMENT_DATA_BUCKET)
         return self._storage
 
-    def create_equipment(self, db, user_id: str, equipment_data: dict):
+    def create_equipment(self, db, user_id: str, domain_id: str, equipment_data: dict):
         """
         Create equipment with encryption and normalization.
 
         Workflow:
             1. Normalize data (via EquipmentNormalizer)
             2. Encrypt sensitive fields (password, license_key, price)
-            3. Add user_id
+            3. Add user_id + domain_id
             4. Create in database (via EquipmentService)
 
         Args:
             db: Database session
-            user_id: User UUID (from JWT)
+            user_id: User UUID (audit trail / created_by)
+            domain_id: Domain UUID (tenant ownership)
             equipment_data: Equipment data dict (plaintext)
 
         Returns:
@@ -70,6 +71,7 @@ class EquipmentOrchestrator:
             equipment = equipment_orchestrator.create_equipment(
                 db,
                 user_id="123e4567-e89b-12d3-a456-426614174000",
+                domain_id="456e...",
                 equipment_data={
                     "type": "Software",
                     "name": "Logic Pro X",
@@ -96,8 +98,9 @@ class EquipmentOrchestrator:
             if price:
                 normalized["price_encrypted"] = encryption_service.encrypt(price)
 
-            # 3. Add user_id
+            # 3. Add user_id + domain_id
             normalized["user_id"] = user_id
+            normalized["domain_id"] = domain_id
 
             # 4. Create in database
             equipment = equipment_service.create_equipment(db, **normalized)
@@ -116,7 +119,7 @@ class EquipmentOrchestrator:
             logger.error("Equipment creation failed", error=str(e), error_type=type(e).__name__, user_id=user_id)
             raise EquipmentOrchestratorError(f"Failed to create equipment: {str(e)}")
 
-    def get_equipment_with_decryption(self, db, equipment_id: str, user_id: str) -> dict | None:
+    def get_equipment_with_decryption(self, db, equipment_id: str, domain_id: str) -> dict | None:
         """
         Get equipment and decrypt sensitive fields.
 
@@ -128,13 +131,13 @@ class EquipmentOrchestrator:
         Args:
             db: Database session
             equipment_id: Equipment UUID
-            user_id: User UUID (from JWT)
+            domain_id: Domain UUID (from JWT)
 
         Returns:
             Equipment data dict with decrypted fields, or None if not found
 
         Example:
-            equipment_dict = equipment_orchestrator.get_equipment_with_decryption(db, equipment_id, user_id)
+            equipment_dict = equipment_orchestrator.get_equipment_with_decryption(db, equipment_id, domain_id)
             # {
             #     "id": "...",
             #     "name": "Logic Pro X",
@@ -143,9 +146,9 @@ class EquipmentOrchestrator:
             #     ...
             # }
         """
-        equipment = equipment_service.get_equipment_by_id(db, equipment_id, user_id)
+        equipment = equipment_service.get_equipment_by_id(db, equipment_id, domain_id)
         if not equipment:
-            logger.warning("Equipment not found", equipment_id=equipment_id, user_id=user_id)
+            logger.warning("Equipment not found", equipment_id=equipment_id, domain_id=domain_id)
             return None
 
         # Convert to dict
@@ -174,10 +177,10 @@ class EquipmentOrchestrator:
         equipment_dict["license_key"] = encryption_service.decrypt(equipment.license_key_encrypted)
         equipment_dict["price"] = encryption_service.decrypt(equipment.price_encrypted)
 
-        logger.debug("Equipment retrieved with decryption", equipment_id=equipment_id, user_id=user_id)
+        logger.debug("Equipment retrieved with decryption", equipment_id=equipment_id, domain_id=domain_id)
         return equipment_dict
 
-    def update_equipment(self, db, equipment_id: str, user_id: str, update_data: dict):
+    def update_equipment(self, db, equipment_id: str, domain_id: str, update_data: dict):
         """
         Update equipment with encryption and normalization.
 
@@ -189,7 +192,7 @@ class EquipmentOrchestrator:
         Args:
             db: Database session
             equipment_id: Equipment UUID
-            user_id: User UUID (from JWT)
+            domain_id: Domain UUID (from JWT)
             update_data: Equipment update data dict (plaintext)
 
         Returns:
@@ -200,7 +203,7 @@ class EquipmentOrchestrator:
 
         Example:
             equipment = equipment_orchestrator.update_equipment(
-                db, equipment_id, user_id, {"status": "archived", "price": "349.99 EUR"}
+                db, equipment_id, domain_id, {"status": "archived", "price": "349.99 EUR"}
             )
         """
         try:
@@ -225,14 +228,14 @@ class EquipmentOrchestrator:
                     normalized["price_encrypted"] = encryption_service.encrypt(price)
 
             # 3. Update in database
-            equipment = equipment_service.update_equipment(db, equipment_id, user_id, normalized)
+            equipment = equipment_service.update_equipment(db, equipment_id, domain_id, normalized)
             if not equipment:
                 raise EquipmentOrchestratorError("Failed to update equipment (not found or database error)")
 
             logger.info(
                 "Equipment updated successfully",
                 equipment_id=equipment_id,
-                user_id=user_id,
+                domain_id=domain_id,
                 fields_updated=list(update_data.keys()),
             )
             return equipment
@@ -247,6 +250,7 @@ class EquipmentOrchestrator:
         db,
         equipment_id: str,
         user_id: str,
+        domain_id: str,
         file_data: bytes,
         filename: str,
     ) -> tuple[dict | None, str | None]:
@@ -289,8 +293,8 @@ class EquipmentOrchestrator:
             if not is_valid:
                 return None, error
 
-            # 3. Verify equipment exists and user owns it
-            equipment = equipment_service.get_equipment_by_id(db, equipment_id, user_id)
+            # 3. Verify equipment exists and belongs to domain
+            equipment = equipment_service.get_equipment_by_id(db, equipment_id, domain_id)
             if not equipment:
                 return None, "Equipment not found"
 
@@ -300,6 +304,7 @@ class EquipmentOrchestrator:
                 db=db,
                 equipment_id=UUID(equipment_id),
                 user_id=UUID(user_id),
+                domain_id=UUID(domain_id),
                 filename=filename,
                 s3_key="temp",  # Will update after upload
                 file_size=file_size,
@@ -317,12 +322,12 @@ class EquipmentOrchestrator:
                 self.storage.upload(file_data, s3_key, content_type=content_type)
             except Exception as e:
                 # Rollback DB record
-                equipment_attachment_service.delete_attachment(db, attachment.id, UUID(user_id))
+                equipment_attachment_service.delete_attachment(db, attachment.id, UUID(domain_id))
                 logger.error("S3 upload failed", error=str(e), filename=filename)
                 return None, f"Failed to upload file: {str(e)}"
 
             # 7. Update attachment with real S3 key
-            attachment = equipment_attachment_service.update_s3_key(db, attachment.id, UUID(user_id), s3_key)
+            attachment = equipment_attachment_service.update_s3_key(db, attachment.id, UUID(domain_id), s3_key)
             if not attachment:
                 return None, "Failed to update attachment with S3 key"
 
@@ -349,7 +354,7 @@ class EquipmentOrchestrator:
         self,
         db,
         attachment_id: str,
-        user_id: str,
+        domain_id: str,
     ) -> bool:
         """
         Delete attachment and cleanup S3 file.
@@ -357,21 +362,21 @@ class EquipmentOrchestrator:
         Args:
             db: Database session
             attachment_id: Attachment UUID
-            user_id: User UUID (from JWT)
+            domain_id: Domain UUID (from JWT)
 
         Returns:
             True if successful
         """
         try:
             # Get attachment
-            attachment = equipment_attachment_service.get_attachment_by_id(db, UUID(attachment_id), UUID(user_id))
+            attachment = equipment_attachment_service.get_attachment_by_id(db, UUID(attachment_id), UUID(domain_id))
             if not attachment:
                 return False
 
             s3_key = attachment.s3_key
 
             # Delete from DB
-            if not equipment_attachment_service.delete_attachment(db, UUID(attachment_id), UUID(user_id)):
+            if not equipment_attachment_service.delete_attachment(db, UUID(attachment_id), UUID(domain_id)):
                 return False
 
             # Delete from S3

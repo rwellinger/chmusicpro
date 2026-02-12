@@ -22,7 +22,9 @@ class WorkshopController:
     """Controller for workshop operations"""
 
     @staticmethod
-    def create_workshop(db: Session, user_id: str, workshop_data: WorkshopCreateRequest) -> tuple[dict[str, Any], int]:
+    def create_workshop(
+        db: Session, user_id: str, domain_id: str, workshop_data: WorkshopCreateRequest
+    ) -> tuple[dict[str, Any], int]:
         """
         Create a new workshop (uses business layer for normalization)
 
@@ -38,6 +40,7 @@ class WorkshopController:
             workshop = orchestrator.create_workshop(
                 db=db,
                 user_id=user_id,
+                domain_id=domain_id,
                 title=workshop_data.title,
                 connect_topic=workshop_data.connect_topic,
                 draft_language=workshop_data.draft_language,
@@ -56,7 +59,7 @@ class WorkshopController:
     @staticmethod
     def get_workshops(
         db: Session,
-        user_id: str,
+        domain_id: str,
         limit: int = 20,
         offset: int = 0,
         search: str = "",
@@ -82,7 +85,7 @@ class WorkshopController:
         try:
             result = workshop_service.get_workshops_paginated(
                 db=db,
-                user_id=user_id,
+                domain_id=domain_id,
                 limit=limit,
                 offset=offset,
                 search=search,
@@ -115,7 +118,7 @@ class WorkshopController:
             return {"error": f"Failed to retrieve workshops: {str(e)}"}, 500
 
     @staticmethod
-    def get_workshop_by_id(db: Session, user_id: str, workshop_id: str) -> tuple[dict[str, Any], int]:
+    def get_workshop_by_id(db: Session, domain_id: str, workshop_id: str) -> tuple[dict[str, Any], int]:
         """
         Get a specific workshop by ID
 
@@ -132,7 +135,7 @@ class WorkshopController:
             except ValueError:
                 return {"error": "Invalid workshop ID format"}, 400
 
-            workshop = workshop_service.get_workshop_by_id(db, workshop_id, user_id=user_id)
+            workshop = workshop_service.get_workshop_by_id(db, workshop_id, domain_id=domain_id)
 
             if not workshop:
                 return {"error": f"Workshop not found with ID: {workshop_id}"}, 404
@@ -146,7 +149,7 @@ class WorkshopController:
 
     @staticmethod
     def update_workshop(
-        db: Session, user_id: str, workshop_id: str, update_data: WorkshopUpdateRequest
+        db: Session, domain_id: str, workshop_id: str, update_data: WorkshopUpdateRequest
     ) -> tuple[dict[str, Any], int]:
         """
         Update an existing workshop (uses business layer for normalization)
@@ -172,7 +175,7 @@ class WorkshopController:
 
             orchestrator = WorkshopOrchestrator()
             workshop = orchestrator.update_workshop(
-                db=db, user_id=user_id, workshop_id=workshop_id, update_data=update_dict
+                db=db, domain_id=domain_id, workshop_id=workshop_id, update_data=update_dict
             )
 
             response = WorkshopResponse.model_validate(workshop)
@@ -188,7 +191,7 @@ class WorkshopController:
             return {"error": f"Failed to update workshop: {str(e)}"}, 500
 
     @staticmethod
-    def delete_workshop(db: Session, user_id: str, workshop_id: str) -> tuple[dict[str, Any], int]:
+    def delete_workshop(db: Session, domain_id: str, workshop_id: str) -> tuple[dict[str, Any], int]:
         """
         Delete a workshop
 
@@ -205,7 +208,7 @@ class WorkshopController:
             except ValueError:
                 return {"error": "Invalid workshop ID format"}, 400
 
-            success = workshop_service.delete_workshop(db, workshop_id, user_id=user_id)
+            success = workshop_service.delete_workshop(db, workshop_id, domain_id=domain_id)
 
             if not success:
                 return {"error": f"Workshop not found with ID: {workshop_id}"}, 404
@@ -217,7 +220,7 @@ class WorkshopController:
             return {"error": f"Failed to delete workshop: {str(e)}"}, 500
 
     @staticmethod
-    def export_to_sketch(db: Session, user_id: str, workshop_id: str) -> tuple[dict[str, Any], int]:
+    def export_to_sketch(db: Session, user_id: str, domain_id: str, workshop_id: str) -> tuple[dict[str, Any], int]:
         """
         Export workshop to a new SongSketch
 
@@ -235,7 +238,7 @@ class WorkshopController:
                 return {"error": "Invalid workshop ID format"}, 400
 
             orchestrator = WorkshopOrchestrator()
-            sketch = orchestrator.export_to_sketch(db=db, user_id=user_id, workshop_id=workshop_id)
+            sketch = orchestrator.export_to_sketch(db=db, user_id=user_id, domain_id=domain_id, workshop_id=workshop_id)
 
             response = SketchResponse.model_validate(sketch)
             return {"data": response.model_dump(), "message": "Workshop exported to sketch successfully"}, 201

@@ -70,21 +70,26 @@ class UserAuthService:
             logger.warning("Password verification error", error=str(e))
             return False
 
-    def generate_jwt_token(self, user_id: str, email: str, role: str = "user") -> str:
+    def generate_jwt_token(
+        self,
+        user_id: str,
+        email: str,
+        role: str = "user",
+        active_domain_id: str | None = None,
+        domain_role: str | None = None,
+    ) -> str:
         """
         Generate JWT token for user authentication
 
         Args:
             user_id: User UUID as string
             email: User email address
-            role: User role (default "user")
+            role: User role (default "user") - legacy, kept for backwards compat
+            active_domain_id: Active domain UUID as string (multi-tenancy)
+            domain_role: User's role in the active domain
 
         Returns:
             JWT token string
-
-        Example:
-            >>> auth_service = UserAuthService()
-            >>> token = auth_service.generate_jwt_token("123e4567-...", "user@example.com", "admin")
         """
         payload = {
             "user_id": str(user_id),
@@ -93,8 +98,20 @@ class UserAuthService:
             "iat": datetime.now(UTC),
             "exp": datetime.now(UTC) + timedelta(hours=self.jwt_expiration_hours),
         }
+        if active_domain_id:
+            payload["active_domain_id"] = str(active_domain_id)
+        if domain_role:
+            payload["domain_role"] = str(domain_role)
+
         token = jwt.encode(payload, self.jwt_secret, algorithm=self.jwt_algorithm)
-        logger.debug("JWT token generated", user_id=user_id, email=email, role=role)
+        logger.debug(
+            "JWT token generated",
+            user_id=user_id,
+            email=email,
+            role=role,
+            active_domain_id=active_domain_id,
+            domain_role=domain_role,
+        )
         return token
 
     def verify_jwt_token(self, token: str) -> dict | None:

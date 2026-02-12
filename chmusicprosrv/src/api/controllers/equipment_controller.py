@@ -119,25 +119,26 @@ class EquipmentController:
     """HTTP request/response handling for equipment"""
 
     @staticmethod
-    def create_equipment(db, user_id: str, equipment_data: EquipmentCreateRequest) -> tuple[dict, int]:
+    def create_equipment(db, user_id: str, domain_id: str, equipment_data: EquipmentCreateRequest) -> tuple[dict, int]:
         """
         Create new equipment.
 
         Args:
             db: Database session
-            user_id: User UUID (from JWT)
+            user_id: User UUID (audit trail / created_by)
+            domain_id: Domain UUID (tenant ownership)
             equipment_data: Validated equipment data
 
         Returns:
             Tuple of (response_dict, status_code)
 
         Example:
-            result, status_code = EquipmentController.create_equipment(db, user_id, equipment_data)
+            result, status_code = EquipmentController.create_equipment(db, user_id, domain_id, equipment_data)
             # ({'data': {'id': '...'}, 'message': 'Equipment created successfully'}, 201)
         """
         try:
             equipment = equipment_orchestrator.create_equipment(
-                db, user_id, equipment_data.model_dump(exclude_none=True)
+                db, user_id, domain_id, equipment_data.model_dump(exclude_none=True)
             )
             logger.info("Equipment created via API", equipment_id=str(equipment.id), user_id=user_id)
             return {"data": {"id": str(equipment.id)}, "message": "Equipment created successfully"}, 201
@@ -149,38 +150,40 @@ class EquipmentController:
             return {"error": "Internal server error"}, 500
 
     @staticmethod
-    def get_equipment(db, equipment_id: str, user_id: str) -> tuple[dict, int]:
+    def get_equipment(db, equipment_id: str, domain_id: str) -> tuple[dict, int]:
         """
         Get equipment by ID with decrypted sensitive fields.
 
         Args:
             db: Database session
             equipment_id: Equipment UUID
-            user_id: User UUID (from JWT)
+            domain_id: Domain UUID (from JWT)
 
         Returns:
             Tuple of (response_dict, status_code)
 
         Example:
-            result, status_code = EquipmentController.get_equipment(db, equipment_id, user_id)
+            result, status_code = EquipmentController.get_equipment(db, equipment_id, domain_id)
             # ({'data': {...}}, 200) or ({'error': 'Equipment not found'}, 404)
         """
         try:
-            equipment_dict = equipment_orchestrator.get_equipment_with_decryption(db, equipment_id, user_id)
+            equipment_dict = equipment_orchestrator.get_equipment_with_decryption(db, equipment_id, domain_id)
             if not equipment_dict:
-                logger.warning("Equipment not found via API", equipment_id=equipment_id, user_id=user_id)
+                logger.warning("Equipment not found via API", equipment_id=equipment_id, domain_id=domain_id)
                 return {"error": "Equipment not found"}, 404
 
-            logger.debug("Equipment retrieved via API", equipment_id=equipment_id, user_id=user_id)
+            logger.debug("Equipment retrieved via API", equipment_id=equipment_id, domain_id=domain_id)
             return {"data": equipment_dict}, 200
         except Exception as e:
-            logger.error("Failed to get equipment via API", error=str(e), equipment_id=equipment_id, user_id=user_id)
+            logger.error(
+                "Failed to get equipment via API", error=str(e), equipment_id=equipment_id, domain_id=domain_id
+            )
             return {"error": "Internal server error"}, 500
 
     @staticmethod
     def list_equipment(
         db,
-        user_id: str,
+        domain_id: str,
         limit: int,
         offset: int,
         type_filter: str | None,
@@ -192,7 +195,7 @@ class EquipmentController:
 
         Args:
             db: Database session
-            user_id: User UUID (from JWT)
+            domain_id: Domain UUID (from JWT)
             limit: Items per page
             offset: Pagination offset
             type_filter: Filter by type
@@ -203,12 +206,12 @@ class EquipmentController:
             Tuple of (response_dict, status_code)
 
         Example:
-            result, status_code = EquipmentController.list_equipment(db, user_id, 20, 0, None, None, None)
+            result, status_code = EquipmentController.list_equipment(db, domain_id, 20, 0, None, None, None)
             # ({'data': [...], 'pagination': {...}}, 200)
         """
         try:
             result = equipment_service.get_equipment_paginated(
-                db, user_id, limit, offset, type_filter, status_filter, search
+                db, domain_id, limit, offset, type_filter, status_filter, search
             )
 
             # Convert to list response format (no sensitive fields)
@@ -229,71 +232,79 @@ class EquipmentController:
                 total=result["pagination"]["total"],
                 limit=limit,
                 offset=offset,
-                user_id=user_id,
+                domain_id=domain_id,
             )
             return {"data": equipment_list, "pagination": result["pagination"]}, 200
         except Exception as e:
-            logger.error("Failed to list equipment via API", error=str(e), user_id=user_id)
+            logger.error("Failed to list equipment via API", error=str(e), domain_id=domain_id)
             return {"error": "Internal server error"}, 500
 
     @staticmethod
-    def update_equipment(db, equipment_id: str, user_id: str, update_data: EquipmentUpdateRequest) -> tuple[dict, int]:
+    def update_equipment(
+        db, equipment_id: str, domain_id: str, update_data: EquipmentUpdateRequest
+    ) -> tuple[dict, int]:
         """
         Update equipment.
 
         Args:
             db: Database session
             equipment_id: Equipment UUID
-            user_id: User UUID (from JWT)
+            domain_id: Domain UUID (from JWT)
             update_data: Validated update data
 
         Returns:
             Tuple of (response_dict, status_code)
 
         Example:
-            result, status_code = EquipmentController.update_equipment(db, equipment_id, user_id, update_data)
+            result, status_code = EquipmentController.update_equipment(db, equipment_id, domain_id, update_data)
             # ({'data': {'id': '...'}, 'message': 'Equipment updated successfully'}, 200)
         """
         try:
             equipment = equipment_orchestrator.update_equipment(
-                db, equipment_id, user_id, update_data.model_dump(exclude_none=True)
+                db, equipment_id, domain_id, update_data.model_dump(exclude_none=True)
             )
-            logger.info("Equipment updated via API", equipment_id=equipment_id, user_id=user_id)
+            logger.info("Equipment updated via API", equipment_id=equipment_id, domain_id=domain_id)
             return {"data": {"id": str(equipment.id)}, "message": "Equipment updated successfully"}, 200
         except EquipmentOrchestratorError as e:
-            logger.error("Equipment update failed via API", error=str(e), equipment_id=equipment_id, user_id=user_id)
+            logger.error(
+                "Equipment update failed via API", error=str(e), equipment_id=equipment_id, domain_id=domain_id
+            )
             return {"error": f"Failed to update equipment: {str(e)}"}, 500
         except Exception as e:
             logger.error(
-                "Unexpected error in equipment update", error=str(e), equipment_id=equipment_id, user_id=user_id
+                "Unexpected error in equipment update", error=str(e), equipment_id=equipment_id, domain_id=domain_id
             )
             return {"error": "Internal server error"}, 500
 
     @staticmethod
-    def delete_equipment(db, equipment_id: str, user_id: str) -> tuple[dict, int]:
+    def delete_equipment(db, equipment_id: str, domain_id: str) -> tuple[dict, int]:
         """
         Delete equipment.
 
         Args:
             db: Database session
             equipment_id: Equipment UUID
-            user_id: User UUID (from JWT)
+            domain_id: Domain UUID (from JWT)
 
         Returns:
             Tuple of (response_dict, status_code)
 
         Example:
-            result, status_code = EquipmentController.delete_equipment(db, equipment_id, user_id)
+            result, status_code = EquipmentController.delete_equipment(db, equipment_id, domain_id)
             # ({'message': 'Equipment deleted successfully'}, 200) or ({'error': 'Equipment not found'}, 404)
         """
         try:
-            success = equipment_service.delete_equipment(db, equipment_id, user_id)
+            success = equipment_service.delete_equipment(db, equipment_id, domain_id)
             if not success:
-                logger.warning("Equipment not found for deletion via API", equipment_id=equipment_id, user_id=user_id)
+                logger.warning(
+                    "Equipment not found for deletion via API", equipment_id=equipment_id, domain_id=domain_id
+                )
                 return {"error": "Equipment not found"}, 404
 
-            logger.info("Equipment deleted via API", equipment_id=equipment_id, user_id=user_id)
+            logger.info("Equipment deleted via API", equipment_id=equipment_id, domain_id=domain_id)
             return {"message": "Equipment deleted successfully"}, 200
         except Exception as e:
-            logger.error("Failed to delete equipment via API", error=str(e), equipment_id=equipment_id, user_id=user_id)
+            logger.error(
+                "Failed to delete equipment via API", error=str(e), equipment_id=equipment_id, domain_id=domain_id
+            )
             return {"error": "Internal server error"}, 500

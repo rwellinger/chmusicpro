@@ -39,6 +39,7 @@ forbidden_modules =
 # Pattern: if TYPE_CHECKING: from sqlalchemy.orm import Session
 ignore_imports =
     src.business.compression_orchestrator -> sqlalchemy
+    src.business.domain_orchestrator -> sqlalchemy
     src.business.prompt_template_orchestrator -> sqlalchemy
     src.business.sketch_orchestrator -> sqlalchemy
     src.business.song_project_orchestrator -> sqlalchemy

@@ -10,6 +10,7 @@ from business.image_orchestrator import ImageGenerationError
 
 
 TEST_USER_ID = str(uuid4())
+TEST_DOMAIN_ID = str(uuid4())
 
 
 @pytest.mark.unit
@@ -35,11 +36,11 @@ class TestImageControllerGetImagesForTextOverlay:
 
         controller.orchestrator.get_images_for_text_overlay.return_value = expected_result
 
-        result, status_code = controller.get_images_for_text_overlay(user_id=TEST_USER_ID)
+        result, status_code = controller.get_images_for_text_overlay(domain_id=TEST_DOMAIN_ID)
 
         assert status_code == 200
         assert result == expected_result
-        controller.orchestrator.get_images_for_text_overlay.assert_called_once_with(user_id=TEST_USER_ID)
+        controller.orchestrator.get_images_for_text_overlay.assert_called_once_with(domain_id=TEST_DOMAIN_ID)
 
     def test_get_images_for_text_overlay_business_error(self, mocker):
         """Test handling of business layer error"""
@@ -49,7 +50,7 @@ class TestImageControllerGetImagesForTextOverlay:
 
         controller.orchestrator.get_images_for_text_overlay.side_effect = ImageGenerationError("Database error")
 
-        result, status_code = controller.get_images_for_text_overlay(user_id=TEST_USER_ID)
+        result, status_code = controller.get_images_for_text_overlay(domain_id=TEST_DOMAIN_ID)
 
         assert status_code == 500
         assert "error" in result
@@ -63,7 +64,7 @@ class TestImageControllerGetImagesForTextOverlay:
 
         controller.orchestrator.get_images_for_text_overlay.side_effect = Exception("Unexpected failure")
 
-        result, status_code = controller.get_images_for_text_overlay(user_id=TEST_USER_ID)
+        result, status_code = controller.get_images_for_text_overlay(domain_id=TEST_DOMAIN_ID)
 
         assert status_code == 500
         assert "error" in result
@@ -88,6 +89,7 @@ class TestImageControllerAddTextOverlay:
         result, status_code = controller.add_text_overlay(
             image_id="nonexistent",
             user_id="user123",
+            domain_id=TEST_DOMAIN_ID,
             title="Test Title",
         )
 
@@ -109,6 +111,7 @@ class TestImageControllerAddTextOverlay:
         result, status_code = controller.add_text_overlay(
             image_id="123",
             user_id="user123",
+            domain_id=TEST_DOMAIN_ID,
             title="Test Title",
         )
 
@@ -127,6 +130,7 @@ class TestImageControllerAddTextOverlay:
         result, status_code = controller.add_text_overlay(
             image_id="123",
             user_id="user123",
+            domain_id=TEST_DOMAIN_ID,
             title="Test Title",
         )
 
@@ -145,6 +149,7 @@ class TestImageControllerAddTextOverlay:
         result, status_code = controller.add_text_overlay(
             image_id="123",
             user_id="user123",
+            domain_id=TEST_DOMAIN_ID,
             title="Test Title",
         )
 
@@ -165,7 +170,7 @@ class TestImageControllerDeleteImage:
 
         controller.orchestrator.delete_single_image.return_value = True
 
-        result, status_code = controller.delete_image(TEST_USER_ID, "123")
+        result, status_code = controller.delete_image(TEST_DOMAIN_ID, "123")
 
         assert status_code == 200
         assert result["message"] == "Image deleted successfully"
@@ -178,7 +183,7 @@ class TestImageControllerDeleteImage:
 
         controller.orchestrator.delete_single_image.return_value = False
 
-        result, status_code = controller.delete_image(TEST_USER_ID, "nonexistent")
+        result, status_code = controller.delete_image(TEST_DOMAIN_ID, "nonexistent")
 
         assert status_code == 404
         assert "error" in result
@@ -191,7 +196,7 @@ class TestImageControllerDeleteImage:
 
         controller.orchestrator.delete_single_image.side_effect = ImageGenerationError("Database error")
 
-        result, status_code = controller.delete_image(TEST_USER_ID, "123")
+        result, status_code = controller.delete_image(TEST_DOMAIN_ID, "123")
 
         assert status_code == 500
         assert "error" in result
@@ -207,7 +212,7 @@ class TestImageControllerBulkDelete:
         controller = ImageController()
         controller.orchestrator = MagicMock()
 
-        result, status_code = controller.bulk_delete_images(TEST_USER_ID, [])
+        result, status_code = controller.bulk_delete_images(TEST_DOMAIN_ID, [])
 
         assert status_code == 400
         assert "error" in result
@@ -222,7 +227,7 @@ class TestImageControllerBulkDelete:
         # Create 101 IDs
         too_many_ids = [f"id_{i}" for i in range(101)]
 
-        result, status_code = controller.bulk_delete_images(TEST_USER_ID, too_many_ids)
+        result, status_code = controller.bulk_delete_images(TEST_DOMAIN_ID, too_many_ids)
 
         assert status_code == 400
         assert "error" in result
@@ -239,7 +244,7 @@ class TestImageControllerBulkDelete:
             "details": [],
         }
 
-        result, status_code = controller.bulk_delete_images(TEST_USER_ID, ["id1", "id2", "id3"])
+        result, status_code = controller.bulk_delete_images(TEST_DOMAIN_ID, ["id1", "id2", "id3"])
 
         assert status_code == 200
         assert result["summary"]["deleted"] == 3
@@ -255,7 +260,7 @@ class TestImageControllerBulkDelete:
             "details": [],
         }
 
-        result, status_code = controller.bulk_delete_images(TEST_USER_ID, ["id1", "id2", "id3"])
+        result, status_code = controller.bulk_delete_images(TEST_DOMAIN_ID, ["id1", "id2", "id3"])
 
         assert status_code == 207  # Multi-status
         assert result["summary"]["deleted"] == 2
@@ -271,7 +276,7 @@ class TestImageControllerBulkDelete:
             "details": [],
         }
 
-        result, status_code = controller.bulk_delete_images(TEST_USER_ID, ["id1", "id2", "id3"])
+        result, status_code = controller.bulk_delete_images(TEST_DOMAIN_ID, ["id1", "id2", "id3"])
 
         assert status_code == 404
         assert result["summary"]["deleted"] == 0
@@ -287,7 +292,7 @@ class TestImageControllerBulkDelete:
             "details": [],
         }
 
-        result, status_code = controller.bulk_delete_images(TEST_USER_ID, ["id1", "id2", "id3"])
+        result, status_code = controller.bulk_delete_images(TEST_DOMAIN_ID, ["id1", "id2", "id3"])
 
         assert status_code == 400
         assert result["summary"]["errors"] == 3
@@ -312,7 +317,7 @@ class TestImageControllerUpdateMetadata:
         controller.orchestrator.update_image_metadata.return_value = expected_result
 
         result, status_code = controller.update_image_metadata(
-            TEST_USER_ID, "123", title="Updated Title", tags="tag1,tag2"
+            TEST_DOMAIN_ID, "123", title="Updated Title", tags="tag1,tag2"
         )
 
         assert status_code == 200

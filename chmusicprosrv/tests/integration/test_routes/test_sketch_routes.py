@@ -18,6 +18,7 @@ from schemas.sketch_schemas import SketchCreateRequest, SketchListResponse, Sket
 
 
 TEST_USER_ID = str(uuid4())
+TEST_DOMAIN_ID = str(uuid4())
 
 
 @pytest.fixture
@@ -73,7 +74,7 @@ class TestSketchControllerIntegration:
             mock_get.return_value = {"items": [mock_sketch_db_model], "total": 1}
 
             result, status_code = SketchController.get_sketches(
-                db=mock_db_session, user_id=TEST_USER_ID, limit=20, offset=0, search="", workflow=None
+                db=mock_db_session, domain_id=TEST_DOMAIN_ID, limit=20, offset=0, search="", workflow=None
             )
 
             assert status_code == 200
@@ -105,7 +106,7 @@ class TestSketchControllerIntegration:
             mock_get.return_value = {"items": [mock_sketch_db_model], "total": 1}
 
             result, status_code = SketchController.get_sketches(
-                db=mock_db_session, user_id=TEST_USER_ID, limit=20, offset=0, search="", workflow=None
+                db=mock_db_session, domain_id=TEST_DOMAIN_ID, limit=20, offset=0, search="", workflow=None
             )
 
             assert status_code == 200
@@ -122,7 +123,7 @@ class TestSketchControllerIntegration:
             mock_get.return_value = {"items": [mock_sketch_db_model] * 20, "total": 50}
 
             result, status_code = SketchController.get_sketches(
-                db=mock_db_session, user_id=TEST_USER_ID, limit=20, offset=0, search="", workflow=None
+                db=mock_db_session, domain_id=TEST_DOMAIN_ID, limit=20, offset=0, search="", workflow=None
             )
 
             assert status_code == 200
@@ -132,7 +133,7 @@ class TestSketchControllerIntegration:
             # Test with last page
             mock_get.return_value = {"items": [mock_sketch_db_model] * 10, "total": 50}
             result, status_code = SketchController.get_sketches(
-                db=mock_db_session, user_id=TEST_USER_ID, limit=20, offset=40, search="", workflow=None
+                db=mock_db_session, domain_id=TEST_DOMAIN_ID, limit=20, offset=40, search="", workflow=None
             )
 
             assert status_code == 200
@@ -149,7 +150,7 @@ class TestSketchControllerIntegration:
             mock_create.return_value = mock_sketch_db_model
 
             result, status_code = SketchController.create_sketch(
-                sketch_data=sketch_data, db=mock_db_session, user_id=TEST_USER_ID
+                sketch_data=sketch_data, db=mock_db_session, user_id=TEST_USER_ID, domain_id=TEST_DOMAIN_ID
             )
 
             assert status_code == 201
@@ -166,7 +167,7 @@ class TestSketchControllerIntegration:
             mock_get.return_value = {"items": [], "total": 0}
 
             result, status_code = SketchController.get_sketches(
-                db=mock_db_session, user_id=TEST_USER_ID, limit=20, offset=0, search="", workflow=None
+                db=mock_db_session, domain_id=TEST_DOMAIN_ID, limit=20, offset=0, search="", workflow=None
             )
 
             assert status_code == 200

@@ -20,6 +20,7 @@ class SketchService:
         self,
         db: Session,
         user_id: str,
+        domain_id: str,
         title: str | None,
         lyrics: str | None,
         prompt: str,
@@ -53,6 +54,7 @@ class SketchService:
         try:
             sketch = SongSketch(
                 user_id=user_id,
+                domain_id=domain_id,
                 title=title,
                 lyrics=lyrics,
                 prompt=prompt,
@@ -86,22 +88,22 @@ class SketchService:
             logger.error("sketch_creation_failed", error=str(e), error_type=type(e).__name__)
             return None
 
-    def get_sketch_by_id(self, db: Session, sketch_id: str | UUID, user_id: str | None = None) -> SongSketch | None:
+    def get_sketch_by_id(self, db: Session, sketch_id: str | UUID, domain_id: str | None = None) -> SongSketch | None:
         """
         Get sketch by ID
 
         Args:
             db: Database session
             sketch_id: UUID of the sketch
-            user_id: UUID of the user (for ownership filter)
+            domain_id: UUID of the domain (for tenant filter)
 
         Returns:
             SongSketch instance if found, None otherwise
         """
         try:
             query = db.query(SongSketch).filter(SongSketch.id == sketch_id)
-            if user_id:
-                query = query.filter(SongSketch.user_id == user_id)
+            if domain_id:
+                query = query.filter(SongSketch.domain_id == domain_id)
             sketch = query.first()
             if sketch:
                 logger.debug("Sketch retrieved", sketch_id=str(sketch_id), workflow=sketch.workflow)
@@ -117,7 +119,7 @@ class SketchService:
     def get_sketches_paginated(
         self,
         db: Session,
-        user_id: str,
+        domain_id: str,
         limit: int = 20,
         offset: int = 0,
         search: str = "",
@@ -145,8 +147,8 @@ class SketchService:
         try:
             query = db.query(SongSketch).options(joinedload(SongSketch.project))
 
-            # Apply user filter
-            query = query.filter(SongSketch.user_id == user_id)
+            # Apply domain filter (tenant isolation)
+            query = query.filter(SongSketch.domain_id == domain_id)
 
             # Apply workflow filter
             if workflow:
@@ -223,7 +225,7 @@ class SketchService:
         self,
         db: Session,
         sketch_id: str | UUID,
-        user_id: str | None = None,
+        domain_id: str | None = None,
         title: str | None = None,
         lyrics: str | None = None,
         prompt: str | None = None,
@@ -260,8 +262,8 @@ class SketchService:
         """
         try:
             query = db.query(SongSketch).filter(SongSketch.id == sketch_id)
-            if user_id:
-                query = query.filter(SongSketch.user_id == user_id)
+            if domain_id:
+                query = query.filter(SongSketch.domain_id == domain_id)
             sketch = query.first()
             if not sketch:
                 logger.warning("Sketch not found for update", sketch_id=str(sketch_id))
@@ -341,22 +343,22 @@ class SketchService:
             )
             return None
 
-    def delete_sketch(self, db: Session, sketch_id: str | UUID, user_id: str | None = None) -> bool:
+    def delete_sketch(self, db: Session, sketch_id: str | UUID, domain_id: str | None = None) -> bool:
         """
         Delete a sketch by ID
 
         Args:
             db: Database session
             sketch_id: UUID of the sketch
-            user_id: UUID of the user (for ownership filter)
+            domain_id: UUID of the domain (for tenant filter)
 
         Returns:
             True if successful, False otherwise
         """
         try:
             query = db.query(SongSketch).filter(SongSketch.id == sketch_id)
-            if user_id:
-                query = query.filter(SongSketch.user_id == user_id)
+            if domain_id:
+                query = query.filter(SongSketch.domain_id == domain_id)
             sketch = query.first()
             if sketch:
                 db.delete(sketch)
@@ -385,6 +387,7 @@ class SketchService:
         self,
         db: Session,
         user_id: str,
+        domain_id: str,
         original_sketch_id: str | UUID,
         new_title: str | None = None,
         new_lyrics: str | None = None,
@@ -404,8 +407,8 @@ class SketchService:
             New SongSketch instance if successful, None otherwise
         """
         try:
-            # Get original sketch (with ownership check)
-            original = self.get_sketch_by_id(db, original_sketch_id, user_id=user_id)
+            # Get original sketch (with domain check)
+            original = self.get_sketch_by_id(db, original_sketch_id, domain_id=domain_id)
             if not original:
                 logger.warning("Original sketch not found for duplication", sketch_id=str(original_sketch_id))
                 return None
@@ -413,6 +416,7 @@ class SketchService:
             # Create duplicate with overrides
             duplicate = SongSketch(
                 user_id=user_id,
+                domain_id=domain_id,
                 title=new_title if new_title is not None else original.title,
                 lyrics=new_lyrics if new_lyrics is not None else original.lyrics,
                 prompt=original.prompt,
@@ -451,22 +455,24 @@ class SketchService:
             )
             return None
 
-    def mark_sketch_as_used(self, db: Session, sketch_id: str | UUID, user_id: str | None = None) -> SongSketch | None:
+    def mark_sketch_as_used(
+        self, db: Session, sketch_id: str | UUID, domain_id: str | None = None
+    ) -> SongSketch | None:
         """
         Mark sketch as used (after song generation)
 
         Args:
             db: Database session
             sketch_id: UUID of the sketch
-            user_id: UUID of the user (for ownership filter)
+            domain_id: UUID of the domain (for tenant filter)
 
         Returns:
             Updated SongSketch instance if successful, None otherwise
         """
         try:
             query = db.query(SongSketch).filter(SongSketch.id == sketch_id)
-            if user_id:
-                query = query.filter(SongSketch.user_id == user_id)
+            if domain_id:
+                query = query.filter(SongSketch.domain_id == domain_id)
             sketch = query.first()
             if not sketch:
                 logger.warning("Sketch not found for mark as used", sketch_id=str(sketch_id))
