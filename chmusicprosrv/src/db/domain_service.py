@@ -9,7 +9,7 @@ import uuid
 
 from sqlalchemy.orm import Session
 
-from db.models import Domain, DomainMembership, DomainRole, DomainType
+from db.models import Domain, DomainMembership, DomainRole, DomainType, User
 from utils.logger import logger
 
 
@@ -134,3 +134,83 @@ class DomainService:
     def get_reserved_domain(self, db: Session, domain_type: DomainType) -> Domain | None:
         """Get a reserved domain (System or KI Templates) by type"""
         return db.query(Domain).filter(Domain.type == int(domain_type)).first()
+
+    def list_members_of_domain(self, db: Session, domain_id: str) -> list[tuple[DomainMembership, User]]:
+        """Get all members of a domain with their user info"""
+        try:
+            domain_uuid = uuid.UUID(domain_id)
+            return (
+                db.query(DomainMembership, User)
+                .join(User, DomainMembership.user_id == User.id)
+                .filter(DomainMembership.domain_id == domain_uuid)
+                .all()
+            )
+        except (ValueError, TypeError):
+            logger.warning("Invalid domain ID format", domain_id=domain_id)
+            return []
+
+    def update_domain(self, db: Session, domain_id: str, update_data: dict) -> Domain | None:
+        """Update domain fields"""
+        domain = self.get_domain_by_id(db, domain_id)
+        if not domain:
+            return None
+        for key, value in update_data.items():
+            if hasattr(domain, key):
+                setattr(domain, key, value)
+        db.flush()
+        logger.info("Domain updated", domain_id=domain_id, fields=list(update_data.keys()))
+        return domain
+
+    def deactivate_domain(self, db: Session, domain_id: str) -> Domain | None:
+        """Deactivate a domain (soft delete)"""
+        domain = self.get_domain_by_id(db, domain_id)
+        if not domain:
+            return None
+        domain.is_active = False
+        db.flush()
+        logger.info("Domain deactivated", domain_id=domain_id)
+        return domain
+
+    def update_membership_role(
+        self, db: Session, domain_id: str, user_id: str, new_role: str
+    ) -> DomainMembership | None:
+        """Update a member's role in a domain"""
+        membership = self.get_membership(db, domain_id, user_id)
+        if not membership:
+            return None
+        membership.role = new_role
+        db.flush()
+        logger.info("Membership role updated", domain_id=domain_id, user_id=user_id, new_role=new_role)
+        return membership
+
+    def delete_membership(self, db: Session, domain_id: str, user_id: str) -> bool:
+        """Remove a member from a domain"""
+        membership = self.get_membership(db, domain_id, user_id)
+        if not membership:
+            return False
+        db.delete(membership)
+        db.flush()
+        logger.info("Membership deleted", domain_id=domain_id, user_id=user_id)
+        return True
+
+    def clear_default_for_user(self, db: Session, user_id: str) -> None:
+        """Clear all is_default flags for a user"""
+        try:
+            user_uuid = uuid.UUID(user_id)
+            db.query(DomainMembership).filter(
+                DomainMembership.user_id == user_uuid,
+                DomainMembership.is_default.is_(True),
+            ).update({"is_default": False})
+            db.flush()
+        except (ValueError, TypeError):
+            logger.warning("Invalid user ID format", user_id=user_id)
+
+    def set_membership_as_default(self, db: Session, domain_id: str, user_id: str) -> DomainMembership | None:
+        """Set a specific membership as the user's default"""
+        membership = self.get_membership(db, domain_id, user_id)
+        if not membership:
+            return None
+        membership.is_default = True
+        db.flush()
+        logger.info("Membership set as default", domain_id=domain_id, user_id=user_id)
+        return membership

@@ -270,8 +270,60 @@
             </mat-card>
         </div>
 
-        <!-- API Costs Section -->
+        <!-- Domains + Costs Column -->
         <div class="costs-section">
+            <!-- Domains Card -->
+            <mat-card class="domains-card">
+                <mat-card-content>
+                    <div class="domains-header">
+                        <div class="domains-avatar">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="domains-header-text">
+                            <h3>{{ 'userProfile.domains.title' | translate }}</h3>
+                            <p>{{ 'userProfile.domains.subtitle' | translate }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div class="loading-state" *ngIf="isLoadingDomains">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+
+                    <!-- Domain List -->
+                    <div class="domain-list" *ngIf="!isLoadingDomains">
+                        <div class="domain-item"
+                             *ngFor="let dwr of userDomains"
+                             [class.domain-active]="dwr.domain.id === activeDomainId">
+                            <div class="domain-info">
+                                <i [class]="getDomainTypeIcon(dwr.domain.type)" class="domain-icon"></i>
+                                <div class="domain-details">
+                                    <span class="domain-name">{{ dwr.domain.name }}</span>
+                                    <div class="domain-badges">
+                                        <span class="domain-type-badge">{{ domainTypeLabels[dwr.domain.type] }}</span>
+                                        <span class="domain-role-badge">{{ dwr.role }}</span>
+                                        <span class="active-badge" *ngIf="dwr.domain.id === activeDomainId">
+                                            {{ 'userProfile.domains.active' | translate }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                    mat-button
+                                    class="switch-button"
+                                    *ngIf="dwr.domain.id !== activeDomainId"
+                                    [disabled]="isSwitchingDomain"
+                                    (click)="switchDomain(dwr.domain.id)">
+                                <i class="fas fa-exchange-alt" *ngIf="!isSwitchingDomain"></i>
+                                <i class="fas fa-spinner fa-spin" *ngIf="isSwitchingDomain"></i>
+                                {{ 'userProfile.domains.switch' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+            <!-- API Costs Card -->
             <mat-card class="profile-card">
                 <mat-card-content>
                     <!-- API Costs Section (OpenAI) -->

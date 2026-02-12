@@ -19,6 +19,7 @@ from .routes.chat_routes import api_chat_v1
 from .routes.claude_chat_routes import api_claude_chat_v1
 from .routes.conversation_routes import api_conversation_v1
 from .routes.cost_routes import api_openai_costs_v1
+from .routes.domain_routes import api_domain_v1
 from .routes.equipment_routes import api_equipment_v1
 from .routes.health_routes import api_health_v1
 from .routes.image_routes import api_image_v1
@@ -311,6 +312,7 @@ def create_app():
                     "api_openai_costs_v1": "OpenAI Costs",
                     "api_equipment_v1": "Equipment",
                     "api_user_v1": "User Management",
+                    "api_domain_v1": "Domains",
                     "api_ollama_v1": "Ollama",
                     "api_v1": "System",
                 }
@@ -334,6 +336,7 @@ def create_app():
                             "api_openai_costs_v1",
                             "api_equipment_v1",
                             "api_user_v1",
+                            "api_domain_v1",
                             "api_ollama_v1",
                             "api_v1",
                         )
@@ -564,5 +567,6 @@ def create_app():
     app.register_blueprint(api_claude_chat_v1)
     app.register_blueprint(api_equipment_v1)
     app.register_blueprint(api_workshop_v1)
+    app.register_blueprint(api_domain_v1)
 
     return app

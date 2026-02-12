@@ -418,4 +418,23 @@ export class AuthService {
         const role = this.authStateSubject.value.domainRole;
         return role === "admin" || role === "owner";
     }
+
+    /**
+     * Update token and domain state after domain switch.
+     * Stores new token, decodes domain claims, updates auth state.
+     */
+    public updateTokenAndDomainState(newToken: string): void {
+        const currentUser = this.authStateSubject.value.user;
+        if (!currentUser) {
+            return;
+        }
+        this.storeAuthData(newToken, currentUser);
+        const decoded = this.decodeToken(newToken);
+        this.updateAuthState({
+            token: newToken,
+            activeDomainId: decoded?.active_domain_id ?? null,
+            domainRole: decoded?.domain_role ?? null,
+            lastValidated: Date.now()
+        });
+    }
 }

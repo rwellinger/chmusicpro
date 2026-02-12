@@ -159,6 +159,16 @@ export class ApiConfigService {
             uploadFile: (id: string) => `${this.baseUrl}/api/v1/song-projects/${id}/files`,
             clearFolder: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/clear`
         },
+        domain: {
+            list: `${this.baseUrl}/api/v1/domains`,
+            detail: (id: string) => `${this.baseUrl}/api/v1/domains/${id}`,
+            create: `${this.baseUrl}/api/v1/domains`,
+            update: (id: string) => `${this.baseUrl}/api/v1/domains/${id}`,
+            deactivate: (id: string) => `${this.baseUrl}/api/v1/domains/${id}`,
+            switch: `${this.baseUrl}/api/v1/domains/switch`,
+            members: (domainId: string) => `${this.baseUrl}/api/v1/domains/${domainId}/members`,
+            memberDetail: (domainId: string, userId: string) => `${this.baseUrl}/api/v1/domains/${domainId}/members/${userId}`
+        },
         songRelease: {
             create: `${this.baseUrl}/api/v1/song-releases`,
             list: (limit?: number, offset?: number, statusFilter?: string, search?: string) => {

@@ -1,0 +1,509 @@
+@use 'sass:color';
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+.domain-management-container {
+  height: 100vh;
+  overflow: hidden;
+
+  &.master-detail-layout {
+    display: grid;
+    grid-template-columns: 35fr 65fr;
+    gap: 0;
+  }
+}
+
+// Left Side: List Section
+.list-section {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: $spacing-md;
+  border-right: 1px solid $border-light;
+  background-color: $background-light;
+}
+
+.list-card {
+  height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: $background-white;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-light;
+
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: $text-primary;
+
+      i {
+        color: $primary-color;
+      }
+    }
+  }
+
+  .domain-count-badge {
+    background: $primary-color;
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  .create-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    background: $primary-color;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background 0.2s;
+
+    &:hover {
+      background: color.adjust($primary-color, $lightness: -10%);
+    }
+  }
+}
+
+// Create Domain Form
+.create-form {
+  padding: $spacing-md;
+  border-bottom: 1px solid $border-light;
+  background: rgba(102, 126, 234, 0.03);
+
+  .full-width {
+    width: 100%;
+  }
+
+  .create-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+    margin-top: $spacing-sm;
+  }
+}
+
+// Domain List
+.domain-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-sm;
+}
+
+.domain-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  margin-bottom: 0.25rem;
+
+  &:hover {
+    background: rgba(102, 126, 234, 0.06);
+  }
+
+  &.selected {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.3);
+  }
+
+  .domain-icon {
+    font-size: 1.1rem;
+    color: $text-secondary;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .domain-list-info {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .domain-list-name {
+    display: block;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: $text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .domain-list-meta {
+    display: flex;
+    gap: 0.375rem;
+    margin-top: 0.25rem;
+  }
+
+  .type-badge,
+  .role-badge {
+    font-size: 0.65rem;
+    padding: 0.0625rem 0.375rem;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+
+  .type-badge {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+  }
+
+  .role-badge {
+    background: rgba(118, 75, 162, 0.1);
+    color: #764ba2;
+  }
+}
+
+// Right Side: Detail Section
+.detail-section {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: $spacing-md;
+}
+
+.no-selection {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: $text-secondary;
+
+  i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.4;
+  }
+
+  p {
+    font-size: 1.1rem;
+  }
+}
+
+.detail-card {
+  background: $background-white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+
+  .detail-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    > i {
+      font-size: 1.5rem;
+      opacity: 0.9;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .detail-subtitle {
+      margin: 0.25rem 0 0;
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
+  }
+
+  .deactivate-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+// Domain Info Grid
+.domain-info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid $border-light;
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .info-label {
+    font-size: 0.75rem;
+    color: $text-secondary;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  .info-value {
+    font-size: 0.9rem;
+    color: $text-primary;
+    font-weight: 500;
+  }
+
+  .status-active {
+    color: #388e3c;
+  }
+}
+
+// Members Section
+.members-section {
+  padding: 1.5rem;
+
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $text-primary;
+
+    i {
+      color: $primary-color;
+    }
+
+    .member-count {
+      font-weight: 400;
+      color: $text-secondary;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Add Member Form
+.add-member-form {
+  display: flex;
+  gap: $spacing-sm;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(102, 126, 234, 0.03);
+  border-radius: 8px;
+  border: 1px solid $border-light;
+
+  .member-email-field {
+    flex: 2;
+  }
+
+  .member-role-field {
+    flex: 1;
+  }
+
+  .add-member-btn {
+    margin-top: 0.25rem;
+    white-space: nowrap;
+
+    i {
+      margin-right: 0.25rem;
+    }
+  }
+}
+
+// Members Table
+.members-table {
+  border: 1px solid $border-light;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.member-row {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 1fr 1fr 0.5fr;
+  gap: $spacing-sm;
+  padding: 0.75rem 1rem;
+  align-items: center;
+  border-bottom: 1px solid $border-light;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.header-row {
+    background: $background-light;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .col-name,
+  .col-email {
+    font-size: 0.85rem;
+    color: $text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .col-email {
+    color: $text-secondary;
+  }
+
+  .col-joined {
+    font-size: 0.8rem;
+    color: $text-secondary;
+  }
+
+  .col-actions {
+    text-align: center;
+  }
+
+  .role-select {
+    font-size: 0.85rem;
+  }
+
+  .remove-btn {
+    background: none;
+    border: none;
+    color: $text-secondary;
+    cursor: pointer;
+    padding: 0.375rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+
+    &:hover {
+      color: #e53935;
+      background: rgba(229, 57, 53, 0.08);
+    }
+  }
+}
+
+.no-members {
+  text-align: center;
+  padding: 2rem;
+  color: $text-secondary;
+  font-size: 0.9rem;
+}
+
+// Loading State
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: $text-secondary;
+
+  i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+// Responsive
+@media (max-width: 1200px) {
+  .domain-management-container {
+    &.master-detail-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .list-section {
+    height: auto;
+    max-height: 40vh;
+    border-right: none;
+    border-bottom: 1px solid $border-light;
+  }
+
+  .list-card {
+    height: auto;
+    max-height: calc(40vh - 2rem);
+  }
+
+  .detail-section {
+    height: auto;
+    min-height: 60vh;
+  }
+
+  .domain-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .member-row {
+    grid-template-columns: 1fr 1.5fr 1fr 1fr 0.5fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .add-member-form {
+    flex-direction: column;
+
+    .member-email-field,
+    .member-role-field {
+      width: 100%;
+    }
+  }
+
+  .member-row {
+    grid-template-columns: 1fr 1fr 0.5fr;
+
+    .col-joined,
+    &.header-row .col-joined {
+      display: none;
+    }
+
+    .col-name,
+    &.header-row .col-name {
+      display: none;
+    }
+  }
+
+  .domain-info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

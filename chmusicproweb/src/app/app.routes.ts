@@ -86,6 +86,12 @@ export const routes: Routes = [
         loadComponent: () => import("./pages/lyric-parsing-rules/lyric-parsing-rules.component").then(m => m.LyricParsingRulesComponent)
     },
     {
+        path: "domain-management",
+        canActivate: [AuthGuard, domainRoleGuard],
+        data: {requiredDomainRoles: ["owner", "admin"]},
+        loadComponent: () => import("./pages/domain-management/domain-management.component").then(m => m.DomainManagementComponent)
+    },
+    {
         path: "text-overlay-editor",
         canActivate: [AuthGuard],
         loadComponent: () => import("./pages/text-overlay-editor/text-overlay-editor.component").then(m => m.TextOverlayEditorComponent)

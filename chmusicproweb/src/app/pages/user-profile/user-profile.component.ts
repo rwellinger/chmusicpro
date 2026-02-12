@@ -17,11 +17,13 @@ import {PasswordChangeModalComponent} from "../../components/password-change-mod
 
 import {UserService} from "../../services/business/user.service";
 import {AuthService} from "../../services/business/auth.service";
+import {DomainService} from "../../services/business/domain.service";
 import {NotificationService} from "../../services/ui/notification.service";
 import {UserSettingsService} from "../../services/user-settings.service";
 import {LanguageService} from "../../services/language.service";
 import {CostService, MonthlyCosts} from "../../services/config/cost.service";
 import {User} from "../../models/user.model";
+import {DomainTypeLabels, DomainWithRole} from "../../models/domain.model";
 import {Language, UserSettings} from "../../models/user-settings.model";
 
 @Component({
@@ -52,14 +54,20 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     isLoading = false;
     isLoadingCosts = false;
     isEditing = false;
-    userDisplayName = "Unknown User"; // Computed property to avoid method calls in template
-    availableLanguages: { code: Language, name: string }[] = []; // Computed property to avoid method calls in template
+    userDisplayName = "Unknown User";
+    availableLanguages: { code: Language, name: string }[] = [];
+    userDomains: DomainWithRole[] = [];
+    isLoadingDomains = false;
+    isSwitchingDomain = false;
+    activeDomainId: string | null = null;
+    domainTypeLabels = DomainTypeLabels;
 
     private destroy$ = new Subject<void>();
     private fb = inject(FormBuilder);
     private dialog = inject(MatDialog);
     private userService = inject(UserService);
     private authService = inject(AuthService);
+    private domainService = inject(DomainService);
     private notificationService = inject(NotificationService);
     private settingsService = inject(UserSettingsService);
     private languageService = inject(LanguageService);
@@ -84,12 +92,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.availableLanguages = this.languageService.getAvailableLanguages(); // Initialize once
+        this.availableLanguages = this.languageService.getAvailableLanguages();
+        this.activeDomainId = this.authService.getActiveDomainId();
         this.loadUserProfile();
         this.subscribeToAuthState();
         this.loadUserSettings();
         this.loadOpenAICosts();
         this.loadOpenAIAllTimeCosts();
+        this.loadUserDomains();
     }
 
     ngOnDestroy(): void {
@@ -409,6 +419,67 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                     this.isLoadingCosts = false;
                 }
             });
+    }
+
+    /**
+     * Load user's domains
+     */
+    private loadUserDomains(): void {
+        this.isLoadingDomains = true;
+        this.domainService.getUserDomains()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (response) => {
+                    this.userDomains = response.domains || [];
+                    this.isLoadingDomains = false;
+                },
+                error: (error) => {
+                    console.error("Error loading domains:", error);
+                    this.isLoadingDomains = false;
+                }
+            });
+    }
+
+    /**
+     * Switch to a different domain
+     */
+    public switchDomain(domainId: string): void {
+        if (this.isSwitchingDomain || domainId === this.activeDomainId) {
+            return;
+        }
+        this.isSwitchingDomain = true;
+        this.domainService.switchDomain({domain_id: domainId})
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (response) => {
+                    this.authService.updateTokenAndDomainState(response.token);
+                    this.activeDomainId = response.domain.domain.id;
+                    this.loadUserDomains();
+                    this.isSwitchingDomain = false;
+                    this.notificationService.success(this.translate.instant("userProfile.domains.switchSuccess"));
+                },
+                error: (error) => {
+                    console.error("Error switching domain:", error);
+                    this.notificationService.error(
+                        error.error?.error || this.translate.instant("userProfile.domains.switchError")
+                    );
+                    this.isSwitchingDomain = false;
+                }
+            });
+    }
+
+    /**
+     * Get icon class for a domain type
+     */
+    public getDomainTypeIcon(type: number): string {
+        switch (type) {
+            case 0: return "fas fa-shield-alt";
+            case 1: return "fas fa-robot";
+            case 2: return "fas fa-user";
+            case 3: return "fas fa-building";
+            case 4: return "fas fa-headphones";
+            default: return "fas fa-globe";
+        }
     }
 
     /**

@@ -55,6 +55,59 @@ class DomainCreateRequest(BaseModel):
     description: str | None = Field(None, description="Domain description")
 
 
+class DomainUpdateRequest(BaseModel):
+    """Schema for updating a domain"""
+
+    name: str | None = Field(None, min_length=1, max_length=200, description="Domain name")
+    description: str | None = Field(None, description="Domain description")
+
+
+class DomainSwitchRequest(BaseModel):
+    """Schema for switching active domain"""
+
+    domain_id: str = Field(..., description="Target domain ID to switch to")
+
+
+class DomainMemberAddRequest(BaseModel):
+    """Schema for adding a member to a domain"""
+
+    email: str = Field(..., description="Email of the user to add")
+    role: str = Field("member", description="Role to assign (owner, admin, member, viewer)")
+
+
+class DomainMemberUpdateRequest(BaseModel):
+    """Schema for updating a member's role"""
+
+    role: str = Field(..., description="New role (owner, admin, member, viewer)")
+
+
+class DomainSwitchResponse(BaseResponse):
+    """Response for domain switch"""
+
+    token: str = Field(..., description="New JWT token with updated domain claims")
+    domain: DomainWithRoleResponse = Field(..., description="The newly active domain")
+    expires_at: str = Field(..., description="Token expiration timestamp")
+
+
+class DomainMemberResponse(BaseModel):
+    """Response for a domain member"""
+
+    membership_id: str = Field(..., description="Membership ID")
+    user_id: str = Field(..., description="User ID")
+    email: str = Field(..., description="User email")
+    first_name: str | None = Field(None, description="User first name")
+    last_name: str | None = Field(None, description="User last name")
+    role: str = Field(..., description="Role in domain")
+    is_default: bool = Field(..., description="Whether this domain is the user's default")
+    created_at: datetime = Field(..., description="Membership creation timestamp")
+
+
+class DomainMemberListResponse(BaseResponse):
+    """Response for domain member list"""
+
+    members: list[DomainMemberResponse] = Field(..., description="List of domain members")
+
+
 class DomainListResponse(BaseResponse):
     """Response for domain list"""
 
