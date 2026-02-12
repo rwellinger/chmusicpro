@@ -15,7 +15,7 @@ class CompressionController:
         self.orchestrator = CompressionOrchestrator()
 
     def compress_conversation(
-        self, db: Session, conversation_id: uuid.UUID, user_id: uuid.UUID, keep_recent: int = 2
+        self, db: Session, conversation_id: uuid.UUID, domain_id: uuid.UUID, keep_recent: int = 2
     ) -> tuple[dict[str, Any], int]:
         """
         Compress a conversation by archiving old messages and creating an AI summary.
@@ -23,16 +23,16 @@ class CompressionController:
         Args:
             db: Database session
             conversation_id: Conversation UUID
-            user_id: User UUID
+            domain_id: Domain UUID
             keep_recent: Number of recent messages to keep (default: 2)
 
         Returns:
             Tuple of (response_data, status_code)
         """
-        return self.orchestrator.compress_conversation(db, conversation_id, user_id, keep_recent)
+        return self.orchestrator.compress_conversation(db, conversation_id, domain_id, keep_recent)
 
     def restore_archive(
-        self, db: Session, conversation_id: uuid.UUID, user_id: uuid.UUID
+        self, db: Session, conversation_id: uuid.UUID, domain_id: uuid.UUID
     ) -> tuple[dict[str, Any], int]:
         """
         Restore archived messages for a conversation.
@@ -40,9 +40,9 @@ class CompressionController:
         Args:
             db: Database session
             conversation_id: Conversation UUID
-            user_id: User UUID
+            domain_id: Domain UUID
 
         Returns:
             Tuple of (response_data, status_code)
         """
-        return self.orchestrator.restore_archive(db, conversation_id, user_id)
+        return self.orchestrator.restore_archive(db, conversation_id, domain_id)

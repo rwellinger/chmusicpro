@@ -34,18 +34,18 @@ class ConversationController:
     def list_conversations(
         self,
         db: Session,
-        user_id: uuid.UUID,
+        domain_id: uuid.UUID,
         skip: int = 0,
         limit: int = 20,
         provider: str = None,
         archived: bool = None,
     ) -> tuple[dict[str, Any], int]:
         """
-        List all conversations for a user.
+        List all conversations for a domain.
 
         Args:
             db: Database session
-            user_id: User UUID
+            domain_id: Domain UUID
             skip: Pagination offset
             limit: Pagination limit
             provider: Optional provider filter ('internal' or 'external')
@@ -59,7 +59,7 @@ class ConversationController:
             query = (
                 db.query(Conversation, func.count(Message.id).label("message_count"))
                 .outerjoin(Message, Conversation.id == Message.conversation_id)
-                .filter(Conversation.user_id == user_id)
+                .filter(Conversation.domain_id == domain_id)
             )
 
             # Filter by provider if specified
@@ -107,7 +107,7 @@ class ConversationController:
             return {"error": f"Failed to list conversations: {e}"}, 500
 
     def get_conversation(
-        self, db: Session, conversation_id: uuid.UUID, user_id: uuid.UUID
+        self, db: Session, conversation_id: uuid.UUID, domain_id: uuid.UUID
     ) -> tuple[dict[str, Any], int]:
         """
         Get conversation with messages.
@@ -115,7 +115,7 @@ class ConversationController:
         Args:
             db: Database session
             conversation_id: Conversation UUID
-            user_id: User UUID
+            domain_id: Domain UUID
 
         Returns:
             Tuple of (response_data, status_code)
@@ -126,7 +126,7 @@ class ConversationController:
                 db.query(Conversation)
                 .filter(
                     Conversation.id == conversation_id,
-                    Conversation.user_id == user_id,
+                    Conversation.domain_id == domain_id,
                 )
                 .first()
             )
@@ -167,7 +167,7 @@ class ConversationController:
             return {"error": f"Failed to get conversation: {e}"}, 500
 
     def get_conversation_with_archive(
-        self, db: Session, conversation_id: uuid.UUID, user_id: uuid.UUID
+        self, db: Session, conversation_id: uuid.UUID, domain_id: uuid.UUID
     ) -> tuple[dict[str, Any], int]:
         """
         Get conversation with messages including archived messages (for export).
@@ -178,7 +178,7 @@ class ConversationController:
         Args:
             db: Database session
             conversation_id: Conversation UUID
-            user_id: User UUID
+            domain_id: Domain UUID
 
         Returns:
             Tuple of (response_data, status_code)
@@ -189,7 +189,7 @@ class ConversationController:
                 db.query(Conversation)
                 .filter(
                     Conversation.id == conversation_id,
-                    Conversation.user_id == user_id,
+                    Conversation.domain_id == domain_id,
                 )
                 .first()
             )
@@ -262,14 +262,15 @@ class ConversationController:
             return {"error": f"Failed to get conversation with archive: {e}"}, 500
 
     def create_conversation(
-        self, db: Session, user_id: uuid.UUID, data: ConversationCreate
+        self, db: Session, user_id: uuid.UUID, domain_id: uuid.UUID, data: ConversationCreate
     ) -> tuple[dict[str, Any], int]:
         """
         Create a new conversation.
 
         Args:
             db: Database session
-            user_id: User UUID
+            user_id: User UUID (audit trail: created_by)
+            domain_id: Domain UUID (ownership)
             data: Conversation creation data
 
         Returns:
@@ -297,6 +298,7 @@ class ConversationController:
             conversation = Conversation(
                 id=uuid.uuid4(),
                 user_id=user_id,
+                domain_id=domain_id,
                 title=data.title,
                 model=data.model,
                 provider=provider,
@@ -341,7 +343,7 @@ class ConversationController:
             return {"error": f"Failed to create conversation: {e}"}, 500
 
     def update_conversation(
-        self, db: Session, conversation_id: uuid.UUID, user_id: uuid.UUID, data: ConversationUpdate
+        self, db: Session, conversation_id: uuid.UUID, domain_id: uuid.UUID, data: ConversationUpdate
     ) -> tuple[dict[str, Any], int]:
         """
         Update a conversation (title only).
@@ -349,7 +351,7 @@ class ConversationController:
         Args:
             db: Database session
             conversation_id: Conversation UUID
-            user_id: User UUID
+            domain_id: Domain UUID
             data: Update data
 
         Returns:
@@ -360,7 +362,7 @@ class ConversationController:
                 db.query(Conversation)
                 .filter(
                     Conversation.id == conversation_id,
-                    Conversation.user_id == user_id,
+                    Conversation.domain_id == domain_id,
                 )
                 .first()
             )
@@ -382,7 +384,7 @@ class ConversationController:
             logger.info(
                 "Conversation updated",
                 conversation_id=str(conversation_id),
-                user_id=str(user_id),
+                domain_id=str(domain_id),
             )
 
             return ConversationResponse.from_orm(conversation).dict(), 200
@@ -399,7 +401,7 @@ class ConversationController:
             return {"error": f"Failed to update conversation: {e}"}, 500
 
     def delete_conversation(
-        self, db: Session, conversation_id: uuid.UUID, user_id: uuid.UUID
+        self, db: Session, conversation_id: uuid.UUID, domain_id: uuid.UUID
     ) -> tuple[dict[str, Any], int]:
         """
         Delete a conversation.
@@ -407,7 +409,7 @@ class ConversationController:
         Args:
             db: Database session
             conversation_id: Conversation UUID
-            user_id: User UUID
+            domain_id: Domain UUID
 
         Returns:
             Tuple of (response_data, status_code)
@@ -417,7 +419,7 @@ class ConversationController:
                 db.query(Conversation)
                 .filter(
                     Conversation.id == conversation_id,
-                    Conversation.user_id == user_id,
+                    Conversation.domain_id == domain_id,
                 )
                 .first()
             )
@@ -440,7 +442,7 @@ class ConversationController:
             logger.info(
                 "Conversation deleted",
                 conversation_id=str(conversation_id),
-                user_id=str(user_id),
+                domain_id=str(domain_id),
             )
 
             return {"message": "Conversation deleted successfully"}, 200
@@ -457,7 +459,7 @@ class ConversationController:
             return {"error": f"Failed to delete conversation: {e}"}, 500
 
     def send_message(
-        self, db: Session, conversation_id: uuid.UUID, user_id: uuid.UUID, content: str
+        self, db: Session, conversation_id: uuid.UUID, domain_id: uuid.UUID, content: str
     ) -> tuple[dict[str, Any], int]:
         """
         Send a message and get AI response.
@@ -465,7 +467,7 @@ class ConversationController:
         Args:
             db: Database session
             conversation_id: Conversation UUID
-            user_id: User UUID
+            domain_id: Domain UUID
             content: Message content
 
         Returns:
@@ -477,7 +479,7 @@ class ConversationController:
                 db.query(Conversation)
                 .filter(
                     Conversation.id == conversation_id,
-                    Conversation.user_id == user_id,
+                    Conversation.domain_id == domain_id,
                 )
                 .first()
             )

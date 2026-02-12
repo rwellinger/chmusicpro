@@ -2,8 +2,6 @@
 Chat Generation Routes - Ollama Integration with Pydantic validation
 """
 
-import logging
-
 from flask import Blueprint, jsonify
 from flask_pydantic import validate
 
@@ -78,6 +76,6 @@ def generate_unified(body: UnifiedChatRequest):
         )
         return jsonify(response_data), status_code
     except Exception as e:
-        logging.error(f"Error in generate_unified: {str(e)}")
+        logger.error(f"Error in generate_unified: {str(e)}")
         error_response = ChatErrorResponse(error=str(e), model=body.model)
         return jsonify(error_response.dict()), 500

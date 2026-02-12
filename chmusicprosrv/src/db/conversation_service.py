@@ -14,14 +14,14 @@ from utils.logger import logger
 class ConversationService:
     """Service for conversation database operations (CRUD only)."""
 
-    def get_conversation(self, db: Session, conversation_id: uuid.UUID, user_id: uuid.UUID) -> Conversation | None:
+    def get_conversation(self, db: Session, conversation_id: uuid.UUID, domain_id: uuid.UUID) -> Conversation | None:
         """
-        Get conversation by ID and user ID.
+        Get conversation by ID and domain ID.
 
         Args:
             db: Database session
             conversation_id: Conversation UUID
-            user_id: User UUID
+            domain_id: Domain UUID
 
         Returns:
             Conversation object if found, None otherwise
@@ -31,15 +31,15 @@ class ConversationService:
                 db.query(Conversation)
                 .filter(
                     Conversation.id == conversation_id,
-                    Conversation.user_id == user_id,
+                    Conversation.domain_id == domain_id,
                 )
                 .first()
             )
 
             if conversation:
-                logger.debug("Conversation retrieved", conversation_id=str(conversation_id), user_id=str(user_id))
+                logger.debug("Conversation retrieved", conversation_id=str(conversation_id), domain_id=str(domain_id))
             else:
-                logger.warning("Conversation not found", conversation_id=str(conversation_id), user_id=str(user_id))
+                logger.warning("Conversation not found", conversation_id=str(conversation_id), domain_id=str(domain_id))
 
             return conversation
 
@@ -47,7 +47,7 @@ class ConversationService:
             logger.error(
                 "Database error retrieving conversation",
                 conversation_id=str(conversation_id),
-                user_id=str(user_id),
+                domain_id=str(domain_id),
                 error=str(e),
                 error_type=type(e).__name__,
             )
@@ -96,6 +96,7 @@ class ConversationService:
         self,
         db: Session,
         user_id: uuid.UUID,
+        domain_id: uuid.UUID,
         title: str,
         model: str,
         provider: str,
@@ -106,7 +107,8 @@ class ConversationService:
 
         Args:
             db: Database session
-            user_id: User UUID
+            user_id: User UUID (audit trail: created_by)
+            domain_id: Domain UUID (ownership)
             title: Conversation title
             model: Model name
             provider: Provider ('internal' or 'external')
@@ -119,6 +121,7 @@ class ConversationService:
             conversation = Conversation(
                 id=uuid.uuid4(),
                 user_id=user_id,
+                domain_id=domain_id,
                 title=title,
                 model=model,
                 provider=provider,
@@ -135,6 +138,7 @@ class ConversationService:
                 "Conversation created",
                 conversation_id=str(conversation.id),
                 user_id=str(user_id),
+                domain_id=str(domain_id),
                 model=model,
                 provider=provider,
             )
@@ -145,42 +149,45 @@ class ConversationService:
             logger.error(
                 "Database error creating conversation",
                 user_id=str(user_id),
+                domain_id=str(domain_id),
                 error=str(e),
                 error_type=type(e).__name__,
                 stacktrace=traceback.format_exc(),
             )
             return None
 
-    def delete_conversation(self, db: Session, conversation_id: uuid.UUID, user_id: uuid.UUID) -> bool:
+    def delete_conversation(self, db: Session, conversation_id: uuid.UUID, domain_id: uuid.UUID) -> bool:
         """
-        Delete a conversation by ID and user ID.
+        Delete a conversation by ID and domain ID.
 
         Args:
             db: Database session
             conversation_id: Conversation UUID
-            user_id: User UUID
+            domain_id: Domain UUID
 
         Returns:
             True if successful, False otherwise
         """
         try:
-            conversation = self.get_conversation(db, conversation_id, user_id)
+            conversation = self.get_conversation(db, conversation_id, domain_id)
 
             if not conversation:
                 logger.warning(
-                    "Conversation not found for deletion", conversation_id=str(conversation_id), user_id=str(user_id)
+                    "Conversation not found for deletion",
+                    conversation_id=str(conversation_id),
+                    domain_id=str(domain_id),
                 )
                 return False
 
             db.delete(conversation)
-            logger.info("Conversation deleted", conversation_id=str(conversation_id), user_id=str(user_id))
+            logger.info("Conversation deleted", conversation_id=str(conversation_id), domain_id=str(domain_id))
             return True
 
         except SQLAlchemyError as e:
             logger.error(
                 "Database error deleting conversation",
                 conversation_id=str(conversation_id),
-                user_id=str(user_id),
+                domain_id=str(domain_id),
                 error=str(e),
                 error_type=type(e).__name__,
             )

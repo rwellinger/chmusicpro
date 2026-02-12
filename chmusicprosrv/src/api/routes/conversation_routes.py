@@ -5,7 +5,7 @@ import uuid
 from flask import Blueprint, jsonify, request
 from flask_pydantic import validate
 
-from api.auth_middleware import get_current_user_id, jwt_required
+from api.auth_middleware import get_current_domain_id, get_current_user_id, jwt_required
 from api.controllers.compression_controller import CompressionController
 from api.controllers.conversation_controller import ConversationController
 from db.database import get_db
@@ -27,9 +27,9 @@ compression_controller = CompressionController()
 @api_conversation_v1.route("", methods=["GET"])
 @jwt_required
 def list_conversations():
-    """List all conversations for the authenticated user."""
+    """List all conversations for the active domain."""
     try:
-        user_id = get_current_user_id()
+        domain_id = get_current_domain_id()
         db = next(get_db())
 
         # Get pagination params
@@ -47,7 +47,7 @@ def list_conversations():
             archived = False  # Show all conversations (no filter)
 
         response_data, status_code = conversation_controller.list_conversations(
-            db=db, user_id=user_id, skip=skip, limit=limit, provider=provider, archived=archived
+            db=db, domain_id=domain_id, skip=skip, limit=limit, provider=provider, archived=archived
         )
 
         return jsonify(response_data), status_code
@@ -64,9 +64,12 @@ def create_conversation(body: ConversationCreate):
     """Create a new conversation."""
     try:
         user_id = get_current_user_id()
+        domain_id = get_current_domain_id()
         db = next(get_db())
 
-        response_data, status_code = conversation_controller.create_conversation(db=db, user_id=user_id, data=body)
+        response_data, status_code = conversation_controller.create_conversation(
+            db=db, user_id=user_id, domain_id=domain_id, data=body
+        )
 
         return jsonify(response_data), status_code
 
@@ -80,7 +83,7 @@ def create_conversation(body: ConversationCreate):
 def get_conversation(conversation_id: str):
     """Get a conversation with its messages."""
     try:
-        user_id = get_current_user_id()
+        domain_id = get_current_domain_id()
         db = next(get_db())
 
         # Parse UUID
@@ -90,7 +93,7 @@ def get_conversation(conversation_id: str):
             return jsonify({"error": "Invalid conversation ID format"}), 400
 
         response_data, status_code = conversation_controller.get_conversation(
-            db=db, conversation_id=conv_uuid, user_id=user_id
+            db=db, conversation_id=conv_uuid, domain_id=domain_id
         )
 
         return jsonify(response_data), status_code
@@ -106,7 +109,7 @@ def get_conversation(conversation_id: str):
 def update_conversation(conversation_id: str, body: ConversationUpdate):
     """Update a conversation (title only)."""
     try:
-        user_id = get_current_user_id()
+        domain_id = get_current_domain_id()
         db = next(get_db())
 
         # Parse UUID
@@ -116,7 +119,7 @@ def update_conversation(conversation_id: str, body: ConversationUpdate):
             return jsonify({"error": "Invalid conversation ID format"}), 400
 
         response_data, status_code = conversation_controller.update_conversation(
-            db=db, conversation_id=conv_uuid, user_id=user_id, data=body
+            db=db, conversation_id=conv_uuid, domain_id=domain_id, data=body
         )
 
         return jsonify(response_data), status_code
@@ -131,7 +134,7 @@ def update_conversation(conversation_id: str, body: ConversationUpdate):
 def delete_conversation(conversation_id: str):
     """Delete a conversation."""
     try:
-        user_id = get_current_user_id()
+        domain_id = get_current_domain_id()
         db = next(get_db())
 
         # Parse UUID
@@ -141,7 +144,7 @@ def delete_conversation(conversation_id: str):
             return jsonify({"error": "Invalid conversation ID format"}), 400
 
         response_data, status_code = conversation_controller.delete_conversation(
-            db=db, conversation_id=conv_uuid, user_id=user_id
+            db=db, conversation_id=conv_uuid, domain_id=domain_id
         )
 
         return jsonify(response_data), status_code
@@ -157,7 +160,7 @@ def delete_conversation(conversation_id: str):
 def send_message(conversation_id: str, body: SendMessageRequest):
     """Send a message in a conversation and get AI response."""
     try:
-        user_id = get_current_user_id()
+        domain_id = get_current_domain_id()
         db = next(get_db())
 
         # Parse UUID
@@ -169,7 +172,7 @@ def send_message(conversation_id: str, body: SendMessageRequest):
         response_data, status_code = conversation_controller.send_message(
             db=db,
             conversation_id=conv_uuid,
-            user_id=user_id,
+            domain_id=domain_id,
             content=body.content,
         )
 
@@ -185,7 +188,7 @@ def send_message(conversation_id: str, body: SendMessageRequest):
 def compress_conversation(conversation_id: str):
     """Compress conversation by archiving old messages and creating AI summary."""
     try:
-        user_id = get_current_user_id()
+        domain_id = get_current_domain_id()
         db = next(get_db())
 
         # Parse UUID
@@ -201,7 +204,7 @@ def compress_conversation(conversation_id: str):
             return jsonify({"error": "keep_recent must be between 1 and 20"}), 400
 
         response_data, status_code = compression_controller.compress_conversation(
-            db=db, conversation_id=conv_uuid, user_id=user_id, keep_recent=keep_recent
+            db=db, conversation_id=conv_uuid, domain_id=domain_id, keep_recent=keep_recent
         )
 
         return jsonify(response_data), status_code
@@ -216,7 +219,7 @@ def compress_conversation(conversation_id: str):
 def restore_archive(conversation_id: str):
     """Restore archived messages (replace summary with original messages)."""
     try:
-        user_id = get_current_user_id()
+        domain_id = get_current_domain_id()
         db = next(get_db())
 
         # Parse UUID
@@ -226,7 +229,7 @@ def restore_archive(conversation_id: str):
             return jsonify({"error": "Invalid conversation ID format"}), 400
 
         response_data, status_code = compression_controller.restore_archive(
-            db=db, conversation_id=conv_uuid, user_id=user_id
+            db=db, conversation_id=conv_uuid, domain_id=domain_id
         )
 
         return jsonify(response_data), status_code
@@ -241,7 +244,7 @@ def restore_archive(conversation_id: str):
 def get_conversation_for_export(conversation_id: str):
     """Get conversation with all messages including archived (for export)."""
     try:
-        user_id = get_current_user_id()
+        domain_id = get_current_domain_id()
         db = next(get_db())
 
         # Parse UUID
@@ -251,7 +254,7 @@ def get_conversation_for_export(conversation_id: str):
             return jsonify({"error": "Invalid conversation ID format"}), 400
 
         response_data, status_code = conversation_controller.get_conversation_with_archive(
-            db=db, conversation_id=conv_uuid, user_id=user_id
+            db=db, conversation_id=conv_uuid, domain_id=domain_id
         )
 
         return jsonify(response_data), status_code
