@@ -23,7 +23,7 @@ from PIL import Image
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from api.auth_middleware import get_current_user_id, jwt_required
+from api.auth_middleware import get_current_domain_id, get_current_user_id, jwt_required
 from api.controllers.song_release_controller import song_release_controller
 from db.database import get_db
 from schemas.song_release_schemas import ReleaseCreateRequest, ReleaseFilterRequest, ReleaseUpdateRequest
@@ -67,7 +67,8 @@ def create_release():
             cover: cover.jpg (binary, 200x200 px)
     """
     user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not user_id or not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
@@ -106,7 +107,9 @@ def create_release():
 
     db: Session = next(get_db())
     try:
-        result, status_code = song_release_controller.create_release(db, UUID(user_id), release_data, cover_file)
+        result, status_code = song_release_controller.create_release(
+            db, UUID(user_id), UUID(domain_id), release_data, cover_file
+        )
         return jsonify(result), status_code
     finally:
         db.close()
@@ -131,8 +134,8 @@ def list_releases():
     Example:
         GET /api/v1/song-releases?limit=10&offset=0&status_filter=progress&search=rock
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     # Parse query parameters
@@ -149,7 +152,7 @@ def list_releases():
 
     db: Session = next(get_db())
     try:
-        result, status_code = song_release_controller.get_releases(db, UUID(user_id), filters)
+        result, status_code = song_release_controller.get_releases(db, UUID(domain_id), filters)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -174,8 +177,8 @@ def get_release(release_id: str):
         GET /api/v1/song-releases/550e8400-e29b-41d4-a716-446655440000
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
@@ -185,7 +188,7 @@ def get_release(release_id: str):
 
     db: Session = next(get_db())
     try:
-        result, status_code = song_release_controller.get_release(db, UUID(user_id), release_uuid)
+        result, status_code = song_release_controller.get_release(db, UUID(domain_id), release_uuid)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -220,8 +223,8 @@ def update_release(release_id: str):
             data: {"status": "uploaded", "upload_date": "2024-01-15"}
             cover: new_cover.jpg (binary, 200x200 px)
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
@@ -266,7 +269,7 @@ def update_release(release_id: str):
     db: Session = next(get_db())
     try:
         result, status_code = song_release_controller.update_release(
-            db, UUID(user_id), release_uuid, update_data, cover_file
+            db, UUID(domain_id), release_uuid, update_data, cover_file
         )
         return jsonify(result), status_code
     finally:
@@ -292,8 +295,8 @@ def delete_release(release_id: str):
         DELETE /api/v1/song-releases/550e8400-e29b-41d4-a716-446655440000
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
@@ -303,7 +306,7 @@ def delete_release(release_id: str):
 
     db: Session = next(get_db())
     try:
-        result, status_code = song_release_controller.delete_release(db, UUID(user_id), release_uuid)
+        result, status_code = song_release_controller.delete_release(db, UUID(domain_id), release_uuid)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -330,8 +333,8 @@ def serve_cover(release_id: str):
         GET /api/v1/song-releases/550e8400-e29b-41d4-a716-446655440000/cover
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
@@ -341,12 +344,12 @@ def serve_cover(release_id: str):
 
         release_uuid = UUID(release_id)
 
-        logger.debug("Serving release cover", release_id=release_id, user_id=user_id)
+        logger.debug("Serving release cover", release_id=release_id, domain_id=domain_id)
 
         # Get release from DB
         db: Session = next(get_db())
         try:
-            release = song_release_service.get_release_by_id(db, release_uuid, UUID(user_id))
+            release = song_release_service.get_release_by_id(db, release_uuid, UUID(domain_id))
             if not release:
                 return jsonify({"error": "Release not found"}), 404
 

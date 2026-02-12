@@ -56,6 +56,7 @@ class SongProjectOrchestrator:
         self,
         db: Session,
         user_id: UUID,
+        domain_id: UUID,
         project_name: str,
         tags: list[str] | None = None,
         description: str | None = None,
@@ -65,7 +66,8 @@ class SongProjectOrchestrator:
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            user_id: User ID (audit trail / created_by)
+            domain_id: Domain ID (tenant ownership)
             project_name: Project name
             tags: Optional tags list
             description: Optional description
@@ -87,6 +89,7 @@ class SongProjectOrchestrator:
             project = self.db_service.create_project(
                 db=db,
                 user_id=user_id,
+                domain_id=domain_id,
                 project_name=normalized_name,
                 s3_prefix=s3_prefix,
                 tags=tags,
@@ -142,14 +145,14 @@ class SongProjectOrchestrator:
             logger.error("Project creation orchestration failed", error=str(e), error_type=type(e).__name__)
             return None
 
-    def get_project_by_id(self, db: Session, project_id: UUID, user_id: UUID) -> dict[str, Any] | None:
+    def get_project_by_id(self, db: Session, project_id: UUID, domain_id: UUID) -> dict[str, Any] | None:
         """
         Get project by ID (without details)
 
         Args:
             db: Database session
             project_id: Project UUID
-            user_id: User ID (for ownership check)
+            domain_id: Domain ID (for ownership check)
 
         Returns:
             Project data dictionary or None if not found/unauthorized
@@ -162,9 +165,9 @@ class SongProjectOrchestrator:
                 logger.debug("Project not found", project_id=str(project_id))
                 return None
 
-            # Check ownership
-            if project.user_id != user_id:
-                logger.warning("Unauthorized project access", project_id=str(project_id), user_id=str(user_id))
+            # Check domain ownership
+            if project.domain_id != domain_id:
+                logger.warning("Unauthorized project access", project_id=str(project_id), domain_id=str(domain_id))
                 return None
 
             # Transform to response
@@ -296,14 +299,14 @@ class SongProjectOrchestrator:
             response_data["all_assigned_sketches"] = []
             response_data["all_assigned_images"] = []
 
-    def get_project_with_details(self, db: Session, project_id: UUID, user_id: UUID) -> dict[str, Any] | None:
+    def get_project_with_details(self, db: Session, project_id: UUID, domain_id: UUID) -> dict[str, Any] | None:
         """
         Get project with all folders, files, and assigned assets
 
         Args:
             db: Database session
             project_id: Project UUID
-            user_id: User ID (for ownership check)
+            domain_id: Domain ID (for ownership check)
 
         Returns:
             Project data with folders, files, and assigned assets, or None if not found/unauthorized
@@ -316,9 +319,9 @@ class SongProjectOrchestrator:
                 logger.debug("Project not found", project_id=str(project_id))
                 return None
 
-            # Check ownership
-            if project.user_id != user_id:
-                logger.warning("Unauthorized project access", project_id=str(project_id), user_id=str(user_id))
+            # Check domain ownership
+            if project.domain_id != domain_id:
+                logger.warning("Unauthorized project access", project_id=str(project_id), domain_id=str(domain_id))
                 return None
 
             # Transform to response (includes folders and files)
@@ -349,7 +352,7 @@ class SongProjectOrchestrator:
     def list_projects(
         self,
         db: Session,
-        user_id: UUID,
+        domain_id: UUID,
         limit: int = 20,
         offset: int = 0,
         search: str = "",
@@ -357,11 +360,11 @@ class SongProjectOrchestrator:
         project_status: str | None = None,
     ) -> dict[str, Any]:
         """
-        List projects for user (paginated)
+        List projects for domain (paginated)
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             limit: Items per page
             offset: Offset for pagination
             search: Search term
@@ -375,7 +378,7 @@ class SongProjectOrchestrator:
             # Get paginated projects from DB
             result = self.db_service.get_projects_paginated(
                 db=db,
-                user_id=user_id,
+                domain_id=domain_id,
                 limit=limit,
                 offset=offset,
                 search=search,
@@ -404,7 +407,7 @@ class SongProjectOrchestrator:
             }
 
         except Exception as e:
-            logger.error("List projects failed", user_id=str(user_id), error=str(e), error_type=type(e).__name__)
+            logger.error("List projects failed", domain_id=str(domain_id), error=str(e), error_type=type(e).__name__)
             return {
                 "projects": [],
                 "pagination": {"total": 0, "limit": limit, "offset": offset, "has_more": False},
@@ -414,7 +417,7 @@ class SongProjectOrchestrator:
         self,
         db: Session,
         project_id: UUID,
-        user_id: UUID,
+        domain_id: UUID,
         update_data: dict[str, Any],
     ) -> dict[str, Any] | None:
         """
@@ -423,7 +426,7 @@ class SongProjectOrchestrator:
         Args:
             db: Database session
             project_id: Project UUID
-            user_id: User ID (for ownership check)
+            domain_id: Domain ID (for ownership check)
             update_data: Data to update
 
         Returns:
@@ -436,9 +439,9 @@ class SongProjectOrchestrator:
                 logger.debug("Project not found", project_id=str(project_id))
                 return None
 
-            # Check ownership
-            if project.user_id != user_id:
-                logger.warning("Unauthorized project update", project_id=str(project_id), user_id=str(user_id))
+            # Check domain ownership
+            if project.domain_id != domain_id:
+                logger.warning("Unauthorized project update", project_id=str(project_id), domain_id=str(domain_id))
                 return None
 
             # Normalize project name if provided (business logic in transformer)
@@ -446,7 +449,7 @@ class SongProjectOrchestrator:
                 update_data["project_name"] = normalize_project_name(update_data["project_name"])
 
             # Update project in DB
-            updated_project = self.db_service.update_project(db, project_id, user_id, update_data)
+            updated_project = self.db_service.update_project(db, project_id, domain_id, update_data)
 
             if not updated_project:
                 logger.error("Failed to update project in DB", project_id=str(project_id))
@@ -459,14 +462,14 @@ class SongProjectOrchestrator:
             logger.error("Update project failed", project_id=str(project_id), error=str(e), error_type=type(e).__name__)
             return None
 
-    def delete_project_with_cleanup(self, db: Session, project_id: UUID, user_id: UUID) -> bool:
+    def delete_project_with_cleanup(self, db: Session, project_id: UUID, domain_id: UUID) -> bool:
         """
         Delete project with S3 cleanup
 
         Args:
             db: Database session
             project_id: Project UUID
-            user_id: User ID (for ownership check)
+            domain_id: Domain ID (for ownership check)
 
         Returns:
             True if successful, False otherwise
@@ -478,9 +481,9 @@ class SongProjectOrchestrator:
                 logger.debug("Project not found", project_id=str(project_id))
                 return False
 
-            # Check ownership
-            if project.user_id != user_id:
-                logger.warning("Unauthorized project deletion", project_id=str(project_id), user_id=str(user_id))
+            # Check domain ownership
+            if project.domain_id != domain_id:
+                logger.warning("Unauthorized project deletion", project_id=str(project_id), domain_id=str(domain_id))
                 return False
 
             # Prevent deletion of archived projects
@@ -537,7 +540,7 @@ class SongProjectOrchestrator:
         self,
         db: Session,
         project_id: UUID,
-        user_id: UUID,
+        domain_id: UUID,
         folder_name: str,
         filename: str,
         file_data: bytes,
@@ -548,7 +551,7 @@ class SongProjectOrchestrator:
         Args:
             db: Database session
             project_id: Project UUID
-            user_id: User ID (for ownership check)
+            domain_id: Domain ID (for ownership check)
             folder_name: Target folder name
             filename: File name
             file_data: File bytes
@@ -559,8 +562,8 @@ class SongProjectOrchestrator:
         try:
             # Get project for ownership check
             project = self.db_service.get_project_by_id(db, project_id)
-            if not project or project.user_id != user_id:
-                logger.warning("Unauthorized file upload", project_id=str(project_id), user_id=str(user_id))
+            if not project or project.domain_id != domain_id:
+                logger.warning("Unauthorized file upload", project_id=str(project_id), domain_id=str(domain_id))
                 return None
 
             # Get project with details to find folder
@@ -690,7 +693,7 @@ class SongProjectOrchestrator:
                 updated_project = self.db_service.update_project(
                     db=db,
                     project_id=project_id,
-                    user_id=user_id,
+                    domain_id=domain_id,
                     update_data={"project_status": "progress"},
                 )
                 if updated_project:
@@ -724,7 +727,7 @@ class SongProjectOrchestrator:
         self,
         db: Session,
         project_id: UUID,
-        user_id: UUID,
+        domain_id: UUID,
         folder_name: str,
         files: list,
     ) -> dict[str, Any]:
@@ -734,7 +737,7 @@ class SongProjectOrchestrator:
         Args:
             db: Database session
             project_id: Project UUID
-            user_id: User ID (for ownership check)
+            domain_id: Domain ID (for ownership check)
             folder_name: Target folder name
             files: List of FileStorage objects from request.files.getlist()
 
@@ -759,7 +762,7 @@ class SongProjectOrchestrator:
                 result = self.upload_file_to_project(
                     db=db,
                     project_id=project_id,
-                    user_id=user_id,
+                    domain_id=domain_id,
                     folder_name=folder_name,
                     filename=filename,
                     file_data=file_data,
@@ -798,7 +801,7 @@ class SongProjectOrchestrator:
         self,
         db: Session,
         project_id: UUID,
-        user_id: UUID,
+        domain_id: UUID,
         folder_id: UUID,
         local_files: list[dict[str, Any]],
     ) -> dict[str, Any] | None:
@@ -808,7 +811,7 @@ class SongProjectOrchestrator:
         Args:
             db: Database session
             project_id: Project UUID
-            user_id: User ID (for ownership check)
+            domain_id: Domain ID (for ownership check)
             folder_id: Folder UUID
             local_files: List of dicts with keys: relative_path, file_hash, file_size_bytes
 
@@ -824,8 +827,8 @@ class SongProjectOrchestrator:
         try:
             # Get project for ownership check
             project = self.db_service.get_project_by_id(db, project_id)
-            if not project or project.user_id != user_id:
-                logger.warning("Unauthorized mirror compare", project_id=str(project_id), user_id=str(user_id))
+            if not project or project.domain_id != domain_id:
+                logger.warning("Unauthorized mirror compare", project_id=str(project_id), domain_id=str(domain_id))
                 return None
 
             # Get folder to extract folder_name (needed for path normalization)
@@ -985,7 +988,7 @@ class SongProjectOrchestrator:
         self,
         db: Session,
         project_id: UUID,
-        user_id: UUID,
+        domain_id: UUID,
         file_ids: list[str],
     ) -> dict[str, Any]:
         """
@@ -994,7 +997,7 @@ class SongProjectOrchestrator:
         Args:
             db: Database session
             project_id: Project UUID
-            user_id: User ID (for ownership check)
+            domain_id: Domain ID (for ownership check)
             file_ids: List of file UUID strings
 
         Returns:
@@ -1012,8 +1015,8 @@ class SongProjectOrchestrator:
         try:
             # Get project for ownership check
             project = self.db_service.get_project_by_id(db, project_id)
-            if not project or project.user_id != user_id:
-                logger.warning("Unauthorized batch delete", project_id=str(project_id), user_id=str(user_id))
+            if not project or project.domain_id != domain_id:
+                logger.warning("Unauthorized batch delete", project_id=str(project_id), domain_id=str(domain_id))
                 return {
                     "deleted": 0,
                     "failed": len(file_ids),
@@ -1093,7 +1096,7 @@ class SongProjectOrchestrator:
         self,
         db: Session,
         project_id: UUID,
-        user_id: UUID,
+        domain_id: UUID,
         move_actions: list[dict[str, Any]],
     ) -> dict[str, Any]:
         """
@@ -1102,7 +1105,7 @@ class SongProjectOrchestrator:
         Args:
             db: Database session
             project_id: Project UUID
-            user_id: User ID (for ownership check)
+            domain_id: Domain ID (for ownership check)
             move_actions: List with keys: file_id, old_path, new_path,
                           s3_key_old, s3_key_new, file_hash
 
@@ -1121,8 +1124,8 @@ class SongProjectOrchestrator:
         try:
             # Get project for ownership check
             project = self.db_service.get_project_by_id(db, project_id)
-            if not project or project.user_id != user_id:
-                logger.warning("Unauthorized batch move", project_id=str(project_id), user_id=str(user_id))
+            if not project or project.domain_id != domain_id:
+                logger.warning("Unauthorized batch move", project_id=str(project_id), domain_id=str(domain_id))
                 return {
                     "moved": 0,
                     "failed": len(move_actions),
@@ -1223,14 +1226,14 @@ class SongProjectOrchestrator:
                 "errors": [{"error": f"Batch move failed: {str(e)}"}],
             }
 
-    def get_all_project_files_with_urls(self, db: Session, project_id: UUID, user_id: UUID) -> dict[str, Any] | None:
+    def get_all_project_files_with_urls(self, db: Session, project_id: UUID, domain_id: UUID) -> dict[str, Any] | None:
         """
         Get all files from all folders for complete project download
 
         Args:
             db: Database session
             project_id: Project UUID
-            user_id: User ID (for ownership check)
+            domain_id: Domain ID (for ownership check)
 
         Returns:
             Dictionary with project_name and folders (with download URLs) or None if failed
@@ -1260,10 +1263,10 @@ class SongProjectOrchestrator:
                 logger.debug("Project not found", project_id=str(project_id))
                 return None
 
-            # Check ownership
-            if project.user_id != user_id:
+            # Check domain ownership
+            if project.domain_id != domain_id:
                 logger.warning(
-                    "Unauthorized complete download access", project_id=str(project_id), user_id=str(user_id)
+                    "Unauthorized complete download access", project_id=str(project_id), domain_id=str(domain_id)
                 )
                 return None
 
@@ -1312,7 +1315,7 @@ class SongProjectOrchestrator:
         db: Session,
         project_id: UUID,
         folder_id: UUID,
-        user_id: UUID,
+        domain_id: UUID,
     ) -> dict[str, Any]:
         """
         Clear all files in a folder (MinIO + DB)
@@ -1321,15 +1324,15 @@ class SongProjectOrchestrator:
             db: Database session
             project_id: Project UUID
             folder_id: Folder UUID
-            user_id: User ID (from JWT, for ownership check)
+            domain_id: Domain ID (for ownership check)
 
         Returns:
             {"deleted": int, "errors": list}
         """
         try:
-            # Load project (ownership check via user_id)
+            # Load project (ownership check via domain_id)
             project = self.db_service.get_project_by_id(db, project_id)
-            if not project or project.user_id != user_id:
+            if not project or project.domain_id != domain_id:
                 raise ValueError("Project not found or unauthorized")
 
             # Check if project is archived

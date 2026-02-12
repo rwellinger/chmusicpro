@@ -47,6 +47,7 @@ class SongReleaseOrchestrator:
         self,
         db: Session,
         user_id: UUID,
+        domain_id: UUID,
         type: str,
         name: str,
         status: str,
@@ -62,7 +63,8 @@ class SongReleaseOrchestrator:
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            user_id: User ID (audit trail / created_by)
+            domain_id: Domain ID (tenant ownership)
             type: Release type ('single', 'album')
             name: Release name
             status: Release status
@@ -113,7 +115,7 @@ class SongReleaseOrchestrator:
                 return None, error_msg
 
             # 4. Create release in DB (CRUD in db_service)
-            release = self.db_service.create_release(db=db, user_id=user_id, **release_data)
+            release = self.db_service.create_release(db=db, user_id=user_id, domain_id=domain_id, **release_data)
 
             if not release:
                 logger.error("Failed to create release in DB")
@@ -135,16 +137,18 @@ class SongReleaseOrchestrator:
                 except Exception as e:
                     logger.error("Failed to upload cover to S3", release_id=str(release.id), error=str(e))
                     # Rollback DB creation
-                    self.db_service.delete_release(db, release.id, user_id)
+                    self.db_service.delete_release(db, release.id, domain_id)
                     return None, f"Failed to upload cover: {str(e)}"
 
                 # Update release with final S3 key
-                update_success = self.db_service.update_release(db, release.id, user_id, {"cover_s3_key": cover_s3_key})
+                update_success = self.db_service.update_release(
+                    db, release.id, domain_id, {"cover_s3_key": cover_s3_key}
+                )
                 if not update_success:
                     logger.error("Failed to update release with cover S3 key")
                     # Cleanup S3
                     self.storage.delete(cover_s3_key)
-                    self.db_service.delete_release(db, release.id, user_id)
+                    self.db_service.delete_release(db, release.id, domain_id)
                     return None, "Failed to update cover reference in database"
 
                 release.cover_s3_key = cover_s3_key
@@ -157,7 +161,7 @@ class SongReleaseOrchestrator:
                     # Cleanup
                     if cover_s3_key:
                         self.storage.delete(cover_s3_key)
-                    self.db_service.delete_release(db, release.id, user_id)
+                    self.db_service.delete_release(db, release.id, domain_id)
                     return None, "Failed to assign projects"
 
             # 7. Get assigned projects for response
@@ -178,21 +182,21 @@ class SongReleaseOrchestrator:
             logger.error("Create release orchestration failed", error=str(e), error_type=e.__class__.__name__)
             return None, f"Creation failed: {str(e)}"
 
-    def get_release_with_details(self, db: Session, release_id: UUID, user_id: UUID) -> dict[str, Any] | None:
+    def get_release_with_details(self, db: Session, release_id: UUID, domain_id: UUID) -> dict[str, Any] | None:
         """
         Get release with all details and presigned cover URL
 
         Args:
             db: Database session
             release_id: Release UUID
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
 
         Returns:
             Release data dictionary or None if not found
         """
         try:
             # 1. Get release from DB (CRUD in db_service)
-            release = self.db_service.get_release_by_id(db, release_id, user_id)
+            release = self.db_service.get_release_by_id(db, release_id, domain_id)
             if not release:
                 logger.debug("Release not found", release_id=str(release_id))
                 return None
@@ -217,7 +221,7 @@ class SongReleaseOrchestrator:
     def list_releases(
         self,
         db: Session,
-        user_id: UUID,
+        domain_id: UUID,
         limit: int = 20,
         offset: int = 0,
         status_filter: str | None = None,
@@ -228,7 +232,7 @@ class SongReleaseOrchestrator:
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             limit: Max results per page
             offset: Skip first N results
             status_filter: Filter by status group
@@ -240,7 +244,7 @@ class SongReleaseOrchestrator:
         try:
             # 1. Get releases from DB (CRUD in db_service)
             releases, total = self.db_service.get_releases_paginated(
-                db, user_id, limit=limit, offset=offset, status_filter=status_filter, search=search
+                db, domain_id, limit=limit, offset=offset, status_filter=status_filter, search=search
             )
 
             # 2. Transform to list responses (business logic in transformer)
@@ -255,14 +259,14 @@ class SongReleaseOrchestrator:
             return {"items": items, "total": total, "limit": limit, "offset": offset}
 
         except Exception as e:
-            logger.error("List releases orchestration failed", error=str(e), user_id=str(user_id))
+            logger.error("List releases orchestration failed", error=str(e), domain_id=str(domain_id))
             return {"items": [], "total": 0, "limit": limit, "offset": offset}
 
     def update_release_with_projects(
         self,
         db: Session,
         release_id: UUID,
-        user_id: UUID,
+        domain_id: UUID,
         update_data: dict[str, Any],
         project_ids: list[UUID] | None = None,
         cover_file: tuple[bytes, str, int, int] | None = None,
@@ -273,7 +277,7 @@ class SongReleaseOrchestrator:
         Args:
             db: Database session
             release_id: Release UUID
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             update_data: Dictionary of fields to update
             project_ids: Optional list of project UUIDs (replaces existing)
             cover_file: Optional tuple of (file_data, filename, width, height)
@@ -285,7 +289,7 @@ class SongReleaseOrchestrator:
         """
         try:
             # 1. Get existing release
-            release = self.db_service.get_release_by_id(db, release_id, user_id)
+            release = self.db_service.get_release_by_id(db, release_id, domain_id)
             if not release:
                 logger.warning("Release not found for update", release_id=str(release_id))
                 return None, "Release not found"
@@ -303,7 +307,7 @@ class SongReleaseOrchestrator:
                     return None, error_msg
 
                 # Generate S3 key (business logic in transformer)
-                new_cover_s3_key = generate_s3_cover_key(str(user_id), str(release_id), filename)
+                new_cover_s3_key = generate_s3_cover_key(str(release.user_id), str(release_id), filename)
 
                 # Determine content type from filename
                 extension = filename.rsplit(".", 1)[-1].lower() if "." in filename else "jpg"
@@ -358,7 +362,7 @@ class SongReleaseOrchestrator:
                 return None, error_msg
 
             # 4. Update release in DB (CRUD in db_service)
-            updated_release = self.db_service.update_release(db, release_id, user_id, update_data)
+            updated_release = self.db_service.update_release(db, release_id, domain_id, update_data)
             if not updated_release:
                 logger.error("Failed to update release in DB")
                 # Cleanup uploaded cover if any
@@ -377,34 +381,34 @@ class SongReleaseOrchestrator:
                     logger.error("Failed to update project assignments")
 
             # 7. Get updated details
-            result = self.get_release_with_details(db, release_id, user_id)
+            result = self.get_release_with_details(db, release_id, domain_id)
             return result, None
 
         except Exception as e:
             logger.error("Update release orchestration failed", error=str(e), release_id=str(release_id))
             return None, f"Update failed: {str(e)}"
 
-    def delete_release_with_cleanup(self, db: Session, release_id: UUID, user_id: UUID) -> bool:
+    def delete_release_with_cleanup(self, db: Session, release_id: UUID, domain_id: UUID) -> bool:
         """
         Delete release and cleanup S3 cover
 
         Args:
             db: Database session
             release_id: Release UUID
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
 
         Returns:
             True if successful, False otherwise
         """
         try:
             # 1. Get release to find cover S3 key
-            release = self.db_service.get_release_by_id(db, release_id, user_id)
+            release = self.db_service.get_release_by_id(db, release_id, domain_id)
             if not release:
                 logger.warning("Release not found for deletion", release_id=str(release_id))
                 return False
 
             # 2. Delete from DB (cascade deletes project references) (CRUD in db_service)
-            delete_success = self.db_service.delete_release(db, release_id, user_id)
+            delete_success = self.db_service.delete_release(db, release_id, domain_id)
             if not delete_success:
                 logger.error("Failed to delete release from DB")
                 return False

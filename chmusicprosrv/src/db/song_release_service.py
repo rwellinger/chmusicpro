@@ -19,6 +19,7 @@ class SongReleaseService:
         self,
         db: Session,
         user_id: UUID,
+        domain_id: UUID,
         type: str,
         name: str,
         status: str,
@@ -41,7 +42,8 @@ class SongReleaseService:
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            user_id: User ID (audit trail / created_by)
+            domain_id: Domain ID (tenant ownership)
             type: Release type ('single', 'album')
             name: Release name
             status: Release status ('draft', 'arranging', 'mixing', etc.)
@@ -65,6 +67,7 @@ class SongReleaseService:
         try:
             release = SongRelease(
                 user_id=user_id,
+                domain_id=domain_id,
                 type=type,
                 name=name,
                 status=status,
@@ -105,30 +108,30 @@ class SongReleaseService:
             logger.error("Release creation failed", error=str(e), error_type=e.__class__.__name__)
             return None
 
-    def get_release_by_id(self, db: Session, release_id: UUID, user_id: UUID) -> SongRelease | None:
+    def get_release_by_id(self, db: Session, release_id: UUID, domain_id: UUID) -> SongRelease | None:
         """
-        Get release by ID with user ownership check
+        Get release by ID with domain ownership check
 
         Args:
             db: Database session
             release_id: Release UUID
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
 
         Returns:
-            SongRelease instance if found and owned by user, None otherwise
+            SongRelease instance if found and owned by domain, None otherwise
         """
         try:
             release = (
                 db.query(SongRelease)
-                .filter(SongRelease.id == release_id, SongRelease.user_id == user_id)
+                .filter(SongRelease.id == release_id, SongRelease.domain_id == domain_id)
                 .options(joinedload(SongRelease.project_references).joinedload(ReleaseProjectReference.project))
                 .first()
             )
 
             if release:
-                logger.debug("Release retrieved", release_id=str(release_id), user_id=str(user_id))
+                logger.debug("Release retrieved", release_id=str(release_id), domain_id=str(domain_id))
             else:
-                logger.debug("Release not found", release_id=str(release_id), user_id=str(user_id))
+                logger.debug("Release not found", release_id=str(release_id), domain_id=str(domain_id))
 
             return release
 
@@ -139,7 +142,7 @@ class SongReleaseService:
     def get_releases_paginated(
         self,
         db: Session,
-        user_id: UUID,
+        domain_id: UUID,
         limit: int = 20,
         offset: int = 0,
         status_filter: str | None = None,
@@ -150,7 +153,7 @@ class SongReleaseService:
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             limit: Max number of results
             offset: Skip first N results
             status_filter: Filter by status group ('all', 'progress', 'uploaded', 'released', 'archive')
@@ -160,7 +163,7 @@ class SongReleaseService:
             Tuple of (releases list, total count)
         """
         try:
-            query = db.query(SongRelease).filter(SongRelease.user_id == user_id)
+            query = db.query(SongRelease).filter(SongRelease.domain_id == domain_id)
 
             # Apply status filter
             if status_filter:
@@ -211,7 +214,7 @@ class SongReleaseService:
 
             logger.debug(
                 "Releases retrieved",
-                user_id=str(user_id),
+                domain_id=str(domain_id),
                 total=total,
                 limit=limit,
                 offset=offset,
@@ -221,11 +224,11 @@ class SongReleaseService:
             return releases, total
 
         except SQLAlchemyError as e:
-            logger.error("Get releases paginated DB error", error=str(e), user_id=str(user_id))
+            logger.error("Get releases paginated DB error", error=str(e), domain_id=str(domain_id))
             return [], 0
 
     def update_release(
-        self, db: Session, release_id: UUID, user_id: UUID, update_data: dict[str, Any]
+        self, db: Session, release_id: UUID, domain_id: UUID, update_data: dict[str, Any]
     ) -> SongRelease | None:
         """
         Update release record
@@ -233,17 +236,19 @@ class SongReleaseService:
         Args:
             db: Database session
             release_id: Release UUID
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             update_data: Dictionary of fields to update
 
         Returns:
             Updated SongRelease instance if successful, None otherwise
         """
         try:
-            release = db.query(SongRelease).filter(SongRelease.id == release_id, SongRelease.user_id == user_id).first()
+            release = (
+                db.query(SongRelease).filter(SongRelease.id == release_id, SongRelease.domain_id == domain_id).first()
+            )
 
             if not release:
-                logger.warning("Release not found for update", release_id=str(release_id), user_id=str(user_id))
+                logger.warning("Release not found for update", release_id=str(release_id), domain_id=str(domain_id))
                 return None
 
             # Update allowed fields
@@ -277,7 +282,7 @@ class SongReleaseService:
             logger.info(
                 "Release updated",
                 release_id=str(release_id),
-                user_id=str(user_id),
+                domain_id=str(domain_id),
                 fields_updated=list(update_data.keys()),
             )
             return release
@@ -287,29 +292,31 @@ class SongReleaseService:
             logger.error("Update release DB error", error=str(e), release_id=str(release_id))
             return None
 
-    def delete_release(self, db: Session, release_id: UUID, user_id: UUID) -> bool:
+    def delete_release(self, db: Session, release_id: UUID, domain_id: UUID) -> bool:
         """
         Delete release and all related project references
 
         Args:
             db: Database session
             release_id: Release UUID
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
 
         Returns:
             True if successful, False otherwise
         """
         try:
-            release = db.query(SongRelease).filter(SongRelease.id == release_id, SongRelease.user_id == user_id).first()
+            release = (
+                db.query(SongRelease).filter(SongRelease.id == release_id, SongRelease.domain_id == domain_id).first()
+            )
 
             if not release:
-                logger.warning("Release not found for deletion", release_id=str(release_id), user_id=str(user_id))
+                logger.warning("Release not found for deletion", release_id=str(release_id), domain_id=str(domain_id))
                 return False
 
             db.delete(release)  # Cascade will delete project_references
             db.commit()
 
-            logger.info("Release deleted", release_id=str(release_id), user_id=str(user_id))
+            logger.info("Release deleted", release_id=str(release_id), domain_id=str(domain_id))
             return True
 
         except SQLAlchemyError as e:

@@ -22,7 +22,7 @@ from flask import Blueprint, jsonify, request
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from api.auth_middleware import get_current_user_id, jwt_required
+from api.auth_middleware import get_current_domain_id, get_current_user_id, jwt_required
 from api.controllers.song_project_controller import song_project_controller
 from db.database import get_db
 from schemas.song_project_schemas import BatchDeleteRequest, MirrorRequest, ProjectCreateRequest, ProjectUpdateRequest
@@ -57,7 +57,8 @@ def create_project():
         }
     """
     user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not user_id or not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
@@ -67,7 +68,7 @@ def create_project():
 
     db: Session = next(get_db())
     try:
-        result, status_code = song_project_controller.create_project(db, UUID(user_id), project_data)
+        result, status_code = song_project_controller.create_project(db, UUID(user_id), UUID(domain_id), project_data)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -93,8 +94,8 @@ def list_projects():
     Example:
         GET /api/v1/song-projects?limit=10&offset=0&search=rock&tags=demo,wip&project_status=new
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     # Parse query parameters
@@ -120,7 +121,7 @@ def list_projects():
     try:
         result, status_code = song_project_controller.get_projects(
             db=db,
-            user_id=UUID(user_id),
+            domain_id=UUID(domain_id),
             limit=limit,
             offset=offset,
             search=search,
@@ -149,14 +150,14 @@ def get_project(project_id: str):
     Example:
         GET /api/v1/song-projects/550e8400-e29b-41d4-a716-446655440000
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     db: Session = next(get_db())
     try:
         # Always return project with details (folders and files)
-        result, status_code = song_project_controller.get_project_with_details(db, UUID(user_id), project_id)
+        result, status_code = song_project_controller.get_project_with_details(db, UUID(domain_id), project_id)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -186,8 +187,8 @@ def update_project(project_id: str):
             "tags": ["rock", "mastered"]
         }
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
@@ -197,7 +198,7 @@ def update_project(project_id: str):
 
     db: Session = next(get_db())
     try:
-        result, status_code = song_project_controller.update_project(db, UUID(user_id), project_id, update_data)
+        result, status_code = song_project_controller.update_project(db, UUID(domain_id), project_id, update_data)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -220,13 +221,13 @@ def delete_project(project_id: str):
     Example:
         DELETE /api/v1/song-projects/550e8400-e29b-41d4-a716-446655440000
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     db: Session = next(get_db())
     try:
-        result, status_code = song_project_controller.delete_project(db, UUID(user_id), project_id)
+        result, status_code = song_project_controller.delete_project(db, UUID(domain_id), project_id)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -259,8 +260,8 @@ def upload_file(project_id: str):
             file: test.wav (binary)
             folder_id: 123e4567-e89b-12d3-a456-426614174000
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     if "file" not in request.files:
@@ -279,7 +280,7 @@ def upload_file(project_id: str):
     db: Session = next(get_db())
     try:
         result, status_code = song_project_controller.upload_file(
-            db, UUID(user_id), project_id, folder_id, filename, file_data
+            db, UUID(domain_id), project_id, folder_id, filename, file_data
         )
         return jsonify(result), status_code
     finally:
@@ -305,13 +306,13 @@ def get_folder_files(project_id: str, folder_id: str):
         GET /api/v1/song-projects/550e8400-e29b-41d4-a716-446655440000/folders/123e4567-e89b-12d3-a456-426614174000/files
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     db: Session = next(get_db())
     try:
-        result, status_code = song_project_controller.get_folder_files(db, UUID(user_id), project_id, folder_id)
+        result, status_code = song_project_controller.get_folder_files(db, UUID(domain_id), project_id, folder_id)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -343,8 +344,8 @@ def batch_upload_files(project_id: str, folder_id: str):
         Form Data:
             files: test1.wav, test2.mp3, test3.flac (multiple files)
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     if "files" not in request.files:
@@ -358,7 +359,7 @@ def batch_upload_files(project_id: str, folder_id: str):
     db: Session = next(get_db())
     try:
         result, status_code = song_project_controller.batch_upload_files(
-            db, UUID(user_id), project_id, folder_id, files
+            db, UUID(domain_id), project_id, folder_id, files
         )
         return jsonify(result), status_code
     finally:
@@ -397,8 +398,8 @@ def mirror_compare(project_id: str, folder_id: str):
             ]
         }
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
@@ -409,7 +410,7 @@ def mirror_compare(project_id: str, folder_id: str):
     db: Session = next(get_db())
     try:
         result, status_code = song_project_controller.mirror_compare(
-            db, UUID(user_id), project_id, folder_id, mirror_data
+            db, UUID(domain_id), project_id, folder_id, mirror_data
         )
         return jsonify(result), status_code
     finally:
@@ -447,8 +448,8 @@ def batch_delete_files(project_id: str):
             ]
         }
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
@@ -458,7 +459,7 @@ def batch_delete_files(project_id: str):
 
     db: Session = next(get_db())
     try:
-        result, status_code = song_project_controller.batch_delete_files(db, UUID(user_id), project_id, delete_data)
+        result, status_code = song_project_controller.batch_delete_files(db, UUID(domain_id), project_id, delete_data)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -512,8 +513,8 @@ def batch_move_files(project_id: str):
             ]
         }
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     db: Session = next(get_db())
@@ -525,7 +526,7 @@ def batch_move_files(project_id: str):
 
         # Call controller
         result, status_code = song_project_controller.batch_move_files(
-            db=db, user_id=UUID(user_id), project_id=project_id, move_actions=data["move_actions"]
+            db=db, domain_id=UUID(domain_id), project_id=project_id, move_actions=data["move_actions"]
         )
 
         return jsonify(result), status_code
@@ -571,8 +572,8 @@ def fix_mime_types(project_id: str):
         POST /api/v1/song-projects/{id}/files/fix-mime?dry_run=true
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     folder_id = request.args.get("folder_id")
@@ -580,7 +581,9 @@ def fix_mime_types(project_id: str):
 
     db: Session = next(get_db())
     try:
-        result, status_code = song_project_controller.fix_mime_types(db, UUID(user_id), project_id, folder_id, dry_run)
+        result, status_code = song_project_controller.fix_mime_types(
+            db, UUID(domain_id), project_id, folder_id, dry_run
+        )
         return jsonify(result), status_code
     finally:
         db.close()
@@ -627,13 +630,13 @@ def get_all_project_files(project_id: str):
         GET /api/v1/song-projects/550e8400-e29b-41d4-a716-446655440000/files/all
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     db: Session = next(get_db())
     try:
-        result, status_code = song_project_controller.get_all_project_files_with_urls(db, UUID(user_id), project_id)
+        result, status_code = song_project_controller.get_all_project_files_with_urls(db, UUID(domain_id), project_id)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -663,13 +666,13 @@ def clear_folder_files(project_id: str, folder_id: str):
         DELETE /api/v1/song-projects/550e8400-e29b-41d4-a716-446655440000/folders/abc123.../clear
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     db: Session = next(get_db())
     try:
-        result, status_code = song_project_controller.clear_folder_files(db, UUID(user_id), project_id, folder_id)
+        result, status_code = song_project_controller.clear_folder_files(db, UUID(domain_id), project_id, folder_id)
         return jsonify(result), status_code
     finally:
         db.close()
@@ -697,8 +700,8 @@ def download_file(project_id: str, file_id: str):
         GET /api/v1/song-projects/550e8400-e29b-41d4-a716-446655440000/files/abc123.../download
         Headers: Authorization: Bearer <JWT_TOKEN>
     """
-    user_id = get_current_user_id()
-    if not user_id:
+    domain_id = get_current_domain_id()
+    if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
@@ -709,7 +712,7 @@ def download_file(project_id: str, file_id: str):
         project_uuid = UUID(project_id)
         file_uuid = UUID(file_id)
 
-        logger.debug("Serving project file", project_id=project_id, file_id=file_id, user_id=user_id)
+        logger.debug("Serving project file", project_id=project_id, file_id=file_id, domain_id=domain_id)
 
         # Get file from DB
         db: Session = next(get_db())
@@ -718,8 +721,8 @@ def download_file(project_id: str, file_id: str):
             if not file:
                 return jsonify({"error": "File not found"}), 404
 
-            # Security: Verify file belongs to user's project
-            if str(file.project_id) != str(project_uuid) or str(file.project.user_id) != str(user_id):
+            # Security: Verify file belongs to domain's project
+            if str(file.project_id) != str(project_uuid) or str(file.project.domain_id) != str(domain_id):
                 return jsonify({"error": "File not found"}), 404
 
             # Verify file has S3 key

@@ -23,6 +23,7 @@ class SongReleaseController:
     def create_release(
         db: Session,
         user_id: UUID,
+        domain_id: UUID,
         release_data: ReleaseCreateRequest,
         cover_file: tuple[bytes, str, int, int] | None = None,
     ) -> tuple[dict[str, Any], int]:
@@ -31,7 +32,8 @@ class SongReleaseController:
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            user_id: User ID (audit trail / created_by)
+            domain_id: Domain ID (tenant ownership)
             release_data: Release creation data (Pydantic model)
             cover_file: Optional tuple of (file_data, filename, width, height)
 
@@ -58,6 +60,7 @@ class SongReleaseController:
             result, error_msg = song_release_orchestrator.create_release_with_projects(
                 db=db,
                 user_id=user_id,
+                domain_id=domain_id,
                 type=release_data.type,
                 name=release_data.name,
                 status=release_data.status,
@@ -89,13 +92,13 @@ class SongReleaseController:
             return {"error": f"Failed to create release: {str(e)}"}, 500
 
     @staticmethod
-    def get_releases(db: Session, user_id: UUID, filters: ReleaseFilterRequest) -> tuple[dict[str, Any], int]:
+    def get_releases(db: Session, domain_id: UUID, filters: ReleaseFilterRequest) -> tuple[dict[str, Any], int]:
         """
-        Get list of releases for user (paginated)
+        Get list of releases for domain (paginated)
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             filters: Filter parameters (Pydantic model)
 
         Returns:
@@ -104,7 +107,7 @@ class SongReleaseController:
         try:
             result = song_release_orchestrator.list_releases(
                 db=db,
-                user_id=user_id,
+                domain_id=domain_id,
                 limit=filters.limit,
                 offset=filters.offset,
                 status_filter=filters.status_filter,
@@ -119,20 +122,22 @@ class SongReleaseController:
             return {"error": f"Failed to retrieve releases: {str(e)}"}, 500
 
     @staticmethod
-    def get_release(db: Session, user_id: UUID, release_id: UUID) -> tuple[dict[str, Any], int]:
+    def get_release(db: Session, domain_id: UUID, release_id: UUID) -> tuple[dict[str, Any], int]:
         """
         Get release details by ID
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             release_id: Release UUID
 
         Returns:
             Tuple of (response_data, status_code)
         """
         try:
-            result = song_release_orchestrator.get_release_with_details(db=db, release_id=release_id, user_id=user_id)
+            result = song_release_orchestrator.get_release_with_details(
+                db=db, release_id=release_id, domain_id=domain_id
+            )
 
             if not result:
                 return {"error": "Release not found"}, 404
@@ -147,7 +152,7 @@ class SongReleaseController:
     @staticmethod
     def update_release(
         db: Session,
-        user_id: UUID,
+        domain_id: UUID,
         release_id: UUID,
         update_data: ReleaseUpdateRequest,
         cover_file: tuple[bytes, str, int, int] | None = None,
@@ -157,7 +162,7 @@ class SongReleaseController:
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             release_id: Release UUID
             update_data: Update data (Pydantic model)
             cover_file: Optional tuple of (file_data, filename, width, height)
@@ -177,7 +182,7 @@ class SongReleaseController:
             result, error_msg = song_release_orchestrator.update_release_with_projects(
                 db=db,
                 release_id=release_id,
-                user_id=user_id,
+                domain_id=domain_id,
                 update_data=update_dict,
                 project_ids=project_uuids,
                 cover_file=cover_file,
@@ -204,13 +209,13 @@ class SongReleaseController:
             return {"error": f"Failed to update release: {str(e)}"}, 500
 
     @staticmethod
-    def delete_release(db: Session, user_id: UUID, release_id: UUID) -> tuple[dict[str, Any], int]:
+    def delete_release(db: Session, domain_id: UUID, release_id: UUID) -> tuple[dict[str, Any], int]:
         """
         Delete release and cleanup S3 cover
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             release_id: Release UUID
 
         Returns:
@@ -218,7 +223,7 @@ class SongReleaseController:
         """
         try:
             success = song_release_orchestrator.delete_release_with_cleanup(
-                db=db, release_id=release_id, user_id=user_id
+                db=db, release_id=release_id, domain_id=domain_id
             )
 
             if not success:

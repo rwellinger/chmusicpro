@@ -27,13 +27,16 @@ class SongProjectController:
     """Controller for song project operations (HTTP handling only)"""
 
     @staticmethod
-    def create_project(db: Session, user_id: UUID, project_data: ProjectCreateRequest) -> tuple[dict[str, Any], int]:
+    def create_project(
+        db: Session, user_id: UUID, domain_id: UUID, project_data: ProjectCreateRequest
+    ) -> tuple[dict[str, Any], int]:
         """
         Create a new project with default folder structure
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            user_id: User ID (audit trail / created_by)
+            domain_id: Domain ID (tenant ownership)
             project_data: Project creation data (Pydantic model)
 
         Returns:
@@ -43,6 +46,7 @@ class SongProjectController:
             result = song_project_orchestrator.create_project_with_structure(
                 db=db,
                 user_id=user_id,
+                domain_id=domain_id,
                 project_name=project_data.project_name,
                 tags=project_data.tags,
                 description=project_data.description,
@@ -61,7 +65,7 @@ class SongProjectController:
     @staticmethod
     def get_projects(
         db: Session,
-        user_id: UUID,
+        domain_id: UUID,
         limit: int = 20,
         offset: int = 0,
         search: str = "",
@@ -69,11 +73,11 @@ class SongProjectController:
         project_status: str | None = None,
     ) -> tuple[dict[str, Any], int]:
         """
-        Get list of projects for user (paginated)
+        Get list of projects for domain (paginated)
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             limit: Items per page
             offset: Offset for pagination
             search: Search term
@@ -86,7 +90,7 @@ class SongProjectController:
         try:
             result = song_project_orchestrator.list_projects(
                 db=db,
-                user_id=user_id,
+                domain_id=domain_id,
                 limit=limit,
                 offset=offset,
                 search=search,
@@ -120,13 +124,13 @@ class SongProjectController:
             return {"error": f"Failed to retrieve projects: {str(e)}"}, 500
 
     @staticmethod
-    def get_project_by_id(db: Session, user_id: UUID, project_id: str) -> tuple[dict[str, Any], int]:
+    def get_project_by_id(db: Session, domain_id: UUID, project_id: str) -> tuple[dict[str, Any], int]:
         """
         Get a specific project by ID (without details)
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID
 
         Returns:
@@ -142,7 +146,7 @@ class SongProjectController:
             result = song_project_orchestrator.get_project_by_id(
                 db=db,
                 project_id=project_uuid,
-                user_id=user_id,
+                domain_id=domain_id,
             )
 
             if not result:
@@ -156,13 +160,13 @@ class SongProjectController:
             return {"error": f"Failed to retrieve project: {str(e)}"}, 500
 
     @staticmethod
-    def get_project_with_details(db: Session, user_id: UUID, project_id: str) -> tuple[dict[str, Any], int]:
+    def get_project_with_details(db: Session, domain_id: UUID, project_id: str) -> tuple[dict[str, Any], int]:
         """
         Get a specific project with all folders and files
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID
 
         Returns:
@@ -178,7 +182,7 @@ class SongProjectController:
             result = song_project_orchestrator.get_project_with_details(
                 db=db,
                 project_id=project_uuid,
-                user_id=user_id,
+                domain_id=domain_id,
             )
 
             if not result:
@@ -194,7 +198,7 @@ class SongProjectController:
     @staticmethod
     def update_project(
         db: Session,
-        user_id: UUID,
+        domain_id: UUID,
         project_id: str,
         update_data: ProjectUpdateRequest,
     ) -> tuple[dict[str, Any], int]:
@@ -203,7 +207,7 @@ class SongProjectController:
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID
             update_data: Update data (Pydantic model)
 
@@ -226,7 +230,7 @@ class SongProjectController:
             result = song_project_orchestrator.update_project(
                 db=db,
                 project_id=project_uuid,
-                user_id=user_id,
+                domain_id=domain_id,
                 update_data=update_dict,
             )
 
@@ -241,13 +245,13 @@ class SongProjectController:
             return {"error": f"Failed to update project: {str(e)}"}, 500
 
     @staticmethod
-    def delete_project(db: Session, user_id: UUID, project_id: str) -> tuple[dict[str, Any], int]:
+    def delete_project(db: Session, domain_id: UUID, project_id: str) -> tuple[dict[str, Any], int]:
         """
         Delete a project (with S3 cleanup)
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID
 
         Returns:
@@ -261,14 +265,14 @@ class SongProjectController:
                 return {"error": "Invalid project ID format"}, 400
 
             # Check if project is archived
-            project = song_project_orchestrator.get_project_by_id(db=db, project_id=project_uuid, user_id=user_id)
+            project = song_project_orchestrator.get_project_by_id(db=db, project_id=project_uuid, domain_id=domain_id)
             if project and project.get("project_status") == "archived":
                 return {"error": "Cannot delete archived project. Unarchive it first."}, 403
 
             success = song_project_orchestrator.delete_project_with_cleanup(
                 db=db,
                 project_id=project_uuid,
-                user_id=user_id,
+                domain_id=domain_id,
             )
 
             if not success:
@@ -282,14 +286,14 @@ class SongProjectController:
 
     @staticmethod
     def upload_file(
-        db: Session, user_id: UUID, project_id: str, folder_id: str, filename: str, file_data: bytes
+        db: Session, domain_id: UUID, project_id: str, folder_id: str, filename: str, file_data: bytes
     ) -> tuple[dict[str, Any], int]:
         """
         Upload file to project folder
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID
             folder_id: Folder UUID
             filename: File name
@@ -308,7 +312,7 @@ class SongProjectController:
 
             # Get project with details to find folder name
             project_details = song_project_orchestrator.get_project_with_details(
-                db=db, project_id=project_uuid, user_id=user_id
+                db=db, project_id=project_uuid, domain_id=domain_id
             )
 
             if not project_details:
@@ -328,7 +332,7 @@ class SongProjectController:
             result = song_project_orchestrator.upload_file_to_project(
                 db=db,
                 project_id=project_uuid,
-                user_id=user_id,
+                domain_id=domain_id,
                 folder_name=folder.get("folder_name"),
                 filename=filename,
                 file_data=file_data,
@@ -345,14 +349,14 @@ class SongProjectController:
 
     @staticmethod
     def batch_upload_files(
-        db: Session, user_id: UUID, project_id: str, folder_id: str, files: list
+        db: Session, domain_id: UUID, project_id: str, folder_id: str, files: list
     ) -> tuple[dict[str, Any], int]:
         """
         Batch upload multiple files to project folder
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID
             folder_id: Folder UUID
             files: List of FileStorage objects from request.files.getlist()
@@ -371,7 +375,7 @@ class SongProjectController:
 
             # Get project with details to find folder name
             project_details = song_project_orchestrator.get_project_with_details(
-                db=db, project_id=project_uuid, user_id=user_id
+                db=db, project_id=project_uuid, domain_id=domain_id
             )
 
             if not project_details:
@@ -387,7 +391,7 @@ class SongProjectController:
             result = song_project_orchestrator.batch_upload_files_to_project(
                 db=db,
                 project_id=project_uuid,
-                user_id=user_id,
+                domain_id=domain_id,
                 folder_name=folder.get("folder_name"),
                 files=files,
             )
@@ -399,13 +403,13 @@ class SongProjectController:
             return {"error": f"Batch upload failed: {str(e)}"}, 500
 
     @staticmethod
-    def get_folder_files(db: Session, user_id: UUID, project_id: str, folder_id: str) -> tuple[dict[str, Any], int]:
+    def get_folder_files(db: Session, domain_id: UUID, project_id: str, folder_id: str) -> tuple[dict[str, Any], int]:
         """
         Get all files in a folder with download URLs (for CLI download)
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID
             folder_id: Folder UUID
 
@@ -423,7 +427,7 @@ class SongProjectController:
 
             # Get project details (checks ownership)
             project_details = song_project_orchestrator.get_project_with_details(
-                db=db, project_id=project_uuid, user_id=user_id
+                db=db, project_id=project_uuid, domain_id=domain_id
             )
 
             if not project_details:
@@ -468,14 +472,14 @@ class SongProjectController:
 
     @staticmethod
     def mirror_compare(
-        db: Session, user_id: UUID, project_id: str, folder_id: str, mirror_data: MirrorRequest
+        db: Session, domain_id: UUID, project_id: str, folder_id: str, mirror_data: MirrorRequest
     ) -> tuple[dict[str, Any], int]:
         """
         Compare local files vs remote files (for Mirror sync)
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID string
             folder_id: Folder UUID string
             mirror_data: Mirror request data (local files with hashes)
@@ -489,7 +493,7 @@ class SongProjectController:
             folder_uuid = UUID(folder_id)
 
             # Check if project is archived
-            project = song_project_orchestrator.get_project_by_id(db=db, project_id=project_uuid, user_id=user_id)
+            project = song_project_orchestrator.get_project_by_id(db=db, project_id=project_uuid, domain_id=domain_id)
             if project and project.get("project_status") == "archived":
                 return {"error": "Cannot mirror to archived project. Unarchive it first."}, 403
 
@@ -501,7 +505,7 @@ class SongProjectController:
 
             # Call orchestrator
             result = song_project_orchestrator.mirror_compare_files(
-                db=db, project_id=project_uuid, user_id=user_id, folder_id=folder_uuid, local_files=local_files
+                db=db, project_id=project_uuid, domain_id=domain_id, folder_id=folder_uuid, local_files=local_files
             )
 
             if not result:
@@ -526,14 +530,14 @@ class SongProjectController:
 
     @staticmethod
     def batch_delete_files(
-        db: Session, user_id: UUID, project_id: str, delete_data: BatchDeleteRequest
+        db: Session, domain_id: UUID, project_id: str, delete_data: BatchDeleteRequest
     ) -> tuple[dict[str, Any], int]:
         """
         Delete multiple files from project (S3 + DB)
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID string
             delete_data: Batch delete request data (file IDs)
 
@@ -546,7 +550,7 @@ class SongProjectController:
 
             # Call orchestrator
             result = song_project_orchestrator.batch_delete_files(
-                db=db, project_id=project_uuid, user_id=user_id, file_ids=delete_data.file_ids
+                db=db, project_id=project_uuid, domain_id=domain_id, file_ids=delete_data.file_ids
             )
 
             # Convert to response model
@@ -567,14 +571,14 @@ class SongProjectController:
 
     @staticmethod
     def batch_move_files(
-        db: Session, user_id: UUID, project_id: str, move_actions: list[dict]
+        db: Session, domain_id: UUID, project_id: str, move_actions: list[dict]
     ) -> tuple[dict[str, Any], int]:
         """
         Move multiple files in S3 and update DB (for Mirror sync)
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID string
             move_actions: List of move action dicts
 
@@ -587,7 +591,7 @@ class SongProjectController:
 
             # Call orchestrator
             result = song_project_orchestrator.batch_move_files(
-                db=db, project_id=project_uuid, user_id=user_id, move_actions=move_actions
+                db=db, project_id=project_uuid, domain_id=domain_id, move_actions=move_actions
             )
 
             return {"data": result}, 200
@@ -606,14 +610,14 @@ class SongProjectController:
 
     @staticmethod
     def fix_mime_types(
-        db: Session, user_id: UUID, project_id: str, folder_id: str | None, dry_run: bool
+        db: Session, domain_id: UUID, project_id: str, folder_id: str | None, dry_run: bool
     ) -> tuple[dict[str, Any], int]:
         """
         Fix missing/wrong MIME types for files in project
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID string
             folder_id: Optional folder UUID string (None = all folders)
             dry_run: If True, preview changes without updating
@@ -630,9 +634,9 @@ class SongProjectController:
             project_uuid = UUID(project_id)
             folder_uuid = UUID(folder_id) if folder_id else None
 
-            # Verify user owns project
+            # Verify domain owns project
             project = song_project_service.get_project_by_id(db, project_uuid)
-            if not project or project.user_id != user_id:
+            if not project or project.domain_id != domain_id:
                 return {"error": "Project not found or unauthorized"}, 404
 
             # Query files with missing/wrong MIME types
@@ -703,13 +707,13 @@ class SongProjectController:
             return {"error": f"Failed to fix MIME types: {str(e)}"}, 500
 
     @staticmethod
-    def get_all_project_files_with_urls(db: Session, user_id: UUID, project_id: str) -> tuple[dict[str, Any], int]:
+    def get_all_project_files_with_urls(db: Session, domain_id: UUID, project_id: str) -> tuple[dict[str, Any], int]:
         """
         Get all files from all folders for complete project download
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID string
 
         Returns:
@@ -725,7 +729,7 @@ class SongProjectController:
 
             # Call orchestrator
             result = song_project_orchestrator.get_all_project_files_with_urls(
-                db=db, project_id=project_uuid, user_id=user_id
+                db=db, project_id=project_uuid, domain_id=domain_id
             )
 
             if not result:
@@ -744,7 +748,7 @@ class SongProjectController:
     @staticmethod
     def clear_folder_files(
         db: Session,
-        user_id: UUID,
+        domain_id: UUID,
         project_id: str,
         folder_id: str,
     ) -> tuple[dict[str, Any], int]:
@@ -753,7 +757,7 @@ class SongProjectController:
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             project_id: Project UUID
             folder_id: Folder UUID
 
@@ -773,7 +777,7 @@ class SongProjectController:
                 db=db,
                 project_id=project_uuid,
                 folder_id=folder_uuid,
-                user_id=user_id,
+                domain_id=domain_id,
             )
 
             return {"data": result, "message": f"{result['deleted']} files deleted successfully"}, 200

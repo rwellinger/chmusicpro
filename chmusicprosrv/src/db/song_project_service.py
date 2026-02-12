@@ -20,6 +20,7 @@ class SongProjectService:
         self,
         db: Session,
         user_id: UUID,
+        domain_id: UUID,
         project_name: str,
         s3_prefix: str | None = None,
         tags: list[str] | None = None,
@@ -31,7 +32,8 @@ class SongProjectService:
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            user_id: User ID (audit trail / created_by)
+            domain_id: Domain ID (tenant ownership)
             project_name: Project name
             s3_prefix: S3 prefix for storage
             tags: List of tags
@@ -44,6 +46,7 @@ class SongProjectService:
         try:
             project = SongProject(
                 user_id=user_id,
+                domain_id=domain_id,
                 project_name=project_name,
                 s3_prefix=s3_prefix,
                 tags=tags or [],
@@ -136,7 +139,7 @@ class SongProjectService:
     def get_projects_paginated(
         self,
         db: Session,
-        user_id: UUID,
+        domain_id: UUID,
         limit: int = 20,
         offset: int = 0,
         search: str = "",
@@ -146,11 +149,11 @@ class SongProjectService:
         sort_direction: str = "desc",
     ) -> dict[str, Any]:
         """
-        Get paginated list of projects for a user
+        Get paginated list of projects for a domain
 
         Args:
             db: Database session
-            user_id: User ID (from JWT)
+            domain_id: Domain ID (tenant filter)
             limit: Number of projects to return
             offset: Number of projects to skip
             search: Search term (project_name, description)
@@ -163,7 +166,7 @@ class SongProjectService:
             Dictionary with 'items' (list of projects) and 'total' (count)
         """
         try:
-            query = db.query(SongProject).filter(SongProject.user_id == user_id)
+            query = db.query(SongProject).filter(SongProject.domain_id == domain_id)
 
             # Apply status filter
             if project_status:
@@ -221,7 +224,7 @@ class SongProjectService:
                 total=total_count,
                 limit=limit,
                 offset=offset,
-                user_id=str(user_id),
+                domain_id=str(domain_id),
                 search=search,
                 tags=tags,
                 project_status=project_status,
@@ -241,7 +244,7 @@ class SongProjectService:
         self,
         db: Session,
         project_id: UUID,
-        user_id: UUID,
+        domain_id: UUID,
         update_data: dict[str, Any],
     ) -> SongProject | None:
         """
@@ -250,7 +253,7 @@ class SongProjectService:
         Args:
             db: Database session
             project_id: Project UUID
-            user_id: User ID (for ownership check)
+            domain_id: Domain ID (for ownership check)
             update_data: Dictionary with fields to update
 
         Returns:
@@ -262,9 +265,9 @@ class SongProjectService:
                 logger.warning("Project not found for update", project_id=str(project_id))
                 return None
 
-            # Ownership check
-            if project.user_id != user_id:
-                logger.warning("Unauthorized project update", project_id=str(project_id), user_id=str(user_id))
+            # Domain ownership check
+            if project.domain_id != domain_id:
+                logger.warning("Unauthorized project update", project_id=str(project_id), domain_id=str(domain_id))
                 return None
 
             # Validate project_status if provided
