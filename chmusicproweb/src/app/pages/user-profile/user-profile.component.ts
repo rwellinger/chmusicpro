@@ -53,6 +53,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     openaiAllTimeCosts: MonthlyCosts | null = null;
     isLoading = false;
     isLoadingCosts = false;
+    showCosts = false;
     isEditing = false;
     userDisplayName = "Unknown User";
     availableLanguages: { code: Language, name: string }[] = [];
@@ -97,8 +98,11 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         this.loadUserProfile();
         this.subscribeToAuthState();
         this.loadUserSettings();
-        this.loadOpenAICosts();
-        this.loadOpenAIAllTimeCosts();
+        this.showCosts = this.authService.isSystemAdmin();
+        if (this.showCosts) {
+            this.loadOpenAICosts();
+            this.loadOpenAIAllTimeCosts();
+        }
         this.loadUserDomains();
     }
 

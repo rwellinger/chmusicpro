@@ -104,6 +104,7 @@ class UserController:
                 str(user.id),
                 user.email,
                 active_domain_id=str(personal_domain.id),
+                active_domain_name=personal_domain.name,
                 domain_role="owner",
                 is_system_admin=False,  # New users are never system admins
             )
@@ -163,10 +164,12 @@ class UserController:
 
             # Domain: Resolve active domain for JWT
             active_domain_id = None
+            active_domain_name = None
             domain_role = None
             try:
                 domain, d_role = self.domain_orchestrator.resolve_active_domain(db, str(user.id))
                 active_domain_id = str(domain.id)
+                active_domain_name = domain.name
                 domain_role = d_role
             except Exception as domain_err:
                 logger.warning("Could not resolve domain for login", error=str(domain_err), user_id=str(user.id))
@@ -176,6 +179,7 @@ class UserController:
                 str(user.id),
                 user.email,
                 active_domain_id=active_domain_id,
+                active_domain_name=active_domain_name,
                 domain_role=domain_role,
                 is_system_admin=self.domain_orchestrator.is_system_admin(db, str(user.id)),
             )

@@ -161,11 +161,19 @@ class DomainController:
                 return {"error": "Invalid domain ID format"}, 400
 
             from db.domain_service import DomainService
+            from db.models import DomainType
 
             svc = DomainService()
-            domain = svc.deactivate_domain(db, domain_id)
+            domain = svc.get_domain_by_id(db, domain_id)
             if not domain:
                 return {"error": "Domain not found"}, 404
+
+            if domain.type in (DomainType.SYSTEM, DomainType.KI_TEMPLATES):
+                return {"error": "Reserved domains cannot be deactivated"}, 403
+
+            deactivated = svc.deactivate_domain(db, domain_id)
+            if not deactivated:
+                return {"error": "Failed to deactivate domain"}, 500
 
             return {"message": "Domain deactivated successfully"}, 200
 

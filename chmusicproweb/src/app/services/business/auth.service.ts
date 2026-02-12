@@ -30,6 +30,7 @@ export class AuthService {
         error: null,
         lastValidated: null,
         activeDomainId: null,
+        activeDomainName: null,
         domainRole: null,
         isSystemAdmin: false
     });
@@ -64,6 +65,7 @@ export class AuthService {
                     loading: false,
                     error: null,
                     activeDomainId: decoded?.active_domain_id ?? null,
+                    activeDomainName: decoded?.active_domain_name ?? null,
                     domainRole: decoded?.domain_role ?? null,
                     isSystemAdmin: decoded?.is_system_admin ?? false
                 });
@@ -122,6 +124,7 @@ export class AuthService {
                             error: null,
                             lastValidated: Date.now(),
                             activeDomainId: decoded?.active_domain_id ?? null,
+                            activeDomainName: decoded?.active_domain_name ?? null,
                             domainRole: decoded?.domain_role ?? null,
                             isSystemAdmin: decoded?.is_system_admin ?? false
                         });
@@ -155,6 +158,7 @@ export class AuthService {
                         error: null,
                         lastValidated: null,
                         activeDomainId: null,
+                        activeDomainName: null,
                         domainRole: null,
                         isSystemAdmin: false
                     });
@@ -170,6 +174,7 @@ export class AuthService {
                         error: null,
                         lastValidated: null,
                         activeDomainId: null,
+                        activeDomainName: null,
                         domainRole: null,
                         isSystemAdmin: false
                     });
@@ -198,6 +203,7 @@ export class AuthService {
                             error: null,
                             lastValidated: Date.now(),
                             activeDomainId: decoded?.active_domain_id ?? null,
+                            activeDomainName: decoded?.active_domain_name ?? null,
                             domainRole: decoded?.domain_role ?? null,
                             isSystemAdmin: decoded?.is_system_admin ?? false
                         });
@@ -278,6 +284,7 @@ export class AuthService {
                 token: null,
                 lastValidated: null,
                 activeDomainId: null,
+                activeDomainName: null,
                 domainRole: null,
                 isSystemAdmin: false
             });
@@ -316,6 +323,7 @@ export class AuthService {
                             token: null,
                             lastValidated: null,
                             activeDomainId: null,
+                            activeDomainName: null,
                             domainRole: null,
                             isSystemAdmin: false
                         });
@@ -330,6 +338,7 @@ export class AuthService {
                         token: null,
                         lastValidated: null,
                         activeDomainId: null,
+                        activeDomainName: null,
                         domainRole: null
                     });
                     return new Observable<boolean>(observer => {
@@ -390,6 +399,7 @@ export class AuthService {
             error: null,
             lastValidated: null,
             activeDomainId: null,
+            activeDomainName: null,
             domainRole: null,
             isSystemAdmin: false
         });
@@ -449,6 +459,7 @@ export class AuthService {
         this.updateAuthState({
             token: newToken,
             activeDomainId: decoded?.active_domain_id ?? null,
+            activeDomainName: decoded?.active_domain_name ?? null,
             domainRole: decoded?.domain_role ?? null,
             isSystemAdmin: decoded?.is_system_admin ?? false,
             lastValidated: Date.now()

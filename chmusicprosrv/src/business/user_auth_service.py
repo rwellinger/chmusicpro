@@ -75,6 +75,7 @@ class UserAuthService:
         user_id: str,
         email: str,
         active_domain_id: str | None = None,
+        active_domain_name: str | None = None,
         domain_role: str | None = None,
         is_system_admin: bool = False,
     ) -> str:
@@ -85,6 +86,7 @@ class UserAuthService:
             user_id: User UUID as string
             email: User email address
             active_domain_id: Active domain UUID as string (multi-tenancy)
+            active_domain_name: Name of the active domain (for display in frontend)
             domain_role: User's role in the active domain
             is_system_admin: Whether user is admin/owner in the System domain
 
@@ -100,6 +102,8 @@ class UserAuthService:
         }
         if active_domain_id:
             payload["active_domain_id"] = str(active_domain_id)
+        if active_domain_name:
+            payload["active_domain_name"] = active_domain_name
         if domain_role:
             payload["domain_role"] = str(domain_role)
 

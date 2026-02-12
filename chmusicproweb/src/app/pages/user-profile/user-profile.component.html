@@ -2,8 +2,60 @@
     <!-- Main Content Grid -->
     <div class="profile-grid">
 
-        <!-- User Profile Section (Right) -->
-        <div class="user-section">
+        <!-- Left Column: Domains + User -->
+        <div class="left-section">
+            <!-- Domains Card -->
+            <mat-card class="domains-card">
+                <mat-card-content>
+                    <div class="domains-header">
+                        <div class="domains-avatar">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="domains-header-text">
+                            <h3>{{ 'userProfile.domains.title' | translate }}</h3>
+                            <p>{{ 'userProfile.domains.subtitle' | translate }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div class="loading-state" *ngIf="isLoadingDomains">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+
+                    <!-- Domain List -->
+                    <div class="domain-list" *ngIf="!isLoadingDomains">
+                        <div class="domain-item"
+                             *ngFor="let dwr of userDomains"
+                             [class.domain-active]="dwr.domain.id === activeDomainId">
+                            <div class="domain-info">
+                                <i [class]="getDomainTypeIcon(dwr.domain.type)" class="domain-icon"></i>
+                                <div class="domain-details">
+                                    <span class="domain-name">{{ dwr.domain.name }}</span>
+                                    <div class="domain-badges">
+                                        <span class="domain-type-badge">{{ domainTypeLabels[dwr.domain.type] }}</span>
+                                        <span class="domain-role-badge">{{ dwr.role }}</span>
+                                        <span class="active-badge" *ngIf="dwr.domain.id === activeDomainId">
+                                            {{ 'userProfile.domains.active' | translate }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                    mat-button
+                                    class="switch-button"
+                                    *ngIf="dwr.domain.id !== activeDomainId"
+                                    [disabled]="isSwitchingDomain"
+                                    (click)="switchDomain(dwr.domain.id)">
+                                <i class="fas fa-exchange-alt" *ngIf="!isSwitchingDomain"></i>
+                                <i class="fas fa-spinner fa-spin" *ngIf="isSwitchingDomain"></i>
+                                {{ 'userProfile.domains.switch' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+            <!-- User Profile Card -->
             <mat-card class="profile-card">
                 <mat-card-content>
                     <div class="user-info" *ngIf="currentUser">
@@ -106,110 +158,6 @@
                                 <mat-hint>{{ 'userProfile.emailHint' | translate }}</mat-hint>
                             </mat-form-field>
                         </form>
-
-                        <!-- User Settings Section -->
-                        <div class="settings-section" *ngIf="currentSettings">
-                            <h4 class="settings-title">
-                                <i class="fas fa-cog"></i>
-                                {{ 'userProfile.userSettings' | translate }}
-                            </h4>
-
-                            <form [formGroup]="settingsForm" class="settings-form">
-                                <div class="form-row">
-                                    <mat-form-field appearance="outline" class="half-width">
-                                        <mat-label>{{ 'userProfile.songsPerPage' | translate }}</mat-label>
-                                        <input
-                                                matInput
-                                                type="number"
-                                                formControlName="songListLimit"
-                                                (blur)="updateSongListLimit()"
-                                                min="5"
-                                                max="100"
-                                                [placeholder]="'userProfile.songsPerPageHint' | translate">
-                                        <mat-hint>{{ 'userProfile.songsPerPageHint' | translate }}</mat-hint>
-                                    </mat-form-field>
-
-                                    <mat-form-field appearance="outline" class="half-width">
-                                        <mat-label>{{ 'userProfile.imagesPerPage' | translate }}</mat-label>
-                                        <input
-                                                matInput
-                                                type="number"
-                                                formControlName="imageListLimit"
-                                                (blur)="updateImageListLimit()"
-                                                min="5"
-                                                max="100"
-                                                [placeholder]="'userProfile.imagesPerPageHint' | translate">
-                                        <mat-hint>{{ 'userProfile.imagesPerPageHint' | translate }}</mat-hint>
-                                    </mat-form-field>
-                                </div>
-
-                                <div class="form-row">
-                                    <mat-form-field appearance="outline" class="half-width">
-                                        <mat-label>{{ 'userProfile.promptsPerPage' | translate }}</mat-label>
-                                        <input
-                                                matInput
-                                                type="number"
-                                                formControlName="promptListLimit"
-                                                (blur)="updatePromptListLimit()"
-                                                min="5"
-                                                max="100"
-                                                [placeholder]="'userProfile.promptsPerPageHint' | translate">
-                                        <mat-hint>{{ 'userProfile.promptsPerPageHint' | translate }}</mat-hint>
-                                    </mat-form-field>
-
-                                    <mat-form-field appearance="outline" class="half-width">
-                                        <mat-label>{{ 'userProfile.sketchesPerPage' | translate }}</mat-label>
-                                        <input
-                                                matInput
-                                                type="number"
-                                                formControlName="sketchListLimit"
-                                                (blur)="updateSketchListLimit()"
-                                                min="5"
-                                                max="100"
-                                                [placeholder]="'userProfile.sketchesPerPageHint' | translate">
-                                        <mat-hint>{{ 'userProfile.sketchesPerPageHint' | translate }}</mat-hint>
-                                    </mat-form-field>
-                                </div>
-
-                                <div class="form-row">
-                                    <mat-form-field appearance="outline" class="half-width">
-                                        <mat-label>{{ 'userProfile.equipmentPerPage' | translate }}</mat-label>
-                                        <input
-                                                matInput
-                                                type="number"
-                                                formControlName="equipmentListLimit"
-                                                (blur)="updateEquipmentListLimit()"
-                                                min="5"
-                                                max="100"
-                                                [placeholder]="'userProfile.equipmentPerPageHint' | translate">
-                                        <mat-hint>{{ 'userProfile.equipmentPerPageHint' | translate }}</mat-hint>
-                                    </mat-form-field>
-
-                                    <mat-form-field appearance="outline" class="half-width">
-                                        <mat-label>{{ 'userProfile.language' | translate }}</mat-label>
-                                        <mat-select
-                                                formControlName="language"
-                                                (selectionChange)="updateLanguage()">
-                                            <mat-option *ngFor="let lang of availableLanguages" [value]="lang.code">
-                                                {{ lang.name }}
-                                            </mat-option>
-                                        </mat-select>
-                                        <mat-hint>{{ 'userProfile.languageHint' | translate }}</mat-hint>
-                                    </mat-form-field>
-                                </div>
-
-                                <div class="settings-actions">
-                                    <button
-                                            mat-button
-                                            type="button"
-                                            color="warn"
-                                            (click)="resetSettingsToDefaults()">
-                                        <i class="fas fa-undo"></i>
-                                        {{ 'userProfile.resetToDefaults' | translate }}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
                     </div>
 
                     <!-- Loading State -->
@@ -270,61 +218,120 @@
             </mat-card>
         </div>
 
-        <!-- Domains + Costs Column -->
-        <div class="costs-section">
-            <!-- Domains Card -->
-            <mat-card class="domains-card">
+        <!-- Right Column: User Settings + AI Costs -->
+        <div class="right-section">
+            <!-- User Settings Card -->
+            <mat-card class="settings-card" *ngIf="currentSettings">
                 <mat-card-content>
-                    <div class="domains-header">
-                        <div class="domains-avatar">
-                            <i class="fas fa-layer-group"></i>
+                    <div class="settings-header">
+                        <div class="settings-avatar">
+                            <i class="fas fa-cog"></i>
                         </div>
-                        <div class="domains-header-text">
-                            <h3>{{ 'userProfile.domains.title' | translate }}</h3>
-                            <p>{{ 'userProfile.domains.subtitle' | translate }}</p>
+                        <div class="settings-header-text">
+                            <h3>{{ 'userProfile.userSettings' | translate }}</h3>
                         </div>
                     </div>
 
-                    <!-- Loading State -->
-                    <div class="loading-state" *ngIf="isLoadingDomains">
-                        <i class="fas fa-spinner fa-spin"></i>
-                    </div>
+                    <form [formGroup]="settingsForm" class="settings-form">
+                        <div class="form-row">
+                            <mat-form-field appearance="outline" class="half-width">
+                                <mat-label>{{ 'userProfile.songsPerPage' | translate }}</mat-label>
+                                <input
+                                        matInput
+                                        type="number"
+                                        formControlName="songListLimit"
+                                        (blur)="updateSongListLimit()"
+                                        min="5"
+                                        max="100"
+                                        [placeholder]="'userProfile.songsPerPageHint' | translate">
+                                <mat-hint>{{ 'userProfile.songsPerPageHint' | translate }}</mat-hint>
+                            </mat-form-field>
 
-                    <!-- Domain List -->
-                    <div class="domain-list" *ngIf="!isLoadingDomains">
-                        <div class="domain-item"
-                             *ngFor="let dwr of userDomains"
-                             [class.domain-active]="dwr.domain.id === activeDomainId">
-                            <div class="domain-info">
-                                <i [class]="getDomainTypeIcon(dwr.domain.type)" class="domain-icon"></i>
-                                <div class="domain-details">
-                                    <span class="domain-name">{{ dwr.domain.name }}</span>
-                                    <div class="domain-badges">
-                                        <span class="domain-type-badge">{{ domainTypeLabels[dwr.domain.type] }}</span>
-                                        <span class="domain-role-badge">{{ dwr.role }}</span>
-                                        <span class="active-badge" *ngIf="dwr.domain.id === activeDomainId">
-                                            {{ 'userProfile.domains.active' | translate }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                            <mat-form-field appearance="outline" class="half-width">
+                                <mat-label>{{ 'userProfile.imagesPerPage' | translate }}</mat-label>
+                                <input
+                                        matInput
+                                        type="number"
+                                        formControlName="imageListLimit"
+                                        (blur)="updateImageListLimit()"
+                                        min="5"
+                                        max="100"
+                                        [placeholder]="'userProfile.imagesPerPageHint' | translate">
+                                <mat-hint>{{ 'userProfile.imagesPerPageHint' | translate }}</mat-hint>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-row">
+                            <mat-form-field appearance="outline" class="half-width">
+                                <mat-label>{{ 'userProfile.promptsPerPage' | translate }}</mat-label>
+                                <input
+                                        matInput
+                                        type="number"
+                                        formControlName="promptListLimit"
+                                        (blur)="updatePromptListLimit()"
+                                        min="5"
+                                        max="100"
+                                        [placeholder]="'userProfile.promptsPerPageHint' | translate">
+                                <mat-hint>{{ 'userProfile.promptsPerPageHint' | translate }}</mat-hint>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" class="half-width">
+                                <mat-label>{{ 'userProfile.sketchesPerPage' | translate }}</mat-label>
+                                <input
+                                        matInput
+                                        type="number"
+                                        formControlName="sketchListLimit"
+                                        (blur)="updateSketchListLimit()"
+                                        min="5"
+                                        max="100"
+                                        [placeholder]="'userProfile.sketchesPerPageHint' | translate">
+                                <mat-hint>{{ 'userProfile.sketchesPerPageHint' | translate }}</mat-hint>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="form-row">
+                            <mat-form-field appearance="outline" class="half-width">
+                                <mat-label>{{ 'userProfile.equipmentPerPage' | translate }}</mat-label>
+                                <input
+                                        matInput
+                                        type="number"
+                                        formControlName="equipmentListLimit"
+                                        (blur)="updateEquipmentListLimit()"
+                                        min="5"
+                                        max="100"
+                                        [placeholder]="'userProfile.equipmentPerPageHint' | translate">
+                                <mat-hint>{{ 'userProfile.equipmentPerPageHint' | translate }}</mat-hint>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" class="half-width">
+                                <mat-label>{{ 'userProfile.language' | translate }}</mat-label>
+                                <mat-select
+                                        formControlName="language"
+                                        (selectionChange)="updateLanguage()">
+                                    <mat-option *ngFor="let lang of availableLanguages" [value]="lang.code">
+                                        {{ lang.name }}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-hint>{{ 'userProfile.languageHint' | translate }}</mat-hint>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="settings-actions">
                             <button
                                     mat-button
-                                    class="switch-button"
-                                    *ngIf="dwr.domain.id !== activeDomainId"
-                                    [disabled]="isSwitchingDomain"
-                                    (click)="switchDomain(dwr.domain.id)">
-                                <i class="fas fa-exchange-alt" *ngIf="!isSwitchingDomain"></i>
-                                <i class="fas fa-spinner fa-spin" *ngIf="isSwitchingDomain"></i>
-                                {{ 'userProfile.domains.switch' | translate }}
+                                    type="button"
+                                    color="warn"
+                                    (click)="resetSettingsToDefaults()">
+                                <i class="fas fa-undo"></i>
+                                {{ 'userProfile.resetToDefaults' | translate }}
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </mat-card-content>
             </mat-card>
 
-            <!-- API Costs Card -->
-            <mat-card class="profile-card">
+            <!-- API Costs Card (System Admin only) -->
+            <mat-card class="costs-card" *ngIf="showCosts">
                 <mat-card-content>
                     <!-- API Costs Section (OpenAI) -->
                     <div class="api-costs-section">
@@ -387,4 +394,3 @@
         </div>
     </div>
 </div>
-

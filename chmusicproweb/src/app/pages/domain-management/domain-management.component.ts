@@ -277,4 +277,12 @@ export class DomainManagementComponent implements OnInit, OnDestroy {
     isSystemAdmin(): boolean {
         return this.authService.isSystemAdmin();
     }
+
+    isReservedDomain(): boolean {
+        if (!this.selectedDomain) {
+            return false;
+        }
+        return this.selectedDomain.domain.type === DomainType.SYSTEM
+            || this.selectedDomain.domain.type === DomainType.KI_TEMPLATES;
+    }
 }

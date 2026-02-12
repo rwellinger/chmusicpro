@@ -164,6 +164,7 @@ class DomainOrchestrator:
             user_id=str(user.id),
             email=user.email,
             active_domain_id=str(domain.id),
+            active_domain_name=domain.name,
             domain_role=role,
             is_system_admin=self.is_system_admin(db, user_id),
         )

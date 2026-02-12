@@ -1,7 +1,7 @@
 import {Component, inject, OnDestroy, OnInit} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {Router, RouterModule} from "@angular/router";
-import {TranslateModule, TranslateService} from "@ngx-translate/core";
+import {TranslateModule} from "@ngx-translate/core";
 import {Subject} from "rxjs";
 import {takeUntil} from "rxjs/operators";
 import {AuthService} from "../../services/business/auth.service";
@@ -20,13 +20,12 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     authState: AuthState | null = null;
     currentUser: User | null = null;
     firstName = "Guest"; // Computed property to avoid method calls in template
-    currentLang = "EN"; // Current language code
+    activeDomainName = ""; // Active domain name from JWT
     isAdmin = false;
 
     private destroy$ = new Subject<void>();
     private authService = inject(AuthService);
     private router = inject(Router);
-    private translate = inject(TranslateService);
 
     ngOnInit(): void {
         // Subscribe to auth state changes
@@ -36,15 +35,10 @@ export class SideMenuComponent implements OnInit, OnDestroy {
                 this.authState = authState;
                 this.currentUser = authState.user;
                 this.isAdmin = authState.isSystemAdmin;
+                const rawName = authState.activeDomainName || "";
+                const cleanName = rawName.includes(":") ? rawName.split(":").slice(1).join(":") : rawName;
+                this.activeDomainName = cleanName.toLowerCase();
                 this.updateFirstName(); // Update computed property
-            });
-
-        // Subscribe to language changes
-        this.currentLang = this.translate.currentLang?.toUpperCase() || "EN";
-        this.translate.onLangChange
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(event => {
-                this.currentLang = event.lang?.toUpperCase() || "EN";
             });
     }
 

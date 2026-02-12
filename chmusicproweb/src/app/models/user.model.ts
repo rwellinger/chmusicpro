@@ -89,6 +89,7 @@ export interface AuthState {
     error: string | null;
     lastValidated: number | null; // Timestamp of last token validation
     activeDomainId: string | null; // From JWT claim
+    activeDomainName: string | null; // From JWT claim
     domainRole: string | null; // From JWT claim: "owner" | "admin" | "member" | "viewer"
     isSystemAdmin: boolean; // From JWT claim: admin/owner in System domain
 }

@@ -124,19 +124,6 @@
             </div>
         </div>
 
-        <div class="nav-group" *ngIf="authState && authState.isAuthenticated">
-            <span class="group-label">
-                <i class="fas fa-layer-group"></i>
-                {{ 'sideMenu.domainManagement' | translate }}
-            </span>
-            <div class="group-items">
-                <a routerLink="/domain-management" routerLinkActive="active">
-                    <i class="fas fa-users"></i>
-                    {{ 'sideMenu.domainManagement' | translate }}
-                </a>
-            </div>
-        </div>
-
         <div class="nav-group" *ngIf="isAdmin">
             <span class="group-label">
                 <i class="fas fa-cogs"></i>
@@ -157,9 +144,13 @@
         <div class="nav-group" *ngIf="authState && authState.isAuthenticated">
             <span class="group-label">
                 <i class="fas fa-user"></i>
-                {{ firstName }} ({{ currentLang }})
+                {{ firstName }} ({{ activeDomainName }})
             </span>
             <div class="group-items">
+                <a routerLink="/domain-management" routerLinkActive="active">
+                    <i class="fas fa-layer-group"></i>
+                    {{ 'sideMenu.domainManagement' | translate }}
+                </a>
                 <a routerLink="/profile" routerLinkActive="active">
                     <i class="fas fa-user-circle"></i>
                     {{ 'sideMenu.profile' | translate }}
