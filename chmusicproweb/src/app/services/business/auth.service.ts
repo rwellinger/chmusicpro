@@ -28,7 +28,9 @@ export class AuthService {
         token: null,
         loading: false,
         error: null,
-        lastValidated: null
+        lastValidated: null,
+        activeDomainId: null,
+        domainRole: null
     });
 
     // Token validation cache duration (5 minutes)
@@ -53,12 +55,15 @@ export class AuthService {
         if (token && userJson) {
             try {
                 const user = JSON.parse(userJson);
+                const decoded = this.decodeToken(token);
                 this.updateAuthState({
                     isAuthenticated: true,
                     user,
                     token,
                     loading: false,
-                    error: null
+                    error: null,
+                    activeDomainId: decoded?.active_domain_id ?? null,
+                    domainRole: decoded?.domain_role ?? null
                 });
             } catch (error) {
                 this.clearAuthData();
@@ -106,13 +111,16 @@ export class AuthService {
                 tap(response => {
                     if (response.success && response.token && response.user) {
                         this.storeAuthData(response.token, response.user);
+                        const decoded = this.decodeToken(response.token);
                         this.updateAuthState({
                             isAuthenticated: true,
                             user: response.user,
                             token: response.token,
                             loading: false,
                             error: null,
-                            lastValidated: Date.now()
+                            lastValidated: Date.now(),
+                            activeDomainId: decoded?.active_domain_id ?? null,
+                            domainRole: decoded?.domain_role ?? null
                         });
                     }
                 }),
@@ -142,7 +150,9 @@ export class AuthService {
                         token: null,
                         loading: false,
                         error: null,
-                        lastValidated: null
+                        lastValidated: null,
+                        activeDomainId: null,
+                        domainRole: null
                     });
                 }),
                 catchError(error => {
@@ -154,7 +164,9 @@ export class AuthService {
                         token: null,
                         loading: false,
                         error: null,
-                        lastValidated: null
+                        lastValidated: null,
+                        activeDomainId: null,
+                        domainRole: null
                     });
                     return throwError(() => error);
                 })
@@ -172,13 +184,16 @@ export class AuthService {
                 tap(response => {
                     if (response.success && response.token && response.user) {
                         this.storeAuthData(response.token, response.user);
+                        const decoded = this.decodeToken(response.token);
                         this.updateAuthState({
                             isAuthenticated: true,
                             user: response.user,
                             token: response.token,
                             loading: false,
                             error: null,
-                            lastValidated: Date.now()
+                            lastValidated: Date.now(),
+                            activeDomainId: decoded?.active_domain_id ?? null,
+                            domainRole: decoded?.domain_role ?? null
                         });
                     }
                 }),
@@ -255,7 +270,9 @@ export class AuthService {
                 isAuthenticated: false,
                 user: null,
                 token: null,
-                lastValidated: null
+                lastValidated: null,
+                activeDomainId: null,
+                domainRole: null
             });
             return new Observable(observer => {
                 observer.next(false);
@@ -290,7 +307,9 @@ export class AuthService {
                             isAuthenticated: false,
                             user: null,
                             token: null,
-                            lastValidated: null
+                            lastValidated: null,
+                            activeDomainId: null,
+                            domainRole: null
                         });
                         return false;
                     }
@@ -301,7 +320,9 @@ export class AuthService {
                         isAuthenticated: false,
                         user: null,
                         token: null,
-                        lastValidated: null
+                        lastValidated: null,
+                        activeDomainId: null,
+                        domainRole: null
                     });
                     return new Observable<boolean>(observer => {
                         observer.next(false);
@@ -359,7 +380,9 @@ export class AuthService {
             token: null,
             loading: false,
             error: null,
-            lastValidated: null
+            lastValidated: null,
+            activeDomainId: null,
+            domainRole: null
         });
     }
 
@@ -372,5 +395,27 @@ export class AuthService {
             this.storeAuthData(currentState.token, user);
             this.updateAuthState({user});
         }
+    }
+
+    /**
+     * Get active domain ID from JWT
+     */
+    public getActiveDomainId(): string | null {
+        return this.authStateSubject.value.activeDomainId;
+    }
+
+    /**
+     * Get domain role from JWT
+     */
+    public getDomainRole(): string | null {
+        return this.authStateSubject.value.domainRole;
+    }
+
+    /**
+     * Check if current user has admin-level domain role (admin or owner)
+     */
+    public isDomainAdmin(): boolean {
+        const role = this.authStateSubject.value.domainRole;
+        return role === "admin" || role === "owner";
     }
 }

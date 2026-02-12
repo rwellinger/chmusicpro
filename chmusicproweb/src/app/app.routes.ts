@@ -1,5 +1,6 @@
 import {Routes} from "@angular/router";
 import {AuthGuard} from "./guards/auth.guard";
+import {domainRoleGuard} from "./guards/domain-role.guard";
 
 export const routes: Routes = [
     {path: "", redirectTo: "/dashboard", pathMatch: "full"},
@@ -68,17 +69,20 @@ export const routes: Routes = [
     },
     {
         path: "prompt-templates",
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard, domainRoleGuard],
+        data: {requiredDomainRoles: ["owner", "admin"]},
         loadComponent: () => import("./pages/prompt-templates/prompt-templates.component").then(m => m.PromptTemplatesComponent)
     },
     {
         path: "prompt-template-editor",
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard, domainRoleGuard],
+        data: {requiredDomainRoles: ["owner", "admin"]},
         loadComponent: () => import("./pages/prompt-template-editor/prompt-template-editor.component").then(m => m.PromptTemplateEditorComponent)
     },
     {
         path: "lyric-parsing-rules",
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard, domainRoleGuard],
+        data: {requiredDomainRoles: ["owner", "admin"]},
         loadComponent: () => import("./pages/lyric-parsing-rules/lyric-parsing-rules.component").then(m => m.LyricParsingRulesComponent)
     },
     {
