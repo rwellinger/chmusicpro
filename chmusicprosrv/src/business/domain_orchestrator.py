@@ -26,6 +26,15 @@ class DomainOrchestratorError(Exception):
 class DomainOrchestrator:
     """Orchestrates domain operations (calls domain service)"""
 
+    @staticmethod
+    def is_system_admin(db: Session, user_id: str) -> bool:
+        """Check if user has admin/owner role in the System domain"""
+        system_domain = domain_service.get_reserved_domain(db, DomainType.SYSTEM)
+        if not system_domain:
+            return False
+        role = domain_service.get_user_role_in_domain(db, str(system_domain.id), user_id)
+        return role in ("admin", "owner")
+
     def create_personal_domain_for_user(self, db: Session, user_id: str, email: str) -> Domain:
         """
         Create a personal domain for a new user with all required memberships.
@@ -154,9 +163,9 @@ class DomainOrchestrator:
         token = auth_service.generate_jwt_token(
             user_id=str(user.id),
             email=user.email,
-            role=user.role,
             active_domain_id=str(domain.id),
             domain_role=role,
+            is_system_admin=self.is_system_admin(db, user_id),
         )
 
         expires_at = (datetime.now(UTC) + timedelta(hours=JWT_EXPIRATION_HOURS)).isoformat()

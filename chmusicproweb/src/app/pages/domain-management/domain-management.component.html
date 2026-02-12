@@ -185,20 +185,20 @@
                         <span class="col-role">
                             <mat-select [value]="member.role"
                                         (selectionChange)="updateMemberRole(member, $event.value)"
-                                        *ngIf="selectedDomain.role === 'owner' || selectedDomain.role === 'admin'"
+                                        *ngIf="(selectedDomain.role === 'owner' || selectedDomain.role === 'admin') && member.user_id !== currentUserId"
                                         class="role-select">
                                 <mat-option *ngFor="let role of domainRoles" [value]="role">
                                     {{ role }}
                                 </mat-option>
                             </mat-select>
-                            <span *ngIf="selectedDomain.role !== 'owner' && selectedDomain.role !== 'admin'">
+                            <span *ngIf="(selectedDomain.role !== 'owner' && selectedDomain.role !== 'admin') || member.user_id === currentUserId">
                                 {{ member.role }}
                             </span>
                         </span>
                         <span class="col-joined">{{ formatDate(member.created_at) }}</span>
                         <span class="col-actions">
                             <button class="remove-btn"
-                                    *ngIf="selectedDomain.role === 'owner' || selectedDomain.role === 'admin'"
+                                    *ngIf="(selectedDomain.role === 'owner' || selectedDomain.role === 'admin') && member.user_id !== currentUserId"
                                     (click)="removeMember(member)"
                                     [title]="'domainManagement.removeMember' | translate">
                                 <i class="fas fa-user-minus"></i>

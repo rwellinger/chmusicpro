@@ -35,11 +35,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                 return handle401Error(req, next, authService, router, snackBar, translate);
             }
 
-            // Handle other errors
+            // Handle 403 Forbidden - show error, do NOT logout
             if (error.status === 403) {
-                // Forbidden - user doesn't have permission
-                authService.forceLogout();
-                router.navigate(["/login"]);
+                snackBar.open(
+                    translate.instant("authInterceptor.forbidden"),
+                    translate.instant("common.close"),
+                    {
+                        duration: 5000,
+                        horizontalPosition: "center",
+                        verticalPosition: "top"
+                    }
+                );
             }
 
             return throwError(() => error);

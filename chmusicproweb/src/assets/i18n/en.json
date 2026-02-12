@@ -35,7 +35,7 @@
     "created": "Created",
     "members": "Members",
     "memberEmail": "Email",
-    "memberEmailPlaceholder": "Enter user email address",
+    "memberEmailPlaceholder": "Email of a registered user",
     "role": "Role",
     "name": "Name",
     "email": "Email",
@@ -272,7 +272,8 @@
   },
   "authInterceptor": {
     "sessionExpired": "Session expired. Please log in again.",
-    "sessionTimeout": "Session validation timeout. Please log in again."
+    "sessionTimeout": "Session validation timeout. Please log in again.",
+    "forbidden": "You do not have permission for this action."
   },
   "common": {
     "actions": "Actions",

@@ -70,7 +70,10 @@ export class DomainManagementComponent implements OnInit, OnDestroy {
     private notificationService = inject(NotificationService);
     private translate = inject(TranslateService);
 
+    currentUserId: string | null = null;
+
     ngOnInit(): void {
+        this.currentUserId = this.authService.getCurrentUser()?.id ?? null;
         this.loadDomains();
     }
 
@@ -272,6 +275,6 @@ export class DomainManagementComponent implements OnInit, OnDestroy {
     }
 
     isSystemAdmin(): boolean {
-        return this.authService.isDomainAdmin();
+        return this.authService.isSystemAdmin();
     }
 }

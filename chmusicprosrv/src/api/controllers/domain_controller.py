@@ -6,6 +6,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from business.domain_orchestrator import DomainOrchestrator, DomainOrchestratorError
+from db.models import DomainType
 from schemas.domain_schemas import (
     DomainCreateRequest,
     DomainListResponse,
@@ -37,8 +38,17 @@ class DomainController:
             svc = DomainService()
             domains_with_memberships = svc.list_domains_for_user(db, user_id)
 
+            # System admins see all domains, normal users only non-reserved ones
+            reserved_types = {int(DomainType.SYSTEM), int(DomainType.KI_TEMPLATES)}
+            system_role = svc.get_user_role_in_domain(
+                db, str(svc.get_reserved_domain(db, DomainType.SYSTEM).id), user_id
+            )
+            is_system_admin = system_role in ("admin", "owner")
+
             domain_responses = []
             for domain, membership in domains_with_memberships:
+                if not is_system_admin and domain.type in reserved_types:
+                    continue
                 domain_responses.append(
                     DomainWithRoleResponse(
                         domain=DomainResponse.model_validate(domain),

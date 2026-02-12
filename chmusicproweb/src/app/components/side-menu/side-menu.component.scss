@@ -61,7 +61,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: $spacing-lg;
+  gap: $spacing-md;
 }
 
 .nav-group {
@@ -74,7 +74,7 @@
   color: white;
   font-weight: $font-weight-medium;
   font-size: $font-sm;
-  margin-bottom: $spacing-sm;
+  margin-bottom: $spacing-xs;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: $spacing-xs 0;
@@ -96,7 +96,7 @@
 .group-items a {
   display: flex;
   align-items: center;
-  padding: $spacing-sm $spacing-md;
+  padding: 6px $spacing-md;
   color: rgba(white, 0.8);
   text-decoration: none;
   font-size: $font-sm;
@@ -246,9 +246,9 @@
   .brand-text {
     font-size: $font-base;
   }
-  
+
   .nav-section {
-    gap: $spacing-md;
+    gap: $spacing-xs;
   }
   
   .group-items a {

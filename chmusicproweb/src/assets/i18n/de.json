@@ -35,7 +35,7 @@
     "created": "Erstellt",
     "members": "Mitglieder",
     "memberEmail": "E-Mail",
-    "memberEmailPlaceholder": "E-Mail-Adresse des Benutzers",
+    "memberEmailPlaceholder": "E-Mail eines registrierten Benutzers",
     "role": "Rolle",
     "name": "Name",
     "email": "E-Mail",
@@ -272,7 +272,8 @@
   },
   "authInterceptor": {
     "sessionExpired": "Sitzung abgelaufen. Bitte melde dich erneut an.",
-    "sessionTimeout": "Zeitüberschreitung bei der Sitzungsvalidierung. Bitte melde dich erneut an."
+    "sessionTimeout": "Zeitüberschreitung bei der Sitzungsvalidierung. Bitte melde dich erneut an.",
+    "forbidden": "Du hast keine Berechtigung für diese Aktion."
   },
   "common": {
     "actions": "Aktionen",

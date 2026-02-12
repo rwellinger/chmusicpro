@@ -74,9 +74,9 @@ class UserAuthService:
         self,
         user_id: str,
         email: str,
-        role: str = "user",
         active_domain_id: str | None = None,
         domain_role: str | None = None,
+        is_system_admin: bool = False,
     ) -> str:
         """
         Generate JWT token for user authentication
@@ -84,9 +84,9 @@ class UserAuthService:
         Args:
             user_id: User UUID as string
             email: User email address
-            role: User role (default "user") - legacy, kept for backwards compat
             active_domain_id: Active domain UUID as string (multi-tenancy)
             domain_role: User's role in the active domain
+            is_system_admin: Whether user is admin/owner in the System domain
 
         Returns:
             JWT token string
@@ -94,9 +94,9 @@ class UserAuthService:
         payload = {
             "user_id": str(user_id),
             "email": email,
-            "role": role,
             "iat": datetime.now(UTC),
             "exp": datetime.now(UTC) + timedelta(hours=self.jwt_expiration_hours),
+            "is_system_admin": is_system_admin,
         }
         if active_domain_id:
             payload["active_domain_id"] = str(active_domain_id)
@@ -108,9 +108,9 @@ class UserAuthService:
             "JWT token generated",
             user_id=user_id,
             email=email,
-            role=role,
             active_domain_id=active_domain_id,
             domain_role=domain_role,
+            is_system_admin=is_system_admin,
         )
         return token
 

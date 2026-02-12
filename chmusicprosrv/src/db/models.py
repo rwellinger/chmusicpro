@@ -32,13 +32,6 @@ class RuleType(StrEnum):
     SECTION = "section"
 
 
-class UserRole(StrEnum):
-    """Enum for user roles"""
-
-    USER = "user"
-    ADMIN = "admin"
-
-
 class DomainType(IntEnum):
     """Enum for domain types (multi-tenancy)"""
 
@@ -303,9 +296,6 @@ class User(Base):
     oauth_provider = Column(String(50), nullable=True)  # 'google', 'github', etc.
     oauth_id = Column(String(255), nullable=True)  # OAuth provider user ID
 
-    # Role-based access control
-    role = Column(String(20), nullable=False, default="user", server_default="user")
-
     # Status and security
     is_active = Column(Boolean, default=True, nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
@@ -327,7 +317,7 @@ class User(Base):
     usage_logs = relationship("UsageLog", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f"<User(id={self.id}, email='{self.email}', role='{self.role}', active={self.is_active})>"
+        return f"<User(id={self.id}, email='{self.email}', active={self.is_active})>"
 
 
 class UsageLog(Base):

@@ -103,9 +103,9 @@ class UserController:
             token = self.auth_service.generate_jwt_token(
                 str(user.id),
                 user.email,
-                user.role,
                 active_domain_id=str(personal_domain.id),
                 domain_role="owner",
+                is_system_admin=False,  # New users are never system admins
             )
             user_response = UserResponse.model_validate(user)
             expires_at = datetime.utcnow() + timedelta(hours=self.auth_service.jwt_expiration_hours)
@@ -175,9 +175,9 @@ class UserController:
             token = self.auth_service.generate_jwt_token(
                 str(user.id),
                 user.email,
-                user.role,
                 active_domain_id=active_domain_id,
                 domain_role=domain_role,
+                is_system_admin=self.domain_orchestrator.is_system_admin(db, str(user.id)),
             )
 
             # Create response

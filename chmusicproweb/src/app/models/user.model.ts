@@ -9,7 +9,6 @@ export interface User {
     last_name?: string;
     artist_name?: string;
     preferred_language?: string;
-    role?: string;
     is_active: boolean;
     is_verified: boolean;
     created_at: string;
@@ -91,4 +90,5 @@ export interface AuthState {
     lastValidated: number | null; // Timestamp of last token validation
     activeDomainId: string | null; // From JWT claim
     domainRole: string | null; // From JWT claim: "owner" | "admin" | "member" | "viewer"
+    isSystemAdmin: boolean; // From JWT claim: admin/owner in System domain
 }

@@ -76,7 +76,6 @@ class UserResponse(BaseModel):
     last_name: str | None = Field(None, description="User last name")
     artist_name: str | None = Field(None, description="Artist name for album covers")
     preferred_language: str = Field("en", description="Preferred language")
-    role: str = Field("user", description="User role (user or admin)")
     is_active: bool = Field(..., description="User active status")
     is_verified: bool = Field(..., description="User verification status")
     created_at: datetime = Field(..., description="User creation timestamp")

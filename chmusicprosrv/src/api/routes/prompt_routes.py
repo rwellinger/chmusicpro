@@ -19,7 +19,7 @@ prompt_controller = PromptController()
 
 @api_prompt_v1.route("", methods=["GET"])
 @jwt_required
-@domain_role_required("admin", "owner", domain_type=DomainType.KI_TEMPLATES)
+@domain_role_required("admin", "owner", "viewer", domain_type=DomainType.KI_TEMPLATES)
 def get_all_templates():
     """Get all prompt templates grouped by category and action"""
     db: Session = next(get_db())
@@ -32,7 +32,7 @@ def get_all_templates():
 
 @api_prompt_v1.route("/<category>", methods=["GET"])
 @jwt_required
-@domain_role_required("admin", "owner", domain_type=DomainType.KI_TEMPLATES)
+@domain_role_required("admin", "owner", "viewer", domain_type=DomainType.KI_TEMPLATES)
 def get_category_templates(category: str):
     """Get all templates for a specific category"""
     db: Session = next(get_db())
@@ -45,7 +45,7 @@ def get_category_templates(category: str):
 
 @api_prompt_v1.route("/<category>/<action>", methods=["GET"])
 @jwt_required
-@domain_role_required("admin", "owner", domain_type=DomainType.KI_TEMPLATES)
+@domain_role_required("admin", "owner", "viewer", domain_type=DomainType.KI_TEMPLATES)
 def get_specific_template(category: str, action: str):
     """Get a specific template by category and action"""
     db: Session = next(get_db())

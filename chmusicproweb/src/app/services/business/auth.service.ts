@@ -30,7 +30,8 @@ export class AuthService {
         error: null,
         lastValidated: null,
         activeDomainId: null,
-        domainRole: null
+        domainRole: null,
+        isSystemAdmin: false
     });
 
     // Token validation cache duration (5 minutes)
@@ -63,7 +64,8 @@ export class AuthService {
                     loading: false,
                     error: null,
                     activeDomainId: decoded?.active_domain_id ?? null,
-                    domainRole: decoded?.domain_role ?? null
+                    domainRole: decoded?.domain_role ?? null,
+                    isSystemAdmin: decoded?.is_system_admin ?? false
                 });
             } catch (error) {
                 this.clearAuthData();
@@ -120,7 +122,8 @@ export class AuthService {
                             error: null,
                             lastValidated: Date.now(),
                             activeDomainId: decoded?.active_domain_id ?? null,
-                            domainRole: decoded?.domain_role ?? null
+                            domainRole: decoded?.domain_role ?? null,
+                            isSystemAdmin: decoded?.is_system_admin ?? false
                         });
                     }
                 }),
@@ -152,7 +155,8 @@ export class AuthService {
                         error: null,
                         lastValidated: null,
                         activeDomainId: null,
-                        domainRole: null
+                        domainRole: null,
+                        isSystemAdmin: false
                     });
                 }),
                 catchError(error => {
@@ -166,7 +170,8 @@ export class AuthService {
                         error: null,
                         lastValidated: null,
                         activeDomainId: null,
-                        domainRole: null
+                        domainRole: null,
+                        isSystemAdmin: false
                     });
                     return throwError(() => error);
                 })
@@ -193,7 +198,8 @@ export class AuthService {
                             error: null,
                             lastValidated: Date.now(),
                             activeDomainId: decoded?.active_domain_id ?? null,
-                            domainRole: decoded?.domain_role ?? null
+                            domainRole: decoded?.domain_role ?? null,
+                            isSystemAdmin: decoded?.is_system_admin ?? false
                         });
                     }
                 }),
@@ -272,7 +278,8 @@ export class AuthService {
                 token: null,
                 lastValidated: null,
                 activeDomainId: null,
-                domainRole: null
+                domainRole: null,
+                isSystemAdmin: false
             });
             return new Observable(observer => {
                 observer.next(false);
@@ -309,7 +316,8 @@ export class AuthService {
                             token: null,
                             lastValidated: null,
                             activeDomainId: null,
-                            domainRole: null
+                            domainRole: null,
+                            isSystemAdmin: false
                         });
                         return false;
                     }
@@ -382,7 +390,8 @@ export class AuthService {
             error: null,
             lastValidated: null,
             activeDomainId: null,
-            domainRole: null
+            domainRole: null,
+            isSystemAdmin: false
         });
     }
 
@@ -412,11 +421,18 @@ export class AuthService {
     }
 
     /**
-     * Check if current user has admin-level domain role (admin or owner)
+     * Check if current user has admin-level domain role (admin or owner) in active domain
      */
     public isDomainAdmin(): boolean {
         const role = this.authStateSubject.value.domainRole;
         return role === "admin" || role === "owner";
+    }
+
+    /**
+     * Check if current user is a system administrator (admin/owner in System domain)
+     */
+    public isSystemAdmin(): boolean {
+        return this.authStateSubject.value.isSystemAdmin;
     }
 
     /**
@@ -434,6 +450,7 @@ export class AuthService {
             token: newToken,
             activeDomainId: decoded?.active_domain_id ?? null,
             domainRole: decoded?.domain_role ?? null,
+            isSystemAdmin: decoded?.is_system_admin ?? false,
             lastValidated: Date.now()
         });
     }

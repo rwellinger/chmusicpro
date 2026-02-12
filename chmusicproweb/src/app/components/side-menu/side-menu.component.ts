@@ -35,7 +35,7 @@ export class SideMenuComponent implements OnInit, OnDestroy {
             .subscribe(authState => {
                 this.authState = authState;
                 this.currentUser = authState.user;
-                this.isAdmin = authState.domainRole === "admin" || authState.domainRole === "owner";
+                this.isAdmin = authState.isSystemAdmin;
                 this.updateFirstName(); // Update computed property
             });
 
