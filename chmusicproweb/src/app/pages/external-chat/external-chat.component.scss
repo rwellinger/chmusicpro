@@ -1,3 +1,6 @@
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
 .external-chat-container {
   display: grid;
   grid-template-columns: 350px 1fr;
@@ -25,9 +28,28 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      
-      button[mat-raised-button] {
-        flex: 1;
+
+      .new-chat-button {
+        @include button-ai('base');
+        min-width: auto !important;
+        width: 40px;
+        height: 40px;
+        padding: 0 !important;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        i {
+          font-size: $font-lg;
+          margin: 0;
+        }
+
+        &:hover:not(:disabled) {
+          background-color: $ai-hover !important;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
       }
     }
   }
@@ -101,8 +123,8 @@
     }
     
     &.active {
-      background: #e3f2fd;
-      border-left: 3px solid #2196f3;
+      background: #ffebee;
+      border-left: 3px solid #D32F2F;
     }
     
     .conversation-item-title {
@@ -246,12 +268,12 @@
             padding: 0.5rem;
             font-size: 1.2rem;
             font-weight: 500;
-            border: 2px solid #2196f3;
+            border: 2px solid #D32F2F;
             border-radius: 4px;
             outline: none;
             
             &:focus {
-              border-color: #1976d2;
+              border-color: #B71C1C;
             }
           }
           
@@ -388,7 +410,7 @@
     
     &--user {
       margin-left: auto;
-      background: #e3f2fd;
+      background: #ffebee;
       text-align: right;
     }
     
@@ -546,9 +568,9 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.5rem 0.75rem;
-      background: #e3f2fd;
-      border-left: 4px solid #2196f3;
-      color: #1565c0;
+      background: #ffebee;
+      border-left: 4px solid #D32F2F;
+      color: #B71C1C;
       font-size: 0.85rem;
       font-weight: 500;
       margin-bottom: 0.5rem;
@@ -595,7 +617,7 @@
       
       &:focus {
         outline: none;
-        border-color: #2196f3;
+        border-color: #D32F2F;
       }
       
       &:disabled {

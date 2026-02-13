@@ -73,7 +73,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 titleKey: "dashboard.tiles.workshop.title",
                 descriptionKey: "dashboard.tiles.workshop.description",
                 icon: "fa-pen-fancy",
-                iconColor: "#7354af",
+                iconColor: "#AD1457",
                 enabled: true,
                 action: () => this.startWorkshop()
             },
@@ -129,7 +129,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 titleKey: "dashboard.tiles.project.title",
                 descriptionKey: "dashboard.tiles.project.description",
                 icon: "fa-folder-open",
-                iconColor: "#007bff",
+                iconColor: "#D32F2F",
                 enabled: true,
                 action: () => this.router.navigate(["/song-projects"])
             }
@@ -209,7 +209,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     title: w.title,
                     subtitle: w.current_phase,
                     icon: "fa-pen-fancy",
-                    iconColor: "#7354af",
+                    iconColor: "#AD1457",
                     updatedAt: w.updated_at || w.created_at,
                     route: ["/text-workshop", w.id]
                 }))
@@ -241,7 +241,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     title: p.project_name,
                     subtitle: p.project_status,
                     icon: "fa-folder-open",
-                    iconColor: "#007bff",
+                    iconColor: "#D32F2F",
                     updatedAt: p.updated_at || p.created_at,
                     route: ["/song-projects"]
                 }))

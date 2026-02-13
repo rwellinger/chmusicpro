@@ -43,7 +43,7 @@
       overflow: hidden;
 
       mat-card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #D32F2F 0%, #880E4F 100%);
         color: white;
         padding: 0.75rem 1.5rem;
 
@@ -113,7 +113,7 @@
           .avatar {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #D32F2F 0%, #880E4F 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -347,7 +347,7 @@
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #D32F2F 0%, #880E4F 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -390,13 +390,13 @@
       transition: all 0.2s ease;
 
       &:hover {
-        background: rgba(102, 126, 234, 0.04);
-        border-color: rgba(102, 126, 234, 0.2);
+        background: rgba(211, 47, 47, 0.04);
+        border-color: rgba(211, 47, 47, 0.2);
       }
 
       &.domain-active {
-        background: rgba(102, 126, 234, 0.08);
-        border-color: rgba(102, 126, 234, 0.3);
+        background: rgba(211, 47, 47, 0.08);
+        border-color: rgba(211, 47, 47, 0.3);
       }
     }
 
@@ -448,13 +448,13 @@
     }
 
     .domain-type-badge {
-      background: rgba(102, 126, 234, 0.1);
-      color: #667eea;
+      background: rgba(211, 47, 47, 0.1);
+      color: #D32F2F;
     }
 
     .domain-role-badge {
-      background: rgba(118, 75, 162, 0.1);
-      color: #764ba2;
+      background: rgba(136, 14, 79, 0.1);
+      color: #880E4F;
     }
 
     .active-badge {
@@ -496,7 +496,7 @@
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #D32F2F 0%, #880E4F 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -577,7 +577,7 @@
     .api-costs-avatar {
       width: 80px;
       height: 80px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #D32F2F 0%, #880E4F 100%);
       border-radius: 50%;
       display: flex;
       align-items: center;

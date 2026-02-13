@@ -71,8 +71,8 @@
       padding: 4px 8px;
       font-size: 0.75rem;
       font-weight: 500;
-      color: #1976d2;
-      background-color: #e3f2fd;
+      color: #B71C1C;
+      background-color: #ffebee;
       border-radius: 12px;
       white-space: nowrap;
     }
@@ -712,8 +712,8 @@
   letter-spacing: 0.5px;
   
   &.badge-draft {
-    background-color: #e3f2fd;
-    color: #1976d2;
+    background-color: #ffebee;
+    color: #B71C1C;
   }
   
   &.badge-used {
@@ -749,7 +749,7 @@
 }
 
 .new-sketch-button {
-  @include button-primary('base');
+  @include button-ai('base');
   min-width: auto !important;
   width: 40px;
   height: 40px;
@@ -758,13 +758,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   i {
     font-size: $font-lg;
     margin: 0;
   }
-  
+
   &:hover:not(:disabled) {
+    background-color: $ai-hover !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }

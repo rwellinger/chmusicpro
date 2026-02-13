@@ -67,8 +67,8 @@
   padding: 4px 8px;
   font-size: 0.75rem;
   font-weight: 500;
-  color: #1976d2;
-  background-color: #e3f2fd;
+  color: #B71C1C;
+  background-color: #ffebee;
   border-radius: 12px;
   white-space: nowrap;
 }
@@ -226,7 +226,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 
-  &.phase-connect { background: #e3f2fd; color: #1565c0; }
+  &.phase-connect { background: #ffebee; color: #B71C1C; }
   &.phase-collect { background: #fff3e0; color: #e65100; }
   &.phase-shape { background: #e8f5e9; color: #2e7d32; }
   &.phase-completed { background: #f3e5f5; color: #7b1fa2; }
@@ -527,7 +527,7 @@
 }
 
 .new-button {
-  @include button-primary('base');
+  @include button-ai('base');
   min-width: auto !important;
   width: 40px;
   height: 40px;
@@ -540,6 +540,12 @@
   i {
     font-size: $font-lg;
     margin: 0;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: $ai-hover !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -627,8 +633,8 @@
   align-items: center;
   gap: $spacing-sm;
   padding: $spacing-sm $spacing-md;
-  background-color: #e3f2fd;
-  color: #1565c0;
+  background-color: #ffebee;
+  color: #B71C1C;
   border-radius: 8px;
   font-size: $font-sm;
   margin-bottom: $spacing-md;

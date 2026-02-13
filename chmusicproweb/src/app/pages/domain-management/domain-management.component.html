@@ -12,11 +12,11 @@
                         {{ domains.length }}
                     </div>
                 </div>
-                <button class="create-btn"
+                <button type="button" class="new-domain-button"
                         *ngIf="isSystemAdmin()"
-                        (click)="showCreateForm = !showCreateForm">
+                        (click)="showCreateForm = !showCreateForm"
+                        [matTooltip]="'domainManagement.create' | translate">
                     <i class="fas fa-plus"></i>
-                    {{ 'domainManagement.create' | translate }}
                 </button>
             </div>
 

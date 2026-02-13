@@ -1,12 +1,69 @@
 /* You can add global styles to this file, and also import other style files */
-@use "@angular/material/prebuilt-themes/indigo-pink.css";
+@use "@angular/material/prebuilt-themes/rose-red.css";
 @use "scss/variables" as *;
 @use "scss/mixins" as *;
 @use "scss/components";
 @use "scss/touch-optimization";
-
-/* Highlight.js Theme for Code Syntax Highlighting */
 @use "highlight.js/styles/github.css";
+
+/* ===== ANGULAR MATERIAL M3 THEME TUNING (Swiss Red) ===== */
+/* rose-red primary is #ba005c (rose) - override to true Swiss Red #D32F2F */
+/* Surface/background: neutralize pink tints to clean white/grey */
+html {
+  /* Primary: Swiss Red */
+  --mat-sys-primary: #{$primary-color};
+  --mat-sys-on-primary: #ffffff;
+  --mat-sys-primary-container: #ffebee;
+  --mat-sys-on-primary-container: #{$primary-active};
+  --mat-sys-surface-tint: #{$primary-color};
+
+  /* Tertiary: Wine/Burgundy */
+  --mat-sys-tertiary: #{$ai-color};
+  --mat-sys-on-tertiary: #ffffff;
+  --mat-sys-tertiary-container: #fce4ec;
+  --mat-sys-on-tertiary-container: #{$ai-active};
+
+  /* Secondary: neutral grey instead of rose */
+  --mat-sys-secondary: #5f5e60;
+  --mat-sys-on-secondary: #ffffff;
+  --mat-sys-secondary-container: #f0f0f0;
+  --mat-sys-on-secondary-container: #3b3b3d;
+
+  /* Surfaces & backgrounds: clean white/grey (no pink tint) */
+  --mat-sys-background: #ffffff;
+  --mat-sys-on-background: #{$text-primary};
+  --mat-sys-surface: #ffffff;
+  --mat-sys-on-surface: #{$text-primary};
+  --mat-sys-surface-bright: #ffffff;
+  --mat-sys-surface-dim: #e0e0e0;
+  --mat-sys-surface-container-lowest: #ffffff;
+  --mat-sys-surface-container-low: #fafafa;
+  --mat-sys-surface-container: #f5f5f5;
+  --mat-sys-surface-container-high: #f0f0f0;
+  --mat-sys-surface-container-highest: #e8e8e8;
+  --mat-sys-surface-variant: #f5f5f5;
+  --mat-sys-on-surface-variant: #{$text-secondary};
+  --mat-sys-inverse-surface: #2e2e2e;
+  --mat-sys-inverse-on-surface: #f5f5f5;
+  --mat-sys-inverse-primary: #ff8a80;
+
+  /* Outline: neutral grey */
+  --mat-sys-outline: #bdbdbd;
+  --mat-sys-outline-variant: #e0e0e0;
+}
+
+/* M3 raised buttons: filled primary style (like M2) instead of elevated */
+.mat-mdc-raised-button.mat-primary {
+  --mdc-protected-button-container-color: var(--mat-sys-primary);
+  --mdc-protected-button-label-text-color: var(--mat-sys-on-primary);
+  --mat-protected-button-state-layer-color: var(--mat-sys-on-primary);
+}
+
+.mat-mdc-raised-button.mat-accent {
+  --mdc-protected-button-container-color: var(--mat-sys-tertiary);
+  --mdc-protected-button-label-text-color: var(--mat-sys-on-tertiary);
+  --mat-protected-button-state-layer-color: var(--mat-sys-on-tertiary);
+}
 
 /* Custom Fonts for Text Overlay Editor */
 @font-face {
@@ -345,13 +402,13 @@ form button[type="button"].btn-danger {
 }
 
 .info-snackbar {
-  background-color: #2196f3 !important;
+  background-color: #D32F2F !important;
   color: white !important;
 }
 
 .info-snackbar .mat-mdc-snack-bar-container,
 .info-snackbar .mdc-snackbar__surface {
-  background-color: #2196f3 !important;
+  background-color: #D32F2F !important;
   color: white !important;
 }
 

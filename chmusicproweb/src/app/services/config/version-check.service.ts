@@ -14,7 +14,7 @@ export interface AppVersion {
 })
 export class VersionCheckService {
     private readonly VERSION_KEY = "app_version";
-    private readonly VERSION_URL = "/chmusicproweb/assets/app-version.json";
+    private readonly VERSION_URL = "/chmusicpro/assets/app-version.json";
     private readonly CHECK_INTERVAL = 15 * 60 * 1000; // 15 minutes
 
     private http = inject(HttpClient);

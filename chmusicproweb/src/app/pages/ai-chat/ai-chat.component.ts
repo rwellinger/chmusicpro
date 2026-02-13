@@ -13,6 +13,7 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatProgressBarModule} from "@angular/material/progress-bar";
 import {MatMenuModule} from "@angular/material/menu";
+import {MatTooltipModule} from "@angular/material/tooltip";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 
 import {ConversationService} from "../../services/business/conversation.service";
@@ -38,6 +39,7 @@ import {MessageContentPipe} from "../../pipes/message-content.pipe";
         MatExpansionModule,
         MatProgressBarModule,
         MatMenuModule,
+        MatTooltipModule,
         TranslateModule,
         MessageContentPipe
     ],

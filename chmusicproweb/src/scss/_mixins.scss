@@ -48,7 +48,7 @@
 
 // 1b. Standard Button Variants
 @mixin button-primary($size: 'base') {
-  @include button-style($info-color, $background-white, $primary-hover);
+  @include button-style($primary-color, $background-white, $primary-hover);
   @include button-size($size);
 }
 

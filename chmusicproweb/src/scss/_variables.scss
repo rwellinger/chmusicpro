@@ -32,9 +32,9 @@ $input-font-size: $font-sm;
 $nav-font-size: $font-sm;
 
 // Colors
-$primary-color: #007bff;
-$primary-hover: #0056b3;
-$primary-active: #004085;
+$primary-color: #D32F2F;
+$primary-hover: #B71C1C;
+$primary-active: #8B0000;
 
 $success-color: #28a745;
 $success-hover: #218838;
@@ -46,9 +46,9 @@ $danger-hover: maroon;
 $info-color: #2196f3;
 $warning-color: #ff9800;
 
-$ai-color: #7354af;
-$ai-hover: #5e3d99;
-$ai-active: #4a2e7d;
+$ai-color: #AD1457;
+$ai-hover: #880E4F;
+$ai-active: #6A0A3E;
 
 // S3/Storage Colors (Yellow/Brown theme)
 $storage-bg: #fef3c7;
@@ -62,7 +62,7 @@ $text-secondary: #666;
 $background-body: #fafafa;
 $background-white: #fff;
 $background-light: #f8f9fa;
-$background-selected: #e3f2fd;
+$background-selected: #ffebee;
 
 $border-light: #e9ecef;
 $border-standard: #ddd;
@@ -111,7 +111,7 @@ $border-radius-xl: 8px;
 $shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
 $shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
 $shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1);
-$shadow-focus: 0 0 0 3px rgba(0, 123, 255, 0.1);
+$shadow-focus: 0 0 0 3px rgba(211, 47, 47, 0.1);
 
 // Transitions
 $transition-fast: 0.2s ease;

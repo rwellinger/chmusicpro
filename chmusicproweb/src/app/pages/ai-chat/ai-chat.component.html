@@ -8,9 +8,9 @@
                         [title]="showArchived ? ('aiChat.sidebar.showActive' | translate) : ('aiChat.sidebar.showArchive' | translate)">
                     <mat-icon>{{ showArchived ? 'unarchive' : 'archive' }}</mat-icon>
                 </button>
-                <button mat-raised-button color="primary" (click)="showNewChat()">
-                    <mat-icon>add</mat-icon>
-                    {{ 'aiChat.sidebar.newChat' | translate }}
+                <button type="button" class="new-chat-button" (click)="showNewChat()"
+                        [matTooltip]="'aiChat.sidebar.newChat' | translate">
+                    <i class="fas fa-plus"></i>
                 </button>
             </div>
         </div>
