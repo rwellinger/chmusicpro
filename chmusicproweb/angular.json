@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "../forwardproxy/html/chmusicproweb",
+            "outputPath": "../forwardproxy/html/chmusicpro",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "baseHref": "/chmusicpro/",
