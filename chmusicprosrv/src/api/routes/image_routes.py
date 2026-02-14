@@ -324,6 +324,21 @@ def add_text_overlay():
     artist_outline_color = raw_json.get("artist_outline_color")
     artist_font_style = raw_json.get("artist_font_style")
 
+    # Extra text fields (optional freetext)
+    extra_text_1 = raw_json.get("extra_text_1")
+    extra_text_1_position = raw_json.get("extra_text_1_position")
+    extra_text_1_font_size = raw_json.get("extra_text_1_font_size", 0.03)
+    extra_text_1_color = raw_json.get("extra_text_1_color")
+    extra_text_1_outline_color = raw_json.get("extra_text_1_outline_color")
+    extra_text_1_font_style = raw_json.get("extra_text_1_font_style")
+
+    extra_text_2 = raw_json.get("extra_text_2")
+    extra_text_2_position = raw_json.get("extra_text_2_position")
+    extra_text_2_font_size = raw_json.get("extra_text_2_font_size", 0.03)
+    extra_text_2_color = raw_json.get("extra_text_2_color")
+    extra_text_2_outline_color = raw_json.get("extra_text_2_outline_color")
+    extra_text_2_font_style = raw_json.get("extra_text_2_font_style")
+
     # Legacy parameters (fallback for old clients)
     position = raw_json.get("position")
     text_color = raw_json.get("text_color")
@@ -350,6 +365,18 @@ def add_text_overlay():
         artist_color=artist_color,
         artist_outline_color=artist_outline_color,
         artist_font_style=artist_font_style,
+        extra_text_1=extra_text_1,
+        extra_text_1_position=extra_text_1_position,
+        extra_text_1_font_size=extra_text_1_font_size,
+        extra_text_1_color=extra_text_1_color,
+        extra_text_1_outline_color=extra_text_1_outline_color,
+        extra_text_1_font_style=extra_text_1_font_style,
+        extra_text_2=extra_text_2,
+        extra_text_2_position=extra_text_2_position,
+        extra_text_2_font_size=extra_text_2_font_size,
+        extra_text_2_color=extra_text_2_color,
+        extra_text_2_outline_color=extra_text_2_outline_color,
+        extra_text_2_font_style=extra_text_2_font_style,
         position=position,
         text_color=text_color,
         outline_color=outline_color,

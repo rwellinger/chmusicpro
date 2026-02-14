@@ -229,8 +229,12 @@
   border: 1px solid #ddd;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   
-  &.clickable {
-    cursor: crosshair !important;
+  &.hovering-marker {
+    cursor: grab;
+  }
+
+  &.dragging {
+    cursor: grabbing;
     border: 2px solid var(--mat-primary-color, #3f51b5);
     box-shadow: 0 0 10px rgba(63, 81, 181, 0.4);
   }
@@ -348,21 +352,9 @@
 .custom-position-controls {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
   margin-top: 0.5rem;
-  
-  button {
-    font-size: 0.875rem;
-    padding: 8px 16px;
-    min-height: 36px;
-    
-    &.active {
-      background-color: var(--mat-primary-color, #3f51b5);
-      color: white;
-      border-color: var(--mat-primary-color, #3f51b5);
-    }
-  }
-  
+
   .coordinate-inputs {
     display: flex;
     gap: 8px;
@@ -383,6 +375,12 @@
       }
     }
   }
+}
+
+.drag-hint {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.45);
 }
 
 // Below Title Group

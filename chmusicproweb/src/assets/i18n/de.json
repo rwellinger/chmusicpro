@@ -1405,6 +1405,8 @@
     "title": "Text Overlay Editor",
     "titleSection": "Titel-Einstellungen",
     "artistSection": "Künstler-Einstellungen (Optional)",
+    "extraText1Section": "Zusatztext 1 (Optional)",
+    "extraText2Section": "Zusatztext 2 (Optional)",
     "form": {
       "selectImage": "Bild auswählen",
       "imageRequired": "Bild ist erforderlich",
@@ -1432,7 +1434,20 @@
       "clickOnImage": "Auf Bild klicken",
       "coordinateX": "X-Position (%)",
       "coordinateY": "Y-Position (%)",
-      "useTitleColor": "Titel-Farbe verwenden"
+      "useTitleColor": "Titel-Farbe verwenden",
+      "dragMarkerHint": "Roten Marker in der Vorschau ziehen zum Repositionieren",
+      "extraText1": "Zusatztext 1",
+      "extraText2": "Zusatztext 2",
+      "extraText1Position": "Zusatztext 1 Position",
+      "extraText2Position": "Zusatztext 2 Position",
+      "extraText1Color": "Zusatztext 1 Farbe",
+      "extraText2Color": "Zusatztext 2 Farbe",
+      "extraText1OutlineColor": "Zusatztext 1 Umrandung",
+      "extraText2OutlineColor": "Zusatztext 2 Umrandung",
+      "useCustomExtraText1Font": "Andere Schriftart für Zusatztext 1",
+      "useCustomExtraText2Font": "Andere Schriftart für Zusatztext 2",
+      "extraText1FontStyle": "Zusatztext 1 Schriftart",
+      "extraText2FontStyle": "Zusatztext 2 Schriftart"
     },
     "buttons": {
       "apply": "Anwenden & Rendern",

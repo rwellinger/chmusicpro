@@ -72,9 +72,15 @@ export class TextOverlayEditorComponent implements OnInit {
     resultImageFilePath: string | null = null;
     userProfile: UserProfile | null = null;
 
-    // Canvas click mode for positioning
-    isCanvasClickMode = false;
-    currentClickTarget: "title" | "artist" | null = null;
+    // Drag mode for positioning markers
+    isDragging = false;
+    isHoveringMarker = false;
+    private dragTarget: "title" | "artist" | "extra1" | "extra2" | null = null;
+    private dragPositionPct: { x: number; y: number } | null = null;
+    private cachedImage: HTMLImageElement | null = null;
+    private animFrameId: number | null = null;
+    private boundOnDocMouseMove = this.onDocMouseMove.bind(this);
+    private boundOnDocMouseUp = this.onDocMouseUp.bind(this);
 
     fontStyles = [
         // Original fonts
@@ -119,6 +125,24 @@ export class TextOverlayEditorComponent implements OnInit {
             artistOutlineColor: [null],  // null = same as title
             useCustomArtistFont: [false],  // Toggle for custom artist font
             artistFontStyle: [null],  // null = same as title font
+            // Extra Text 1 (optional freetext, rendered as-is)
+            extraText1: [""],
+            extraText1PositionCustomX: [50],
+            extraText1PositionCustomY: [80],
+            extraText1FontSize: [30],
+            extraText1Color: [null],  // null = same as title
+            extraText1OutlineColor: [null],
+            useCustomExtraText1Font: [false],
+            extraText1FontStyle: [null],
+            // Extra Text 2 (optional freetext, rendered as-is)
+            extraText2: [""],
+            extraText2PositionCustomX: [50],
+            extraText2PositionCustomY: [85],
+            extraText2FontSize: [30],
+            extraText2Color: [null],
+            extraText2OutlineColor: [null],
+            useCustomExtraText2Font: [false],
+            extraText2FontStyle: [null],
             // Common
             fontStyle: ["bold", Validators.required]
         });
@@ -233,6 +257,7 @@ export class TextOverlayEditorComponent implements OnInit {
             canvas.width = img.width;
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
+            this.cachedImage = img;
 
             if (withText) {
                 this.drawTextOverlay(ctx, canvas);
@@ -244,21 +269,57 @@ export class TextOverlayEditorComponent implements OnInit {
     }
 
     drawTextOverlay(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void {
-        const formValues = this.form.value;
+        this.drawTextOverlayWithValues(ctx, canvas, this.form.value);
+    }
+
+    private drawTextOverlayWithValues(
+        ctx: CanvasRenderingContext2D,
+        canvas: HTMLCanvasElement,
+        formValues: any,
+        dragOverride?: { target: "title" | "artist" | "extra1" | "extra2"; position: { x: number; y: number } }
+    ): void {
         const title = formValues.title || "";
         const artist = formValues.artist || "";
         const fontStyle = formValues.fontStyle || "bold";
 
         // V2 parameters - use getTitlePosition/getArtistPosition to support custom coordinates
-        const titlePosition = this.getTitlePosition(formValues);
-        const titleFontSize = formValues.titleFontSize || 80;  // Pixels
+        let titlePosition = this.getTitlePosition(formValues);
+        const titleFontSize = formValues.titleFontSize || 80;
         const titleColor = formValues.titleColor || "#FFFFFF";
         const titleOutlineColor = formValues.titleOutlineColor || "#000000";
-        const artistPosition = this.getArtistPosition(formValues);
-        const artistFontSize = formValues.artistFontSize || 40;  // Pixels
+        let artistPosition = this.getArtistPosition(formValues);
+        const artistFontSize = formValues.artistFontSize || 40;
         const artistColor = formValues.artistColor || titleColor;
         const artistOutlineColor = formValues.artistOutlineColor || titleOutlineColor;
         const artistFontStyle = formValues.useCustomArtistFont ? (formValues.artistFontStyle || fontStyle) : fontStyle;
+
+        // Extra text fields
+        const extraText1 = formValues.extraText1 || "";
+        let extraText1Position = this.getExtraText1Position(formValues);
+        const extraText1FontSize = formValues.extraText1FontSize || 30;
+        const extraText1Color = formValues.extraText1Color || titleColor;
+        const extraText1OutlineColor = formValues.extraText1OutlineColor || titleOutlineColor;
+        const extraText1FontStyle = formValues.useCustomExtraText1Font ? (formValues.extraText1FontStyle || fontStyle) : fontStyle;
+
+        const extraText2 = formValues.extraText2 || "";
+        let extraText2Position = this.getExtraText2Position(formValues);
+        const extraText2FontSize = formValues.extraText2FontSize || 30;
+        const extraText2Color = formValues.extraText2Color || titleColor;
+        const extraText2OutlineColor = formValues.extraText2OutlineColor || titleOutlineColor;
+        const extraText2FontStyle = formValues.useCustomExtraText2Font ? (formValues.extraText2FontStyle || fontStyle) : fontStyle;
+
+        // Apply drag override
+        if (dragOverride) {
+            if (dragOverride.target === "title") {
+                titlePosition = dragOverride.position;
+            } else if (dragOverride.target === "artist") {
+                artistPosition = dragOverride.position;
+            } else if (dragOverride.target === "extra1") {
+                extraText1Position = dragOverride.position;
+            } else if (dragOverride.target === "extra2") {
+                extraText2Position = dragOverride.position;
+            }
+        }
 
         if (!title) return;
 
@@ -299,13 +360,13 @@ export class TextOverlayEditorComponent implements OnInit {
 
         // Draw title
         const titleText = title.toUpperCase();
-        const titleFontSizePx = titleFontSize;  // Already in pixels
+        const titleFontSizePx = titleFontSize;
         ctx.font = `bold ${titleFontSizePx}px ${titleFontFamily}`;
 
         this.drawText(ctx, canvas, {
             text: titleText,
             position: titlePosition,
-            fontSizePct: titleFontSize,  // Actually pixels now
+            fontSizePct: titleFontSize,
             color: titleColor,
             outlineColor: titleOutlineColor,
             fontFamily: titleFontFamily,
@@ -320,7 +381,7 @@ export class TextOverlayEditorComponent implements OnInit {
             this.drawText(ctx, canvas, {
                 text: artistText,
                 position: artistPosition,
-                fontSizePct: artistFontSize,  // Already in pixels
+                fontSizePct: artistFontSize,
                 color: artistColor,
                 outlineColor: artistOutlineColor,
                 fontFamily: artistFontFamily,
@@ -331,10 +392,40 @@ export class TextOverlayEditorComponent implements OnInit {
         }
 
         // Draw visual markers for positions (showing top-left anchor point)
-        this.drawPositionMarker(ctx, canvas, titlePosition.x * 100, titlePosition.y * 100);
+        this.drawPositionMarker(ctx, canvas, titlePosition.x * 100, titlePosition.y * 100, "T");
 
         if (artist && artistPosition) {
-            this.drawPositionMarker(ctx, canvas, artistPosition.x * 100, artistPosition.y * 100);
+            this.drawPositionMarker(ctx, canvas, artistPosition.x * 100, artistPosition.y * 100, "A");
+        }
+
+        // Draw extra text 1 if provided (rendered as-is, no uppercase)
+        if (extraText1) {
+            const et1FontFamily = getFontFamily(extraText1FontStyle);
+            this.drawText(ctx, canvas, {
+                text: extraText1,
+                position: extraText1Position,
+                fontSizePct: extraText1FontSize,
+                color: extraText1Color,
+                outlineColor: extraText1OutlineColor,
+                fontFamily: et1FontFamily,
+                offsetY: 0
+            });
+            this.drawPositionMarker(ctx, canvas, extraText1Position.x * 100, extraText1Position.y * 100, "1");
+        }
+
+        // Draw extra text 2 if provided (rendered as-is, no uppercase)
+        if (extraText2) {
+            const et2FontFamily = getFontFamily(extraText2FontStyle);
+            this.drawText(ctx, canvas, {
+                text: extraText2,
+                position: extraText2Position,
+                fontSizePct: extraText2FontSize,
+                color: extraText2Color,
+                outlineColor: extraText2OutlineColor,
+                fontFamily: et2FontFamily,
+                offsetY: 0
+            });
+            this.drawPositionMarker(ctx, canvas, extraText2Position.x * 100, extraText2Position.y * 100, "2");
         }
     }
 
@@ -342,32 +433,45 @@ export class TextOverlayEditorComponent implements OnInit {
         ctx: CanvasRenderingContext2D,
         canvas: HTMLCanvasElement,
         xPct: number,
-        yPct: number
+        yPct: number,
+        label: string = ""
     ): void {
-        // The marker shows the top-left corner of the text (matches Pillow default anchor)
-        // This is where the text rendering starts
         const x = (xPct / 100) * canvas.width;
         const y = (yPct / 100) * canvas.height;
 
-        // Save context
         ctx.save();
 
-        // Draw marker at text start position (top-left)
+        // Semi-transparent red fill circle
+        ctx.fillStyle = "rgba(255, 0, 0, 0.25)";
+        ctx.beginPath();
+        ctx.arc(x, y, 12, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Crosshair arms (14px)
         ctx.strokeStyle = "#FF0000";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(x - 14, y);
+        ctx.lineTo(x + 14, y);
+        ctx.moveTo(x, y - 14);
+        ctx.lineTo(x, y + 14);
+        ctx.stroke();
+
+        // Outer circle
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(x - 10, y);
-        ctx.lineTo(x + 10, y);
-        ctx.moveTo(x, y - 10);
-        ctx.lineTo(x, y + 10);
+        ctx.arc(x, y, 12, 0, 2 * Math.PI);
         ctx.stroke();
 
-        // Circle
-        ctx.beginPath();
-        ctx.arc(x, y, 5, 0, 2 * Math.PI);
-        ctx.stroke();
+        // Label (T/A)
+        if (label) {
+            ctx.font = "bold 14px sans-serif";
+            ctx.fillStyle = "#FF0000";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "bottom";
+            ctx.fillText(label, x + 15, y - 5);
+        }
 
-        // Restore context
         ctx.restore();
     }
 
@@ -488,58 +592,147 @@ export class TextOverlayEditorComponent implements OnInit {
         }
     }
 
-    activateCanvasClick(target: "title" | "artist"): void {
-        this.isCanvasClickMode = true;
-        this.currentClickTarget = target;
-    }
-
-    onCanvasClick(event: MouseEvent): void {
-        if (!this.isCanvasClickMode || !this.canvasRef) return;
+    onCanvasMouseDown(event: MouseEvent): void {
+        if (!this.canvasRef) return;
 
         const canvas = this.canvasRef.nativeElement;
-        const rect = canvas.getBoundingClientRect();
+        const pct = this.eventToCanvasPct(event, canvas);
+        const formValues = this.form.value;
+        const hitThreshold = 20;
 
-        // IMPORTANT: Account for CSS scaling
-        // rect.width/height = displayed size (e.g., 500x500)
-        // canvas.width/height = actual canvas resolution (e.g., 1024x1024)
-        // We need percentage of the ACTUAL canvas, not the displayed size
+        // Collect all active markers with distances
+        const markers: { target: "title" | "artist" | "extra1" | "extra2"; dist: number }[] = [];
 
-        // Click position relative to displayed canvas
-        const clickX = event.clientX - rect.left;
-        const clickY = event.clientY - rect.top;
+        markers.push({target: "title", dist: this.markerDistanceInDisplayPx(pct, this.getTitlePosition(formValues), canvas)});
 
-        // Scale factor between display and actual canvas
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-
-        // Actual canvas coordinates
-        const actualX = clickX * scaleX;
-        const actualY = clickY * scaleY;
-
-        // Convert to percentage (0-100) of actual canvas
-        const xPct = Math.round((actualX / canvas.width) * 100);
-        const yPct = Math.round((actualY / canvas.height) * 100);
-
-        // Clamping
-        const xClamped = Math.max(0, Math.min(100, xPct));
-        const yClamped = Math.max(0, Math.min(100, yPct));
-
-        // Update form based on target
-        if (this.currentClickTarget === "title") {
-            this.form.patchValue({
-                titlePositionCustomX: xClamped,
-                titlePositionCustomY: yClamped
-            });
-        } else if (this.currentClickTarget === "artist") {
-            this.form.patchValue({
-                artistPositionCustomX: xClamped,
-                artistPositionCustomY: yClamped
-            });
+        if (formValues.artist) {
+            markers.push({target: "artist", dist: this.markerDistanceInDisplayPx(pct, this.getArtistPosition(formValues), canvas)});
+        }
+        if (formValues.extraText1) {
+            markers.push({target: "extra1", dist: this.markerDistanceInDisplayPx(pct, this.getExtraText1Position(formValues), canvas)});
+        }
+        if (formValues.extraText2) {
+            markers.push({target: "extra2", dist: this.markerDistanceInDisplayPx(pct, this.getExtraText2Position(formValues), canvas)});
         }
 
-        // Deactivate click mode
-        this.isCanvasClickMode = false;
-        this.currentClickTarget = null;
+        const nearest = markers.reduce((a, b) => a.dist < b.dist ? a : b);
+        if (nearest.dist < hitThreshold) {
+            this.dragTarget = nearest.target;
+            this.isDragging = true;
+            this.dragPositionPct = pct;
+
+            document.addEventListener("mousemove", this.boundOnDocMouseMove);
+            document.addEventListener("mouseup", this.boundOnDocMouseUp);
+            event.preventDefault();
+        }
+    }
+
+    onCanvasMouseMove(event: MouseEvent): void {
+        if (this.isDragging) return;
+        if (!this.canvasRef) return;
+
+        const canvas = this.canvasRef.nativeElement;
+        const pct = this.eventToCanvasPct(event, canvas);
+        const formValues = this.form.value;
+
+        const distances: number[] = [
+            this.markerDistanceInDisplayPx(pct, this.getTitlePosition(formValues), canvas)
+        ];
+        if (formValues.artist) {
+            distances.push(this.markerDistanceInDisplayPx(pct, this.getArtistPosition(formValues), canvas));
+        }
+        if (formValues.extraText1) {
+            distances.push(this.markerDistanceInDisplayPx(pct, this.getExtraText1Position(formValues), canvas));
+        }
+        if (formValues.extraText2) {
+            distances.push(this.markerDistanceInDisplayPx(pct, this.getExtraText2Position(formValues), canvas));
+        }
+
+        this.isHoveringMarker = Math.min(...distances) < 20;
+    }
+
+    private onDocMouseMove(event: MouseEvent): void {
+        if (!this.isDragging || !this.canvasRef) return;
+
+        const canvas = this.canvasRef.nativeElement;
+        const pct = this.eventToCanvasPct(event, canvas);
+        this.dragPositionPct = {
+            x: Math.max(0, Math.min(1, pct.x)),
+            y: Math.max(0, Math.min(1, pct.y))
+        };
+
+        if (this.animFrameId === null) {
+            this.animFrameId = requestAnimationFrame(() => {
+                this.renderDragPreview();
+                this.animFrameId = null;
+            });
+        }
+    }
+
+    private onDocMouseUp(): void {
+        if (!this.isDragging || !this.dragPositionPct || !this.dragTarget) return;
+
+        const xClamped = Math.round(Math.max(0, Math.min(100, this.dragPositionPct.x * 100)));
+        const yClamped = Math.round(Math.max(0, Math.min(100, this.dragPositionPct.y * 100)));
+
+        if (this.dragTarget === "title") {
+            this.form.patchValue({titlePositionCustomX: xClamped, titlePositionCustomY: yClamped});
+        } else if (this.dragTarget === "artist") {
+            this.form.patchValue({artistPositionCustomX: xClamped, artistPositionCustomY: yClamped});
+        } else if (this.dragTarget === "extra1") {
+            this.form.patchValue({extraText1PositionCustomX: xClamped, extraText1PositionCustomY: yClamped});
+        } else if (this.dragTarget === "extra2") {
+            this.form.patchValue({extraText2PositionCustomX: xClamped, extraText2PositionCustomY: yClamped});
+        }
+
+        document.removeEventListener("mousemove", this.boundOnDocMouseMove);
+        document.removeEventListener("mouseup", this.boundOnDocMouseUp);
+        this.isDragging = false;
+        this.isHoveringMarker = false;
+        this.dragTarget = null;
+        this.dragPositionPct = null;
+
+        if (this.animFrameId !== null) {
+            cancelAnimationFrame(this.animFrameId);
+            this.animFrameId = null;
+        }
+    }
+
+    private renderDragPreview(): void {
+        if (!this.canvasRef || !this.cachedImage || !this.dragTarget || !this.dragPositionPct) return;
+
+        const canvas = this.canvasRef.nativeElement;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        ctx.drawImage(this.cachedImage, 0, 0);
+        this.drawTextOverlayWithValues(ctx, canvas, this.form.value, {
+            target: this.dragTarget,
+            position: this.dragPositionPct
+        });
+    }
+
+    private eventToCanvasPct(event: MouseEvent, canvas: HTMLCanvasElement): { x: number; y: number } {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = event.clientX - rect.left;
+        const clickY = event.clientY - rect.top;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        return {
+            x: (clickX * scaleX) / canvas.width,
+            y: (clickY * scaleY) / canvas.height
+        };
+    }
+
+    private markerDistanceInDisplayPx(
+        pct: { x: number; y: number },
+        markerPos: { x: number; y: number },
+        canvas: HTMLCanvasElement
+    ): number {
+        const rect = canvas.getBoundingClientRect();
+        const dx = (pct.x - markerPos.x) * rect.width;
+        const dy = (pct.y - markerPos.y) * rect.height;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     private getTitlePosition(formValues: any): { x: number; y: number } {
@@ -551,10 +744,23 @@ export class TextOverlayEditorComponent implements OnInit {
     }
 
     private getArtistPosition(formValues: any): { x: number; y: number } {
-        // Always custom position
         return {
             x: formValues.artistPositionCustomX / 100,
             y: formValues.artistPositionCustomY / 100
+        };
+    }
+
+    private getExtraText1Position(formValues: any): { x: number; y: number } {
+        return {
+            x: formValues.extraText1PositionCustomX / 100,
+            y: formValues.extraText1PositionCustomY / 100
+        };
+    }
+
+    private getExtraText2Position(formValues: any): { x: number; y: number } {
+        return {
+            x: formValues.extraText2PositionCustomX / 100,
+            y: formValues.extraText2PositionCustomY / 100
         };
     }
 
@@ -571,13 +777,14 @@ export class TextOverlayEditorComponent implements OnInit {
         // Assuming 1024px image height as reference, 80px = ~0.078 (7.8%)
         const titleFontSizePct = formValues.titleFontSize / 1024;
         const artistFontSizePct = formValues.artistFontSize / 1024;
+        const extraText1FontSizePct = formValues.extraText1FontSize / 1024;
+        const extraText2FontSizePct = formValues.extraText2FontSize / 1024;
 
-        const payload = {
+        const payload: Record<string, any> = {
             image_id: formValues.imageId,
             title: formValues.title,
             artist: formValues.artist || null,
             font_style: formValues.fontStyle,
-            // V2 parameters with custom position support
             title_position: this.getTitlePosition(formValues),
             title_font_size: titleFontSizePct,
             title_color: formValues.titleColor,
@@ -586,7 +793,19 @@ export class TextOverlayEditorComponent implements OnInit {
             artist_font_size: artistFontSizePct,
             artist_color: formValues.artistColor,
             artist_outline_color: formValues.artistOutlineColor,
-            artist_font_style: formValues.useCustomArtistFont ? formValues.artistFontStyle : null
+            artist_font_style: formValues.useCustomArtistFont ? formValues.artistFontStyle : null,
+            extra_text_1: formValues.extraText1 || null,
+            extra_text_1_position: formValues.extraText1 ? this.getExtraText1Position(formValues) : null,
+            extra_text_1_font_size: extraText1FontSizePct,
+            extra_text_1_color: formValues.extraText1Color,
+            extra_text_1_outline_color: formValues.extraText1OutlineColor,
+            extra_text_1_font_style: formValues.useCustomExtraText1Font ? formValues.extraText1FontStyle : null,
+            extra_text_2: formValues.extraText2 || null,
+            extra_text_2_position: formValues.extraText2 ? this.getExtraText2Position(formValues) : null,
+            extra_text_2_font_size: extraText2FontSizePct,
+            extra_text_2_color: formValues.extraText2Color,
+            extra_text_2_outline_color: formValues.extraText2OutlineColor,
+            extra_text_2_font_style: formValues.useCustomExtraText2Font ? formValues.extraText2FontStyle : null,
         };
 
         this.http.post<{ image_id: string; image_url: string }>(

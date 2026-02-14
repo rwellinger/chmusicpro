@@ -402,33 +402,25 @@ class ImageOrchestrator:
         artist_color: str | None = None,
         artist_outline_color: str | None = None,
         artist_font_style: str | None = None,
+        extra_text_1: str | None = None,
+        extra_text_1_position: str | dict[str, float] | None = None,
+        extra_text_1_font_size: float | int = 30,
+        extra_text_1_color: str | None = None,
+        extra_text_1_outline_color: str | None = None,
+        extra_text_1_font_style: str | None = None,
+        extra_text_2: str | None = None,
+        extra_text_2_position: str | dict[str, float] | None = None,
+        extra_text_2_font_size: float | int = 30,
+        extra_text_2_color: str | None = None,
+        extra_text_2_outline_color: str | None = None,
+        extra_text_2_font_style: str | None = None,
         outline_width: int = 3,
     ) -> dict[str, Any]:
         """
         Add text overlay to existing image (3-layer architecture)
 
-        Args:
-            source_image_id: ID of the source image
-            title: Title text (will be uppercase)
-            artist: Optional artist name (will be uppercase with "BY" prefix)
-            font_style: Font style for title (bold/elegant/light)
-            title_position: Grid position or custom dict
-            title_font_size: Font size (pixels or percentage)
-            title_color: Hex color for title
-            title_outline_color: Hex outline color for title
-            artist_position: Grid/custom position or None (below title)
-            artist_font_size: Font size (pixels or percentage)
-            artist_color: Hex color for artist (if None, uses title_color)
-            artist_outline_color: Hex outline for artist (if None, uses title_outline_color)
-            artist_font_style: Font style for artist (if None, uses same as title)
-            outline_width: Pixel width of outline
-
         Returns:
-            {
-                "image_id": "new_image_id",
-                "image_url": "/api/v1/image/filename.png",
-                "metadata": {...}
-            }
+            {"image_id": "...", "image_url": "...", "metadata": {...}}
 
         Raises:
             ImageGenerationError: If image not found or overlay fails
@@ -564,6 +556,71 @@ class ImageOrchestrator:
                     artist_anchor,
                 )
 
+            # === EXTRA TEXT FIELDS (optional, rendered as-is without uppercasing) ===
+            for extra_text, extra_pos, extra_size, extra_color, extra_outline, extra_font in [
+                (
+                    extra_text_1,
+                    extra_text_1_position,
+                    extra_text_1_font_size,
+                    extra_text_1_color,
+                    extra_text_1_outline_color,
+                    extra_text_1_font_style,
+                ),
+                (
+                    extra_text_2,
+                    extra_text_2_position,
+                    extra_text_2_font_size,
+                    extra_text_2_color,
+                    extra_text_2_outline_color,
+                    extra_text_2_font_style,
+                ),
+            ]:
+                if not extra_text:
+                    continue
+
+                actual_extra_color = extra_color if extra_color else title_color
+                actual_extra_outline = extra_outline if extra_outline else title_outline_color
+                actual_extra_pos = extra_pos if extra_pos else title_position
+                actual_extra_font = extra_font if extra_font else font_style
+
+                extra_font_size_px = ImageTextOverlayTransformer.calculate_font_size(extra_size, img.height)
+                extra_text_rgb = ImageTextOverlayTransformer.hex_to_rgb(actual_extra_color)
+                extra_outline_rgb = ImageTextOverlayTransformer.hex_to_rgb(actual_extra_outline)
+
+                extra_font_path = ImageTextOverlayTransformer.get_font_path(
+                    actual_extra_font, ImageFileService.FONTS_DIR
+                )
+                if not extra_font_path.exists():
+                    extra_font_path = None
+
+                extra_loaded_font = ImageFileService.load_font(extra_font_path, extra_font_size_px)
+                extra_dims = ImageFileService.get_text_dimensions(draw, extra_text, extra_loaded_font)
+
+                is_custom_extra = isinstance(actual_extra_pos, dict)
+                if is_custom_extra:
+                    gx, gy = ImageTextOverlayTransformer.get_custom_coordinates(actual_extra_pos)
+                    ex, ey = ImageTextOverlayTransformer.calculate_text_position_custom(
+                        img.width, img.height, gx, gy, extra_dims["bbox_left_offset"]
+                    )
+                    extra_anchor = "lt"
+                else:
+                    gx, gy = ImageTextOverlayTransformer.get_grid_coordinates(actual_extra_pos)
+                    ex, ey = ImageTextOverlayTransformer.calculate_text_position_grid(
+                        img.width, img.height, gx, gy, extra_dims["width"], extra_dims["height"]
+                    )
+                    extra_anchor = None
+
+                ImageFileService.draw_text_with_outline(
+                    draw,
+                    (ex, ey),
+                    extra_text,
+                    extra_loaded_font,
+                    extra_text_rgb,
+                    extra_outline_rgb,
+                    outline_width,
+                    extra_anchor,
+                )
+
             # === INFRASTRUCTURE LAYER: Save image to S3 ===
             # Convert PIL Image to bytes
             img_rgb = img.convert("RGB")
@@ -621,6 +678,16 @@ class ImageOrchestrator:
                     "artist_font_size": artist_font_size,
                     "artist_color": artist_color,
                     "artist_font_style": artist_font_style,
+                    "extra_text_1": extra_text_1,
+                    "extra_text_1_position": extra_text_1_position,
+                    "extra_text_1_font_size": extra_text_1_font_size,
+                    "extra_text_1_color": extra_text_1_color,
+                    "extra_text_1_font_style": extra_text_1_font_style,
+                    "extra_text_2": extra_text_2,
+                    "extra_text_2_position": extra_text_2_position,
+                    "extra_text_2_font_size": extra_text_2_font_size,
+                    "extra_text_2_color": extra_text_2_color,
+                    "extra_text_2_font_style": extra_text_2_font_style,
                 }
                 db.add(new_image)
                 db.commit()

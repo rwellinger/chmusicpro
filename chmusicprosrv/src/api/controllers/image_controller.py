@@ -272,6 +272,19 @@ class ImageController:
         artist_color: str | None = None,
         artist_outline_color: str | None = None,
         artist_font_style: str | None = None,
+        # Extra text fields (optional freetext)
+        extra_text_1: str | None = None,
+        extra_text_1_position: str | dict[str, float] | None = None,
+        extra_text_1_font_size: float = 0.03,
+        extra_text_1_color: str | None = None,
+        extra_text_1_outline_color: str | None = None,
+        extra_text_1_font_style: str | None = None,
+        extra_text_2: str | None = None,
+        extra_text_2_position: str | dict[str, float] | None = None,
+        extra_text_2_font_size: float = 0.03,
+        extra_text_2_color: str | None = None,
+        extra_text_2_outline_color: str | None = None,
+        extra_text_2_font_style: str | None = None,
         # Legacy (deprecated, ignored)
         position: str | None = None,
         text_color: str | None = None,
@@ -279,25 +292,6 @@ class ImageController:
     ) -> tuple[dict[str, Any], int]:
         """
         Add text overlay to existing image (3-layer architecture)
-
-        Args:
-            image_id: ID of the source image
-            user_id: ID of the authenticated user (for auth)
-            title: Title text to render
-            artist: Optional artist name
-            font_style: Font style (bold/elegant/light)
-            title_position: Grid position or custom dict for title
-            title_font_size: Font size (pixels or percentage)
-            title_color: Hex color for title
-            title_outline_color: Hex outline color for title
-            artist_position: Grid/custom position or None (below title)
-            artist_font_size: Font size (pixels or percentage)
-            artist_color: Hex color for artist (if None, uses title_color)
-            artist_outline_color: Hex outline for artist (if None, uses title_outline_color)
-            artist_font_style: Font style for artist (if None, uses title font)
-            position: DEPRECATED - ignored (use title_position)
-            text_color: DEPRECATED - ignored (use title_color)
-            outline_color: DEPRECATED - ignored (use title_outline_color)
 
         Returns:
             Tuple of (response_data, status_code)
@@ -320,6 +314,18 @@ class ImageController:
                 artist_color=artist_color,
                 artist_outline_color=artist_outline_color,
                 artist_font_style=artist_font_style,
+                extra_text_1=extra_text_1,
+                extra_text_1_position=extra_text_1_position,
+                extra_text_1_font_size=extra_text_1_font_size,
+                extra_text_1_color=extra_text_1_color,
+                extra_text_1_outline_color=extra_text_1_outline_color,
+                extra_text_1_font_style=extra_text_1_font_style,
+                extra_text_2=extra_text_2,
+                extra_text_2_position=extra_text_2_position,
+                extra_text_2_font_size=extra_text_2_font_size,
+                extra_text_2_color=extra_text_2_color,
+                extra_text_2_outline_color=extra_text_2_outline_color,
+                extra_text_2_font_style=extra_text_2_font_style,
             )
 
             logger.info(
