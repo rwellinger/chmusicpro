@@ -287,7 +287,7 @@ def login(api_url):
             api_url = existing_config["api_url"]
             console.print(f"[dim]Using API URL from config: {api_url}[/dim]")
         else:
-            api_url = "https://macstudio/musicproapi"
+            api_url = "https://macstudio/chmusicprosrv"
             console.print(f"[dim]No config found, using default: {api_url}[/dim]")
 
     console.print(f"API URL: [bold]{api_url}[/bold]\n")

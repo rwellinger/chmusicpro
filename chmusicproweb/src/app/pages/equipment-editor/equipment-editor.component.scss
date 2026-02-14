@@ -182,56 +182,6 @@
   border-top: 1px solid $border-light;
 }
 
-.action-button {
-  display: flex;
-  align-items: center;
-  gap: $spacing-xs;
-  padding: $spacing-sm $spacing-lg;
-  border: 1px solid $border-light;
-  border-radius: 8px;
-  background-color: $background-white;
-  color: $text-primary;
-  font-size: $font-sm;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
-  
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  &:not(:disabled):hover {
-    border-color: $primary-color;
-    background-color: rgba(25, 118, 210, 0.05);
-  }
-  
-  &.primary-button {
-    background-color: $primary-color;
-    color: white;
-    border-color: $primary-color;
-    
-    &:not(:disabled):hover {
-      background-color: color.adjust($primary-color, $lightness: -10%);
-    }
-  }
-  
-  &.secondary-button {
-    background-color: $background-light;
-    border-color: $border-light;
-    
-    &:not(:disabled):hover {
-      background-color: color.adjust($background-light, $lightness: -5%);
-    }
-  }
-}
-
 // Material Form Field Customization
 mat-form-field {
   margin-bottom: $spacing-sm;

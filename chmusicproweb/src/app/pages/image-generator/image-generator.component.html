@@ -244,16 +244,14 @@
                             </div>
 
                             <div class="button-group">
-                                <button type="submit"
-                                        [disabled]="promptForm.invalid || isLoading || isImprovingPrompt || isTranslatingPrompt || isGeneratingTitle || !isStorageHealthy || isCheckingStorage"
-                                        class="create-button">
+                                <button mat-stroked-button type="submit"
+                                        [disabled]="promptForm.invalid || isLoading || isImprovingPrompt || isTranslatingPrompt || isGeneratingTitle || !isStorageHealthy || isCheckingStorage">
                                     <i class="fas fa-spinner fa-spin" *ngIf="isLoading || isCheckingStorage"></i>
                                     <i class="fas fa-brain" *ngIf="!isLoading && !isCheckingStorage"></i>
                                     {{ isCheckingStorage ? 'Checking storage...' : (isLoading ? ('imageGenerator.creating' | translate) : ('imageGenerator.createButton' | translate)) }}
                                 </button>
-                                <button type="button" (click)="resetForm()"
-                                        [disabled]="isLoading || isImprovingPrompt || isTranslatingPrompt || isGeneratingTitle"
-                                        class="reset-button">
+                                <button mat-button type="button" (click)="resetForm()"
+                                        [disabled]="isLoading || isImprovingPrompt || isTranslatingPrompt || isGeneratingTitle">
                                     <i class="fas fa-rotate-left"></i> {{ 'imageGenerator.resetButton' | translate }}
                                 </button>
                             </div>

@@ -11,6 +11,7 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatDatepickerModule} from "@angular/material/datepicker";
 import {MatNativeDateModule} from "@angular/material/core";
 import {MatDialog} from "@angular/material/dialog";
+import {MatButtonModule} from "@angular/material/button";
 
 import {SongReleaseService} from "../../services/business/song-release.service";
 import {SongProjectService} from "../../services/business/song-project.service";
@@ -33,7 +34,8 @@ import {ReleaseStatus, ReleaseType, SongRelease} from "../../models/song-release
         MatInputModule,
         MatSelectModule,
         MatDatepickerModule,
-        MatNativeDateModule
+        MatNativeDateModule,
+        MatButtonModule
     ],
     templateUrl: "./song-release-editor.component.html",
     styleUrl: "./song-release-editor.component.scss"

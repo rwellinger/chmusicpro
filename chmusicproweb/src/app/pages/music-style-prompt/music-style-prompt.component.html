@@ -10,23 +10,15 @@
                 </div>
                 <div class="prompt-header-actions">
                     <div *ngIf="isFromSketchCreator" class="sketch-navigation-buttons">
-                        <button
-                                type="button"
+                        <button mat-button type="button"
                                 (click)="cancelChanges()"
-                                class="cancel-button"
-                                [disabled]="isAnyOperationInProgress"
-                                [title]="'common.cancel' | translate">
-                            <i class="fas fa-times"></i>
-                            <span>{{ 'common.cancel' | translate }}</span>
+                                [disabled]="isAnyOperationInProgress">
+                            <i class="fas fa-times"></i> {{ 'common.cancel' | translate }}
                         </button>
-                        <button
-                                type="button"
+                        <button mat-flat-button color="primary" type="button"
                                 (click)="applyChanges()"
-                                class="apply-button"
-                                [disabled]="isAnyOperationInProgress"
-                                [title]="'common.apply' | translate">
-                            <i class="fas fa-check"></i>
-                            <span>{{ 'common.apply' | translate }}</span>
+                                [disabled]="isAnyOperationInProgress">
+                            <i class="fas fa-check"></i> {{ 'common.apply' | translate }}
                         </button>
                     </div>
                     <div class="mode-badge" [class.auto-mode]="currentMode === 'auto'"
@@ -114,14 +106,12 @@
                         </button>
                         <!-- Edit Dropdown -->
                         <div class="edit-dropdown-container">
-                            <button
-                                    type="button"
+                            <button mat-button type="button"
                                     (click)="toggleEditDropdown()"
                                     [disabled]="isAnyOperationInProgress || !characterCount"
-                                    class="utility-button"
                                     [title]="'musicStylePrompt.edit' | translate">
                                 <i class="fas fa-edit"></i>
-                                <span>{{ 'musicStylePrompt.edit' | translate }}</span>
+                                {{ 'musicStylePrompt.edit' | translate }}
                                 <i class="fas fa-chevron-down dropdown-chevron"></i>
                             </button>
                             <div class="dropdown-menu" *ngIf="showEditDropdown"
@@ -155,11 +145,9 @@
                     </div>
 
                     <div class="utility-actions">
-                        <button
-                                type="button"
+                        <button mat-button type="button"
                                 (click)="clearPrompt()"
-                                [disabled]="isAnyOperationInProgress || !characterCount"
-                                class="clear-button">
+                                [disabled]="isAnyOperationInProgress || !characterCount">
                             <i class="fas fa-trash-alt"></i> {{ 'musicStylePrompt.resetButton' | translate }}
                         </button>
                     </div>

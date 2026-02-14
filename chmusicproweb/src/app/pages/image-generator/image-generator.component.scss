@@ -271,30 +271,12 @@
   display: flex;
   gap: $spacing-10;
   margin-top: $spacing-20;
-}
 
-.create-button {
-  @include button-ai('base');
-  background-color: $ai-color !important;
-  flex: 1;
-  font-weight: $font-weight-medium !important;
-  
-  &:hover:not(:disabled) {
-    background-color: $ai-hover !important;
+  button:first-child {
+    flex: 1;
   }
 }
 
-.reset-button {
-  @include button-secondary('base');
-  flex: 0 0 auto;
-  font-weight: $font-weight-medium !important;
-}
-
-
-.create-button i,
-.reset-button i {
-  margin-right: 8px;
-}
 
 .magic-icon-button {
   @include button-ai('sm');
@@ -439,22 +421,6 @@
   gap: 10px;
 }
 
-.action-button {
-  @include button-size('base');
-  border: none;
-  border-radius: $border-radius-lg;
-  cursor: pointer;
-  font-weight: $font-weight-medium;
-  transition: $transition-standard;
-}
-
-.download-btn {
-  @include button-success('base');
-}
-
-.preview-btn {
-  @include button-secondary('base');
-}
 
 .image-display {
   text-align: center;

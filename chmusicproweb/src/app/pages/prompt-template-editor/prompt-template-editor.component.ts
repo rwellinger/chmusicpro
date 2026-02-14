@@ -8,6 +8,7 @@ import {MatCardModule} from "@angular/material/card";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatSelectModule} from "@angular/material/select";
 import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatButtonModule} from "@angular/material/button";
 
 import {PromptTemplate, PromptTemplateUpdate} from "../../models/prompt-template.model";
 import {PromptTemplateService} from "../../services/config/prompt-template.service";
@@ -28,7 +29,8 @@ import {TemperatureOption, TemperatureOptionsService} from "../../services/confi
         MatCardModule,
         MatSnackBarModule,
         MatSelectModule,
-        MatFormFieldModule
+        MatFormFieldModule,
+        MatButtonModule
     ],
     templateUrl: "./prompt-template-editor.component.html",
     styleUrl: "./prompt-template-editor.component.scss"

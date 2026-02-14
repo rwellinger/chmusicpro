@@ -557,26 +557,11 @@
   border-radius: 8px;
 }
 
-.ai-button {
-  @include button-ai('base');
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-xs;
-}
-
 .secondary-button {
   @include button-secondary('base');
   display: inline-flex;
   align-items: center;
   gap: $spacing-xs;
-}
-
-.save-button {
-  @include button-primary('base');
-}
-
-.export-button {
-  @include button-secondary('base');
 }
 
 // ===== Action Section (Footer) =====
@@ -610,21 +595,6 @@
   color: $text-muted;
 
   .fa-check { color: $success-color; }
-}
-
-// ===== Preview Toggle =====
-.preview-toggle-button {
-  @include button-secondary('base');
-
-  &.active {
-    background-color: $primary-color;
-    border-color: $primary-color;
-    color: $background-white;
-  }
-}
-
-.export-md-button {
-  @include button-secondary('base');
 }
 
 // ===== Selection Mode =====

@@ -56,7 +56,7 @@ setup-cli-config-prod:
 	@echo "Creating PROD config (~/.chmusicpro/config.json)..."
 	@mkdir -p ~/.chmusicpro
 	@chmod 700 ~/.chmusicpro
-	@echo '{\n  "api_url": "https://macstudio/musicproapi",\n  "jwt_token": "",\n  "email": "",\n  "expires_at": "",\n  "ssl_verify": false\n}' > ~/.chmusicpro/config.json
+	@echo '{\n  "api_url": "https://macstudio/chmusicprosrv",\n  "jwt_token": "",\n  "email": "",\n  "expires_at": "",\n  "ssl_verify": false\n}' > ~/.chmusicpro/config.json
 	@chmod 600 ~/.chmusicpro/config.json
 	@echo "✓ PROD config created: ~/.chmusicpro/config.json"
 	@echo ""

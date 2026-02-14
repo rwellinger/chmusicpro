@@ -528,38 +528,6 @@
   justify-content: flex-end;
 }
 
-.action-button {
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-xs;
-  font-weight: $font-weight-medium !important;
-  
-  i {
-    font-size: $font-base;
-  }
-  
-  span {
-    display: inline-block;
-  }
-  
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
-}
-
-.edit-button {
-  @include button-secondary('base');
-}
-
-.save-button {
-  @include button-primary('base');
-}
-
-.cancel-button {
-  @include button-secondary('base');
-}
-
 // Edit Form Styles
 .description-section {
   margin-bottom: $spacing-md;

@@ -271,12 +271,11 @@
 
             <!-- Actions -->
             <div class="editor-actions">
-                <button type="button" class="action-button cancel-button" (click)="cancel()" [disabled]="isSaving">
-                    <i class="fas fa-times"></i>
-                    <span>{{ 'common.cancel' | translate }}</span>
+                <button mat-button type="button" (click)="cancel()" [disabled]="isSaving">
+                    <i class="fas fa-times"></i> {{ 'common.cancel' | translate }}
                 </button>
 
-                <button type="submit" class="action-button save-button" [disabled]="isSaving || releaseForm.invalid">
+                <button mat-flat-button color="primary" type="submit" [disabled]="isSaving || releaseForm.invalid">
                     <i class="fas fa-save"></i>
                     <span *ngIf="!isSaving">{{ 'common.save' | translate }}</span>
                     <span *ngIf="isSaving">{{ 'common.saving' | translate }}</span>

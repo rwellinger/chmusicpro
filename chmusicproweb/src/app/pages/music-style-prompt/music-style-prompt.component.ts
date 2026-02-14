@@ -9,6 +9,7 @@ import {NotificationService} from "../../services/ui/notification.service";
 import {ChatService} from "../../services/config/chat.service";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatCardModule} from "@angular/material/card";
+import {MatButtonModule} from "@angular/material/button";
 import {ProgressService} from "../../services/ui/progress.service";
 import {
     MusicStyleChooserInlineComponent
@@ -18,7 +19,7 @@ import {MusicStyleChooserService} from "../../services/music-style-chooser.servi
 @Component({
     selector: "app-music-style-prompt",
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, MatSnackBarModule, MatCardModule, TranslateModule, MusicStyleChooserInlineComponent],
+    imports: [CommonModule, ReactiveFormsModule, MatSnackBarModule, MatCardModule, MatButtonModule, TranslateModule, MusicStyleChooserInlineComponent],
     templateUrl: "./music-style-prompt.component.html",
     styleUrl: "./music-style-prompt.component.scss",
     encapsulation: ViewEncapsulation.None

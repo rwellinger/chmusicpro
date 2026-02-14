@@ -6,6 +6,7 @@ import {DomSanitizer} from "@angular/platform-browser";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {MatCardModule} from "@angular/material/card";
 import {MatExpansionModule} from "@angular/material/expansion";
+import {MatButtonModule} from "@angular/material/button";
 import {debounceTime, firstValueFrom, Subject, takeUntil} from "rxjs";
 import {marked} from "marked";
 
@@ -34,6 +35,7 @@ interface SelectableItem {
         MatCardModule,
         MatDialogModule,
         MatExpansionModule,
+        MatButtonModule,
         TranslateModule
     ],
     templateUrl: "./text-workshop.component.html",

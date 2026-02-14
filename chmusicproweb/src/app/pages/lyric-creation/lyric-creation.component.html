@@ -9,23 +9,15 @@
                     </h2>
                 </div>
                 <div *ngIf="isFromSketchCreator && !sectionEditorMode" class="sketch-navigation-buttons">
-                    <button
-                            type="button"
+                    <button mat-button type="button"
                             (click)="cancelChanges()"
-                            class="cancel-button"
-                            [disabled]="isAnyLyricOperationInProgress"
-                            [title]="'common.cancel' | translate">
-                        <i class="fas fa-times"></i>
-                        <span>{{ 'common.cancel' | translate }}</span>
+                            [disabled]="isAnyLyricOperationInProgress">
+                        <i class="fas fa-times"></i> {{ 'common.cancel' | translate }}
                     </button>
-                    <button
-                            type="button"
+                    <button mat-flat-button color="primary" type="button"
                             (click)="applyChanges()"
-                            class="apply-button"
-                            [disabled]="isAnyLyricOperationInProgress"
-                            [title]="'common.apply' | translate">
-                        <i class="fas fa-check"></i>
-                        <span>{{ 'common.apply' | translate }}</span>
+                            [disabled]="isAnyLyricOperationInProgress">
+                        <i class="fas fa-check"></i> {{ 'common.apply' | translate }}
                     </button>
                 </div>
             </div>
@@ -79,19 +71,13 @@
                                     {{ activeSection?.label }}
                                 </h3>
                                 <div class="workspace-actions">
-                                    <button
-                                            type="button"
-                                            (click)="cancelSectionEditor()"
-                                            class="cancel-button">
-                                        <i class="fas fa-times"></i>
-                                        {{ 'common.cancel' | translate }}
+                                    <button mat-button type="button"
+                                            (click)="cancelSectionEditor()">
+                                        <i class="fas fa-times"></i> {{ 'common.cancel' | translate }}
                                     </button>
-                                    <button
-                                            type="button"
-                                            (click)="applyAndCloseSectionEditor()"
-                                            class="apply-button">
-                                        <i class="fas fa-check"></i>
-                                        {{ 'lyricCreation.sectionEditor.apply' | translate }}
+                                    <button mat-flat-button color="primary" type="button"
+                                            (click)="applyAndCloseSectionEditor()">
+                                        <i class="fas fa-check"></i> {{ 'lyricCreation.sectionEditor.apply' | translate }}
                                     </button>
                                 </div>
                             </div>
@@ -190,13 +176,10 @@
 
                 <div class="action-section">
                     <div class="ai-actions">
-                        <button
-                                type="button"
+                        <button mat-button type="button"
                                 (click)="openLyricArchitectModal()"
-                                [disabled]="isAnyLyricOperationInProgress || sectionEditorMode"
-                                class="utility-button">
-                            <i class="fas fa-layer-group"></i>
-                            <span>{{ 'lyricCreation.lyricArchitecture' | translate }}</span>
+                                [disabled]="isAnyLyricOperationInProgress || sectionEditorMode">
+                            <i class="fas fa-layer-group"></i> {{ 'lyricCreation.lyricArchitecture' | translate }}
                         </button>
                         <button
                                 type="button"
@@ -218,14 +201,12 @@
                         </button>
                         <!-- Edit Dropdown -->
                         <div class="edit-dropdown-container">
-                            <button
-                                    type="button"
+                            <button mat-button type="button"
                                     (click)="toggleEditDropdown()"
                                     [disabled]="isAnyLyricOperationInProgress || sectionEditorMode || !characterCount"
-                                    class="utility-button"
                                     [title]="'lyricCreation.edit' | translate">
                                 <i class="fas fa-edit"></i>
-                                <span>{{ 'lyricCreation.edit' | translate }}</span>
+                                {{ 'lyricCreation.edit' | translate }}
                                 <i class="fas fa-chevron-down dropdown-chevron"></i>
                             </button>
                             <div class="dropdown-menu" *ngIf="showEditDropdown"
@@ -259,14 +240,12 @@
 
                         <!-- Tools Dropdown -->
                         <div class="tools-dropdown-container">
-                            <button
-                                    type="button"
+                            <button mat-button type="button"
                                     (click)="toggleToolsDropdown()"
                                     [disabled]="isAnyLyricOperationInProgress || sectionEditorMode || !characterCount"
-                                    class="utility-button"
                                     [title]="'lyricCreation.tools' | translate">
                                 <i class="fas fa-tools"></i>
-                                <span>{{ 'lyricCreation.tools' | translate }}</span>
+                                {{ 'lyricCreation.tools' | translate }}
                                 <i class="fas fa-chevron-down dropdown-chevron"></i>
                             </button>
                             <div class="dropdown-menu" *ngIf="showToolsDropdown"
@@ -331,11 +310,9 @@
                     </div>
 
                     <div class="utility-actions">
-                        <button
-                                type="button"
+                        <button mat-button type="button"
                                 (click)="clearLyrics()"
-                                [disabled]="isAnyLyricOperationInProgress || sectionEditorMode || !characterCount"
-                                class="clear-button">
+                                [disabled]="isAnyLyricOperationInProgress || sectionEditorMode || !characterCount">
                             <i class="fas fa-trash-alt"></i> {{ 'lyricCreation.resetButton' | translate }}
                         </button>
                     </div>

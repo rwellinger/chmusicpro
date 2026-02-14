@@ -9,6 +9,7 @@ import {NotificationService} from "../../services/ui/notification.service";
 import {ChatService} from "../../services/config/chat.service";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatCardModule} from "@angular/material/card";
+import {MatButtonModule} from "@angular/material/button";
 import {ProgressService} from "../../services/ui/progress.service";
 import {LyricArchitectModalComponent} from "../../components/lyric-architect-modal/lyric-architect-modal.component";
 import {LyricArchitectureService} from "../../services/lyric-architecture.service";
@@ -26,7 +27,7 @@ interface LyricSection {
 @Component({
     selector: "app-lyric-creation",
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FormsModule, MatSnackBarModule, MatCardModule, TranslateModule],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, MatSnackBarModule, MatCardModule, MatButtonModule, TranslateModule],
     templateUrl: "./lyric-creation.component.html",
     styleUrl: "./lyric-creation.component.scss",
     encapsulation: ViewEncapsulation.None

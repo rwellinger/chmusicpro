@@ -912,18 +912,6 @@
   }
 }
 
-.edit-button {
-  @include button-secondary('base');
-}
-
-.duplicate-button {
-  @include button-secondary('base');
-}
-
-.delete-button {
-  @include button-secondary('base');
-}
-
 .load-more-button {
   @include button-primary('base');
   width: 100%;

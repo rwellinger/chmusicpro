@@ -7,6 +7,7 @@ import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {MatCardModule} from "@angular/material/card";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatTabsModule} from "@angular/material/tabs";
+import {MatButtonModule} from "@angular/material/button";
 import {MatDialog} from "@angular/material/dialog";
 
 import {Sketch, SketchService} from "../../services/business/sketch.service";
@@ -25,7 +26,8 @@ import {
         TranslateModule,
         MatCardModule,
         MatSnackBarModule,
-        MatTabsModule
+        MatTabsModule,
+        MatButtonModule
     ],
     templateUrl: "./song-sketch-library.component.html",
     styleUrl: "./song-sketch-library.component.scss",

@@ -52,7 +52,7 @@ chmusicpro-cli login
 
 **Interactive prompts:**
 ```
-API URL [https://macstudio/musicproapi]: <Enter>
+API URL [https://macstudio/chmusicprosrv]: <Enter>
 Email: your@email.com
 Password: ***
 
@@ -112,7 +112,7 @@ Config file: `~/.chmusicpro/config.json`
 
 ```json
 {
-  "api_url": "https://macstudio/musicproapi",
+  "api_url": "https://macstudio/chmusicprosrv",
   "jwt_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "email": "user@example.com",
   "expires_at": "2024-11-03T10:30:00Z",
@@ -159,8 +159,8 @@ chmusicpro-cli login  # Re-login to get new token
 ### "Connection error"
 
 Check if:
-1. API URL is correct (`https://macstudio/musicproapi`)
-2. You can reach the server (try `curl https://macstudio/musicproapi/api/v1/health`)
+1. API URL is correct (`https://macstudio/chmusicprosrv`)
+2. You can reach the server (try `curl https://macstudio/chmusicprosrv/api/v1/health`)
 3. VPN/Network is connected
 
 ### SSL Certificate error

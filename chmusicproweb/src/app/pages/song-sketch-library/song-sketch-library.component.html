@@ -358,88 +358,45 @@
             <!-- Action Buttons at Bottom -->
             <mat-card-actions align="end">
                 <div class="detail-actions">
-                    <!-- 1. Assign to Project Button - only if not assigned -->
                     <button mat-button type="button"
                             *ngIf="!selectedSketch.project_id"
-                            (click)="openAssignToProjectDialog()"
-                            [title]="'songSketch.library.actions.assignToProject' | translate">
-                        <i class="fas fa-folder-plus"></i>
-                        {{ 'songSketch.library.actions.assignToProject' | translate }}
+                            (click)="openAssignToProjectDialog()">
+                        <i class="fas fa-folder-plus"></i> {{ 'songSketch.library.actions.assignToProject' | translate }}
                     </button>
-
-                    <!-- 1b. Unassign from Project Button - only if assigned -->
                     <button mat-button type="button"
                             *ngIf="selectedSketch.project_id"
-                            (click)="unassignFromProject()"
-                            [title]="'songSketch.library.actions.unassignFromProject' | translate">
-                        <i class="fas fa-folder-minus"></i>
-                        {{ 'songSketch.library.actions.unassignFromProject' | translate }}
+                            (click)="unassignFromProject()">
+                        <i class="fas fa-folder-minus"></i> {{ 'songSketch.library.actions.unassignFromProject' | translate }}
                     </button>
-
-                    <!-- 2. Mark as Used Button - only for draft sketches -->
-                    <button
-                            type="button"
-                            class="action-button used-button"
+                    <button mat-button type="button"
                             *ngIf="selectedSketch.workflow === 'draft'"
-                            (click)="markAsUsed(selectedSketch)"
-                            [title]="'songSketch.library.actions.markAsUsed' | translate">
-                        <i class="fas fa-check-circle"></i>
-                        <span>{{ 'songSketch.library.actions.markAsUsed' | translate }}</span>
+                            (click)="markAsUsed(selectedSketch)">
+                        <i class="fas fa-check-circle"></i> {{ 'songSketch.library.actions.markAsUsed' | translate }}
                     </button>
-
-                    <!-- 2b. Back to Draft Button - only for used sketches -->
-                    <button
-                            type="button"
-                            class="action-button draft-button"
+                    <button mat-button type="button"
                             *ngIf="selectedSketch.workflow === 'used'"
-                            (click)="markAsDraft(selectedSketch)"
-                            [title]="'songSketch.library.actions.backToDraft' | translate">
-                        <i class="fas fa-undo"></i>
-                        <span>{{ 'songSketch.library.actions.backToDraft' | translate }}</span>
+                            (click)="markAsDraft(selectedSketch)">
+                        <i class="fas fa-undo"></i> {{ 'songSketch.library.actions.backToDraft' | translate }}
                     </button>
-
-                    <!-- 3. Archive Button - visible for draft and used sketches -->
-                    <button
-                            type="button"
-                            class="action-button archive-button"
+                    <button mat-button type="button"
                             *ngIf="selectedSketch.workflow !== 'archived'"
-                            (click)="archiveSketch(selectedSketch)"
-                            [title]="'songSketch.library.actions.archive' | translate">
-                        <i class="fas fa-archive"></i>
-                        <span>{{ 'songSketch.library.actions.archive' | translate }}</span>
+                            (click)="archiveSketch(selectedSketch)">
+                        <i class="fas fa-archive"></i> {{ 'songSketch.library.actions.archive' | translate }}
                     </button>
-
-                    <!-- 4. Edit Button - only enabled for draft sketches -->
-                    <button
-                            type="button"
-                            class="action-button edit-button"
-                            (click)="editSketch()"
-                            [disabled]="selectedSketch.workflow !== 'draft'"
-                            [title]="selectedSketch.workflow !== 'draft' ? ('songSketch.library.actions.editDisabled' | translate) : ('songSketch.library.actions.edit' | translate)">
-                        <i class="fas fa-edit"></i>
-                        <span>{{ 'songSketch.library.actions.edit' | translate }}</span>
+                    <button mat-button type="button"
+                            *ngIf="selectedSketch.workflow === 'draft'"
+                            (click)="editSketch()">
+                        <i class="fas fa-edit"></i> {{ 'songSketch.library.actions.edit' | translate }}
                     </button>
-
-                    <!-- 5. Duplicate Button - disabled for type 'song' -->
-                    <button
-                            type="button"
-                            class="action-button duplicate-button"
-                            (click)="duplicateSketch(selectedSketch)"
-                            [disabled]="selectedSketch.sketch_type === 'song'"
-                            [title]="selectedSketch.sketch_type === 'song' ? ('songSketch.library.actions.duplicateDisabled' | translate) : ('songSketch.library.actions.duplicate' | translate)">
-                        <i class="fas fa-copy"></i>
-                        <span>{{ 'songSketch.library.actions.duplicate' | translate }}</span>
+                    <button mat-button type="button"
+                            *ngIf="selectedSketch.sketch_type !== 'song'"
+                            (click)="duplicateSketch(selectedSketch)">
+                        <i class="fas fa-copy"></i> {{ 'songSketch.library.actions.duplicate' | translate }}
                     </button>
-
-                    <!-- 6. Delete Button - disabled for workflow 'used' or assigned to project -->
-                    <button
-                            type="button"
-                            class="action-button delete-button"
-                            (click)="confirmDeleteSketch(selectedSketch.id)"
-                            [disabled]="selectedSketch.workflow === 'used' || selectedSketch.project_id"
-                            [title]="selectedSketch.project_id ? ('songSketch.library.actions.deleteDisabledProject' | translate:{project: selectedSketch.project_name}) : (selectedSketch.workflow === 'used' ? ('songSketch.library.actions.deleteDisabled' | translate) : ('songSketch.library.actions.delete' | translate))">
-                        <i class="fas fa-trash"></i>
-                        <span>{{ 'songSketch.library.actions.delete' | translate }}</span>
+                    <button mat-button type="button"
+                            *ngIf="selectedSketch.workflow !== 'used' && !selectedSketch.project_id"
+                            (click)="confirmDeleteSketch(selectedSketch.id)">
+                        <i class="fas fa-trash"></i> {{ 'songSketch.library.actions.delete' | translate }}
                     </button>
                 </div>
             </mat-card-actions>

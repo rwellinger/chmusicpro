@@ -6,6 +6,7 @@ import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {MatCardModule} from "@angular/material/card";
 import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatTabsModule} from "@angular/material/tabs";
+import {MatButtonModule} from "@angular/material/button";
 import {filter, firstValueFrom, Subject, takeUntil} from "rxjs";
 
 import {SketchService} from "../../services/business/sketch.service";
@@ -23,6 +24,7 @@ import {MUSIC_STYLE_CATEGORIES} from "../../models/music-style-chooser.model";
         MatCardModule,
         MatSnackBarModule,
         MatTabsModule,
+        MatButtonModule,
         TranslateModule
     ],
     templateUrl: "./song-sketch-creator.component.html",

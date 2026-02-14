@@ -5,6 +5,7 @@ import {Router} from "@angular/router";
 import {debounceTime, distinctUntilChanged, Subject, takeUntil} from "rxjs";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {MatCardModule} from "@angular/material/card";
+import {MatButtonModule} from "@angular/material/button";
 
 import {SongReleaseService} from "../../services/business/song-release.service";
 import {NotificationService} from "../../services/ui/notification.service";
@@ -24,7 +25,8 @@ import {
         CommonModule,
         FormsModule,
         TranslateModule,
-        MatCardModule
+        MatCardModule,
+        MatButtonModule
     ],
     templateUrl: "./song-release-gallery.component.html",
     styleUrl: "./song-release-gallery.component.scss"

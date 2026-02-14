@@ -111,7 +111,7 @@
                                         type="button"
                                         (click)="navigateToLyricCreator()"
                                         [disabled]="isSaving"
-                                        class="edit-button"
+                                        class="magic-icon-button"
                                         [title]="'songSketch.creator.buttons.editLyrics' | translate">
                                     <i class="fas fa-pen-to-square"></i>
                                 </button>
@@ -147,7 +147,7 @@
                                         type="button"
                                         (click)="navigateToMusicStylePrompt()"
                                         [disabled]="isSaving"
-                                        class="edit-button"
+                                        class="magic-icon-button"
                                         [title]="'songSketch.creator.buttons.editMusicStyle' | translate">
                                     <i class="fas fa-pen-to-square"></i>
                                 </button>
@@ -412,7 +412,7 @@
                                         type="button"
                                         (click)="insertInfoTemplate()"
                                         [disabled]="isSaving"
-                                        class="edit-button"
+                                        class="magic-icon-button"
                                         [title]="'songSketch.creator.description.infoHint' | translate">
                                     <i class="fas fa-file-lines"></i>
                                 </button>
@@ -425,39 +425,28 @@
                 <!-- Action Section -->
                 <div class="action-section">
                     <div class="utility-actions">
-                        <!-- Show different buttons based on mode -->
-                        <button
+                        <button mat-button type="button"
                                 *ngIf="!isEditMode"
-                                type="button"
-                                class="utility-button"
                                 (click)="navigateToSketchLibrary()"
                                 [disabled]="isSaving">
-                            <i class="fas fa-folder-open"></i>
-                            <span>{{ 'songSketch.creator.buttons.openLibrary' | translate }}</span>
+                            <i class="fas fa-folder-open"></i> {{ 'songSketch.creator.buttons.openLibrary' | translate }}
                         </button>
-                        <button
+                        <button mat-button type="button"
                                 *ngIf="isEditMode"
-                                type="button"
-                                class="cancel-button"
                                 (click)="cancelEdit()"
                                 [disabled]="isSaving">
-                            <i class="fas fa-times"></i>
-                            {{ 'songSketch.creator.buttons.cancel' | translate }}
+                            <i class="fas fa-times"></i> {{ 'songSketch.creator.buttons.cancel' | translate }}
                         </button>
-                        <button
+                        <button mat-button type="button"
                                 *ngIf="!isEditMode"
-                                type="button"
-                                class="clear-button"
                                 (click)="resetForm()"
                                 [disabled]="isSaving">
-                            <i class="fas fa-eraser"></i>
-                            {{ 'songSketch.creator.buttons.reset' | translate }}
+                            <i class="fas fa-eraser"></i> {{ 'songSketch.creator.buttons.reset' | translate }}
                         </button>
                     </div>
                     <div class="submit-actions">
-                        <button
+                        <button mat-flat-button color="primary"
                                 type="submit"
-                                class="submit-button"
                                 [disabled]="!sketchForm.valid || isSaving">
                             <i class="fas fa-save" *ngIf="!isSaving"></i>
                             <i class="fas fa-spinner fa-spin" *ngIf="isSaving"></i>

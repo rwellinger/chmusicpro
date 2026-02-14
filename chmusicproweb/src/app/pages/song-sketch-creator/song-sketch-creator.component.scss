@@ -194,35 +194,6 @@
       }
     }
     
-    .edit-button {
-      flex-shrink: 0;
-      width: 40px;
-      height: 40px;
-      border: 1px solid $border-standard;
-      background-color: $background-white;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: $primary-color;
-      
-      i {
-        font-size: 1rem;
-      }
-      
-      &:hover:not(:disabled) {
-        background-color: $primary-color;
-        color: $background-white;
-        border-color: $primary-color;
-      }
-      
-      &:disabled {
-        cursor: not-allowed;
-        opacity: 0.5;
-      }
-    }
   }
   
   // AI Button for title generation
@@ -368,78 +339,6 @@
 .submit-actions {
   display: flex;
   gap: $spacing-sm;
-}
-
-.utility-button {
-  @include button-secondary('base');
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-xs;
-  font-weight: $font-weight-medium !important;
-  
-  i {
-    font-size: $font-base;
-  }
-  
-  span {
-    display: inline-block;
-  }
-  
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
-}
-
-.clear-button {
-  @include button-secondary('base');
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-xs;
-  font-weight: $font-weight-medium !important;
-  
-  i {
-    font-size: $font-base;
-  }
-  
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
-}
-
-.cancel-button {
-  @include button-secondary('base');
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-xs;
-  font-weight: $font-weight-medium !important;
-  
-  i {
-    font-size: $font-base;
-  }
-  
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
-}
-
-.submit-button {
-  @include button-primary('base');
-  display: inline-flex;
-  align-items: center;
-  gap: $spacing-xs;
-  font-weight: $font-weight-medium !important;
-  
-  i {
-    font-size: $font-base;
-  }
-  
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  }
 }
 
 // Tags Section Title
@@ -603,16 +502,6 @@
     flex-direction: column;
     width: 100%;
     gap: 0.5rem;
-  }
-  
-  // Full-width buttons with larger touch targets
-  .utility-button,
-  .submit-button,
-  .clear-button,
-  .cancel-button {
-    width: 100%;
-    height: 60px;
-    font-size: 1rem;
   }
   
   // Tag buttons - slightly larger for touch

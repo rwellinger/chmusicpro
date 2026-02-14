@@ -247,12 +247,10 @@
 
                 <!-- Action Buttons -->
                 <div class="detail-actions">
-                    <button type="button"
+                    <button mat-button type="button"
                             (click)="openAdvancedEditor()"
-                            [disabled]="isLoading"
-                            class="action-button edit-button">
-                        <i class="fas fa-edit"></i>
-                        <span>{{ 'promptTemplates.actions.edit' | translate }}</span>
+                            [disabled]="isLoading">
+                        <i class="fas fa-edit"></i> {{ 'promptTemplates.actions.edit' | translate }}
                     </button>
                 </div>
             </ng-container>

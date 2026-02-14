@@ -538,19 +538,14 @@
 
             <!-- Detail Actions -->
             <div class="detail-actions">
-                <button type="button" class="action-button edit-button" (click)="editEquipment(selectedEquipment.id)">
-                    <i class="fas fa-edit"></i>
-                    <span>{{ 'equipment.gallery.actions.edit' | translate }}</span>
+                <button mat-button type="button" (click)="editEquipment(selectedEquipment.id)">
+                    <i class="fas fa-edit"></i> {{ 'equipment.gallery.actions.edit' | translate }}
                 </button>
-                <button type="button" class="action-button duplicate-button"
-                        (click)="duplicateEquipment(selectedEquipment.id)">
-                    <i class="fas fa-copy"></i>
-                    <span>{{ 'equipment.gallery.actions.duplicate' | translate }}</span>
+                <button mat-button type="button" (click)="duplicateEquipment(selectedEquipment.id)">
+                    <i class="fas fa-copy"></i> {{ 'equipment.gallery.actions.duplicate' | translate }}
                 </button>
-                <button type="button" class="action-button delete-button"
-                        (click)="confirmDelete(selectedEquipment.id, $event)">
-                    <i class="fas fa-trash"></i>
-                    <span>{{ 'equipment.gallery.actions.delete' | translate }}</span>
+                <button mat-button type="button" (click)="confirmDelete(selectedEquipment.id, $event)">
+                    <i class="fas fa-trash"></i> {{ 'equipment.gallery.actions.delete' | translate }}
                 </button>
             </div>
         </mat-card>

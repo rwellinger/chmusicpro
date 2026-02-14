@@ -261,9 +261,7 @@
                             #fileInput
                             (change)="onFileSelect($event)"
                             style="display: none">
-                        <button
-                            type="button"
-                            class="action-button secondary-button"
+                        <button mat-button type="button"
                             (click)="fileInput.click()"
                             [disabled]="isUploadingFile">
                             <mat-icon>{{ isUploadingFile ? 'hourglass_empty' : 'upload' }}</mat-icon>
@@ -312,17 +310,14 @@
 
             <!-- Form Actions -->
             <div class="form-actions">
-                <button
-                        type="button"
-                        class="action-button secondary-button"
+                <button mat-button type="button"
                         (click)="onCancel()"
                         [disabled]="isSaving">
                     <mat-icon>close</mat-icon>
                     {{ 'equipment.editor.cancel' | translate }}
                 </button>
-                <button
+                <button mat-flat-button color="primary"
                         type="submit"
-                        class="action-button primary-button"
                         [disabled]="isSaving || equipmentForm.invalid">
                     <mat-icon>{{ isSaving ? 'hourglass_empty' : 'save' }}</mat-icon>
                     {{ (isSaving ? 'equipment.editor.saving' : 'equipment.editor.save') | translate }}

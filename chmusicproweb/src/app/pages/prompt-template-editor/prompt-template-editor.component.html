@@ -13,23 +13,15 @@
                     </p>
                 </div>
                 <div class="navigation-buttons">
-                    <button
-                            type="button"
+                    <button mat-button type="button"
                             (click)="cancel()"
-                            class="cancel-button"
-                            [disabled]="isSaving"
-                            [title]="'common.cancel' | translate">
-                        <i class="fas fa-times"></i>
-                        <span>{{ 'common.cancel' | translate }}</span>
+                            [disabled]="isSaving">
+                        <i class="fas fa-times"></i> {{ 'common.cancel' | translate }}
                     </button>
-                    <button
-                            type="button"
+                    <button mat-flat-button color="primary" type="button"
                             (click)="save()"
-                            class="apply-button"
-                            [disabled]="isSaving || editorForm.invalid"
-                            [title]="'common.apply' | translate">
-                        <i class="fas fa-check"></i>
-                        <span>{{ 'common.apply' | translate }}</span>
+                            [disabled]="isSaving || editorForm.invalid">
+                        <i class="fas fa-check"></i> {{ 'common.apply' | translate }}
                     </button>
                 </div>
             </div>

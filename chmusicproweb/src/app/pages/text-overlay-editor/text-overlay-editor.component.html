@@ -227,22 +227,18 @@
 
                         <!-- Action Buttons -->
                         <div class="button-group">
-                            <button
-                                    type="button"
+                            <button mat-flat-button color="primary" type="button"
                                     (click)="applyTextOverlay()"
-                                    [disabled]="!form.valid || isProcessing"
-                                    class="action-button">
+                                    [disabled]="!form.valid || isProcessing">
                                 <mat-spinner *ngIf="isProcessing" diameter="20" class="button-spinner"></mat-spinner>
                                 <span *ngIf="!isProcessing">{{ 'textOverlayEditor.buttons.apply' | translate }}</span>
                             </button>
 
-                            <button
-                                    type="button"
+                            <button mat-button type="button"
                                     (click)="downloadResult()"
-                                    [disabled]="!resultImageFilePath"
-                                    class="action-button action-button--secondary">
+                                    [disabled]="!resultImageFilePath">
                                 <i class="fas fa-download"></i>
-                                <span>{{ 'textOverlayEditor.buttons.download' | translate }}</span>
+                                {{ 'textOverlayEditor.buttons.download' | translate }}
                             </button>
                         </div>
                     </form>

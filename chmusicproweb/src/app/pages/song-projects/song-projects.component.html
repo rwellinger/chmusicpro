@@ -473,52 +473,31 @@
 
                 <!-- Detail Actions -->
                 <div class="detail-actions">
-                    <button type="button" class="action-button refresh-button" (click)="refreshProject()">
-                        <i class="fas fa-sync-alt"></i>
-                        <span>{{ 'common.refresh' | translate }}</span>
+                    <button mat-button type="button" (click)="refreshProject()">
+                        <i class="fas fa-sync-alt"></i> {{ 'common.refresh' | translate }}
                     </button>
-                    <button type="button" class="action-button complete-clone-button"
-                            (click)="copyCLICompleteCloneCommand()">
-                        <i class="fas fa-code"></i>
-                        <span>{{ 'songProjects.detail.copyCompleteClone' | translate }}</span>
+                    <button mat-button type="button" (click)="copyCLICompleteCloneCommand()">
+                        <i class="fas fa-code"></i> {{ 'songProjects.detail.copyCompleteClone' | translate }}
                     </button>
-                    <button
-                            type="button"
-                            class="action-button edit-button"
-                            (click)="openEditDialog()"
-                            [disabled]="selectedProject.project_status === 'archived'"
-                            [matTooltip]="selectedProject.project_status === 'archived' ? ('songProjects.warnings.editBlocked' | translate) : ''"
-                    >
-                        <i class="fas fa-edit"></i>
-                        <span>{{ 'songProjects.list.actions.edit' | translate }}</span>
-                    </button>
-                    <button
-                            type="button"
-                            class="action-button archive-button"
-                            (click)="toggleProjectStatus()"
+                    <button mat-button type="button"
                             *ngIf="selectedProject.project_status !== 'archived'"
-                    >
-                        <i class="fas fa-archive"></i>
-                        <span>{{ 'songProjects.actions.archive' | translate }}</span>
+                            (click)="openEditDialog()">
+                        <i class="fas fa-edit"></i> {{ 'songProjects.list.actions.edit' | translate }}
                     </button>
-                    <button
-                            type="button"
-                            class="action-button unarchive-button"
-                            (click)="toggleProjectStatus()"
+                    <button mat-button type="button"
+                            *ngIf="selectedProject.project_status !== 'archived'"
+                            (click)="toggleProjectStatus()">
+                        <i class="fas fa-archive"></i> {{ 'songProjects.actions.archive' | translate }}
+                    </button>
+                    <button mat-button type="button"
                             *ngIf="selectedProject.project_status === 'archived'"
-                    >
-                        <i class="fas fa-box-open"></i>
-                        <span>{{ 'songProjects.actions.unarchive' | translate }}</span>
+                            (click)="toggleProjectStatus()">
+                        <i class="fas fa-box-open"></i> {{ 'songProjects.actions.unarchive' | translate }}
                     </button>
-                    <button
-                            type="button"
-                            class="action-button delete-button"
-                            (click)="deleteProject()"
-                            [disabled]="selectedProject.project_status === 'archived' || (selectedProject.assigned_releases && selectedProject.assigned_releases.length > 0)"
-                            [matTooltip]="selectedProject.assigned_releases && selectedProject.assigned_releases.length > 0 ? ('songProjects.warnings.deleteBlockedRelease' | translate:{count: selectedProject.assigned_releases.length}) : (selectedProject.project_status === 'archived' ? ('songProjects.warnings.deleteBlocked' | translate) : '')"
-                    >
-                        <i class="fas fa-trash"></i>
-                        <span>{{ 'songProjects.list.actions.delete' | translate }}</span>
+                    <button mat-button type="button"
+                            *ngIf="selectedProject.project_status !== 'archived' && !(selectedProject.assigned_releases && selectedProject.assigned_releases.length > 0)"
+                            (click)="deleteProject()">
+                        <i class="fas fa-trash"></i> {{ 'songProjects.list.actions.delete' | translate }}
                     </button>
                 </div>
             </div>

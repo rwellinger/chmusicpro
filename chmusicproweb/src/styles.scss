@@ -362,12 +362,12 @@ select {
   }
 }
 
-form button[type="submit"] {
+form button[type="submit"]:not([mat-button]):not([mat-flat-button]):not([mat-raised-button]):not([mat-stroked-button]):not([mat-icon-button]) {
   @include button-primary('lg');
 }
 
-/* Form buttons - neutral by default, AI-buttons and Material components excluded */
-form button[type="button"]:not(.magic-icon-button):not(.dropdown-item):not(.mdc-switch__icon) {
+/* Form buttons - neutral by default, AI/Material components excluded */
+form button[type="button"]:not(.magic-icon-button):not(.dropdown-item):not(.mdc-switch__icon):not([mat-button]):not([mat-flat-button]):not([mat-raised-button]):not([mat-stroked-button]):not([mat-icon-button]) {
   @include button-secondary('lg');
 }
 

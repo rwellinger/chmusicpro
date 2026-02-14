@@ -685,14 +685,6 @@
   }
 }
 
-.edit-button {
-  @include button-secondary('base');
-}
-
-.delete-button {
-  @include button-secondary('base');
-}
-
 // Responsive
 @media (max-width: 1200px) {
   .song-release-container {

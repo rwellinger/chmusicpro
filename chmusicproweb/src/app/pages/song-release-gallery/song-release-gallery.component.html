@@ -322,19 +322,11 @@
 
                 <!-- Detail Actions -->
                 <div class="detail-actions">
-                    <button
-                            type="button"
-                            class="action-button edit-button"
-                            (click)="editRelease()">
-                        <i class="fas fa-edit"></i>
-                        <span>{{ 'songRelease.gallery.actions.edit' | translate }}</span>
+                    <button mat-button type="button" (click)="editRelease()">
+                        <i class="fas fa-edit"></i> {{ 'songRelease.gallery.actions.edit' | translate }}
                     </button>
-                    <button
-                            type="button"
-                            class="action-button delete-button"
-                            (click)="deleteRelease()">
-                        <i class="fas fa-trash"></i>
-                        <span>{{ 'songRelease.gallery.actions.delete' | translate }}</span>
+                    <button mat-button type="button" (click)="deleteRelease()">
+                        <i class="fas fa-trash"></i> {{ 'songRelease.gallery.actions.delete' | translate }}
                     </button>
                 </div>
             </div>

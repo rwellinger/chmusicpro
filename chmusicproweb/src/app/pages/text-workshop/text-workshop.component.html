@@ -232,20 +232,14 @@
                                     </div>
                                 </div>
                                 <div class="selection-actions">
-                                    <button
-                                        type="button"
-                                        class="action-button save-button"
+                                    <button mat-flat-button color="primary" type="button"
                                         (click)="applyInspirationSelection()"
                                         [disabled]="!hasSelectedInspirations">
-                                        <i class="fas fa-check"></i>
-                                        <span>{{ 'workshop.selection.applyButton' | translate }}</span>
+                                        <i class="fas fa-check"></i> {{ 'workshop.selection.applyButton' | translate }}
                                     </button>
-                                    <button
-                                        type="button"
-                                        class="action-button export-button"
+                                    <button mat-button type="button"
                                         (click)="cancelInspirationSelection()">
-                                        <i class="fas fa-times"></i>
-                                        <span>{{ 'workshop.selection.cancelButton' | translate }}</span>
+                                        <i class="fas fa-times"></i> {{ 'workshop.selection.cancelButton' | translate }}
                                     </button>
                                 </div>
                             </div>
@@ -336,20 +330,14 @@
                                     </div>
                                 </div>
                                 <div class="selection-actions">
-                                    <button
-                                        type="button"
-                                        class="action-button save-button"
+                                    <button mat-flat-button color="primary" type="button"
                                         (click)="applyStorySelection()"
                                         [disabled]="!hasSelectedStories">
-                                        <i class="fas fa-check"></i>
-                                        <span>{{ 'workshop.selection.applyButton' | translate }}</span>
+                                        <i class="fas fa-check"></i> {{ 'workshop.selection.applyButton' | translate }}
                                     </button>
-                                    <button
-                                        type="button"
-                                        class="action-button export-button"
+                                    <button mat-button type="button"
                                         (click)="cancelStorySelection()">
-                                        <i class="fas fa-times"></i>
-                                        <span>{{ 'workshop.selection.cancelButton' | translate }}</span>
+                                        <i class="fas fa-times"></i> {{ 'workshop.selection.cancelButton' | translate }}
                                     </button>
                                 </div>
                             </div>
@@ -528,21 +516,17 @@
                 <!-- Action Section -->
                 <div class="action-section">
                     <div class="utility-actions">
-                        <button
-                            type="button"
-                            class="action-button preview-toggle-button"
+                        <button mat-button type="button"
                             [class.active]="isPreviewMode"
                             (click)="togglePreviewMode()">
                             <i class="fas" [ngClass]="isPreviewMode ? 'fa-edit' : 'fa-eye'"></i>
-                            <span>{{ (isPreviewMode ? 'workshop.preview.exitPreview' : 'workshop.preview.enterPreview') | translate }}</span>
+                            {{ (isPreviewMode ? 'workshop.preview.exitPreview' : 'workshop.preview.enterPreview') | translate }}
                         </button>
-                        <button
-                            type="button"
-                            class="action-button export-md-button"
+                        <button mat-button type="button"
                             (click)="exportToMarkdown()"
                             [title]="'workshop.export.markdownTitle' | translate">
                             <i class="fas fa-file-arrow-down"></i>
-                            <span>{{ 'workshop.export.markdown' | translate }}</span>
+                            {{ 'workshop.export.markdown' | translate }}
                         </button>
                     </div>
                     <div class="submit-actions">
@@ -550,13 +534,11 @@
                             <i class="fas" [ngClass]="saveStatus === 'saving' ? 'fa-spinner fa-spin' : 'fa-check'"></i>
                             {{ (saveStatus === 'saving' ? 'workshop.editor.saving' : 'workshop.editor.saved') | translate }}
                         </span>
-                        <button
-                            type="button"
-                            class="action-button export-button"
+                        <button mat-flat-button color="primary" type="button"
                             (click)="exportToSketch()"
                             [disabled]="isExporting || currentPhase === 'completed'">
                             <i class="fas" [ngClass]="isExporting ? 'fa-spinner fa-spin' : 'fa-file-export'"></i>
-                            <span>{{ 'workshop.editor.exportToSketch' | translate }}</span>
+                            {{ 'workshop.editor.exportToSketch' | translate }}
                         </button>
                     </div>
                 </div>

@@ -291,39 +291,6 @@
   justify-content: flex-end;
   padding-top: $spacing-lg;
   border-top: 1px solid $border-light;
-  
-  .action-button {
-    display: inline-flex;
-    align-items: center;
-    gap: $spacing-xs;
-    font-weight: $font-weight-medium !important;
-    
-    i {
-      font-size: $font-base;
-    }
-    
-    span {
-      display: inline-block;
-    }
-    
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-    
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-  
-  .cancel-button {
-    @include button-secondary('base');
-  }
-  
-  .save-button {
-    @include button-primary('base');
-  }
 }
 
 // Responsive
@@ -344,10 +311,5 @@
   
   .editor-actions {
     flex-direction: column;
-    
-    .action-button {
-      width: 100%;
-      justify-content: center;
-    }
   }
 }
