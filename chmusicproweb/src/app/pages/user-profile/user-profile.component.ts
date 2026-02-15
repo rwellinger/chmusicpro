@@ -23,7 +23,7 @@ import {UserSettingsService} from "../../services/user-settings.service";
 import {LanguageService} from "../../services/language.service";
 import {CostService, MonthlyCosts} from "../../services/config/cost.service";
 import {User} from "../../models/user.model";
-import {DomainTypeLabels, DomainWithRole} from "../../models/domain.model";
+import {DomainType, DomainTypeLabels, DomainWithRole} from "../../models/domain.model";
 import {Language, UserSettings} from "../../models/user-settings.model";
 
 @Component({
@@ -475,6 +475,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     /**
      * Get icon class for a domain type
      */
+    public isSystemDomain(dwr: DomainWithRole): boolean {
+        return dwr.domain.type === DomainType.SYSTEM || dwr.domain.type === DomainType.KI_TEMPLATES;
+    }
+
     public getDomainTypeIcon(type: number): string {
         switch (type) {
             case 0: return "fas fa-shield-alt";

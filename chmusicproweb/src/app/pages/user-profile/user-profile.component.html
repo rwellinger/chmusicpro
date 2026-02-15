@@ -43,7 +43,7 @@
                             <button
                                     mat-button
                                     class="switch-button"
-                                    *ngIf="dwr.domain.id !== activeDomainId"
+                                    *ngIf="dwr.domain.id !== activeDomainId && !isSystemDomain(dwr)"
                                     [disabled]="isSwitchingDomain"
                                     (click)="switchDomain(dwr.domain.id)">
                                 <i class="fas fa-exchange-alt" *ngIf="!isSwitchingDomain"></i>

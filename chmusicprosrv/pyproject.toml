@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chmusicprosrv"
-version = "0.2.3"
+version = "0.3.0"
 dependencies = [
     "Flask>=3.1.2",
     "Flask-CORS>=4.0.0",

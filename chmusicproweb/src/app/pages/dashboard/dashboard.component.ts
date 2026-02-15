@@ -2,14 +2,13 @@ import {Component, inject, OnDestroy, OnInit} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {Router, RouterModule} from "@angular/router";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
-import {catchError, firstValueFrom, forkJoin, of, Subject, takeUntil} from "rxjs";
+import {catchError, forkJoin, of, Subject, takeUntil} from "rxjs";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {HttpClient} from "@angular/common/http";
 import {WorkshopService} from "../../services/business/workshop.service";
 import {SongProjectService} from "../../services/business/song-project.service";
 import {SongReleaseService} from "../../services/business/song-release.service";
 import {ApiConfigService} from "../../services/config/api-config.service";
-import {NotificationService} from "../../services/ui/notification.service";
 import {Workshop, WorkshopListResponse} from "../../models/workshop.model";
 import {SongProjectListItem, SongProjectListResponse} from "../../models/song-project.model";
 import {SongReleaseListItem, SongReleaseListResponse} from "../../models/song-release.model";
@@ -54,7 +53,6 @@ interface RecentCategory {
 export class DashboardComponent implements OnInit, OnDestroy {
     tiles: DashboardTile[] = [];
     recentCategories: RecentCategory[] = [];
-    isCreatingWorkshop = false;
     isLoadingRecent = true;
 
     private router = inject(Router);
@@ -64,7 +62,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private songProjectService = inject(SongProjectService);
     private songReleaseService = inject(SongReleaseService);
     private apiConfig = inject(ApiConfigService);
-    private notificationService = inject(NotificationService);
     private destroy$ = new Subject<void>();
 
     ngOnInit(): void {
@@ -75,7 +72,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 icon: "fa-pen-fancy",
                 iconColor: "#AD1457",
                 enabled: true,
-                action: () => this.startWorkshop()
+                action: () => this.router.navigate(["/text-workshop"])
             },
             {
                 titleKey: "dashboard.tiles.composition.title",
@@ -91,7 +88,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 icon: "fa-image",
                 iconColor: "#28a745",
                 enabled: true,
-                action: () => this.router.navigate(["/imagegen"], {queryParams: {composition: "album-cover"}})
+                action: () => this.router.navigate(["/imageview"])
             },
             {
                 titleKey: "dashboard.tiles.mixing.title",
@@ -115,7 +112,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 icon: "fa-share-alt",
                 iconColor: "#ff9800",
                 enabled: true,
-                action: () => this.router.navigate(["/song-releases/new"])
+                action: () => this.router.navigate(["/song-releases"])
             },
             {
                 titleKey: "dashboard.tiles.promote.title",
@@ -267,26 +264,4 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return categories;
     }
 
-    private async startWorkshop(): Promise<void> {
-        if (this.isCreatingWorkshop) return;
-        this.isCreatingWorkshop = true;
-
-        try {
-            const response = await firstValueFrom(
-                this.workshopService.createWorkshop({
-                    title: this.translate.instant("workshop.newWorkshopTitle")
-                }).pipe(takeUntil(this.destroy$))
-            );
-            if (response?.data?.id) {
-                this.router.navigate(["/text-workshop", response.data.id]);
-            }
-        } catch (error) {
-            console.error("Failed to create workshop:", error);
-            this.notificationService.error(
-                this.translate.instant("workshop.errors.createFailed")
-            );
-        } finally {
-            this.isCreatingWorkshop = false;
-        }
-    }
 }

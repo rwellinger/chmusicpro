@@ -100,7 +100,7 @@
                     </div>
                 </div>
                 <button class="deactivate-btn"
-                        *ngIf="isSystemAdmin() && !isReservedDomain()"
+                        *ngIf="isSystemAdmin() && !isReservedDomain() && !isActiveDomain()"
                         (click)="deactivateDomain()">
                     <i class="fas fa-ban"></i>
                     {{ 'domainManagement.deactivate' | translate }}

@@ -287,4 +287,11 @@ export class DomainManagementComponent implements OnInit, OnDestroy {
         return this.selectedDomain.domain.type === DomainType.SYSTEM
             || this.selectedDomain.domain.type === DomainType.KI_TEMPLATES;
     }
+
+    isActiveDomain(): boolean {
+        if (!this.selectedDomain) {
+            return false;
+        }
+        return this.selectedDomain.domain.id === this.authService.getActiveDomainId();
+    }
 }
