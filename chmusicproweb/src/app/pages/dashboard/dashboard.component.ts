@@ -1,5 +1,5 @@
 import {Component, inject, OnDestroy, OnInit} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {Router, RouterModule} from "@angular/router";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {catchError, forkJoin, of, Subject, takeUntil} from "rxjs";
@@ -42,11 +42,10 @@ interface RecentCategory {
     selector: "app-dashboard",
     standalone: true,
     imports: [
-        CommonModule,
-        TranslateModule,
-        RouterModule,
-        MatTooltipModule
-    ],
+    TranslateModule,
+    RouterModule,
+    MatTooltipModule
+],
     templateUrl: "./dashboard.component.html",
     styleUrl: "./dashboard.component.scss"
 })

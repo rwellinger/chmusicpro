@@ -1,5 +1,5 @@
 import {Component, inject, OnDestroy, OnInit} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {FormsModule} from "@angular/forms";
 import {MatCardModule} from "@angular/material/card";
 import {MatButtonModule} from "@angular/material/button";
@@ -27,17 +27,16 @@ import {
     selector: "app-domain-management",
     standalone: true,
     imports: [
-        CommonModule,
-        FormsModule,
-        MatCardModule,
-        MatButtonModule,
-        MatSelectModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSnackBarModule,
-        MatTooltipModule,
-        TranslateModule
-    ],
+    FormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSnackBarModule,
+    MatTooltipModule,
+    TranslateModule
+],
     templateUrl: "./domain-management.component.html",
     styleUrl: "./domain-management.component.scss"
 })

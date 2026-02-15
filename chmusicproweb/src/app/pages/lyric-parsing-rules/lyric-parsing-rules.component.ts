@@ -1,5 +1,5 @@
 import {Component, inject, OnDestroy, OnInit, ViewEncapsulation} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatTableModule} from "@angular/material/table";
 import {MatButtonModule} from "@angular/material/button";
@@ -28,21 +28,20 @@ import {NotificationService} from "../../services/ui/notification.service";
     selector: "app-lyric-parsing-rules",
     standalone: true,
     imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        FormsModule,
-        MatTableModule,
-        MatButtonModule,
-        MatIconModule,
-        MatCardModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        MatSlideToggleModule,
-        MatTooltipModule,
-        DragDropModule,
-        TranslateModule
-    ],
+    ReactiveFormsModule,
+    FormsModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatSlideToggleModule,
+    MatTooltipModule,
+    DragDropModule,
+    TranslateModule
+],
     templateUrl: "./lyric-parsing-rules.component.html",
     styleUrl: "./lyric-parsing-rules.component.scss",
     encapsulation: ViewEncapsulation.None

@@ -1,5 +1,5 @@
 import {Component, inject, OnInit} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {FormsModule} from "@angular/forms";
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import {MatFormFieldModule} from "@angular/material/form-field";
@@ -35,14 +35,13 @@ interface ProjectFolder {
     selector: "app-assign-to-project-dialog",
     standalone: true,
     imports: [
-        CommonModule,
-        FormsModule,
-        MatDialogModule,
-        MatFormFieldModule,
-        MatSelectModule,
-        MatButtonModule,
-        TranslateModule
-    ],
+    FormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatButtonModule,
+    TranslateModule
+],
     templateUrl: "./assign-to-project-dialog.component.html",
     styleUrl: "./assign-to-project-dialog.component.scss"
 })

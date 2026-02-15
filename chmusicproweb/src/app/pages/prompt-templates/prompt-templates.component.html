@@ -1,267 +1,274 @@
 <div class="prompt-templates-container master-detail-layout">
-    <!-- Left Side: Template Library Section -->
-    <div class="list-section">
-        <div class="list-card">
-            <div class="list-header">
-                <div class="header-title">
-                    <div class="header-title-group">
-                        <h2>
-                            <i class="fas fa-file-alt"></i>
-                            {{ 'promptTemplates.title' | translate }}
-                        </h2>
-                        <div class="templates-count-badge" *ngIf="filteredTemplates.length > 0">
-                            {{ 'promptTemplates.list.count' | translate:{count: filteredTemplates.length} }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="filters-section">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text"
-                           [placeholder]="'promptTemplates.list.searchPlaceholder' | translate"
-                           class="search-input"
-                           [(ngModel)]="searchTerm"
-                           (input)="onSearchChange($event)"
-                           [disabled]="isLoading"
-                           #searchInput>
-                    <button type="button"
-                            class="clear-search-button"
-                            *ngIf="searchTerm"
-                            (click)="clearSearch()"
-                            [disabled]="isLoading"
-                            [title]="'promptTemplates.list.clearSearch' | translate">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <div class="category-filter">
-                    <button type="button"
-                            class="filter-btn"
-                            [class.active]="currentCategory === 'all'"
-                            (click)="onCategoryChange('all')">
-                        {{ 'promptTemplates.filters.all' | translate }}
-                    </button>
-                    <button type="button"
-                            class="filter-btn"
-                            [class.active]="currentCategory === 'lyrics'"
-                            (click)="onCategoryChange('lyrics')">
-                        {{ 'promptTemplates.filters.lyrics' | translate }}
-                    </button>
-                    <button type="button"
-                            class="filter-btn"
-                            [class.active]="currentCategory === 'image'"
-                            (click)="onCategoryChange('image')">
-                        {{ 'promptTemplates.filters.image' | translate }}
-                    </button>
-                    <button type="button"
-                            class="filter-btn"
-                            [class.active]="currentCategory === 'music'"
-                            (click)="onCategoryChange('music')">
-                        {{ 'promptTemplates.filters.music' | translate }}
-                    </button>
-                    <button type="button"
-                            class="filter-btn"
-                            [class.active]="currentCategory === 'titel'"
-                            (click)="onCategoryChange('titel')">
-                        {{ 'promptTemplates.filters.titel' | translate }}
-                    </button>
-                    <button type="button"
-                            class="filter-btn"
-                            [class.active]="currentCategory === 'description'"
-                            (click)="onCategoryChange('description')">
-                        {{ 'promptTemplates.filters.description' | translate }}
-                    </button>
-                    <button type="button"
-                            class="filter-btn"
-                            [class.active]="currentCategory === 'other'"
-                            (click)="onCategoryChange('other')">
-                        {{ 'promptTemplates.filters.other' | translate }}
-                    </button>
-                </div>
-            </div>
-
-            <div class="template-list" [class.loading]="isLoading">
-                <div class="loading-overlay" *ngIf="isLoading">
-                    <div class="loading-content">
-                        <i class="fas fa-spinner fa-spin loading-icon"></i>
-                        <span class="loading-text">{{ loadingMessage }}</span>
-                    </div>
-                </div>
-
-                <div *ngIf="paginatedTemplates.length > 0">
-                    <div class="template-item"
-                         *ngFor="let template of paginatedTemplates; trackBy: trackByTemplate"
-                         [class.selected]="selectedTemplate?.category === template.category && selectedTemplate?.action === template.action"
-                         (click)="selectTemplate(template)">
-
-                        <div class="template-header">
-                            <div class="template-name">{{ getTemplateDisplayName(template) }}</div>
-                            <div class="template-version" *ngIf="template.version">v{{ template.version }}</div>
-                        </div>
-
-                        <div class="template-description" *ngIf="template.description">
-                            {{ template.description.length > 60 ? template.description.substring(0, 57) + '...' : template.description }}
-                        </div>
-
-                        <div class="template-meta">
-                            <span class="template-status">
-                                <i class="fas fa-circle" [class.active]="template.active"></i>
-                                {{ (template.active ? 'promptTemplates.list.status.active' : 'promptTemplates.list.status.inactive') | translate }}
-                            </span>
-                            <span class="template-updated" *ngIf="template.updated_at">
-                                {{ formatDate(template.updated_at) }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="empty-state" *ngIf="filteredTemplates.length === 0 && !isLoading">
-                    <i class="fas fa-file-alt"></i>
-                    <p>{{ (currentCategory === 'all' ? 'promptTemplates.list.noTemplates' : 'promptTemplates.list.noTemplatesInCategory') | translate }}</p>
-                </div>
-            </div>
-
-            <!-- Pagination -->
-            <div class="pagination" *ngIf="pagination.total > pagination.limit">
-                <button type="button"
-                        class="pagination-btn"
-                        (click)="previousPage()"
-                        [disabled]="pagination.offset === 0 || isLoading">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-
-                <span class="pagination-info">
-                    {{ Math.floor(pagination.offset / pagination.limit) + 1 }}
-                    / {{ Math.ceil(pagination.total / pagination.limit) }}
-                </span>
-
-                <button type="button"
-                        class="pagination-btn"
-                        (click)="nextPage()"
-                        [disabled]="pagination.offset + pagination.limit >= pagination.total || isLoading">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
+  <!-- Left Side: Template Library Section -->
+  <div class="list-section">
+    <div class="list-card">
+      <div class="list-header">
+        <div class="header-title">
+          <div class="header-title-group">
+            <h2>
+              <i class="fas fa-file-alt"></i>
+              {{ 'promptTemplates.title' | translate }}
+            </h2>
+            @if (filteredTemplates.length > 0) {
+              <div class="templates-count-badge">
+                {{ 'promptTemplates.list.count' | translate:{count: filteredTemplates.length} }}
+              </div>
+            }
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- Right Side: Template Details Section -->
-    <div class="detail-section">
-        <div class="detail-card" [class.empty-detail]="!selectedTemplate">
-            <ng-container *ngIf="selectedTemplate; else emptyDetail">
-                <div class="detail-header">
-                    <i class="fas fa-file-alt detail-type-icon"></i>
-                    <div class="detail-title-group">
-                        <h3>{{ getTemplateDisplayName(selectedTemplate) }}</h3>
-                        <div class="detail-subtitle">
-                            <span class="version-badge"
-                                  *ngIf="selectedTemplate.version">v{{ selectedTemplate.version }}</span>
-                            <span class="status-badge" [class.active]="selectedTemplate.active">
-                                {{ (selectedTemplate.active ? 'promptTemplates.list.status.active' : 'promptTemplates.list.status.inactive') | translate }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="detail-content">
-                    <!-- Read-only view -->
-                    <div>
-                        <div class="detail-section-block">
-                            <h4 class="section-title">
-                                <i class="fas fa-info-circle"></i>
-                                {{ 'promptTemplates.detail.fields.description' | translate }}
-                            </h4>
-                            <div class="detail-field">
-                                <div class="readonly-field">
-                                    {{ selectedTemplate.description || ('promptTemplates.detail.defaults.noDescription' | translate) }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="detail-section-block">
-                            <h4 class="section-title">
-                                <i class="fas fa-cog"></i>
-                                {{ 'promptTemplates.detail.aiParameters' | translate }}
-                            </h4>
-
-                            <div class="detail-field-row">
-                                <div class="detail-field">
-                                    <span class="field-label">{{ 'promptTemplates.detail.fields.model' | translate }}</span>
-                                    <div class="readonly-field">
-                                        {{ selectedTemplate.model || ('promptTemplates.detail.defaults.model' | translate) }}
-                                    </div>
-                                </div>
-
-                                <div class="detail-field">
-                                    <span class="field-label">{{ 'promptTemplates.detail.fields.temperature' | translate }}</span>
-                                    <div class="readonly-field">
-                                        {{ selectedTemplate.temperature !== null ? getTemperatureLabel(selectedTemplate.temperature) : ('promptTemplates.detail.defaults.temperature' | translate) }}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="detail-field">
-                                <span class="field-label">{{ 'promptTemplates.detail.fields.maxTokens' | translate }}</span>
-                                <div class="readonly-field">
-                                    {{ selectedTemplate.max_tokens !== null && selectedTemplate.max_tokens !== undefined ? selectedTemplate.max_tokens + ' ' + getTokensToWordsHint(selectedTemplate.max_tokens) : ('promptTemplates.detail.defaults.maxTokens' | translate) }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="detail-section-block">
-                            <h4 class="section-title">
-                                <i class="fas fa-code"></i>
-                                {{ 'promptTemplates.detail.fields.preCondition' | translate }}
-                            </h4>
-                            <div class="detail-field">
-                                <div class="readonly-field multiline">{{ selectedTemplate.pre_condition }}</div>
-                            </div>
-                        </div>
-
-                        <div class="detail-section-block">
-                            <h4 class="section-title">
-                                <i class="fas fa-code"></i>
-                                {{ 'promptTemplates.detail.fields.postCondition' | translate }}
-                            </h4>
-                            <div class="detail-field">
-                                <div class="readonly-field multiline">{{ selectedTemplate.post_condition }}</div>
-                            </div>
-                        </div>
-
-                        <div class="metadata-compact">
-                            <div class="meta-grid">
-                                <div class="meta-item">
-                                    <i class="fas fa-calendar meta-icon"></i>
-                                    <span class="meta-value">{{ formatDate(selectedTemplate.created_at) }}</span>
-                                </div>
-                                <div class="meta-item" *ngIf="selectedTemplate.updated_at">
-                                    <i class="fas fa-sync meta-icon"></i>
-                                    <span class="meta-value">{{ formatDate(selectedTemplate.updated_at) }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="detail-actions">
-                    <button mat-button type="button"
-                            (click)="openAdvancedEditor()"
-                            [disabled]="isLoading">
-                        <i class="fas fa-edit"></i> {{ 'promptTemplates.actions.edit' | translate }}
-                    </button>
-                </div>
-            </ng-container>
-
-            <ng-template #emptyDetail>
-                <div class="empty-detail-content">
-                    <i class="fas fa-mouse-pointer"></i>
-                    <p>{{ 'promptTemplates.detail.noSelection' | translate }}</p>
-                </div>
-            </ng-template>
+      <div class="filters-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text"
+            [placeholder]="'promptTemplates.list.searchPlaceholder' | translate"
+            class="search-input"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange($event)"
+            [disabled]="isLoading"
+            #searchInput>
+          @if (searchTerm) {
+            <button type="button"
+              class="clear-search-button"
+              (click)="clearSearch()"
+              [disabled]="isLoading"
+              [title]="'promptTemplates.list.clearSearch' | translate">
+              <i class="fas fa-times"></i>
+            </button>
+          }
         </div>
+
+        <div class="category-filter">
+          <button type="button"
+            class="filter-btn"
+            [class.active]="currentCategory === 'all'"
+            (click)="onCategoryChange('all')">
+            {{ 'promptTemplates.filters.all' | translate }}
+          </button>
+          <button type="button"
+            class="filter-btn"
+            [class.active]="currentCategory === 'lyrics'"
+            (click)="onCategoryChange('lyrics')">
+            {{ 'promptTemplates.filters.lyrics' | translate }}
+          </button>
+          <button type="button"
+            class="filter-btn"
+            [class.active]="currentCategory === 'image'"
+            (click)="onCategoryChange('image')">
+            {{ 'promptTemplates.filters.image' | translate }}
+          </button>
+          <button type="button"
+            class="filter-btn"
+            [class.active]="currentCategory === 'music'"
+            (click)="onCategoryChange('music')">
+            {{ 'promptTemplates.filters.music' | translate }}
+          </button>
+          <button type="button"
+            class="filter-btn"
+            [class.active]="currentCategory === 'titel'"
+            (click)="onCategoryChange('titel')">
+            {{ 'promptTemplates.filters.titel' | translate }}
+          </button>
+          <button type="button"
+            class="filter-btn"
+            [class.active]="currentCategory === 'description'"
+            (click)="onCategoryChange('description')">
+            {{ 'promptTemplates.filters.description' | translate }}
+          </button>
+          <button type="button"
+            class="filter-btn"
+            [class.active]="currentCategory === 'other'"
+            (click)="onCategoryChange('other')">
+            {{ 'promptTemplates.filters.other' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <div class="template-list" [class.loading]="isLoading">
+        @if (isLoading) {
+          <div class="loading-overlay">
+            <div class="loading-content">
+              <i class="fas fa-spinner fa-spin loading-icon"></i>
+              <span class="loading-text">{{ loadingMessage }}</span>
+            </div>
+          </div>
+        }
+
+        @if (paginatedTemplates.length > 0) {
+          <div>
+            @for (template of paginatedTemplates; track trackByTemplate($index, template)) {
+              <div class="template-item"
+                [class.selected]="selectedTemplate?.category === template.category && selectedTemplate?.action === template.action"
+                (click)="selectTemplate(template)">
+                <div class="template-header">
+                  <div class="template-name">{{ getTemplateDisplayName(template) }}</div>
+                  @if (template.version) {
+                    <div class="template-version">v{{ template.version }}</div>
+                  }
+                </div>
+                @if (template.description) {
+                  <div class="template-description">
+                    {{ template.description.length > 60 ? template.description.substring(0, 57) + '...' : template.description }}
+                  </div>
+                }
+                <div class="template-meta">
+                  <span class="template-status">
+                    <i class="fas fa-circle" [class.active]="template.active"></i>
+                    {{ (template.active ? 'promptTemplates.list.status.active' : 'promptTemplates.list.status.inactive') | translate }}
+                  </span>
+                  @if (template.updated_at) {
+                    <span class="template-updated">
+                      {{ formatDate(template.updated_at) }}
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (filteredTemplates.length === 0 && !isLoading) {
+          <div class="empty-state">
+            <i class="fas fa-file-alt"></i>
+            <p>{{ (currentCategory === 'all' ? 'promptTemplates.list.noTemplates' : 'promptTemplates.list.noTemplatesInCategory') | translate }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if (pagination.total > pagination.limit) {
+        <div class="pagination">
+          <button type="button"
+            class="pagination-btn"
+            (click)="previousPage()"
+            [disabled]="pagination.offset === 0 || isLoading">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <span class="pagination-info">
+            {{ Math.floor(pagination.offset / pagination.limit) + 1 }}
+            / {{ Math.ceil(pagination.total / pagination.limit) }}
+          </span>
+          <button type="button"
+            class="pagination-btn"
+            (click)="nextPage()"
+            [disabled]="pagination.offset + pagination.limit >= pagination.total || isLoading">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      }
     </div>
+  </div>
+
+  <!-- Right Side: Template Details Section -->
+  <div class="detail-section">
+    <div class="detail-card" [class.empty-detail]="!selectedTemplate">
+      @if (selectedTemplate) {
+        <div class="detail-header">
+          <i class="fas fa-file-alt detail-type-icon"></i>
+          <div class="detail-title-group">
+            <h3>{{ getTemplateDisplayName(selectedTemplate) }}</h3>
+            <div class="detail-subtitle">
+              @if (selectedTemplate.version) {
+                <span class="version-badge"
+                >v{{ selectedTemplate.version }}</span>
+              }
+              <span class="status-badge" [class.active]="selectedTemplate.active">
+                {{ (selectedTemplate.active ? 'promptTemplates.list.status.active' : 'promptTemplates.list.status.inactive') | translate }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="detail-content">
+          <!-- Read-only view -->
+          <div>
+            <div class="detail-section-block">
+              <h4 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                {{ 'promptTemplates.detail.fields.description' | translate }}
+              </h4>
+              <div class="detail-field">
+                <div class="readonly-field">
+                  {{ selectedTemplate.description || ('promptTemplates.detail.defaults.noDescription' | translate) }}
+                </div>
+              </div>
+            </div>
+            <div class="detail-section-block">
+              <h4 class="section-title">
+                <i class="fas fa-cog"></i>
+                {{ 'promptTemplates.detail.aiParameters' | translate }}
+              </h4>
+              <div class="detail-field-row">
+                <div class="detail-field">
+                  <span class="field-label">{{ 'promptTemplates.detail.fields.model' | translate }}</span>
+                  <div class="readonly-field">
+                    {{ selectedTemplate.model || ('promptTemplates.detail.defaults.model' | translate) }}
+                  </div>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">{{ 'promptTemplates.detail.fields.temperature' | translate }}</span>
+                  <div class="readonly-field">
+                    {{ selectedTemplate.temperature !== null ? getTemperatureLabel(selectedTemplate.temperature) : ('promptTemplates.detail.defaults.temperature' | translate) }}
+                  </div>
+                </div>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">{{ 'promptTemplates.detail.fields.maxTokens' | translate }}</span>
+                <div class="readonly-field">
+                  {{ selectedTemplate.max_tokens !== null && selectedTemplate.max_tokens !== undefined ? selectedTemplate.max_tokens + ' ' + getTokensToWordsHint(selectedTemplate.max_tokens) : ('promptTemplates.detail.defaults.maxTokens' | translate) }}
+                </div>
+              </div>
+            </div>
+            <div class="detail-section-block">
+              <h4 class="section-title">
+                <i class="fas fa-code"></i>
+                {{ 'promptTemplates.detail.fields.preCondition' | translate }}
+              </h4>
+              <div class="detail-field">
+                <div class="readonly-field multiline">{{ selectedTemplate.pre_condition }}</div>
+              </div>
+            </div>
+            <div class="detail-section-block">
+              <h4 class="section-title">
+                <i class="fas fa-code"></i>
+                {{ 'promptTemplates.detail.fields.postCondition' | translate }}
+              </h4>
+              <div class="detail-field">
+                <div class="readonly-field multiline">{{ selectedTemplate.post_condition }}</div>
+              </div>
+            </div>
+            <div class="metadata-compact">
+              <div class="meta-grid">
+                <div class="meta-item">
+                  <i class="fas fa-calendar meta-icon"></i>
+                  <span class="meta-value">{{ formatDate(selectedTemplate.created_at) }}</span>
+                </div>
+                @if (selectedTemplate.updated_at) {
+                  <div class="meta-item">
+                    <i class="fas fa-sync meta-icon"></i>
+                    <span class="meta-value">{{ formatDate(selectedTemplate.updated_at) }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Action Buttons -->
+        <div class="detail-actions">
+          <button mat-button type="button"
+            (click)="openAdvancedEditor()"
+            [disabled]="isLoading">
+            <i class="fas fa-edit"></i> {{ 'promptTemplates.actions.edit' | translate }}
+          </button>
+        </div>
+      } @else {
+        <div class="empty-detail-content">
+          <i class="fas fa-mouse-pointer"></i>
+          <p>{{ 'promptTemplates.detail.noSelection' | translate }}</p>
+        </div>
+      }
+
+    </div>
+  </div>
 </div>
 

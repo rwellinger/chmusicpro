@@ -1,5 +1,5 @@
 import {Component, input, output} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 
 export type GridPosition =
     | "top-left"
@@ -15,7 +15,7 @@ export type GridPosition =
 @Component({
     selector: "app-grid-position-selector",
     standalone: true,
-    imports: [CommonModule],
+    imports: [],
     templateUrl: "./grid-position-selector.component.html",
     styleUrl: "./grid-position-selector.component.scss"
 })

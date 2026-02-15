@@ -1,5 +1,5 @@
 import {Component, inject, OnDestroy, OnInit} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
@@ -22,13 +22,12 @@ import {DeviceService} from "../../services/ui/device.service";
     selector: "app-lyric-architect-modal",
     standalone: true,
     imports: [
-        CommonModule,
-        TranslateModule,
-        MatDialogModule,
-        MatButtonModule,
-        MatIconModule,
-        DragDropModule
-    ],
+    TranslateModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+    DragDropModule
+],
     templateUrl: "./lyric-architect-modal.component.html",
     styleUrl: "./lyric-architect-modal.component.scss"
 })

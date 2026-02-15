@@ -1,5 +1,5 @@
 import {Component, EventEmitter, inject, Input, OnDestroy, OnInit, Output} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {MatButtonModule} from "@angular/material/button";
 import {MatChipsModule} from "@angular/material/chips";
 import {MatIconModule} from "@angular/material/icon";
@@ -14,12 +14,11 @@ import {NotificationService} from "../../services/ui/notification.service";
     selector: "app-music-style-chooser-inline",
     standalone: true,
     imports: [
-        CommonModule,
-        TranslateModule,
-        MatButtonModule,
-        MatChipsModule,
-        MatIconModule
-    ],
+    TranslateModule,
+    MatButtonModule,
+    MatChipsModule,
+    MatIconModule
+],
     templateUrl: "./music-style-chooser-inline.component.html",
     styleUrl: "./music-style-chooser-inline.component.scss"
 })

@@ -1,5 +1,5 @@
 import {Component, inject, OnDestroy, OnInit} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {Router, RouterModule} from "@angular/router";
 import {TranslateModule} from "@ngx-translate/core";
 import {Subject} from "rxjs";
@@ -12,7 +12,7 @@ import appVersion from "../../../assets/app-version.json";
 @Component({
     selector: "app-side-menu",
     standalone: true,
-    imports: [RouterModule, CommonModule, TranslateModule],
+    imports: [RouterModule, TranslateModule],
     templateUrl: "./side-menu.component.html",
     styleUrl: "./side-menu.component.scss"
 })

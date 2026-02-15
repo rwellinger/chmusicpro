@@ -1,5 +1,5 @@
 import {Component, inject, OnDestroy, OnInit} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors} from "@angular/forms";
 import {Router, RouterLink} from "@angular/router";
 import {Subject} from "rxjs";
@@ -15,7 +15,7 @@ declare const grecaptcha: any;
 @Component({
     selector: "app-register",
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, TranslateModule, RouterLink],
+    imports: [ReactiveFormsModule, TranslateModule, RouterLink],
     templateUrl: "./register.component.html",
     styleUrls: ["./register.component.scss"]
 })

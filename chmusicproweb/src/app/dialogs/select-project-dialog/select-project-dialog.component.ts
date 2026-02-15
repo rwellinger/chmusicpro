@@ -1,5 +1,5 @@
 import {Component, inject} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import {MatButtonModule} from "@angular/material/button";
 import {MatListModule} from "@angular/material/list";
@@ -17,12 +17,11 @@ export interface ProjectSelectionData {
     selector: "app-select-project-dialog",
     standalone: true,
     imports: [
-        CommonModule,
-        MatDialogModule,
-        MatButtonModule,
-        MatListModule,
-        TranslateModule
-    ],
+    MatDialogModule,
+    MatButtonModule,
+    MatListModule,
+    TranslateModule
+],
     templateUrl: "./select-project-dialog.component.html",
     styleUrl: "./select-project-dialog.component.scss"
 })

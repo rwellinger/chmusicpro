@@ -1,5 +1,5 @@
 import {Component, inject, OnDestroy, OnInit} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {firstValueFrom, Subject, takeUntil} from "rxjs";
@@ -26,17 +26,16 @@ import {ReleaseStatus, ReleaseType, SongRelease} from "../../models/song-release
     selector: "app-song-release-editor",
     standalone: true,
     imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        TranslateModule,
-        MatCardModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        MatDatepickerModule,
-        MatNativeDateModule,
-        MatButtonModule
-    ],
+    ReactiveFormsModule,
+    TranslateModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatButtonModule
+],
     templateUrl: "./song-release-editor.component.html",
     styleUrl: "./song-release-editor.component.scss"
 })

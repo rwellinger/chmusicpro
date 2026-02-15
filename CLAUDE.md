@@ -269,7 +269,7 @@ cat scripts/db/seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U ch
 
 # 🎯 Tech Stack Summary
 
-**Frontend:** Angular 20, Material, SCSS, TypeScript, RxJS, ngx-translate
+**Frontend:** Angular 21, Material, SCSS, TypeScript, RxJS, ngx-translate
 **Backend:** FastAPI, Python 3.12.12, SQLAlchemy, Alembic
 **Database:** PostgreSQL
 **Deployment:** Docker (Colima), Nginx

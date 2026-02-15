@@ -1,396 +1,427 @@
 <div class="user-profile-container master-detail-layout">
-    <!-- Main Content Grid -->
-    <div class="profile-grid">
+  <!-- Main Content Grid -->
+  <div class="profile-grid">
 
-        <!-- Left Column: Domains + User -->
-        <div class="left-section">
-            <!-- Domains Card -->
-            <mat-card class="domains-card">
-                <mat-card-content>
-                    <div class="domains-header">
-                        <div class="domains-avatar">
-                            <i class="fas fa-layer-group"></i>
-                        </div>
-                        <div class="domains-header-text">
-                            <h3>{{ 'userProfile.domains.title' | translate }}</h3>
-                            <p>{{ 'userProfile.domains.subtitle' | translate }}</p>
-                        </div>
+    <!-- Left Column: Domains + User -->
+    <div class="left-section">
+      <!-- Domains Card -->
+      <mat-card class="domains-card">
+        <mat-card-content>
+          <div class="domains-header">
+            <div class="domains-avatar">
+              <i class="fas fa-layer-group"></i>
+            </div>
+            <div class="domains-header-text">
+              <h3>{{ 'userProfile.domains.title' | translate }}</h3>
+              <p>{{ 'userProfile.domains.subtitle' | translate }}</p>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          @if (isLoadingDomains) {
+            <div class="loading-state">
+              <i class="fas fa-spinner fa-spin"></i>
+            </div>
+          }
+
+          <!-- Domain List -->
+          @if (!isLoadingDomains) {
+            <div class="domain-list">
+              @for (dwr of userDomains; track dwr) {
+                <div class="domain-item"
+                  [class.domain-active]="dwr.domain.id === activeDomainId">
+                  <div class="domain-info">
+                    <i [class]="getDomainTypeIcon(dwr.domain.type)" class="domain-icon"></i>
+                    <div class="domain-details">
+                      <span class="domain-name">{{ dwr.domain.name }}</span>
+                      <div class="domain-badges">
+                        <span class="domain-type-badge">{{ domainTypeLabels[dwr.domain.type] }}</span>
+                        <span class="domain-role-badge">{{ dwr.role }}</span>
+                        @if (dwr.domain.id === activeDomainId) {
+                          <span class="active-badge">
+                            {{ 'userProfile.domains.active' | translate }}
+                          </span>
+                        }
+                      </div>
                     </div>
-
-                    <!-- Loading State -->
-                    <div class="loading-state" *ngIf="isLoadingDomains">
+                  </div>
+                  @if (dwr.domain.id !== activeDomainId && !isSystemDomain(dwr)) {
+                    <button
+                      mat-button
+                      class="switch-button"
+                      [disabled]="isSwitchingDomain"
+                      (click)="switchDomain(dwr.domain.id)">
+                      @if (!isSwitchingDomain) {
+                        <i class="fas fa-exchange-alt"></i>
+                      }
+                      @if (isSwitchingDomain) {
                         <i class="fas fa-spinner fa-spin"></i>
-                    </div>
+                      }
+                      {{ 'userProfile.domains.switch' | translate }}
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
 
-                    <!-- Domain List -->
-                    <div class="domain-list" *ngIf="!isLoadingDomains">
-                        <div class="domain-item"
-                             *ngFor="let dwr of userDomains"
-                             [class.domain-active]="dwr.domain.id === activeDomainId">
-                            <div class="domain-info">
-                                <i [class]="getDomainTypeIcon(dwr.domain.type)" class="domain-icon"></i>
-                                <div class="domain-details">
-                                    <span class="domain-name">{{ dwr.domain.name }}</span>
-                                    <div class="domain-badges">
-                                        <span class="domain-type-badge">{{ domainTypeLabels[dwr.domain.type] }}</span>
-                                        <span class="domain-role-badge">{{ dwr.role }}</span>
-                                        <span class="active-badge" *ngIf="dwr.domain.id === activeDomainId">
-                                            {{ 'userProfile.domains.active' | translate }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <button
-                                    mat-button
-                                    class="switch-button"
-                                    *ngIf="dwr.domain.id !== activeDomainId && !isSystemDomain(dwr)"
-                                    [disabled]="isSwitchingDomain"
-                                    (click)="switchDomain(dwr.domain.id)">
-                                <i class="fas fa-exchange-alt" *ngIf="!isSwitchingDomain"></i>
-                                <i class="fas fa-spinner fa-spin" *ngIf="isSwitchingDomain"></i>
-                                {{ 'userProfile.domains.switch' | translate }}
-                            </button>
-                        </div>
-                    </div>
-                </mat-card-content>
-            </mat-card>
-
-            <!-- User Profile Card -->
-            <mat-card class="profile-card">
-                <mat-card-content>
-                    <div class="user-info" *ngIf="currentUser">
-                        <!-- Avatar Section -->
-                        <div class="avatar-section">
-                            <div class="avatar">
-                                <i class="fas fa-user-circle"></i>
-                            </div>
-                            <div class="user-details">
-                                <h3>{{ userDisplayName }}</h3>
-                                <p class="email">{{ currentUser.email }}</p>
-                                <div class="badges">
-                  <span class="badge" [class.active]="currentUser.is_active">
-                    <i class="fas fa-circle"></i>
+      <!-- User Profile Card -->
+      <mat-card class="profile-card">
+        <mat-card-content>
+          @if (currentUser) {
+            <div class="user-info">
+              <!-- Avatar Section -->
+              <div class="avatar-section">
+                <div class="avatar">
+                  <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                  <h3>{{ userDisplayName }}</h3>
+                  <p class="email">{{ currentUser.email }}</p>
+                  <div class="badges">
+                    <span class="badge" [class.active]="currentUser.is_active">
+                      <i class="fas fa-circle"></i>
                       {{ currentUser.is_active ? ('userProfile.active' | translate) : ('userProfile.inactive' | translate) }}
-                  </span>
-                                    <span class="badge" [class.verified]="currentUser.is_verified">
-                    <i class="fas fa-check-circle"></i>
-                                        {{ currentUser.is_verified ? ('userProfile.verified' | translate) : ('userProfile.notVerified' | translate) }}
-                  </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Account Information -->
-                        <div class="account-info">
-                            <div class="info-row">
-                <span class="label">
-                  <i class="fas fa-calendar-plus"></i>
+                    </span>
+                    <span class="badge" [class.verified]="currentUser.is_verified">
+                      <i class="fas fa-check-circle"></i>
+                      {{ currentUser.is_verified ? ('userProfile.verified' | translate) : ('userProfile.notVerified' | translate) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <!-- Account Information -->
+              <div class="account-info">
+                <div class="info-row">
+                  <span class="label">
+                    <i class="fas fa-calendar-plus"></i>
                     {{ 'userProfile.memberSince' | translate }}
-                </span>
-                                <span class="value">{{ formatDate(currentUser.created_at) }}</span>
-                            </div>
-                            <div class="info-row" *ngIf="currentUser.last_login">
-                <span class="label">
-                  <i class="fas fa-clock"></i>
-                    {{ 'userProfile.lastLogin' | translate }}
-                </span>
-                                <span class="value">{{ formatDate(currentUser.last_login) }}</span>
-                            </div>
-                        </div>
+                  </span>
+                  <span class="value">{{ formatDate(currentUser.created_at) }}</span>
+                </div>
+                @if (currentUser.last_login) {
+                  <div class="info-row">
+                    <span class="label">
+                      <i class="fas fa-clock"></i>
+                      {{ 'userProfile.lastLogin' | translate }}
+                    </span>
+                    <span class="value">{{ formatDate(currentUser.last_login) }}</span>
+                  </div>
+                }
+              </div>
+              <!-- Edit Form -->
+              <form [formGroup]="userForm" (ngSubmit)="saveProfile()" class="edit-form"
+                [class.readonly-mode]="!isEditing">
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="half-width"
+                    [class.readonly-field]="!isEditing">
+                    <mat-label>{{ 'userProfile.firstName' | translate }}</mat-label>
+                    <input
+                      matInput
+                      formControlName="first_name"
+                      [readonly]="!isEditing"
+                      [class.readonly-input]="!isEditing"
+                      [placeholder]="'userProfile.firstNamePlaceholder' | translate">
+                    @if (hasFieldError('first_name') && isEditing) {
+                      <mat-error>
+                        {{ getErrorMessage('first_name') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="half-width"
+                    [class.readonly-field]="!isEditing">
+                    <mat-label>{{ 'userProfile.lastName' | translate }}</mat-label>
+                    <input
+                      matInput
+                      formControlName="last_name"
+                      [readonly]="!isEditing"
+                      [class.readonly-input]="!isEditing"
+                      [placeholder]="'userProfile.lastNamePlaceholder' | translate">
+                    @if (hasFieldError('last_name') && isEditing) {
+                      <mat-error>
+                        {{ getErrorMessage('last_name') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+                <!-- Artist Name Field -->
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="full-width"
+                    [class.readonly-field]="!isEditing">
+                    <mat-label>{{ 'userProfile.artistName' | translate }}</mat-label>
+                    <input
+                      matInput
+                      formControlName="artist_name"
+                      [readonly]="!isEditing"
+                      [class.readonly-input]="!isEditing"
+                      [placeholder]="'userProfile.artistNamePlaceholder' | translate">
+                    <mat-hint>{{ 'userProfile.artistNameHint' | translate }}</mat-hint>
+                  </mat-form-field>
+                </div>
+                <!-- Email (Always Read-only) -->
+                <mat-form-field appearance="outline" class="full-width readonly-field">
+                  <mat-label>{{ 'userProfile.email' | translate }}</mat-label>
+                  <input
+                    matInput
+                    [value]="currentUser.email"
+                    readonly
+                    class="readonly-input"
+                    [placeholder]="'userProfile.email' | translate">
+                  <mat-hint>{{ 'userProfile.emailHint' | translate }}</mat-hint>
+                </mat-form-field>
+              </form>
+            </div>
+          }
 
-                        <!-- Edit Form -->
-                        <form [formGroup]="userForm" (ngSubmit)="saveProfile()" class="edit-form"
-                              [class.readonly-mode]="!isEditing">
-                            <div class="form-row">
-                                <mat-form-field appearance="outline" class="half-width"
-                                                [class.readonly-field]="!isEditing">
-                                    <mat-label>{{ 'userProfile.firstName' | translate }}</mat-label>
-                                    <input
-                                            matInput
-                                            formControlName="first_name"
-                                            [readonly]="!isEditing"
-                                            [class.readonly-input]="!isEditing"
-                                            [placeholder]="'userProfile.firstNamePlaceholder' | translate">
-                                    <mat-error *ngIf="hasFieldError('first_name') && isEditing">
-                                        {{ getErrorMessage('first_name') }}
-                                    </mat-error>
-                                </mat-form-field>
+          <!-- Loading State -->
+          @if (isLoading && !currentUser) {
+            <div class="loading-state">
+              <i class="fas fa-spinner fa-spin"></i>
+              <p>{{ 'userProfile.loadingProfile' | translate }}</p>
+            </div>
+          }
+        </mat-card-content>
 
-                                <mat-form-field appearance="outline" class="half-width"
-                                                [class.readonly-field]="!isEditing">
-                                    <mat-label>{{ 'userProfile.lastName' | translate }}</mat-label>
-                                    <input
-                                            matInput
-                                            formControlName="last_name"
-                                            [readonly]="!isEditing"
-                                            [class.readonly-input]="!isEditing"
-                                            [placeholder]="'userProfile.lastNamePlaceholder' | translate">
-                                    <mat-error *ngIf="hasFieldError('last_name') && isEditing">
-                                        {{ getErrorMessage('last_name') }}
-                                    </mat-error>
-                                </mat-form-field>
-                            </div>
+        <mat-card-actions align="end">
+          <!-- Edit Mode Actions -->
+          @if (isEditing) {
+            <div class="action-buttons">
+              <button
+                mat-button
+                type="button"
+                (click)="cancelEditing()"
+                [disabled]="isLoading">
+                <i class="fas fa-times"></i>
+                {{ 'userProfile.cancelButton' | translate }}
+              </button>
+              <button
+                mat-raised-button
+                color="primary"
+                type="button"
+                (click)="saveProfile()"
+                [disabled]="userForm.invalid || isLoading">
+                @if (isLoading) {
+                  <span>
+                    <i class="fas fa-spinner fa-spin"></i>
+                    {{ 'userProfile.saving' | translate }}
+                  </span>
+                }
+                @if (!isLoading) {
+                  <span>
+                    <i class="fas fa-save"></i>
+                    {{ 'userProfile.saveButton' | translate }}
+                  </span>
+                }
+              </button>
+            </div>
+          }
 
-                            <!-- Artist Name Field -->
-                            <div class="form-row">
-                                <mat-form-field appearance="outline" class="full-width"
-                                                [class.readonly-field]="!isEditing">
-                                    <mat-label>{{ 'userProfile.artistName' | translate }}</mat-label>
-                                    <input
-                                            matInput
-                                            formControlName="artist_name"
-                                            [readonly]="!isEditing"
-                                            [class.readonly-input]="!isEditing"
-                                            [placeholder]="'userProfile.artistNamePlaceholder' | translate">
-                                    <mat-hint>{{ 'userProfile.artistNameHint' | translate }}</mat-hint>
-                                </mat-form-field>
-                            </div>
-
-                            <!-- Email (Always Read-only) -->
-                            <mat-form-field appearance="outline" class="full-width readonly-field">
-                                <mat-label>{{ 'userProfile.email' | translate }}</mat-label>
-                                <input
-                                        matInput
-                                        [value]="currentUser.email"
-                                        readonly
-                                        class="readonly-input"
-                                        [placeholder]="'userProfile.email' | translate">
-                                <mat-hint>{{ 'userProfile.emailHint' | translate }}</mat-hint>
-                            </mat-form-field>
-                        </form>
-                    </div>
-
-                    <!-- Loading State -->
-                    <div class="loading-state" *ngIf="isLoading && !currentUser">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>{{ 'userProfile.loadingProfile' | translate }}</p>
-                    </div>
-                </mat-card-content>
-
-                <mat-card-actions align="end">
-                    <!-- Edit Mode Actions -->
-                    <div class="action-buttons" *ngIf="isEditing">
-                        <button
-                                mat-button
-                                type="button"
-                                (click)="cancelEditing()"
-                                [disabled]="isLoading">
-                            <i class="fas fa-times"></i>
-                            {{ 'userProfile.cancelButton' | translate }}
-                        </button>
-                        <button
-                                mat-raised-button
-                                color="primary"
-                                type="button"
-                                (click)="saveProfile()"
-                                [disabled]="userForm.invalid || isLoading">
-              <span *ngIf="isLoading">
-                <i class="fas fa-spinner fa-spin"></i>
-                  {{ 'userProfile.saving' | translate }}
-              </span>
-                            <span *ngIf="!isLoading">
-                <i class="fas fa-save"></i>
-                                {{ 'userProfile.saveButton' | translate }}
-              </span>
-                        </button>
-                    </div>
-
-                    <!-- View Mode Actions -->
-                    <div class="action-buttons" *ngIf="!isEditing">
-                        <button
-                                mat-button
-                                color="accent"
-                                type="button"
-                                (click)="openPasswordChangeModal()">
-                            <i class="fas fa-key"></i>
-                            {{ 'userProfile.changePassword' | translate }}
-                        </button>
-                        <button
-                                mat-raised-button
-                                color="primary"
-                                type="button"
-                                (click)="startEditing()">
-                            <i class="fas fa-edit"></i>
-                            {{ 'userProfile.editButton' | translate }}
-                        </button>
-                    </div>
-                </mat-card-actions>
-            </mat-card>
-        </div>
-
-        <!-- Right Column: User Settings + AI Costs -->
-        <div class="right-section">
-            <!-- User Settings Card -->
-            <mat-card class="settings-card" *ngIf="currentSettings">
-                <mat-card-content>
-                    <div class="settings-header">
-                        <div class="settings-avatar">
-                            <i class="fas fa-cog"></i>
-                        </div>
-                        <div class="settings-header-text">
-                            <h3>{{ 'userProfile.userSettings' | translate }}</h3>
-                        </div>
-                    </div>
-
-                    <form [formGroup]="settingsForm" class="settings-form">
-                        <div class="form-row">
-                            <mat-form-field appearance="outline" class="half-width">
-                                <mat-label>{{ 'userProfile.songsPerPage' | translate }}</mat-label>
-                                <input
-                                        matInput
-                                        type="number"
-                                        formControlName="songListLimit"
-                                        (blur)="updateSongListLimit()"
-                                        min="5"
-                                        max="100"
-                                        [placeholder]="'userProfile.songsPerPageHint' | translate">
-                                <mat-hint>{{ 'userProfile.songsPerPageHint' | translate }}</mat-hint>
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline" class="half-width">
-                                <mat-label>{{ 'userProfile.imagesPerPage' | translate }}</mat-label>
-                                <input
-                                        matInput
-                                        type="number"
-                                        formControlName="imageListLimit"
-                                        (blur)="updateImageListLimit()"
-                                        min="5"
-                                        max="100"
-                                        [placeholder]="'userProfile.imagesPerPageHint' | translate">
-                                <mat-hint>{{ 'userProfile.imagesPerPageHint' | translate }}</mat-hint>
-                            </mat-form-field>
-                        </div>
-
-                        <div class="form-row">
-                            <mat-form-field appearance="outline" class="half-width">
-                                <mat-label>{{ 'userProfile.promptsPerPage' | translate }}</mat-label>
-                                <input
-                                        matInput
-                                        type="number"
-                                        formControlName="promptListLimit"
-                                        (blur)="updatePromptListLimit()"
-                                        min="5"
-                                        max="100"
-                                        [placeholder]="'userProfile.promptsPerPageHint' | translate">
-                                <mat-hint>{{ 'userProfile.promptsPerPageHint' | translate }}</mat-hint>
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline" class="half-width">
-                                <mat-label>{{ 'userProfile.sketchesPerPage' | translate }}</mat-label>
-                                <input
-                                        matInput
-                                        type="number"
-                                        formControlName="sketchListLimit"
-                                        (blur)="updateSketchListLimit()"
-                                        min="5"
-                                        max="100"
-                                        [placeholder]="'userProfile.sketchesPerPageHint' | translate">
-                                <mat-hint>{{ 'userProfile.sketchesPerPageHint' | translate }}</mat-hint>
-                            </mat-form-field>
-                        </div>
-
-                        <div class="form-row">
-                            <mat-form-field appearance="outline" class="half-width">
-                                <mat-label>{{ 'userProfile.equipmentPerPage' | translate }}</mat-label>
-                                <input
-                                        matInput
-                                        type="number"
-                                        formControlName="equipmentListLimit"
-                                        (blur)="updateEquipmentListLimit()"
-                                        min="5"
-                                        max="100"
-                                        [placeholder]="'userProfile.equipmentPerPageHint' | translate">
-                                <mat-hint>{{ 'userProfile.equipmentPerPageHint' | translate }}</mat-hint>
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline" class="half-width">
-                                <mat-label>{{ 'userProfile.language' | translate }}</mat-label>
-                                <mat-select
-                                        formControlName="language"
-                                        (selectionChange)="updateLanguage()">
-                                    <mat-option *ngFor="let lang of availableLanguages" [value]="lang.code">
-                                        {{ lang.name }}
-                                    </mat-option>
-                                </mat-select>
-                                <mat-hint>{{ 'userProfile.languageHint' | translate }}</mat-hint>
-                            </mat-form-field>
-                        </div>
-
-                        <div class="settings-actions">
-                            <button
-                                    mat-button
-                                    type="button"
-                                    color="warn"
-                                    (click)="resetSettingsToDefaults()">
-                                <i class="fas fa-undo"></i>
-                                {{ 'userProfile.resetToDefaults' | translate }}
-                            </button>
-                        </div>
-                    </form>
-                </mat-card-content>
-            </mat-card>
-
-            <!-- API Costs Card (System Admin only) -->
-            <mat-card class="costs-card" *ngIf="showCosts">
-                <mat-card-content>
-                    <!-- API Costs Section (OpenAI) -->
-                    <div class="api-costs-section">
-                        <!-- Loading State -->
-                        <div class="loading-state" *ngIf="isLoadingCosts">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>{{ 'userProfile.costs.loading' | translate }}</p>
-                        </div>
-
-                        <!-- Costs Content -->
-                        <div *ngIf="!isLoadingCosts && openaiCosts">
-                            <div class="api-costs-header">
-                                <div class="api-costs-avatar">
-                                    <i class="fas fa-dollar-sign"></i>
-                                </div>
-                                <div class="api-costs-header-text">
-                                    <h3>{{ 'userProfile.costs.title' | translate }}</h3>
-                                    <p *ngIf="openaiCosts.organization_id">{{ openaiCosts.organization_id }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Current Month Section -->
-                            <h4 class="api-costs-subtitle">{{ 'userProfile.costs.currentMonth' | translate }}</h4>
-                            <div class="api-costs-list">
-                                <div class="api-costs-item">
-                                    <span class="api-costs-label">{{ 'userProfile.costs.image' | translate }}:</span>
-                                    <span class="api-costs-value">${{ openaiCosts.image.toFixed(2) }}</span>
-                                </div>
-                                <div class="api-costs-item">
-                                    <span class="api-costs-label">{{ 'userProfile.costs.chat' | translate }}:</span>
-                                    <span class="api-costs-value">${{ openaiCosts.chat.toFixed(2) }}</span>
-                                </div>
-                                <div class="api-costs-item api-costs-total">
-                                    <span class="api-costs-label">{{ 'userProfile.costs.total' | translate }}:</span>
-                                    <span class="api-costs-value">${{ openaiCosts.total.toFixed(2) }}</span>
-                                </div>
-                            </div>
-
-                            <!-- All Time Summary Section -->
-                            <h4 class="api-costs-subtitle"
-                                *ngIf="openaiAllTimeCosts">{{ 'userProfile.costs.allTimeSummary' | translate }}</h4>
-                            <div class="api-costs-list" *ngIf="openaiAllTimeCosts">
-                                <div class="api-costs-item">
-                                    <span class="api-costs-label">{{ 'userProfile.costs.image' | translate }}:</span>
-                                    <span class="api-costs-value">${{ openaiAllTimeCosts.image.toFixed(2) }}</span>
-                                </div>
-                                <div class="api-costs-item">
-                                    <span class="api-costs-label">{{ 'userProfile.costs.chat' | translate }}:</span>
-                                    <span class="api-costs-value">${{ openaiAllTimeCosts.chat.toFixed(2) }}</span>
-                                </div>
-                                <div class="api-costs-item api-costs-total">
-                                    <span class="api-costs-label">{{ 'userProfile.costs.total' | translate }}:</span>
-                                    <span class="api-costs-value">${{ openaiAllTimeCosts.total.toFixed(2) }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </mat-card-content>
-            </mat-card>
-        </div>
+          <!-- View Mode Actions -->
+          @if (!isEditing) {
+            <div class="action-buttons">
+              <button
+                mat-button
+                color="accent"
+                type="button"
+                (click)="openPasswordChangeModal()">
+                <i class="fas fa-key"></i>
+                {{ 'userProfile.changePassword' | translate }}
+              </button>
+              <button
+                mat-raised-button
+                color="primary"
+                type="button"
+                (click)="startEditing()">
+                <i class="fas fa-edit"></i>
+                {{ 'userProfile.editButton' | translate }}
+              </button>
+            </div>
+          }
+        </mat-card-actions>
+      </mat-card>
     </div>
+
+    <!-- Right Column: User Settings + AI Costs -->
+    <div class="right-section">
+      <!-- User Settings Card -->
+      @if (currentSettings) {
+        <mat-card class="settings-card">
+          <mat-card-content>
+            <div class="settings-header">
+              <div class="settings-avatar">
+                <i class="fas fa-cog"></i>
+              </div>
+              <div class="settings-header-text">
+                <h3>{{ 'userProfile.userSettings' | translate }}</h3>
+              </div>
+            </div>
+            <form [formGroup]="settingsForm" class="settings-form">
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="half-width">
+                  <mat-label>{{ 'userProfile.songsPerPage' | translate }}</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    formControlName="songListLimit"
+                    (blur)="updateSongListLimit()"
+                    min="5"
+                    max="100"
+                    [placeholder]="'userProfile.songsPerPageHint' | translate">
+                  <mat-hint>{{ 'userProfile.songsPerPageHint' | translate }}</mat-hint>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="half-width">
+                  <mat-label>{{ 'userProfile.imagesPerPage' | translate }}</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    formControlName="imageListLimit"
+                    (blur)="updateImageListLimit()"
+                    min="5"
+                    max="100"
+                    [placeholder]="'userProfile.imagesPerPageHint' | translate">
+                  <mat-hint>{{ 'userProfile.imagesPerPageHint' | translate }}</mat-hint>
+                </mat-form-field>
+              </div>
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="half-width">
+                  <mat-label>{{ 'userProfile.promptsPerPage' | translate }}</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    formControlName="promptListLimit"
+                    (blur)="updatePromptListLimit()"
+                    min="5"
+                    max="100"
+                    [placeholder]="'userProfile.promptsPerPageHint' | translate">
+                  <mat-hint>{{ 'userProfile.promptsPerPageHint' | translate }}</mat-hint>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="half-width">
+                  <mat-label>{{ 'userProfile.sketchesPerPage' | translate }}</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    formControlName="sketchListLimit"
+                    (blur)="updateSketchListLimit()"
+                    min="5"
+                    max="100"
+                    [placeholder]="'userProfile.sketchesPerPageHint' | translate">
+                  <mat-hint>{{ 'userProfile.sketchesPerPageHint' | translate }}</mat-hint>
+                </mat-form-field>
+              </div>
+              <div class="form-row">
+                <mat-form-field appearance="outline" class="half-width">
+                  <mat-label>{{ 'userProfile.equipmentPerPage' | translate }}</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    formControlName="equipmentListLimit"
+                    (blur)="updateEquipmentListLimit()"
+                    min="5"
+                    max="100"
+                    [placeholder]="'userProfile.equipmentPerPageHint' | translate">
+                  <mat-hint>{{ 'userProfile.equipmentPerPageHint' | translate }}</mat-hint>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="half-width">
+                  <mat-label>{{ 'userProfile.language' | translate }}</mat-label>
+                  <mat-select
+                    formControlName="language"
+                    (selectionChange)="updateLanguage()">
+                    @for (lang of availableLanguages; track lang) {
+                      <mat-option [value]="lang.code">
+                        {{ lang.name }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                  <mat-hint>{{ 'userProfile.languageHint' | translate }}</mat-hint>
+                </mat-form-field>
+              </div>
+              <div class="settings-actions">
+                <button
+                  mat-button
+                  type="button"
+                  color="warn"
+                  (click)="resetSettingsToDefaults()">
+                  <i class="fas fa-undo"></i>
+                  {{ 'userProfile.resetToDefaults' | translate }}
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- API Costs Card (System Admin only) -->
+      @if (showCosts) {
+        <mat-card class="costs-card">
+          <mat-card-content>
+            <!-- API Costs Section (OpenAI) -->
+            <div class="api-costs-section">
+              <!-- Loading State -->
+              @if (isLoadingCosts) {
+                <div class="loading-state">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <p>{{ 'userProfile.costs.loading' | translate }}</p>
+                </div>
+              }
+              <!-- Costs Content -->
+              @if (!isLoadingCosts && openaiCosts) {
+                <div>
+                  <div class="api-costs-header">
+                    <div class="api-costs-avatar">
+                      <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="api-costs-header-text">
+                      <h3>{{ 'userProfile.costs.title' | translate }}</h3>
+                      @if (openaiCosts.organization_id) {
+                        <p>{{ openaiCosts.organization_id }}</p>
+                      }
+                    </div>
+                  </div>
+                  <!-- Current Month Section -->
+                  <h4 class="api-costs-subtitle">{{ 'userProfile.costs.currentMonth' | translate }}</h4>
+                  <div class="api-costs-list">
+                    <div class="api-costs-item">
+                      <span class="api-costs-label">{{ 'userProfile.costs.image' | translate }}:</span>
+                      <span class="api-costs-value">${{ openaiCosts.image.toFixed(2) }}</span>
+                    </div>
+                    <div class="api-costs-item">
+                      <span class="api-costs-label">{{ 'userProfile.costs.chat' | translate }}:</span>
+                      <span class="api-costs-value">${{ openaiCosts.chat.toFixed(2) }}</span>
+                    </div>
+                    <div class="api-costs-item api-costs-total">
+                      <span class="api-costs-label">{{ 'userProfile.costs.total' | translate }}:</span>
+                      <span class="api-costs-value">${{ openaiCosts.total.toFixed(2) }}</span>
+                    </div>
+                  </div>
+                  <!-- All Time Summary Section -->
+                  @if (openaiAllTimeCosts) {
+                    <h4 class="api-costs-subtitle"
+                    >{{ 'userProfile.costs.allTimeSummary' | translate }}</h4>
+                  }
+                  @if (openaiAllTimeCosts) {
+                    <div class="api-costs-list">
+                      <div class="api-costs-item">
+                        <span class="api-costs-label">{{ 'userProfile.costs.image' | translate }}:</span>
+                        <span class="api-costs-value">${{ openaiAllTimeCosts.image.toFixed(2) }}</span>
+                      </div>
+                      <div class="api-costs-item">
+                        <span class="api-costs-label">{{ 'userProfile.costs.chat' | translate }}:</span>
+                        <span class="api-costs-value">${{ openaiAllTimeCosts.chat.toFixed(2) }}</span>
+                      </div>
+                      <div class="api-costs-item api-costs-total">
+                        <span class="api-costs-label">{{ 'userProfile.costs.total' | translate }}:</span>
+                        <span class="api-costs-value">${{ openaiAllTimeCosts.total.toFixed(2) }}</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  </div>
 </div>

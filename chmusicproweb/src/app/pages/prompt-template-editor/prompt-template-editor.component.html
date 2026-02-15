@@ -1,180 +1,186 @@
 <div class="prompt-editor-container">
-    <mat-card class="prompt-editor-card">
-        <mat-card-content>
-            <!-- Header (copied from lyric-creation.component.html line 4-31) -->
-            <div class="prompt-editor-header">
-                <div class="prompt-editor-title">
-                    <h2 *ngIf="category && action">
-                        <i class="fas fa-code"></i>
-                        {{ category }} / {{ action }}
-                    </h2>
-                    <p class="template-subtitle">
-                        {{ 'promptTemplateEditor.title' | translate }}
-                    </p>
-                </div>
-                <div class="navigation-buttons">
-                    <button mat-button type="button"
-                            (click)="cancel()"
-                            [disabled]="isSaving">
-                        <i class="fas fa-times"></i> {{ 'common.cancel' | translate }}
-                    </button>
-                    <button mat-flat-button color="primary" type="button"
-                            (click)="save()"
-                            [disabled]="isSaving || editorForm.invalid">
-                        <i class="fas fa-check"></i> {{ 'common.apply' | translate }}
-                    </button>
-                </div>
+  <mat-card class="prompt-editor-card">
+    <mat-card-content>
+      <!-- Header (copied from lyric-creation.component.html line 4-31) -->
+      <div class="prompt-editor-header">
+        <div class="prompt-editor-title">
+          @if (category && action) {
+            <h2>
+              <i class="fas fa-code"></i>
+              {{ category }} / {{ action }}
+            </h2>
+          }
+          <p class="template-subtitle">
+            {{ 'promptTemplateEditor.title' | translate }}
+          </p>
+        </div>
+        <div class="navigation-buttons">
+          <button mat-button type="button"
+            (click)="cancel()"
+            [disabled]="isSaving">
+            <i class="fas fa-times"></i> {{ 'common.cancel' | translate }}
+          </button>
+          <button mat-flat-button color="primary" type="button"
+            (click)="save()"
+            [disabled]="isSaving || editorForm.invalid">
+            <i class="fas fa-check"></i> {{ 'common.apply' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Form Content (copied structure from lyric-creation.component.html) -->
+      <form [formGroup]="editorForm">
+        <!-- Metadata Section -->
+        <div class="metadata-section">
+          <div class="metadata-row">
+            <div class="metadata-field">
+              <label for="description">{{ 'promptTemplateEditor.fields.description' | translate }}</label>
+              <input
+                type="text"
+                id="description"
+                formControlName="description"
+                class="form-input"
+                [placeholder]="'promptTemplateEditor.placeholders.description' | translate">
             </div>
 
-            <!-- Form Content (copied structure from lyric-creation.component.html) -->
-            <form [formGroup]="editorForm">
-                <!-- Metadata Section -->
-                <div class="metadata-section">
-                    <div class="metadata-row">
-                        <div class="metadata-field">
-                            <label for="description">{{ 'promptTemplateEditor.fields.description' | translate }}</label>
-                            <input
-                                    type="text"
-                                    id="description"
-                                    formControlName="description"
-                                    class="form-input"
-                                    [placeholder]="'promptTemplateEditor.placeholders.description' | translate">
-                        </div>
+            <div class="metadata-field">
+              <label for="provider">{{ 'promptTemplateEditor.fields.provider' | translate }}</label>
+              <mat-form-field appearance="outline" class="provider-select">
+                <mat-select
+                  id="provider"
+                  formControlName="provider"
+                  (selectionChange)="onProviderChange($event.value)">
+                  @for (provider of availableProviders; track provider) {
+                    <mat-option [value]="provider">{{ provider }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
 
-                        <div class="metadata-field">
-                            <label for="provider">{{ 'promptTemplateEditor.fields.provider' | translate }}</label>
-                            <mat-form-field appearance="outline" class="provider-select">
-                                <mat-select
-                                        id="provider"
-                                        formControlName="provider"
-                                        (selectionChange)="onProviderChange($event.value)">
-                                    @for (provider of availableProviders; track provider) {
-                                        <mat-option [value]="provider">{{ provider }}</mat-option>
-                                    }
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-
-                        <div class="metadata-field">
-                            <label for="model">{{ 'promptTemplateEditor.fields.model' | translate }}</label>
-                            <mat-form-field appearance="outline" class="model-select">
-                                <mat-select
-                                        id="model"
-                                        formControlName="model"
+            <div class="metadata-field">
+              <label for="model">{{ 'promptTemplateEditor.fields.model' | translate }}</label>
+              <mat-form-field appearance="outline" class="model-select">
+                <mat-select
+                  id="model"
+                  formControlName="model"
                                         [placeholder]="isLoadingModels
                                             ? ('promptTemplateEditor.labels.loadingModels' | translate)
                                             : ('promptTemplateEditor.placeholders.model' | translate)">
-                                    @for (model of models; track model.name) {
-                                        <mat-option [value]="model.name">{{ model.name }}</mat-option>
-                                    }
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                    </div>
+                  @for (model of models; track model.name) {
+                    <mat-option [value]="model.name">{{ model.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
 
-                    <div class="metadata-row">
-                        <div class="metadata-field">
-                            <label for="temperature">{{ 'promptTemplateEditor.fields.temperature' | translate }}</label>
-                            <mat-form-field appearance="outline" class="temperature-select">
-                                <mat-select
-                                        id="temperature"
-                                        formControlName="temperature"
-                                        [placeholder]="'promptTemplateEditor.placeholders.temperature' | translate">
-                                    @for (option of temperatureOptions; track option.value) {
-                                        <mat-option [value]="option.value">
-                                            <div class="temperature-option">
-                                                <div class="temperature-option__label">
-                                                    {{ option.value }} - {{ option.labelKey | translate }}
-                                                </div>
-                                                <div class="temperature-option__description">
-                                                    {{ option.descriptionKey | translate }}
-                                                </div>
-                                            </div>
-                                        </mat-option>
-                                    }
-                                </mat-select>
-                            </mat-form-field>
+          <div class="metadata-row">
+            <div class="metadata-field">
+              <label for="temperature">{{ 'promptTemplateEditor.fields.temperature' | translate }}</label>
+              <mat-form-field appearance="outline" class="temperature-select">
+                <mat-select
+                  id="temperature"
+                  formControlName="temperature"
+                  [placeholder]="'promptTemplateEditor.placeholders.temperature' | translate">
+                  @for (option of temperatureOptions; track option.value) {
+                    <mat-option [value]="option.value">
+                      <div class="temperature-option">
+                        <div class="temperature-option__label">
+                          {{ option.value }} - {{ option.labelKey | translate }}
                         </div>
+                        <div class="temperature-option__description">
+                          {{ option.descriptionKey | translate }}
+                        </div>
+                      </div>
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
 
-                        <div class="metadata-field">
-                            <label for="maxTokens">{{ 'promptTemplateEditor.fields.maxTokens' | translate }}</label>
-                            <input
-                                    type="number"
-                                    id="maxTokens"
-                                    formControlName="max_tokens"
-                                    class="form-input"
-                                    max="100000"
-                                    [placeholder]="'promptTemplateEditor.placeholders.maxTokens' | translate">
-                            <div class="field-hint">
-                                {{ 'promptTemplateEditor.hints.maxTokens' | translate }}
-                            </div>
-                        </div>
-                    </div>
+            <div class="metadata-field">
+              <label for="maxTokens">{{ 'promptTemplateEditor.fields.maxTokens' | translate }}</label>
+              <input
+                type="number"
+                id="maxTokens"
+                formControlName="max_tokens"
+                class="form-input"
+                max="100000"
+                [placeholder]="'promptTemplateEditor.placeholders.maxTokens' | translate">
+              <div class="field-hint">
+                {{ 'promptTemplateEditor.hints.maxTokens' | translate }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conditions Section (2-column layout) -->
+        <div class="conditions-section">
+          <!-- PRE-Condition -->
+          <div class="condition-group">
+            <label for="preCondition" class="condition-label">
+              <i class="fas fa-arrow-right"></i>
+              {{ 'promptTemplateEditor.fields.preCondition' | translate }}
+              <span class="required-indicator">*</span>
+            </label>
+            <textarea
+              id="preCondition"
+              formControlName="pre_condition"
+              class="condition-textarea"
+              [placeholder]="'promptTemplateEditor.placeholders.preCondition' | translate"
+              [disabled]="isImprovingPre">
+            </textarea>
+            <div class="condition-footer">
+              @if (characterCountPre > 0) {
+                <div class="char-count">
+                  {{ characterCountPre }} {{ 'promptTemplateEditor.charactersCount' | translate }}
                 </div>
+              }
+              <button mat-stroked-button type="button"
+                class="ai-accent"
+                (click)="improvePreCondition()"
+                [disabled]="isSaving || isImprovingPre || characterCountPre === 0"
+                [title]="'promptTemplateEditor.actions.improvePre' | translate">
+                <i class="fas" [class.fa-magic]="!isImprovingPre" [class.fa-spinner]="isImprovingPre"
+                [class.fa-spin]="isImprovingPre"></i>
+                <span>{{ 'promptTemplateEditor.actions.improvePre' | translate }}</span>
+              </button>
+            </div>
+          </div>
 
-                <!-- Conditions Section (2-column layout) -->
-                <div class="conditions-section">
-                    <!-- PRE-Condition -->
-                    <div class="condition-group">
-                        <label for="preCondition" class="condition-label">
-                            <i class="fas fa-arrow-right"></i>
-                            {{ 'promptTemplateEditor.fields.preCondition' | translate }}
-                            <span class="required-indicator">*</span>
-                        </label>
-                        <textarea
-                                id="preCondition"
-                                formControlName="pre_condition"
-                                class="condition-textarea"
-                                [placeholder]="'promptTemplateEditor.placeholders.preCondition' | translate"
-                                [disabled]="isImprovingPre">
-                        </textarea>
-                        <div class="condition-footer">
-                            <div class="char-count" *ngIf="characterCountPre > 0">
-                                {{ characterCountPre }} {{ 'promptTemplateEditor.charactersCount' | translate }}
-                            </div>
-                            <button mat-stroked-button type="button"
-                                    class="ai-accent"
-                                    (click)="improvePreCondition()"
-                                    [disabled]="isSaving || isImprovingPre || characterCountPre === 0"
-                                    [title]="'promptTemplateEditor.actions.improvePre' | translate">
-                                <i class="fas" [class.fa-magic]="!isImprovingPre" [class.fa-spinner]="isImprovingPre"
-                                   [class.fa-spin]="isImprovingPre"></i>
-                                <span>{{ 'promptTemplateEditor.actions.improvePre' | translate }}</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- POST-Condition -->
-                    <div class="condition-group">
-                        <label for="postCondition" class="condition-label">
-                            <i class="fas fa-arrow-left"></i>
-                            {{ 'promptTemplateEditor.fields.postCondition' | translate }}
-                            <span class="required-indicator">*</span>
-                        </label>
-                        <textarea
-                                id="postCondition"
-                                formControlName="post_condition"
-                                class="condition-textarea"
-                                [placeholder]="'promptTemplateEditor.placeholders.postCondition' | translate"
-                                [disabled]="isImprovingPost">
-                        </textarea>
-                        <div class="condition-footer">
-                            <div class="char-count" *ngIf="characterCountPost > 0">
-                                {{ characterCountPost }} {{ 'promptTemplateEditor.charactersCount' | translate }}
-                            </div>
-                            <button mat-stroked-button type="button"
-                                    class="ai-accent"
-                                    (click)="improvePostCondition()"
-                                    [disabled]="isSaving || isImprovingPost || characterCountPost === 0"
-                                    [title]="'promptTemplateEditor.actions.improvePost' | translate">
-                                <i class="fas" [class.fa-magic]="!isImprovingPost" [class.fa-spinner]="isImprovingPost"
-                                   [class.fa-spin]="isImprovingPost"></i>
-                                <span>{{ 'promptTemplateEditor.actions.improvePost' | translate }}</span>
-                            </button>
-                        </div>
-                    </div>
+          <!-- POST-Condition -->
+          <div class="condition-group">
+            <label for="postCondition" class="condition-label">
+              <i class="fas fa-arrow-left"></i>
+              {{ 'promptTemplateEditor.fields.postCondition' | translate }}
+              <span class="required-indicator">*</span>
+            </label>
+            <textarea
+              id="postCondition"
+              formControlName="post_condition"
+              class="condition-textarea"
+              [placeholder]="'promptTemplateEditor.placeholders.postCondition' | translate"
+              [disabled]="isImprovingPost">
+            </textarea>
+            <div class="condition-footer">
+              @if (characterCountPost > 0) {
+                <div class="char-count">
+                  {{ characterCountPost }} {{ 'promptTemplateEditor.charactersCount' | translate }}
                 </div>
-            </form>
-        </mat-card-content>
-    </mat-card>
+              }
+              <button mat-stroked-button type="button"
+                class="ai-accent"
+                (click)="improvePostCondition()"
+                [disabled]="isSaving || isImprovingPost || characterCountPost === 0"
+                [title]="'promptTemplateEditor.actions.improvePost' | translate">
+                <i class="fas" [class.fa-magic]="!isImprovingPost" [class.fa-spinner]="isImprovingPost"
+                [class.fa-spin]="isImprovingPost"></i>
+                <span>{{ 'promptTemplateEditor.actions.improvePost' | translate }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
 </div>

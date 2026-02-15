@@ -8,10 +8,11 @@
         <div class="style-chooser-container">
 
             <!-- Selection Summary -->
-            <div class="selection-summary"
-                 *ngIf="config.selectedStyles.length > 0 || config.selectedThemes.length > 0 || config.selectedInstruments.length > 0">
-                <small class="summary-label">{{ getSelectionSummary() }}</small>
-            </div>
+            @if (config.selectedStyles.length > 0 || config.selectedThemes.length > 0 || config.selectedInstruments.length > 0) {
+                <div class="selection-summary">
+                    <small class="summary-label">{{ getSelectionSummary() }}</small>
+                </div>
+            }
 
             <!-- Styles Section -->
             <div class="category-section">
@@ -21,15 +22,18 @@
                 </h3>
 
                 <div class="tag-grid">
-                    <button
-                            *ngFor="let style of availableStyles"
-                            type="button"
-                            class="tag-button"
-                            [class.selected]="isStyleSelected(style)"
-                            (click)="toggleStyle(style)">
-                        {{ style }}
-                        <span class="checkmark" *ngIf="isStyleSelected(style)">✓</span>
-                    </button>
+                    @for (style of availableStyles; track style) {
+                        <button
+                                type="button"
+                                class="tag-button"
+                                [class.selected]="isStyleSelected(style)"
+                                (click)="toggleStyle(style)">
+                            {{ style }}
+                            @if (isStyleSelected(style)) {
+                                <span class="checkmark">✓</span>
+                            }
+                        </button>
+                    }
                 </div>
             </div>
 
@@ -41,15 +45,18 @@
                 </h3>
 
                 <div class="tag-grid">
-                    <button
-                            *ngFor="let instrument of availableInstruments"
-                            type="button"
-                            class="tag-button"
-                            [class.selected]="isInstrumentSelected(instrument)"
-                            (click)="toggleInstrument(instrument)">
-                        {{ instrument }}
-                        <span class="checkmark" *ngIf="isInstrumentSelected(instrument)">✓</span>
-                    </button>
+                    @for (instrument of availableInstruments; track instrument) {
+                        <button
+                                type="button"
+                                class="tag-button"
+                                [class.selected]="isInstrumentSelected(instrument)"
+                                (click)="toggleInstrument(instrument)">
+                            {{ instrument }}
+                            @if (isInstrumentSelected(instrument)) {
+                                <span class="checkmark">✓</span>
+                            }
+                        </button>
+                    }
                 </div>
             </div>
 
@@ -61,15 +68,18 @@
                 </h3>
 
                 <div class="tag-grid">
-                    <button
-                            *ngFor="let theme of availableThemes"
-                            type="button"
-                            class="tag-button"
-                            [class.selected]="isThemeSelected(theme)"
-                            (click)="toggleTheme(theme)">
-                        {{ theme }}
-                        <span class="checkmark" *ngIf="isThemeSelected(theme)">✓</span>
-                    </button>
+                    @for (theme of availableThemes; track theme) {
+                        <button
+                                type="button"
+                                class="tag-button"
+                                [class.selected]="isThemeSelected(theme)"
+                                (click)="toggleTheme(theme)">
+                            {{ theme }}
+                            @if (isThemeSelected(theme)) {
+                                <span class="checkmark">✓</span>
+                            }
+                        </button>
+                    }
                 </div>
             </div>
 

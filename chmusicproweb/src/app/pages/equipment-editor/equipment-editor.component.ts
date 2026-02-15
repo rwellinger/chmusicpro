@@ -1,6 +1,6 @@
 import {Component, inject, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {CommonModule} from "@angular/common";
+
 import {ActivatedRoute, Router} from "@angular/router";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {MatCardModule} from "@angular/material/card";
@@ -30,20 +30,19 @@ import {InfoTooltipComponent} from "../../components/info-tooltip/info-tooltip.c
     selector: "app-equipment-editor",
     standalone: true,
     imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        TranslateModule,
-        MatCardModule,
-        MatButtonModule,
-        MatIconModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        MatDatepickerModule,
-        MatNativeDateModule,
-        MatExpansionModule,
-        InfoTooltipComponent
-    ],
+    ReactiveFormsModule,
+    TranslateModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatExpansionModule,
+    InfoTooltipComponent
+],
     templateUrl: "./equipment-editor.component.html",
     styleUrl: "./equipment-editor.component.scss"
 })

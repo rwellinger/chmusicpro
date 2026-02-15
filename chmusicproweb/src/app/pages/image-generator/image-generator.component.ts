@@ -1,6 +1,6 @@
 import {Component, HostListener, inject, OnInit} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {CommonModule} from "@angular/common";
+
 import {HttpClient} from "@angular/common/http";
 import {ActivatedRoute} from "@angular/router";
 import {firstValueFrom} from "rxjs";
@@ -33,7 +33,7 @@ import {
 @Component({
     selector: "app-image-generator",
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, MatSnackBarModule, MatCardModule, MatButtonModule, MatSelectModule, MatFormFieldModule, ImageDetailPanelComponent, InfoTooltipComponent, TranslateModule],
+    imports: [ReactiveFormsModule, MatSnackBarModule, MatCardModule, MatButtonModule, MatSelectModule, MatFormFieldModule, ImageDetailPanelComponent, InfoTooltipComponent, TranslateModule],
     templateUrl: "./image-generator.component.html",
     styleUrl: "./image-generator.component.scss"
 })

@@ -1,227 +1,256 @@
 <div class="register-container">
-    <div class="register-card">
-        <div class="register-header">
-            <h1>{{ 'register.title' | translate }}</h1>
-            <p>{{ 'register.subtitle' | translate }}</p>
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="step-progress" *ngIf="currentStep < 5">
-            <div class="step-indicator"
-                 *ngFor="let step of [1,2,3,4]"
-                 [class.active]="currentStep === step"
-                 [class.completed]="currentStep > step"
-                 (click)="goToStep(step)">
-                <div class="step-dot">
-                    <span *ngIf="currentStep <= step">{{ step }}</span>
-                    <span *ngIf="currentStep > step" class="check-icon">&#10003;</span>
-                </div>
-                <span class="step-label">{{ 'register.steps.step' + step | translate }}</span>
-            </div>
-        </div>
-
-        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-
-            <!-- Step 1: Language -->
-            <div class="step-content" *ngIf="currentStep === 1">
-                <h2>{{ 'register.step1.title' | translate }}</h2>
-                <p class="step-subtitle">{{ 'register.step1.subtitle' | translate }}</p>
-
-                <div class="language-selector">
-                    <div class="language-option"
-                         *ngFor="let lang of availableLanguages"
-                         [class.selected]="registerForm.get('preferred_language')?.value === lang.code"
-                         (click)="registerForm.patchValue({preferred_language: lang.code}); onLanguageChange()">
-                        <span class="language-flag">{{ lang.code === 'en' ? '&#127468;&#127463;' : '&#127465;&#127466;' }}</span>
-                        <span class="language-name">{{ lang.name }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2: Personal Info -->
-            <div class="step-content" *ngIf="currentStep === 2">
-                <h2>{{ 'register.step2.title' | translate }}</h2>
-                <p class="step-subtitle">{{ 'register.step2.subtitle' | translate }}</p>
-
-                <div class="form-group">
-                    <label for="first_name">{{ 'register.step2.firstName' | translate }}</label>
-                    <input
-                        id="first_name"
-                        type="text"
-                        formControlName="first_name"
-                        [placeholder]="'register.step2.firstNamePlaceholder' | translate"
-                    />
-                </div>
-
-                <div class="form-group">
-                    <label for="last_name">{{ 'register.step2.lastName' | translate }}</label>
-                    <input
-                        id="last_name"
-                        type="text"
-                        formControlName="last_name"
-                        [placeholder]="'register.step2.lastNamePlaceholder' | translate"
-                    />
-                </div>
-
-                <div class="form-group">
-                    <label for="artist_name">{{ 'register.step2.artistName' | translate }}</label>
-                    <input
-                        id="artist_name"
-                        type="text"
-                        formControlName="artist_name"
-                        [placeholder]="'register.step2.artistNamePlaceholder' | translate"
-                    />
-                    <span class="field-hint">{{ 'register.step2.artistNameHint' | translate }}</span>
-                </div>
-            </div>
-
-            <!-- Step 3: Account -->
-            <div class="step-content" *ngIf="currentStep === 3">
-                <h2>{{ 'register.step3.title' | translate }}</h2>
-                <p class="step-subtitle">{{ 'register.step3.subtitle' | translate }}</p>
-
-                <div class="form-group">
-                    <label for="email">{{ 'register.step3.email' | translate }} *</label>
-                    <input
-                        id="email"
-                        type="email"
-                        formControlName="email"
-                        [placeholder]="'register.step3.emailPlaceholder' | translate"
-                        [class.invalid]="isFieldInvalid('email')"
-                    />
-                    <div class="error-message" *ngIf="isFieldInvalid('email')">
-                        {{ 'register.errors.emailInvalid' | translate }}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">{{ 'register.step3.password' | translate }} *</label>
-                    <div class="password-input-container">
-                        <input
-                            id="password"
-                            [type]="hidePassword ? 'password' : 'text'"
-                            formControlName="password"
-                            [placeholder]="'register.step3.passwordPlaceholder' | translate"
-                            [class.invalid]="isFieldInvalid('password')"
-                        />
-                        <button
-                            type="button"
-                            class="password-toggle"
-                            (click)="togglePasswordVisibility()"
-                            tabindex="-1">
-                            <span class="toggle-icon">{{ hidePassword ? '&#128065;&#65039;' : '&#128584;' }}</span>
-                        </button>
-                    </div>
-                    <div class="error-message" *ngIf="isFieldInvalid('password')">
-                        {{ 'register.errors.passwordTooShort' | translate }}
-                    </div>
-                    <!-- Password Strength -->
-                    <div class="password-strength" *ngIf="registerForm.get('password')?.value">
-                        <div class="strength-bar">
-                            <div class="strength-fill" [class]="passwordStrengthClass" [style.width.%]="passwordStrength * 25"></div>
-                        </div>
-                        <span class="strength-label" [class]="passwordStrengthClass">{{ passwordStrengthLabel | translate }}</span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="confirmPassword">{{ 'register.step3.confirmPassword' | translate }} *</label>
-                    <div class="password-input-container">
-                        <input
-                            id="confirmPassword"
-                            [type]="hideConfirmPassword ? 'password' : 'text'"
-                            formControlName="confirmPassword"
-                            [placeholder]="'register.step3.confirmPasswordPlaceholder' | translate"
-                            [class.invalid]="hasPasswordMismatch()"
-                        />
-                        <button
-                            type="button"
-                            class="password-toggle"
-                            (click)="toggleConfirmPasswordVisibility()"
-                            tabindex="-1">
-                            <span class="toggle-icon">{{ hideConfirmPassword ? '&#128065;&#65039;' : '&#128584;' }}</span>
-                        </button>
-                    </div>
-                    <div class="error-message" *ngIf="hasPasswordMismatch()">
-                        {{ 'register.errors.passwordMismatch' | translate }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 4: Terms + CAPTCHA -->
-            <div class="step-content" *ngIf="currentStep === 4">
-                <h2>{{ 'register.step4.title' | translate }}</h2>
-                <p class="step-subtitle">{{ 'register.step4.subtitle' | translate }}</p>
-
-                <div class="terms-container">
-                    <div class="terms-scroll">
-                        <h3>{{ 'register.step4.termsTitle' | translate }}</h3>
-                        <p>{{ 'register.step4.termsContent' | translate }}</p>
-                        <h3>{{ 'register.step4.privacyTitle' | translate }}</h3>
-                        <p>{{ 'register.step4.privacyContent' | translate }}</p>
-                    </div>
-                </div>
-
-                <label class="checkbox-label">
-                    <input type="checkbox" formControlName="termsAccepted" />
-                    <span>{{ 'register.step4.acceptTerms' | translate }}</span>
-                </label>
-
-                <div id="recaptcha-container" class="recaptcha-wrapper"></div>
-            </div>
-
-            <!-- Step 5: Success -->
-            <div class="step-content success-step" *ngIf="currentStep === 5">
-                <div class="success-icon">&#10003;</div>
-                <h2>{{ 'register.step5.title' | translate }}</h2>
-                <p class="step-subtitle">{{ 'register.step5.subtitle' | translate }}</p>
-                <p class="email-hint">{{ 'register.step5.emailHint' | translate }}</p>
-                <button type="button" class="enter-app-button" (click)="enterApp()">
-                    {{ 'register.step5.enterApp' | translate }}
-                </button>
-            </div>
-
-            <!-- Global Error -->
-            <div class="error-message global-error" *ngIf="error">
-                {{ error }}
-            </div>
-
-            <!-- Navigation -->
-            <div class="step-navigation" *ngIf="currentStep < 5">
-                <button
-                    type="button"
-                    class="nav-button back"
-                    *ngIf="currentStep > 1"
-                    (click)="prevStep()">
-                    {{ 'register.navigation.back' | translate }}
-                </button>
-                <div class="nav-spacer" *ngIf="currentStep === 1"></div>
-
-                <button
-                    type="button"
-                    class="nav-button next"
-                    *ngIf="currentStep < 4"
-                    [disabled]="!canProceed()"
-                    (click)="nextStep()">
-                    {{ 'register.navigation.next' | translate }}
-                </button>
-
-                <button
-                    type="submit"
-                    class="nav-button submit"
-                    *ngIf="currentStep === 4"
-                    [disabled]="!canProceed() || loading">
-                    <span *ngIf="loading">{{ 'register.navigation.creating' | translate }}</span>
-                    <span *ngIf="!loading">{{ 'register.navigation.submit' | translate }}</span>
-                </button>
-            </div>
-        </form>
-
-        <div class="register-footer" *ngIf="currentStep < 5">
-            <p>
-                {{ 'register.backToLogin' | translate }}
-                <a routerLink="/login">{{ 'register.loginLink' | translate }}</a>
-            </p>
-        </div>
+  <div class="register-card">
+    <div class="register-header">
+      <h1>{{ 'register.title' | translate }}</h1>
+      <p>{{ 'register.subtitle' | translate }}</p>
     </div>
+
+    <!-- Progress Bar -->
+    @if (currentStep < 5) {
+      <div class="step-progress">
+        @for (step of [1,2,3,4]; track step) {
+          <div class="step-indicator"
+            [class.active]="currentStep === step"
+            [class.completed]="currentStep > step"
+            (click)="goToStep(step)">
+            <div class="step-dot">
+              @if (currentStep <= step) {
+                <span>{{ step }}</span>
+              }
+              @if (currentStep > step) {
+                <span class="check-icon">&#10003;</span>
+              }
+            </div>
+            <span class="step-label">{{ 'register.steps.step' + step | translate }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+      <!-- Step 1: Language -->
+      @if (currentStep === 1) {
+        <div class="step-content">
+          <h2>{{ 'register.step1.title' | translate }}</h2>
+          <p class="step-subtitle">{{ 'register.step1.subtitle' | translate }}</p>
+          <div class="language-selector">
+            @for (lang of availableLanguages; track lang) {
+              <div class="language-option"
+                [class.selected]="registerForm.get('preferred_language')?.value === lang.code"
+                (click)="registerForm.patchValue({preferred_language: lang.code}); onLanguageChange()">
+                <span class="language-flag">{{ lang.code === 'en' ? '&#127468;&#127463;' : '&#127465;&#127466;' }}</span>
+                <span class="language-name">{{ lang.name }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Step 2: Personal Info -->
+      @if (currentStep === 2) {
+        <div class="step-content">
+          <h2>{{ 'register.step2.title' | translate }}</h2>
+          <p class="step-subtitle">{{ 'register.step2.subtitle' | translate }}</p>
+          <div class="form-group">
+            <label for="first_name">{{ 'register.step2.firstName' | translate }}</label>
+            <input
+              id="first_name"
+              type="text"
+              formControlName="first_name"
+              [placeholder]="'register.step2.firstNamePlaceholder' | translate"
+              />
+          </div>
+          <div class="form-group">
+            <label for="last_name">{{ 'register.step2.lastName' | translate }}</label>
+            <input
+              id="last_name"
+              type="text"
+              formControlName="last_name"
+              [placeholder]="'register.step2.lastNamePlaceholder' | translate"
+              />
+          </div>
+          <div class="form-group">
+            <label for="artist_name">{{ 'register.step2.artistName' | translate }}</label>
+            <input
+              id="artist_name"
+              type="text"
+              formControlName="artist_name"
+              [placeholder]="'register.step2.artistNamePlaceholder' | translate"
+              />
+            <span class="field-hint">{{ 'register.step2.artistNameHint' | translate }}</span>
+          </div>
+        </div>
+      }
+
+      <!-- Step 3: Account -->
+      @if (currentStep === 3) {
+        <div class="step-content">
+          <h2>{{ 'register.step3.title' | translate }}</h2>
+          <p class="step-subtitle">{{ 'register.step3.subtitle' | translate }}</p>
+          <div class="form-group">
+            <label for="email">{{ 'register.step3.email' | translate }} *</label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              [placeholder]="'register.step3.emailPlaceholder' | translate"
+              [class.invalid]="isFieldInvalid('email')"
+              />
+            @if (isFieldInvalid('email')) {
+              <div class="error-message">
+                {{ 'register.errors.emailInvalid' | translate }}
+              </div>
+            }
+          </div>
+          <div class="form-group">
+            <label for="password">{{ 'register.step3.password' | translate }} *</label>
+            <div class="password-input-container">
+              <input
+                id="password"
+                [type]="hidePassword ? 'password' : 'text'"
+                formControlName="password"
+                [placeholder]="'register.step3.passwordPlaceholder' | translate"
+                [class.invalid]="isFieldInvalid('password')"
+                />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePasswordVisibility()"
+                tabindex="-1">
+                <span class="toggle-icon">{{ hidePassword ? '&#128065;&#65039;' : '&#128584;' }}</span>
+              </button>
+            </div>
+            @if (isFieldInvalid('password')) {
+              <div class="error-message">
+                {{ 'register.errors.passwordTooShort' | translate }}
+              </div>
+            }
+            <!-- Password Strength -->
+            @if (registerForm.get('password')?.value) {
+              <div class="password-strength">
+                <div class="strength-bar">
+                  <div class="strength-fill" [class]="passwordStrengthClass" [style.width.%]="passwordStrength * 25"></div>
+                </div>
+                <span class="strength-label" [class]="passwordStrengthClass">{{ passwordStrengthLabel | translate }}</span>
+              </div>
+            }
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword">{{ 'register.step3.confirmPassword' | translate }} *</label>
+            <div class="password-input-container">
+              <input
+                id="confirmPassword"
+                [type]="hideConfirmPassword ? 'password' : 'text'"
+                formControlName="confirmPassword"
+                [placeholder]="'register.step3.confirmPasswordPlaceholder' | translate"
+                [class.invalid]="hasPasswordMismatch()"
+                />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="toggleConfirmPasswordVisibility()"
+                tabindex="-1">
+                <span class="toggle-icon">{{ hideConfirmPassword ? '&#128065;&#65039;' : '&#128584;' }}</span>
+              </button>
+            </div>
+            @if (hasPasswordMismatch()) {
+              <div class="error-message">
+                {{ 'register.errors.passwordMismatch' | translate }}
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Step 4: Terms + CAPTCHA -->
+      @if (currentStep === 4) {
+        <div class="step-content">
+          <h2>{{ 'register.step4.title' | translate }}</h2>
+          <p class="step-subtitle">{{ 'register.step4.subtitle' | translate }}</p>
+          <div class="terms-container">
+            <div class="terms-scroll">
+              <h3>{{ 'register.step4.termsTitle' | translate }}</h3>
+              <p>{{ 'register.step4.termsContent' | translate }}</p>
+              <h3>{{ 'register.step4.privacyTitle' | translate }}</h3>
+              <p>{{ 'register.step4.privacyContent' | translate }}</p>
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="termsAccepted" />
+            <span>{{ 'register.step4.acceptTerms' | translate }}</span>
+          </label>
+          <div id="recaptcha-container" class="recaptcha-wrapper"></div>
+        </div>
+      }
+
+      <!-- Step 5: Success -->
+      @if (currentStep === 5) {
+        <div class="step-content success-step">
+          <div class="success-icon">&#10003;</div>
+          <h2>{{ 'register.step5.title' | translate }}</h2>
+          <p class="step-subtitle">{{ 'register.step5.subtitle' | translate }}</p>
+          <p class="email-hint">{{ 'register.step5.emailHint' | translate }}</p>
+          <button type="button" class="enter-app-button" (click)="enterApp()">
+            {{ 'register.step5.enterApp' | translate }}
+          </button>
+        </div>
+      }
+
+      <!-- Global Error -->
+      @if (error) {
+        <div class="error-message global-error">
+          {{ error }}
+        </div>
+      }
+
+      <!-- Navigation -->
+      @if (currentStep < 5) {
+        <div class="step-navigation">
+          @if (currentStep > 1) {
+            <button
+              type="button"
+              class="nav-button back"
+              (click)="prevStep()">
+              {{ 'register.navigation.back' | translate }}
+            </button>
+          }
+          @if (currentStep === 1) {
+            <div class="nav-spacer"></div>
+          }
+          @if (currentStep < 4) {
+            <button
+              type="button"
+              class="nav-button next"
+              [disabled]="!canProceed()"
+              (click)="nextStep()">
+              {{ 'register.navigation.next' | translate }}
+            </button>
+          }
+          @if (currentStep === 4) {
+            <button
+              type="submit"
+              class="nav-button submit"
+              [disabled]="!canProceed() || loading">
+              @if (loading) {
+                <span>{{ 'register.navigation.creating' | translate }}</span>
+              }
+              @if (!loading) {
+                <span>{{ 'register.navigation.submit' | translate }}</span>
+              }
+            </button>
+          }
+        </div>
+      }
+    </form>
+
+    @if (currentStep < 5) {
+      <div class="register-footer">
+        <p>
+          {{ 'register.backToLogin' | translate }}
+          <a routerLink="/login">{{ 'register.loginLink' | translate }}</a>
+        </p>
+      </div>
+    }
+  </div>
 </div>

@@ -1,206 +1,243 @@
 <div class="image-details-panel">
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="loading-section">
-        <div class="placeholder-content">
-            <i class="fas fa-spinner fa-spin placeholder-icon"></i>
-            <p>{{ 'imageDetailPanel.loading' | translate }}</p>
-        </div>
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="loading-section">
+      <div class="placeholder-content">
+        <i class="fas fa-spinner fa-spin placeholder-icon"></i>
+        <p>{{ 'imageDetailPanel.loading' | translate }}</p>
+      </div>
     </div>
+  }
 
-    <!-- Error State -->
-    <div *ngIf="loadingError && !isLoading" class="error-section">
-        <div class="placeholder-content">
-            <i class="fas fa-exclamation-triangle placeholder-icon error-icon"></i>
-            <p>{{ loadingError }}</p>
-        </div>
+  <!-- Error State -->
+  @if (loadingError && !isLoading) {
+    <div class="error-section">
+      <div class="placeholder-content">
+        <i class="fas fa-exclamation-triangle placeholder-icon error-icon"></i>
+        <p>{{ loadingError }}</p>
+      </div>
     </div>
+  }
 
-    <!-- No Selection State -->
-    <div *ngIf="!image && !isLoading && !loadingError" class="no-selection">
-        <div class="placeholder-content">
-            <i [class]="placeholderIcon + ' placeholder-icon'"></i>
-            <p>{{ placeholderText }}</p>
-        </div>
+  <!-- No Selection State -->
+  @if (!image && !isLoading && !loadingError) {
+    <div class="no-selection">
+      <div class="placeholder-content">
+        <i [class]="placeholderIcon + ' placeholder-icon'"></i>
+        <p>{{ placeholderText }}</p>
+      </div>
     </div>
+  }
 
-    <!-- Image Details Content -->
-    <div *ngIf="image" class="image-details-section">
-        <div class="title-with-badge">
-            <h2>{{ title }}</h2>
-            <span *ngIf="hasTextOverlay()" class="overlay-badge">
-                <i class="fas fa-layer-group"></i>
-                {{ 'imageDetailPanel.badges.textOverlay' | translate }}
-            </span>
-        </div>
-
-        <!-- Editable Title Section -->
-        <div class="image-title-section" *ngIf="showEditTitle">
-            <div class="title-row" *ngIf="!editingTitle">
-                <h3 class="image-title">{{ getDisplayTitle(image) }}</h3>
-                <button type="button" class="edit-btn" (click)="startEditTitle()">
-                    <i class="fas fa-edit"></i>
-                </button>
+  <!-- Image Details Content -->
+  @if (image) {
+    <div class="image-details-section">
+      <div class="title-with-badge">
+        <h2>{{ title }}</h2>
+        @if (hasTextOverlay()) {
+          <span class="overlay-badge">
+            <i class="fas fa-layer-group"></i>
+            {{ 'imageDetailPanel.badges.textOverlay' | translate }}
+          </span>
+        }
+      </div>
+      <!-- Editable Title Section -->
+      @if (showEditTitle) {
+        <div class="image-title-section">
+          @if (!editingTitle) {
+            <div class="title-row">
+              <h3 class="image-title">{{ getDisplayTitle(image) }}</h3>
+              <button type="button" class="edit-btn" (click)="startEditTitle()">
+                <i class="fas fa-edit"></i>
+              </button>
             </div>
-            <div class="title-edit-row" *ngIf="editingTitle">
-                <div class="title-input-group">
-                    <input type="text"
-                           class="title-input"
-                           [(ngModel)]="editTitleValue"
-                           (keyup.enter)="saveTitle()"
-                           (keyup.escape)="cancelEditTitle()"
-                           #titleInput>
-                    <div class="title-dropdown-container">
-                        <button
-                                type="button"
-                                (click)="toggleTitleDropdown()"
-                                [disabled]="isGeneratingTitle"
-                                class="magic-icon-button"
-                                [title]="'imageGenerator.titleActions' | translate">
-                            <i class="fas fa-ellipsis-vertical" *ngIf="!isGeneratingTitle"></i>
-                            <i class="fas fa-spinner fa-spin" *ngIf="isGeneratingTitle"></i>
-                        </button>
-                        <div class="dropdown-menu" *ngIf="showTitleDropdown" (click)="$event.stopPropagation()">
-                            <button
-                                    type="button"
-                                    class="dropdown-item"
-                                    [disabled]="isGeneratingTitle"
-                                    (click)="selectTitleAction('generate')">
-                                <i class="fas fa-wand-magic-sparkles"></i>
-                                <span>{{ 'imageGenerator.generateTitle' | translate }}</span>
-                                <i class="fas fa-spinner fa-spin action-spinner" *ngIf="isGeneratingTitle"></i>
-                            </button>
-                        </div>
+          }
+          @if (editingTitle) {
+            <div class="title-edit-row">
+              <div class="title-input-group">
+                <input type="text"
+                  class="title-input"
+                  [(ngModel)]="editTitleValue"
+                  (keyup.enter)="saveTitle()"
+                  (keyup.escape)="cancelEditTitle()"
+                  #titleInput>
+                <div class="title-dropdown-container">
+                  <button
+                    type="button"
+                    (click)="toggleTitleDropdown()"
+                    [disabled]="isGeneratingTitle"
+                    class="magic-icon-button"
+                    [title]="'imageGenerator.titleActions' | translate">
+                    @if (!isGeneratingTitle) {
+                      <i class="fas fa-ellipsis-vertical"></i>
+                    }
+                    @if (isGeneratingTitle) {
+                      <i class="fas fa-spinner fa-spin"></i>
+                    }
+                  </button>
+                  @if (showTitleDropdown) {
+                    <div class="dropdown-menu" (click)="$event.stopPropagation()">
+                      <button
+                        type="button"
+                        class="dropdown-item"
+                        [disabled]="isGeneratingTitle"
+                        (click)="selectTitleAction('generate')">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <span>{{ 'imageGenerator.generateTitle' | translate }}</span>
+                        @if (isGeneratingTitle) {
+                          <i class="fas fa-spinner fa-spin action-spinner"></i>
+                        }
+                      </button>
                     </div>
+                  }
                 </div>
-                <button type="button" class="save-btn" (click)="saveTitle()">
-                    <i class="fas fa-check"></i>
-                </button>
-                <button type="button" class="cancel-btn" (click)="cancelEditTitle()">
-                    <i class="fas fa-times"></i>
-                </button>
+              </div>
+              <button type="button" class="save-btn" (click)="saveTitle()">
+                <i class="fas fa-check"></i>
+              </button>
+              <button type="button" class="cancel-btn" (click)="cancelEditTitle()">
+                <i class="fas fa-times"></i>
+              </button>
             </div>
+          }
         </div>
-
-        <!-- Compact Image Display -->
-        <div class="image-display-compact">
-            <div class="responsive-image-container" [ngClass]="getImageSizeClass()">
-                <img [src]="imageBlobUrl"
-                     [alt]="image.user_prompt || image.prompt || ('imageDetailPanel.alt.image' | translate)"
-                     (error)="onImageError($event)"
-                     loading="lazy"
-                     class="responsive-image">
+      }
+      <!-- Compact Image Display -->
+      <div class="image-display-compact">
+        <div class="responsive-image-container" [ngClass]="getImageSizeClass()">
+          <img [src]="imageBlobUrl"
+            [alt]="image.user_prompt || image.prompt || ('imageDetailPanel.alt.image' | translate)"
+            (error)="onImageError($event)"
+            loading="lazy"
+            class="responsive-image">
+        </div>
+      </div>
+      <!-- Meta Info -->
+      <div class="image-meta-info">
+        <!-- ID Row (separate, full width) -->
+        @if (shouldShowMetaInfo('id') && image.id) {
+          <div class="meta-id-row">
+            <div class="meta-item meta-item-id">
+              <i class="fas fa-fingerprint meta-icon"></i>
+              <span class="meta-value meta-id" [title]="image.id">{{ image.id }}</span>
+              <button type="button"
+                class="copy-id-btn"
+                (click)="copyToClipboard(image.id)"
+                [title]="'imageDetailPanel.copyId' | translate">
+                <i class="fas fa-copy"></i>
+              </button>
             </div>
+          </div>
+        }
+        <!-- Other Meta Data Grid -->
+        <div class="meta-grid">
+          @if (shouldShowMetaInfo('model') && image.model_used) {
+            <div class="meta-item">
+              <i class="fas fa-robot meta-icon"></i>
+              <span class="meta-value">{{ image.model_used }}</span>
+            </div>
+          }
+          @if (shouldShowMetaInfo('size') && image.size) {
+            <div class="meta-item">
+              <i class="fas fa-expand-arrows-alt meta-icon"></i>
+              <span class="meta-value">{{ image.size }}</span>
+            </div>
+          }
+          @if (shouldShowMetaInfo('created') && image.created_at) {
+            <div class="meta-item">
+              <i class="fas fa-calendar meta-icon"></i>
+              <span class="meta-value">{{ formatDate(image.created_at) }}</span>
+            </div>
+          }
         </div>
-
-        <!-- Meta Info -->
-        <div class="image-meta-info">
-            <!-- ID Row (separate, full width) -->
-            <div class="meta-id-row" *ngIf="shouldShowMetaInfo('id') && image.id">
-                <div class="meta-item meta-item-id">
-                    <i class="fas fa-fingerprint meta-icon"></i>
-                    <span class="meta-value meta-id" [title]="image.id">{{ image.id }}</span>
+      </div>
+      <!-- Prompt Details Expansion Panel -->
+      @if (shouldShowPromptSection()) {
+        <div class="expansion-panels">
+          <details class="expansion-panel" open>
+            <summary class="expansion-header">
+              <i class="fas fa-comment-dots"></i>
+              <span>{{ 'imageDetailPanel.prompts.title' | translate }}</span>
+            </summary>
+            <div class="expansion-content">
+              <!-- User Input Prompt -->
+              @if (hasUserPrompt()) {
+                <div class="prompt-section">
+                  <div class="prompt-label">
+                    <i class="fas fa-user"></i>
+                    {{ 'imageDetailPanel.prompts.userInput.label' | translate }}
+                  </div>
+                  <div class="prompt-text">{{ image.user_prompt }}</div>
+                </div>
+              }
+              <!-- AI Enhanced Prompt (Ollama) -->
+              @if (image.prompt) {
+                <div class="prompt-section">
+                  <div class="prompt-label">
+                    <i class="fas fa-brain"></i>
+                    {{ 'imageDetailPanel.prompts.aiEnhanced.label' | translate }}
+                  </div>
+                  <div class="prompt-text">{{ image.prompt }}</div>
+                </div>
+              }
+              <!-- Final Prompt (to DALL-E with Styles) -->
+              @if (hasEnhancedPrompt()) {
+                <div class="prompt-section">
+                  <div class="prompt-label">
+                    <i class="fas fa-paper-plane"></i>
+                    {{ 'imageDetailPanel.prompts.final.label' | translate }}
+                  </div>
+                  <div class="prompt-text-with-copy">
+                    <div class="prompt-text">{{ image.enhanced_prompt }}</div>
                     <button type="button"
-                            class="copy-id-btn"
-                            (click)="copyToClipboard(image.id)"
-                            [title]="'imageDetailPanel.copyId' | translate">
-                        <i class="fas fa-copy"></i>
+                      class="copy-btn"
+                      (click)="copyToClipboard(image.enhanced_prompt!)"
+                      [title]="'imageDetailPanel.prompts.final.copy' | translate">
+                      <i class="fas fa-copy"></i>
                     </button>
+                  </div>
                 </div>
+              }
             </div>
-
-            <!-- Other Meta Data Grid -->
-            <div class="meta-grid">
-                <div class="meta-item" *ngIf="shouldShowMetaInfo('model') && image.model_used">
-                    <i class="fas fa-robot meta-icon"></i>
-                    <span class="meta-value">{{ image.model_used }}</span>
-                </div>
-                <div class="meta-item" *ngIf="shouldShowMetaInfo('size') && image.size">
-                    <i class="fas fa-expand-arrows-alt meta-icon"></i>
-                    <span class="meta-value">{{ image.size }}</span>
-                </div>
-                <div class="meta-item" *ngIf="shouldShowMetaInfo('created') && image.created_at">
-                    <i class="fas fa-calendar meta-icon"></i>
-                    <span class="meta-value">{{ formatDate(image.created_at) }}</span>
-                </div>
+          </details>
+        </div>
+      }
+      <!-- Style Selections Expansion Panel -->
+      @if (hasManualStyles()) {
+        <div class="expansion-panels">
+          <details class="expansion-panel">
+            <summary class="expansion-header">
+              <i class="fas fa-palette"></i>
+              <span>{{ 'imageDetailPanel.styles.title' | translate }}</span>
+            </summary>
+            <div class="expansion-content">
+              <div class="style-chips-container">
+                @for (chip of getStyleChips(); track chip) {
+                  <div class="style-chip">
+                    <span class="chip-label">{{ chip.label }}:</span>
+                    <span class="chip-value">{{ chip.value }}</span>
+                  </div>
+                }
+              </div>
             </div>
+          </details>
         </div>
-
-        <!-- Prompt Details Expansion Panel -->
-        <div class="expansion-panels" *ngIf="shouldShowPromptSection()">
-            <details class="expansion-panel" open>
-                <summary class="expansion-header">
-                    <i class="fas fa-comment-dots"></i>
-                    <span>{{ 'imageDetailPanel.prompts.title' | translate }}</span>
-                </summary>
-                <div class="expansion-content">
-                    <!-- User Input Prompt -->
-                    <div class="prompt-section" *ngIf="hasUserPrompt()">
-                        <div class="prompt-label">
-                            <i class="fas fa-user"></i>
-                            {{ 'imageDetailPanel.prompts.userInput.label' | translate }}
-                        </div>
-                        <div class="prompt-text">{{ image.user_prompt }}</div>
-                    </div>
-
-                    <!-- AI Enhanced Prompt (Ollama) -->
-                    <div class="prompt-section" *ngIf="image.prompt">
-                        <div class="prompt-label">
-                            <i class="fas fa-brain"></i>
-                            {{ 'imageDetailPanel.prompts.aiEnhanced.label' | translate }}
-                        </div>
-                        <div class="prompt-text">{{ image.prompt }}</div>
-                    </div>
-
-                    <!-- Final Prompt (to DALL-E with Styles) -->
-                    <div class="prompt-section" *ngIf="hasEnhancedPrompt()">
-                        <div class="prompt-label">
-                            <i class="fas fa-paper-plane"></i>
-                            {{ 'imageDetailPanel.prompts.final.label' | translate }}
-                        </div>
-                        <div class="prompt-text-with-copy">
-                            <div class="prompt-text">{{ image.enhanced_prompt }}</div>
-                            <button type="button"
-                                    class="copy-btn"
-                                    (click)="copyToClipboard(image.enhanced_prompt!)"
-                                    [title]="'imageDetailPanel.prompts.final.copy' | translate">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </details>
+      }
+      <!-- Action Buttons Area -->
+      @if (showActionButtons) {
+        <div class="detail-actions">
+          <div class="action-buttons">
+            <button type="button" (click)="onDownloadOriginal()" class="action-btn download-btn">
+              <i class="fas fa-download"></i>
+              <span>{{ 'imageDetailPanel.actions.download' | translate }}</span>
+            </button>
+            <button type="button" (click)="onPreview()" class="action-btn preview-btn">
+              <i class="fas fa-expand"></i>
+              <span>{{ 'imageDetailPanel.actions.fullSize' | translate }}</span>
+            </button>
+          </div>
         </div>
-
-        <!-- Style Selections Expansion Panel -->
-        <div class="expansion-panels" *ngIf="hasManualStyles()">
-            <details class="expansion-panel">
-                <summary class="expansion-header">
-                    <i class="fas fa-palette"></i>
-                    <span>{{ 'imageDetailPanel.styles.title' | translate }}</span>
-                </summary>
-                <div class="expansion-content">
-                    <div class="style-chips-container">
-                        <div class="style-chip" *ngFor="let chip of getStyleChips()">
-                            <span class="chip-label">{{ chip.label }}:</span>
-                            <span class="chip-value">{{ chip.value }}</span>
-                        </div>
-                    </div>
-                </div>
-            </details>
-        </div>
-
-        <!-- Action Buttons Area -->
-        <div class="detail-actions" *ngIf="showActionButtons">
-            <div class="action-buttons">
-                <button type="button" (click)="onDownloadOriginal()" class="action-btn download-btn">
-                    <i class="fas fa-download"></i>
-                    <span>{{ 'imageDetailPanel.actions.download' | translate }}</span>
-                </button>
-                <button type="button" (click)="onPreview()" class="action-btn preview-btn">
-                    <i class="fas fa-expand"></i>
-                    <span>{{ 'imageDetailPanel.actions.fullSize' | translate }}</span>
-                </button>
-            </div>
-        </div>
+      }
     </div>
+  }
 </div>

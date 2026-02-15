@@ -369,7 +369,7 @@ export class SongSketchCreatorComponent implements OnInit, OnDestroy {
         this.showTitleDropdown = false;
     }
 
-    @HostListener("document:click", ["$event"])
+    @HostListener("document:click")
     onDocumentClick(): void {
         this.closeTitleDropdown();
     }

@@ -1,5 +1,5 @@
 import {Component, inject, OnInit} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import {MatButtonModule} from "@angular/material/button";
@@ -16,14 +16,13 @@ export interface SearchReplaceDialogData {
     selector: "app-search-replace-dialog",
     standalone: true,
     imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        TranslateModule,
-        MatDialogModule,
-        MatButtonModule,
-        MatFormFieldModule,
-        MatInputModule
-    ],
+    ReactiveFormsModule,
+    TranslateModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule
+],
     templateUrl: "./search-replace-dialog.component.html",
     styleUrl: "./search-replace-dialog.component.scss"
 })

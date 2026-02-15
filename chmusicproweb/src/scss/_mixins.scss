@@ -4,7 +4,10 @@
 
 // 1. Button Styling
 @mixin button-style($bg-color, $text-color: $background-white, $hover-bg: null, $disabled-bg: $text-muted) {
-  $hover-color: if($hover-bg, $hover-bg, color.adjust($bg-color, $lightness: -10%));
+  $hover-color: color.adjust($bg-color, $lightness: -10%);
+  @if $hover-bg {
+    $hover-color: $hover-bg;
+  }
   
   background-color: $bg-color;
   color: $text-color;

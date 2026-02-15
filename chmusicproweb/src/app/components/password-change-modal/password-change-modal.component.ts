@@ -1,5 +1,5 @@
 import {Component, inject} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import {MatButtonModule} from "@angular/material/button";
@@ -14,15 +14,14 @@ import {NotificationService} from "../../services/ui/notification.service";
     selector: "app-password-change-modal",
     standalone: true,
     imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        MatDialogModule,
-        MatButtonModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatIconModule,
-        TranslateModule
-    ],
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    TranslateModule
+],
     templateUrl: "./password-change-modal.component.html",
     styleUrl: "./password-change-modal.component.scss"
 })

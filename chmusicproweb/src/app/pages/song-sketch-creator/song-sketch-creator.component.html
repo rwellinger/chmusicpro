@@ -1,460 +1,502 @@
 <div class="sketch-creator-container">
-    <mat-card class="sketch-creator-card">
-        <mat-card-content>
-            <!-- Header -->
-            <div class="sketch-creator-header">
-                <div class="sketch-creator-title">
-                    <h2>
-                        <i class="fas fa-lightbulb"></i>
-                        {{ (isEditMode ? 'songSketch.creator.titleEdit' : 'songSketch.creator.title') | translate }}
-                    </h2>
+  <mat-card class="sketch-creator-card">
+    <mat-card-content>
+      <!-- Header -->
+      <div class="sketch-creator-header">
+        <div class="sketch-creator-title">
+          <h2>
+            <i class="fas fa-lightbulb"></i>
+            {{ (isEditMode ? 'songSketch.creator.titleEdit' : 'songSketch.creator.title') | translate }}
+          </h2>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="sketchForm" (ngSubmit)="saveSketch()">
+        <!-- Create Mode: No tabs, only General form -->
+        @if (!isEditMode) {
+          <div>
+            <ng-container *ngTemplateOutlet="generalContent"></ng-container>
+          </div>
+        }
+
+        <!-- Edit Mode: Material Tabs -->
+        @if (isEditMode) {
+          <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="creator-tabs">
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <i class="fas fa-edit tab-icon"></i>
+                {{ 'songSketch.creator.tabs.general' | translate }}
+              </ng-template>
+              <ng-container *ngTemplateOutlet="generalContent"></ng-container>
+            </mat-tab>
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <i class="fas fa-info-circle tab-icon"></i>
+                {{ 'songSketch.creator.tabs.description' | translate }}
+              </ng-template>
+              <ng-container *ngTemplateOutlet="descriptionContent"></ng-container>
+            </mat-tab>
+          </mat-tab-group>
+        }
+
+        <!-- Template for General Content -->
+        <ng-template #generalContent>
+          <div class="tab-content">
+            <!-- Title Field -->
+            <div class="form-group">
+              <label for="title">
+                {{ 'songSketch.creator.fields.title' | translate }}
+                <span class="required">*</span>
+              </label>
+              <div class="prompt-input-group">
+                <input
+                  id="title"
+                  type="text"
+                  formControlName="title"
+                  [placeholder]="'songSketch.creator.fields.titlePlaceholder' | translate"
+                  required
+                  maxlength="500"
+                  [disabled]="isSaving"
+                  class="title-input">
+                <div class="title-dropdown-container" (click)="$event.stopPropagation()">
+                  <button
+                    type="button"
+                    (click)="toggleTitleDropdown(); $event.stopPropagation()"
+                    [disabled]="isSaving || isGeneratingTitle"
+                    class="magic-icon-button"
+                    [title]="'songSketch.creator.buttons.titleActions' | translate">
+                    @if (!isGeneratingTitle) {
+                      <i class="fas fa-ellipsis-vertical"></i>
+                    }
+                    @if (isGeneratingTitle) {
+                      <i class="fas fa-spinner fa-spin"></i>
+                    }
+                  </button>
+                  @if (showTitleDropdown) {
+                    <div class="dropdown-menu"
+                      (click)="$event.stopPropagation()">
+                      <button
+                        type="button"
+                        class="dropdown-item"
+                        [disabled]="isSaving || isGeneratingTitle"
+                        (click)="selectTitleAction('generate'); $event.stopPropagation()">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <span>{{ 'songSketch.creator.buttons.generateTitle' | translate }}</span>
+                        @if (isGeneratingTitle) {
+                          <i class="fas fa-spinner fa-spin action-spinner"
+                          ></i>
+                        }
+                      </button>
+                    </div>
+                  }
                 </div>
+              </div>
+              <div class="char-counter">
+                {{
+                'songSketch.creator.fields.titleCharCounter' | translate: {
+                count: sketchForm.get('title')?.value?.length || 0,
+                max: 500
+              }
+              }}
             </div>
+          </div>
 
-            <!-- Form -->
-            <form [formGroup]="sketchForm" (ngSubmit)="saveSketch()">
-                <!-- Create Mode: No tabs, only General form -->
-                <div *ngIf="!isEditMode">
-                    <ng-container *ngTemplateOutlet="generalContent"></ng-container>
-                </div>
-
-                <!-- Edit Mode: Material Tabs -->
-                <mat-tab-group *ngIf="isEditMode" [(selectedIndex)]="selectedTabIndex" class="creator-tabs">
-                    <mat-tab>
-                        <ng-template mat-tab-label>
-                            <i class="fas fa-edit tab-icon"></i>
-                            {{ 'songSketch.creator.tabs.general' | translate }}
-                        </ng-template>
-                        <ng-container *ngTemplateOutlet="generalContent"></ng-container>
-                    </mat-tab>
-                    <mat-tab>
-                        <ng-template mat-tab-label>
-                            <i class="fas fa-info-circle tab-icon"></i>
-                            {{ 'songSketch.creator.tabs.description' | translate }}
-                        </ng-template>
-                        <ng-container *ngTemplateOutlet="descriptionContent"></ng-container>
-                    </mat-tab>
-                </mat-tab-group>
-
-                <!-- Template for General Content -->
-                <ng-template #generalContent>
-                    <div class="tab-content">
-                        <!-- Title Field -->
-                        <div class="form-group">
-                            <label for="title">
-                                {{ 'songSketch.creator.fields.title' | translate }}
-                                <span class="required">*</span>
-                            </label>
-                            <div class="prompt-input-group">
-                                <input
-                                        id="title"
-                                        type="text"
-                                        formControlName="title"
-                                        [placeholder]="'songSketch.creator.fields.titlePlaceholder' | translate"
-                                        required
-                                        maxlength="500"
-                                        [disabled]="isSaving"
-                                        class="title-input">
-                                <div class="title-dropdown-container" (click)="$event.stopPropagation()">
-                                    <button
-                                            type="button"
-                                            (click)="toggleTitleDropdown(); $event.stopPropagation()"
-                                            [disabled]="isSaving || isGeneratingTitle"
-                                            class="magic-icon-button"
-                                            [title]="'songSketch.creator.buttons.titleActions' | translate">
-                                        <i class="fas fa-ellipsis-vertical" *ngIf="!isGeneratingTitle"></i>
-                                        <i class="fas fa-spinner fa-spin" *ngIf="isGeneratingTitle"></i>
-                                    </button>
-                                    <div class="dropdown-menu" *ngIf="showTitleDropdown"
-                                         (click)="$event.stopPropagation()">
-                                        <button
-                                                type="button"
-                                                class="dropdown-item"
-                                                [disabled]="isSaving || isGeneratingTitle"
-                                                (click)="selectTitleAction('generate'); $event.stopPropagation()">
-                                            <i class="fas fa-wand-magic-sparkles"></i>
-                                            <span>{{ 'songSketch.creator.buttons.generateTitle' | translate }}</span>
-                                            <i class="fas fa-spinner fa-spin action-spinner"
-                                               *ngIf="isGeneratingTitle"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="char-counter">
-                                {{
-                                    'songSketch.creator.fields.titleCharCounter' | translate: {
-                                        count: sketchForm.get('title')?.value?.length || 0,
-                                        max: 500
-                                    }
-                                }}
-                            </div>
-                        </div>
-
-                        <!-- Lyrics Field -->
-                        <div class="form-group">
-                            <label for="lyrics">
-                                {{ 'songSketch.creator.fields.lyrics' | translate }}
-                                <span class="required">*</span>
-                            </label>
-                            <div class="prompt-input-group">
+          <!-- Lyrics Field -->
+          <div class="form-group">
+            <label for="lyrics">
+              {{ 'songSketch.creator.fields.lyrics' | translate }}
+              <span class="required">*</span>
+            </label>
+            <div class="prompt-input-group">
               <textarea
-                      id="lyrics"
-                      formControlName="lyrics"
-                      [placeholder]="'songSketch.creator.fields.lyricsPlaceholder' | translate"
-                      required
-                      [disabled]="isSaving"
-                      rows="10"
-                      maxlength="10000"
-                      class="form-textarea">
+                id="lyrics"
+                formControlName="lyrics"
+                [placeholder]="'songSketch.creator.fields.lyricsPlaceholder' | translate"
+                required
+                [disabled]="isSaving"
+                rows="10"
+                maxlength="10000"
+                class="form-textarea">
               </textarea>
-                                <button
-                                        type="button"
-                                        (click)="navigateToLyricCreator()"
-                                        [disabled]="isSaving"
-                                        class="magic-icon-button"
-                                        [title]="'songSketch.creator.buttons.editLyrics' | translate">
-                                    <i class="fas fa-pen-to-square"></i>
-                                </button>
-                            </div>
-                            <div class="char-counter">
-                                {{
-                                    'songSketch.creator.fields.lyricsCharCounter' | translate: {
-                                        count: charCountLyrics,
-                                        max: 10000
-                                    }
-                                }}
-                            </div>
-                        </div>
+              <button
+                type="button"
+                (click)="navigateToLyricCreator()"
+                [disabled]="isSaving"
+                class="magic-icon-button"
+                [title]="'songSketch.creator.buttons.editLyrics' | translate">
+                <i class="fas fa-pen-to-square"></i>
+              </button>
+            </div>
+            <div class="char-counter">
+              {{
+              'songSketch.creator.fields.lyricsCharCounter' | translate: {
+              count: charCountLyrics,
+              max: 10000
+            }
+            }}
+          </div>
+        </div>
 
-                        <!-- Music Style Prompt Field -->
-                        <div class="form-group">
-                            <label for="prompt">
-                                {{ 'songSketch.creator.fields.prompt' | translate }}
-                                <span class="required">*</span>
-                            </label>
-                            <div class="prompt-input-group">
-              <textarea
-                      id="prompt"
-                      formControlName="prompt"
-                      [placeholder]="'songSketch.creator.fields.promptPlaceholder' | translate"
-                      required
-                      [disabled]="isSaving"
-                      rows="2"
-                      maxlength="1024"
-                      class="form-textarea prompt-textarea">
-              </textarea>
-                                <button
-                                        type="button"
-                                        (click)="navigateToMusicStylePrompt()"
-                                        [disabled]="isSaving"
-                                        class="magic-icon-button"
-                                        [title]="'songSketch.creator.buttons.editMusicStyle' | translate">
-                                    <i class="fas fa-pen-to-square"></i>
-                                </button>
-                            </div>
-                            <div class="char-counter">
-                                {{
-                                    'songSketch.creator.fields.promptCharCounter' | translate: {
-                                        count: charCountPrompt,
-                                        max: 1024
-                                    }
-                                }}
-                            </div>
-                        </div>
+        <!-- Music Style Prompt Field -->
+        <div class="form-group">
+          <label for="prompt">
+            {{ 'songSketch.creator.fields.prompt' | translate }}
+            <span class="required">*</span>
+          </label>
+          <div class="prompt-input-group">
+            <textarea
+              id="prompt"
+              formControlName="prompt"
+              [placeholder]="'songSketch.creator.fields.promptPlaceholder' | translate"
+              required
+              [disabled]="isSaving"
+              rows="2"
+              maxlength="1024"
+              class="form-textarea prompt-textarea">
+            </textarea>
+            <button
+              type="button"
+              (click)="navigateToMusicStylePrompt()"
+              [disabled]="isSaving"
+              class="magic-icon-button"
+              [title]="'songSketch.creator.buttons.editMusicStyle' | translate">
+              <i class="fas fa-pen-to-square"></i>
+            </button>
+          </div>
+          <div class="char-counter">
+            {{
+            'songSketch.creator.fields.promptCharCounter' | translate: {
+            count: charCountPrompt,
+            max: 1024
+          }
+          }}
+        </div>
+      </div>
 
-                        <!-- Workflow Field -->
-                        <div class="form-group">
-                            <label for="workflow">{{ 'songSketch.creator.fields.workflow' | translate }}</label>
+      <!-- Workflow Field -->
+      <div class="form-group">
+        <label for="workflow">{{ 'songSketch.creator.fields.workflow' | translate }}</label>
 
-                            <!-- Both modes: Read-only badge -->
-                            <div class="workflow-readonly">
-              <span class="workflow-badge-display">
-                {{ getWorkflowLabel(sketchForm.get('workflow')?.value || 'draft') }}
-              </span>
-                                <div class="field-hint">
-                                    {{ 'songSketch.creator.fields.workflowReadonlyHint' | translate }}
-                                </div>
-                            </div>
-                        </div>
+        <!-- Both modes: Read-only badge -->
+        <div class="workflow-readonly">
+          <span class="workflow-badge-display">
+            {{ getWorkflowLabel(sketchForm.get('workflow')?.value || 'draft') }}
+          </span>
+          <div class="field-hint">
+            {{ 'songSketch.creator.fields.workflowReadonlyHint' | translate }}
+          </div>
+        </div>
+      </div>
 
-                        <!-- Sketch Type Field -->
-                        <div class="form-group">
-                            <label for="sketch_type">{{ 'songSketch.creator.fields.sketchType' | translate }}</label>
+      <!-- Sketch Type Field -->
+      <div class="form-group">
+        <label for="sketch_type">{{ 'songSketch.creator.fields.sketchType' | translate }}</label>
 
-                            <div class="sketch-type-selector">
-                                <label class="type-option"
-                                       [class.selected]="sketchForm.get('sketch_type')?.value === 'inspiration'">
-                                    <input
-                                            type="radio"
-                                            formControlName="sketch_type"
-                                            value="inspiration"
-                                            [disabled]="isSaving">
-                                    <div class="type-badge inspiration">
-                                        <i class="fas fa-lightbulb"></i>
-                                        <span>{{ 'songSketch.creator.fields.sketchTypeInspiration' | translate }}</span>
-                                    </div>
-                                </label>
+        <div class="sketch-type-selector">
+          <label class="type-option"
+            [class.selected]="sketchForm.get('sketch_type')?.value === 'inspiration'">
+            <input
+              type="radio"
+              formControlName="sketch_type"
+              value="inspiration"
+              [disabled]="isSaving">
+            <div class="type-badge inspiration">
+              <i class="fas fa-lightbulb"></i>
+              <span>{{ 'songSketch.creator.fields.sketchTypeInspiration' | translate }}</span>
+            </div>
+          </label>
 
-                                <label class="type-option"
-                                       [class.selected]="sketchForm.get('sketch_type')?.value === 'song'">
-                                    <input
-                                            type="radio"
-                                            formControlName="sketch_type"
-                                            value="song"
-                                            [disabled]="isSaving">
-                                    <div class="type-badge song">
-                                        <i class="fas fa-music"></i>
-                                        <span>{{ 'songSketch.creator.fields.sketchTypeSong' | translate }}</span>
-                                    </div>
-                                </label>
-                            </div>
+          <label class="type-option"
+            [class.selected]="sketchForm.get('sketch_type')?.value === 'song'">
+            <input
+              type="radio"
+              formControlName="sketch_type"
+              value="song"
+              [disabled]="isSaving">
+            <div class="type-badge song">
+              <i class="fas fa-music"></i>
+              <span>{{ 'songSketch.creator.fields.sketchTypeSong' | translate }}</span>
+            </div>
+          </label>
+        </div>
 
-                            <div class="field-hint">
-                                {{ 'songSketch.creator.fields.sketchTypeHint' | translate }}
-                            </div>
-                        </div>
+        <div class="field-hint">
+          {{ 'songSketch.creator.fields.sketchTypeHint' | translate }}
+        </div>
+      </div>
 
-                        <!-- Tags Selection -->
-                        <div class="form-group">
-                            <h4 class="tags-section-title">{{ 'songSketch.creator.tags.title' | translate }}</h4>
+      <!-- Tags Selection -->
+      <div class="form-group">
+        <h4 class="tags-section-title">{{ 'songSketch.creator.tags.title' | translate }}</h4>
 
-                            <div class="tags-selection-container">
-                                <!-- Style Tags -->
-                                <div class="tag-category">
-                                    <h4 class="category-title" (click)="toggleCategory('style')">
-                                        <i class="fas fa-music"></i>
-                                        {{ 'songSketch.creator.tags.styleCategory' | translate }}
-                                        <i class="fas category-chevron"
-                                           [class.fa-chevron-down]="!isCategoryExpanded('style')"
-                                           [class.fa-chevron-up]="isCategoryExpanded('style')"></i>
-                                    </h4>
-                                    <div class="tag-grid" *ngIf="isCategoryExpanded('style')">
-                                        <button
-                                                *ngFor="let tag of tagCategories.style"
-                                                type="button"
-                                                class="tag-button"
-                                                [class.selected]="isTagSelected(tag)"
-                                                [disabled]="isSaving"
-                                                (click)="toggleTag(tag)">
-                                            {{ tag }}
-                                        </button>
-                                    </div>
-                                </div>
+        <div class="tags-selection-container">
+          <!-- Style Tags -->
+          <div class="tag-category">
+            <h4 class="category-title" (click)="toggleCategory('style')">
+              <i class="fas fa-music"></i>
+              {{ 'songSketch.creator.tags.styleCategory' | translate }}
+              <i class="fas category-chevron"
+                [class.fa-chevron-down]="!isCategoryExpanded('style')"
+              [class.fa-chevron-up]="isCategoryExpanded('style')"></i>
+            </h4>
+            @if (isCategoryExpanded('style')) {
+              <div class="tag-grid">
+                @for (tag of tagCategories.style; track tag) {
+                  <button
+                    type="button"
+                    class="tag-button"
+                    [class.selected]="isTagSelected(tag)"
+                    [disabled]="isSaving"
+                    (click)="toggleTag(tag)">
+                    {{ tag }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
 
-                                <!-- Theme Tags -->
-                                <div class="tag-category">
-                                    <h4 class="category-title" (click)="toggleCategory('theme')">
-                                        <i class="fas fa-palette"></i>
-                                        {{ 'songSketch.creator.tags.themeCategory' | translate }}
-                                        <i class="fas category-chevron"
-                                           [class.fa-chevron-down]="!isCategoryExpanded('theme')"
-                                           [class.fa-chevron-up]="isCategoryExpanded('theme')"></i>
-                                    </h4>
-                                    <div class="tag-grid" *ngIf="isCategoryExpanded('theme')">
-                                        <button
-                                                *ngFor="let tag of tagCategories.theme"
-                                                type="button"
-                                                class="tag-button"
-                                                [class.selected]="isTagSelected(tag)"
-                                                [disabled]="isSaving"
-                                                (click)="toggleTag(tag)">
-                                            {{ tag }}
-                                        </button>
-                                    </div>
-                                </div>
+          <!-- Theme Tags -->
+          <div class="tag-category">
+            <h4 class="category-title" (click)="toggleCategory('theme')">
+              <i class="fas fa-palette"></i>
+              {{ 'songSketch.creator.tags.themeCategory' | translate }}
+              <i class="fas category-chevron"
+                [class.fa-chevron-down]="!isCategoryExpanded('theme')"
+              [class.fa-chevron-up]="isCategoryExpanded('theme')"></i>
+            </h4>
+            @if (isCategoryExpanded('theme')) {
+              <div class="tag-grid">
+                @for (tag of tagCategories.theme; track tag) {
+                  <button
+                    type="button"
+                    class="tag-button"
+                    [class.selected]="isTagSelected(tag)"
+                    [disabled]="isSaving"
+                    (click)="toggleTag(tag)">
+                    {{ tag }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
 
-                                <!-- Use Case Tags -->
-                                <div class="tag-category">
-                                    <h4 class="category-title" (click)="toggleCategory('useCase')">
-                                        <i class="fas fa-tags"></i>
-                                        {{ 'songSketch.creator.tags.useCaseCategory' | translate }}
-                                        <i class="fas category-chevron"
-                                           [class.fa-chevron-down]="!isCategoryExpanded('useCase')"
-                                           [class.fa-chevron-up]="isCategoryExpanded('useCase')"></i>
-                                    </h4>
-                                    <div class="tag-grid" *ngIf="isCategoryExpanded('useCase')">
-                                        <button
-                                                *ngFor="let tag of tagCategories.useCase"
-                                                type="button"
-                                                class="tag-button"
-                                                [class.selected]="isTagSelected(tag)"
-                                                [disabled]="isSaving"
-                                                (click)="toggleTag(tag)">
-                                            {{ tag }}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+          <!-- Use Case Tags -->
+          <div class="tag-category">
+            <h4 class="category-title" (click)="toggleCategory('useCase')">
+              <i class="fas fa-tags"></i>
+              {{ 'songSketch.creator.tags.useCaseCategory' | translate }}
+              <i class="fas category-chevron"
+                [class.fa-chevron-down]="!isCategoryExpanded('useCase')"
+              [class.fa-chevron-up]="isCategoryExpanded('useCase')"></i>
+            </h4>
+            @if (isCategoryExpanded('useCase')) {
+              <div class="tag-grid">
+                @for (tag of tagCategories.useCase; track tag) {
+                  <button
+                    type="button"
+                    class="tag-button"
+                    [class.selected]="isTagSelected(tag)"
+                    [disabled]="isSaving"
+                    (click)="toggleTag(tag)">
+                    {{ tag }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
 
-                            <div class="field-hint" *ngIf="selectedTags.length > 0">
-                                {{ 'songSketch.creator.tags.selectedCount' | translate:{count: selectedTags.length} }}
-                            </div>
-                        </div>
-                    </div>
-                </ng-template>
-                <!-- End General Content Template -->
+        @if (selectedTags.length > 0) {
+          <div class="field-hint">
+            {{ 'songSketch.creator.tags.selectedCount' | translate:{count: selectedTags.length} }}
+          </div>
+        }
+      </div>
+    </div>
+  </ng-template>
+  <!-- End General Content Template -->
 
-                <!-- Template for Description Content -->
-                <ng-template #descriptionContent>
-                    <div class="tab-content">
-                        <!-- Long Description Field -->
-                        <div class="form-group">
-                            <label for="description_long">
-                                {{ 'songSketch.creator.description.descriptionLong' | translate }}
-                            </label>
-                            <div class="prompt-input-group">
-                <textarea
-                        id="description_long"
-                        formControlName="description_long"
-                        [placeholder]="'songSketch.creator.description.descriptionLongPlaceholder' | translate"
-                        [disabled]="isSaving || isGeneratingDescriptionLong"
-                        rows="6"
-                        maxlength="1000"
-                        class="form-textarea">
-                </textarea>
-                                <button
-                                        type="button"
-                                        (click)="generateDescriptionLong()"
-                                        [disabled]="isSaving || isGeneratingDescriptionLong"
-                                        class="magic-icon-button"
-                                        [title]="'songSketch.creator.description.descriptionLongHint' | translate">
-                                    <i class="fas fa-wand-magic-sparkles" *ngIf="!isGeneratingDescriptionLong"></i>
-                                    <i class="fas fa-spinner fa-spin" *ngIf="isGeneratingDescriptionLong"></i>
-                                </button>
-                            </div>
-                            <div class="char-counter">
-                                {{
-                                    'songSketch.creator.description.charCounter' | translate: {
-                                        count: charCountDescriptionLong,
-                                        max: 1000
-                                    }
-                                }}
-                            </div>
-                        </div>
+  <!-- Template for Description Content -->
+  <ng-template #descriptionContent>
+    <div class="tab-content">
+      <!-- Long Description Field -->
+      <div class="form-group">
+        <label for="description_long">
+          {{ 'songSketch.creator.description.descriptionLong' | translate }}
+        </label>
+        <div class="prompt-input-group">
+          <textarea
+            id="description_long"
+            formControlName="description_long"
+            [placeholder]="'songSketch.creator.description.descriptionLongPlaceholder' | translate"
+            [disabled]="isSaving || isGeneratingDescriptionLong"
+            rows="6"
+            maxlength="1000"
+            class="form-textarea">
+          </textarea>
+          <button
+            type="button"
+            (click)="generateDescriptionLong()"
+            [disabled]="isSaving || isGeneratingDescriptionLong"
+            class="magic-icon-button"
+            [title]="'songSketch.creator.description.descriptionLongHint' | translate">
+            @if (!isGeneratingDescriptionLong) {
+              <i class="fas fa-wand-magic-sparkles"></i>
+            }
+            @if (isGeneratingDescriptionLong) {
+              <i class="fas fa-spinner fa-spin"></i>
+            }
+          </button>
+        </div>
+        <div class="char-counter">
+          {{
+          'songSketch.creator.description.charCounter' | translate: {
+          count: charCountDescriptionLong,
+          max: 1000
+        }
+        }}
+      </div>
+    </div>
 
-                        <!-- Short Description Field -->
-                        <div class="form-group">
-                            <label for="description_short">
-                                {{ 'songSketch.creator.description.descriptionShort' | translate }}
-                            </label>
-                            <div class="prompt-input-group">
-                <textarea
-                        id="description_short"
-                        formControlName="description_short"
-                        [placeholder]="'songSketch.creator.description.descriptionShortPlaceholder' | translate"
-                        maxlength="150"
-                        [disabled]="isSaving || isGeneratingDescriptionShort"
-                        rows="2"
-                        class="form-textarea form-textarea-compact">
-                </textarea>
-                                <button
-                                        type="button"
-                                        (click)="generateDescriptionShort()"
-                                        [disabled]="isSaving || isGeneratingDescriptionShort || !hasDescriptionLong()"
-                                        class="magic-icon-button"
-                                        [title]="'songSketch.creator.description.descriptionShortHint' | translate">
-                                    <i class="fas fa-wand-magic-sparkles" *ngIf="!isGeneratingDescriptionShort"></i>
-                                    <i class="fas fa-spinner fa-spin" *ngIf="isGeneratingDescriptionShort"></i>
-                                </button>
-                            </div>
-                            <div class="char-counter">
-                                {{
-                                    'songSketch.creator.description.charCounter' | translate: {
-                                        count: charCountDescriptionShort,
-                                        max: 150
-                                    }
-                                }}
-                            </div>
-                        </div>
+    <!-- Short Description Field -->
+    <div class="form-group">
+      <label for="description_short">
+        {{ 'songSketch.creator.description.descriptionShort' | translate }}
+      </label>
+      <div class="prompt-input-group">
+        <textarea
+          id="description_short"
+          formControlName="description_short"
+          [placeholder]="'songSketch.creator.description.descriptionShortPlaceholder' | translate"
+          maxlength="150"
+          [disabled]="isSaving || isGeneratingDescriptionShort"
+          rows="2"
+          class="form-textarea form-textarea-compact">
+        </textarea>
+        <button
+          type="button"
+          (click)="generateDescriptionShort()"
+          [disabled]="isSaving || isGeneratingDescriptionShort || !hasDescriptionLong()"
+          class="magic-icon-button"
+          [title]="'songSketch.creator.description.descriptionShortHint' | translate">
+          @if (!isGeneratingDescriptionShort) {
+            <i class="fas fa-wand-magic-sparkles"></i>
+          }
+          @if (isGeneratingDescriptionShort) {
+            <i class="fas fa-spinner fa-spin"></i>
+          }
+        </button>
+      </div>
+      <div class="char-counter">
+        {{
+        'songSketch.creator.description.charCounter' | translate: {
+        count: charCountDescriptionShort,
+        max: 150
+      }
+      }}
+    </div>
+  </div>
 
-                        <!-- Description Tags Field -->
-                        <div class="form-group">
-                            <label for="description_tags">
-                                {{ 'songSketch.creator.description.descriptionTags' | translate }}
-                            </label>
-                            <div class="prompt-input-group">
-                <textarea
-                        id="description_tags"
-                        formControlName="description_tags"
-                        [placeholder]="'songSketch.creator.description.descriptionTagsPlaceholder' | translate"
-                        [disabled]="isSaving || isGeneratingTags"
-                        rows="2"
-                        maxlength="1000"
-                        class="form-textarea form-textarea-compact">
-                </textarea>
-                                <button
-                                        type="button"
-                                        (click)="generateDescriptionTags()"
-                                        [disabled]="isSaving || isGeneratingTags || !hasDescriptionLong()"
-                                        class="magic-icon-button"
-                                        [title]="'songSketch.creator.description.descriptionTagsHint' | translate">
-                                    <i class="fas fa-wand-magic-sparkles" *ngIf="!isGeneratingTags"></i>
-                                    <i class="fas fa-spinner fa-spin" *ngIf="isGeneratingTags"></i>
-                                </button>
-                            </div>
-                        </div>
+  <!-- Description Tags Field -->
+  <div class="form-group">
+    <label for="description_tags">
+      {{ 'songSketch.creator.description.descriptionTags' | translate }}
+    </label>
+    <div class="prompt-input-group">
+      <textarea
+        id="description_tags"
+        formControlName="description_tags"
+        [placeholder]="'songSketch.creator.description.descriptionTagsPlaceholder' | translate"
+        [disabled]="isSaving || isGeneratingTags"
+        rows="2"
+        maxlength="1000"
+        class="form-textarea form-textarea-compact">
+      </textarea>
+      <button
+        type="button"
+        (click)="generateDescriptionTags()"
+        [disabled]="isSaving || isGeneratingTags || !hasDescriptionLong()"
+        class="magic-icon-button"
+        [title]="'songSketch.creator.description.descriptionTagsHint' | translate">
+        @if (!isGeneratingTags) {
+          <i class="fas fa-wand-magic-sparkles"></i>
+        }
+        @if (isGeneratingTags) {
+          <i class="fas fa-spinner fa-spin"></i>
+        }
+      </button>
+    </div>
+  </div>
 
-                        <!-- Info Field -->
-                        <div class="form-group">
-                            <label for="info">
-                                {{ 'songSketch.creator.description.info' | translate }}
-                            </label>
-                            <div class="prompt-input-group">
-                <textarea
-                        id="info"
-                        formControlName="info"
-                        [placeholder]="'songSketch.creator.description.infoPlaceholder' | translate"
-                        [disabled]="isSaving"
-                        rows="5"
-                        class="form-textarea form-textarea-large">
-                </textarea>
-                                <button
-                                        type="button"
-                                        (click)="insertInfoTemplate()"
-                                        [disabled]="isSaving"
-                                        class="magic-icon-button"
-                                        [title]="'songSketch.creator.description.infoHint' | translate">
-                                    <i class="fas fa-file-lines"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </ng-template>
-                <!-- End Description Content Template -->
+  <!-- Info Field -->
+  <div class="form-group">
+    <label for="info">
+      {{ 'songSketch.creator.description.info' | translate }}
+    </label>
+    <div class="prompt-input-group">
+      <textarea
+        id="info"
+        formControlName="info"
+        [placeholder]="'songSketch.creator.description.infoPlaceholder' | translate"
+        [disabled]="isSaving"
+        rows="5"
+        class="form-textarea form-textarea-large">
+      </textarea>
+      <button
+        type="button"
+        (click)="insertInfoTemplate()"
+        [disabled]="isSaving"
+        class="magic-icon-button"
+        [title]="'songSketch.creator.description.infoHint' | translate">
+        <i class="fas fa-file-lines"></i>
+      </button>
+    </div>
+  </div>
+</div>
+</ng-template>
+<!-- End Description Content Template -->
 
-                <!-- Action Section -->
-                <div class="action-section">
-                    <div class="utility-actions">
-                        <button mat-button type="button"
-                                *ngIf="!isEditMode"
-                                (click)="navigateToSketchLibrary()"
-                                [disabled]="isSaving">
-                            <i class="fas fa-folder-open"></i> {{ 'songSketch.creator.buttons.openLibrary' | translate }}
-                        </button>
-                        <button mat-button type="button"
-                                *ngIf="isEditMode"
-                                (click)="cancelEdit()"
-                                [disabled]="isSaving">
-                            <i class="fas fa-times"></i> {{ 'songSketch.creator.buttons.cancel' | translate }}
-                        </button>
-                        <button mat-button type="button"
-                                *ngIf="!isEditMode"
-                                (click)="resetForm()"
-                                [disabled]="isSaving">
-                            <i class="fas fa-eraser"></i> {{ 'songSketch.creator.buttons.reset' | translate }}
-                        </button>
-                    </div>
-                    <div class="submit-actions">
-                        <button mat-flat-button color="primary"
-                                type="submit"
-                                [disabled]="!sketchForm.valid || isSaving">
-                            <i class="fas fa-save" *ngIf="!isSaving"></i>
-                            <i class="fas fa-spinner fa-spin" *ngIf="isSaving"></i>
-                            {{ (isEditMode ? 'songSketch.creator.buttons.update' : 'songSketch.creator.buttons.save') | translate }}
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </mat-card-content>
-    </mat-card>
+<!-- Action Section -->
+<div class="action-section">
+  <div class="utility-actions">
+    @if (!isEditMode) {
+      <button mat-button type="button"
+        (click)="navigateToSketchLibrary()"
+        [disabled]="isSaving">
+        <i class="fas fa-folder-open"></i> {{ 'songSketch.creator.buttons.openLibrary' | translate }}
+      </button>
+    }
+    @if (isEditMode) {
+      <button mat-button type="button"
+        (click)="cancelEdit()"
+        [disabled]="isSaving">
+        <i class="fas fa-times"></i> {{ 'songSketch.creator.buttons.cancel' | translate }}
+      </button>
+    }
+    @if (!isEditMode) {
+      <button mat-button type="button"
+        (click)="resetForm()"
+        [disabled]="isSaving">
+        <i class="fas fa-eraser"></i> {{ 'songSketch.creator.buttons.reset' | translate }}
+      </button>
+    }
+  </div>
+  <div class="submit-actions">
+    <button mat-flat-button color="primary"
+      type="submit"
+      [disabled]="!sketchForm.valid || isSaving">
+      @if (!isSaving) {
+        <i class="fas fa-save"></i>
+      }
+      @if (isSaving) {
+        <i class="fas fa-spinner fa-spin"></i>
+      }
+      {{ (isEditMode ? 'songSketch.creator.buttons.update' : 'songSketch.creator.buttons.save') | translate }}
+    </button>
+  </div>
+</div>
+</form>
+</mat-card-content>
+</mat-card>
 </div>

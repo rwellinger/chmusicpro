@@ -1,335 +1,386 @@
 <div class="song-release-container master-detail-layout">
-    <!-- Left Side: Releases List -->
-    <div class="list-section">
-        <mat-card class="list-card">
-            <!-- List Header -->
-            <div class="list-header">
-                <div class="header-title">
-                    <div class="header-title-group">
-                        <h2>
-                            <i class="fas fa-compact-disc"></i>
-                            {{ 'songRelease.gallery.title' | translate }}
-                        </h2>
-                        <div class="releases-count-badge" *ngIf="pagination.total > 0">
-                            {{ pagination.total }}
-                        </div>
-                    </div>
-                    <p class="subtitle">{{ 'songRelease.gallery.subtitle' | translate }}</p>
-                </div>
-                <button
-                        type="button"
-                        class="action-button new-release-button"
-                        (click)="createNewRelease()"
-                        [title]="'songRelease.gallery.actions.new' | translate">
-                    <i class="fas fa-plus"></i>
-                </button>
+  <!-- Left Side: Releases List -->
+  <div class="list-section">
+    <mat-card class="list-card">
+      <!-- List Header -->
+      <div class="list-header">
+        <div class="header-title">
+          <div class="header-title-group">
+            <h2>
+              <i class="fas fa-compact-disc"></i>
+              {{ 'songRelease.gallery.title' | translate }}
+            </h2>
+            @if (pagination.total > 0) {
+              <div class="releases-count-badge">
+                {{ pagination.total }}
+              </div>
+            }
+          </div>
+          <p class="subtitle">{{ 'songRelease.gallery.subtitle' | translate }}</p>
+        </div>
+        <button
+          type="button"
+          class="action-button new-release-button"
+          (click)="createNewRelease()"
+          [title]="'songRelease.gallery.actions.new' | translate">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+
+      <!-- Search and Filters -->
+      <div class="filters-section">
+        <!-- Search -->
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            [placeholder]="'songRelease.gallery.search' | translate"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange($event)"
+            class="search-input">
+        </div>
+
+        <!-- Status Filter -->
+        <div class="status-filter">
+          <button
+            type="button"
+            class="filter-btn"
+            [class.active]="selectedStatusFilter === 'all'"
+            (click)="selectStatusFilter('all')">
+            {{ 'songRelease.gallery.filters.all' | translate }}
+          </button>
+          <button
+            type="button"
+            class="filter-btn"
+            [class.active]="selectedStatusFilter === 'progress'"
+            (click)="selectStatusFilter('progress')">
+            {{ 'songRelease.gallery.filters.progress' | translate }}
+          </button>
+          <button
+            type="button"
+            class="filter-btn"
+            [class.active]="selectedStatusFilter === 'uploaded'"
+            (click)="selectStatusFilter('uploaded')">
+            {{ 'songRelease.gallery.filters.uploaded' | translate }}
+          </button>
+          <button
+            type="button"
+            class="filter-btn"
+            [class.active]="selectedStatusFilter === 'released'"
+            (click)="selectStatusFilter('released')">
+            {{ 'songRelease.gallery.filters.released' | translate }}
+          </button>
+          <button
+            type="button"
+            class="filter-btn"
+            [class.active]="selectedStatusFilter === 'archive'"
+            (click)="selectStatusFilter('archive')">
+            {{ 'songRelease.gallery.filters.archive' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      @if (isLoading) {
+        <div class="loading-state">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>{{ 'songRelease.gallery.loading' | translate }}</p>
+        </div>
+      }
+
+      <!-- Release List -->
+      @if (!isLoading) {
+        <div class="releases-list">
+          <!-- Empty State -->
+          @if (releaseList.length === 0) {
+            <div class="empty-state">
+              <i class="fas fa-compact-disc"></i>
+              <p>{{ 'songRelease.gallery.empty' | translate }}</p>
             </div>
-
-            <!-- Search and Filters -->
-            <div class="filters-section">
-                <!-- Search -->
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input
-                            type="text"
-                            [placeholder]="'songRelease.gallery.search' | translate"
-                            [(ngModel)]="searchTerm"
-                            (ngModelChange)="onSearchChange($event)"
-                            class="search-input">
+          }
+          <!-- Release Items -->
+          @for (release of releaseList; track release) {
+            <div
+              class="release-item"
+              [class.selected]="selectedRelease?.id === release.id"
+              (click)="selectRelease(release)">
+              <div class="release-item-header">
+                <div class="release-cover">
+                  <!-- List view: Show cover if available, otherwise placeholder -->
+                  @if (getListItemCoverUrl(release.id)) {
+                    <img [src]="getListItemCoverUrl(release.id)"
+                      alt="Cover">
+                  }
+                  @if (!getListItemCoverUrl(release.id)) {
+                    <div class="cover-placeholder"
+                      [style.background-color]="getColorFromString(release.name)">
+                      <span class="initials">{{ getInitials(release.name) }}</span>
+                    </div>
+                  }
                 </div>
+                <div class="release-info">
+                  <h4 class="release-title">{{ release.name }}</h4>
+                  <p class="release-genre">{{ release.genre }}</p>
+                  <div class="release-badges">
+                    <span class="status-badge" [ngClass]="getStatusClass(release.status)">
+                      {{ 'songRelease.statuses.' + release.status | translate }}
+                    </span>
+                    <span class="type-badge">
+                      <i class="fas" [ngClass]="release.type === ReleaseType.SINGLE ? 'fa-music' : 'fa-compact-disc'"></i>
+                      {{ 'songRelease.types.' + release.type | translate }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
 
-                <!-- Status Filter -->
-                <div class="status-filter">
+      <!-- Pagination -->
+      @if (totalPages > 1) {
+        <div class="pagination">
+          <button
+            class="pagination-btn"
+            (click)="changePage(currentPage - 1)"
+            [disabled]="currentPage === 0 || isLoading">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <span class="pagination-info">
+            {{ 'songRelease.gallery.pagination.info' | translate: {current: currentPage + 1, total: totalPages} }}
+          </span>
+          <button
+            class="pagination-btn"
+            (click)="changePage(currentPage + 1)"
+            [disabled]="currentPage >= totalPages - 1 || isLoading">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      }
+    </mat-card>
+  </div>
+
+  <!-- Right Side: Release Detail -->
+  <div class="detail-section">
+    <mat-card class="detail-card">
+      <!-- Detail Loading State -->
+      @if (isLoadingDetail) {
+        <div class="loading-state">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>{{ 'songRelease.gallery.loading' | translate }}</p>
+        </div>
+      }
+
+      <!-- No Selection State -->
+      @if (!selectedRelease && !isLoadingDetail) {
+        <div class="empty-detail">
+          <i class="fas fa-info-circle"></i>
+          <p>{{ 'songRelease.gallery.selectPrompt' | translate }}</p>
+        </div>
+      }
+
+      <!-- Release Details -->
+      @if (selectedRelease && !isLoadingDetail) {
+        <div class="detail-content">
+          <!-- Detail Header with Cover -->
+          <div class="detail-header">
+            <div class="detail-cover">
+              <!-- Detail view: Show blob URL (authenticated) -->
+              @if (selectedReleaseCoverBlobUrl) {
+                <img [src]="selectedReleaseCoverBlobUrl" alt="Cover">
+              }
+              @if (!selectedReleaseCoverBlobUrl) {
+                <div class="cover-placeholder-large"
+                  [style.background-color]="getColorFromString(selectedRelease.name)">
+                  <span class="initials">{{ getInitials(selectedRelease.name) }}</span>
+                </div>
+              }
+            </div>
+            <div class="detail-title-group">
+              <h2>{{ selectedRelease.name }}</h2>
+              <p class="detail-genre">{{ selectedRelease.genre }}</p>
+              <span class="status-badge" [ngClass]="getStatusClass(selectedRelease.status)">
+                {{ 'songRelease.statuses.' + selectedRelease.status | translate }}
+              </span>
+              <!-- Smart Link in Header -->
+              @if (selectedRelease.smart_link) {
+                <div class="smart-link-header">
+                  <a [href]="selectedRelease.smart_link" target="_blank" class="external-link">
+                    <i class="fas fa-external-link-alt"></i>
+                    {{ 'songRelease.editor.smartLink' | translate }}
+                  </a>
+                </div>
+              }
+            </div>
+          </div>
+          <!-- Details Sections -->
+          <div class="detail-section-block">
+            <h3 class="section-title">
+              <i class="fas fa-info-circle"></i>
+              {{ 'songRelease.gallery.sections.general' | translate }}
+            </h3>
+            <div class="detail-field-row-2col">
+              <div class="detail-field">
+                <span class="field-label">{{ 'songRelease.editor.type' | translate }}</span>
+                <div class="readonly-field">
+                  <i class="fas"
+                  [ngClass]="selectedRelease.type === ReleaseType.SINGLE ? 'fa-music' : 'fa-compact-disc'"></i>
+                  {{ 'songRelease.types.' + selectedRelease.type | translate }}
+                </div>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">{{ 'songRelease.editor.genre' | translate }}</span>
+                <div class="readonly-field">{{ selectedRelease.genre }}</div>
+              </div>
+            </div>
+            @if (selectedRelease.description) {
+              <div class="detail-field">
+                <span class="field-label">{{ 'songRelease.editor.description' | translate }}</span>
+                <div class="readonly-field">{{ selectedRelease.description }}</div>
+              </div>
+            }
+            @if (selectedRelease.tags) {
+              <div class="detail-field">
+                <span class="field-label">{{ 'songRelease.editor.tags' | translate }}</span>
+                <div class="readonly-field">{{ selectedRelease.tags }}</div>
+              </div>
+            }
+          </div>
+          <!-- Assigned Projects -->
+          @if (selectedRelease.assigned_projects && selectedRelease.assigned_projects.length > 0) {
+            <div class="detail-section-block"
+              >
+              <h3 class="section-title">
+                <i class="fas fa-folder-open"></i>
+                {{ 'songRelease.gallery.sections.projects' | translate }}
+              </h3>
+              <div class="assigned-projects-list">
+                @for (project of selectedRelease.assigned_projects; track project) {
+                  <div class="project-item">
+                    <div class="project-info">
+                      <i class="fas fa-folder"></i>
+                      <span class="project-name">{{ project.project_name }}</span>
+                    </div>
                     <button
-                            type="button"
-                            class="filter-btn"
-                            [class.active]="selectedStatusFilter === 'all'"
-                            (click)="selectStatusFilter('all')">
-                        {{ 'songRelease.gallery.filters.all' | translate }}
+                      type="button"
+                      class="asset-action-button"
+                      (click)="openProject(project)"
+                      [title]="'songRelease.gallery.actions.openProject' | translate">
+                      <i class="fas fa-external-link-alt"></i>
                     </button>
-                    <button
-                            type="button"
-                            class="filter-btn"
-                            [class.active]="selectedStatusFilter === 'progress'"
-                            (click)="selectStatusFilter('progress')">
-                        {{ 'songRelease.gallery.filters.progress' | translate }}
-                    </button>
-                    <button
-                            type="button"
-                            class="filter-btn"
-                            [class.active]="selectedStatusFilter === 'uploaded'"
-                            (click)="selectStatusFilter('uploaded')">
-                        {{ 'songRelease.gallery.filters.uploaded' | translate }}
-                    </button>
-                    <button
-                            type="button"
-                            class="filter-btn"
-                            [class.active]="selectedStatusFilter === 'released'"
-                            (click)="selectStatusFilter('released')">
-                        {{ 'songRelease.gallery.filters.released' | translate }}
-                    </button>
-                    <button
-                            type="button"
-                            class="filter-btn"
-                            [class.active]="selectedStatusFilter === 'archive'"
-                            (click)="selectStatusFilter('archive')">
-                        {{ 'songRelease.gallery.filters.archive' | translate }}
-                    </button>
-                </div>
+                  </div>
+                }
+              </div>
             </div>
-
-            <!-- Loading State -->
-            <div *ngIf="isLoading" class="loading-state">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>{{ 'songRelease.gallery.loading' | translate }}</p>
+          }
+          <!-- Industry Metadata -->
+          @if (selectedRelease.upc || selectedRelease.isrc || selectedRelease.copyright_info) {
+            <div class="detail-section-block"
+              >
+              <h3 class="section-title">
+                <i class="fas fa-barcode"></i>
+                {{ 'songRelease.gallery.sections.industry' | translate }}
+              </h3>
+              <div class="detail-field-row">
+                @if (selectedRelease.upc) {
+                  <div class="detail-field">
+                    <span class="field-label">{{ 'songRelease.editor.upc' | translate }}</span>
+                    <div class="readonly-field">{{ selectedRelease.upc }}</div>
+                  </div>
+                }
+                @if (selectedRelease.isrc) {
+                  <div class="detail-field">
+                    <span class="field-label">{{ 'songRelease.editor.isrc' | translate }}</span>
+                    <div class="readonly-field">{{ selectedRelease.isrc }}</div>
+                  </div>
+                }
+              </div>
+              @if (selectedRelease.copyright_info) {
+                <div class="detail-field">
+                  <span class="field-label">{{ 'songRelease.editor.copyrightInfo' | translate }}</span>
+                  <div class="readonly-field">{{ selectedRelease.copyright_info }}</div>
+                </div>
+              }
             </div>
-
-            <!-- Release List -->
-            <div *ngIf="!isLoading" class="releases-list">
-                <!-- Empty State -->
-                <div *ngIf="releaseList.length === 0" class="empty-state">
-                    <i class="fas fa-compact-disc"></i>
-                    <p>{{ 'songRelease.gallery.empty' | translate }}</p>
+          }
+          <!-- Dates -->
+          <div class="detail-section-block">
+            <h3 class="section-title">
+              <i class="fas fa-calendar-alt"></i>
+              {{ 'songRelease.gallery.sections.dates' | translate }}
+            </h3>
+            <div class="detail-field-row">
+              @if (selectedRelease.upload_date) {
+                <div class="detail-field">
+                  <span class="field-label">{{ 'songRelease.editor.uploadDate' | translate }}</span>
+                  <div class="readonly-field">{{ formatDate(selectedRelease.upload_date) }}</div>
                 </div>
-
-                <!-- Release Items -->
-                <div
-                        *ngFor="let release of releaseList"
-                        class="release-item"
-                        [class.selected]="selectedRelease?.id === release.id"
-                        (click)="selectRelease(release)">
-                    <div class="release-item-header">
-                        <div class="release-cover">
-                            <!-- List view: Show cover if available, otherwise placeholder -->
-                            <img *ngIf="getListItemCoverUrl(release.id)" [src]="getListItemCoverUrl(release.id)"
-                                 alt="Cover">
-                            <div *ngIf="!getListItemCoverUrl(release.id)" class="cover-placeholder"
-                                 [style.background-color]="getColorFromString(release.name)">
-                                <span class="initials">{{ getInitials(release.name) }}</span>
-                            </div>
-                        </div>
-                        <div class="release-info">
-                            <h4 class="release-title">{{ release.name }}</h4>
-                            <p class="release-genre">{{ release.genre }}</p>
-                            <div class="release-badges">
-                <span class="status-badge" [ngClass]="getStatusClass(release.status)">
-                  {{ 'songRelease.statuses.' + release.status | translate }}
-                </span>
-                                <span class="type-badge">
-                  <i class="fas" [ngClass]="release.type === ReleaseType.SINGLE ? 'fa-music' : 'fa-compact-disc'"></i>
-                                    {{ 'songRelease.types.' + release.type | translate }}
-                </span>
-                            </div>
-                        </div>
-                    </div>
+              }
+              @if (selectedRelease.release_date) {
+                <div class="detail-field">
+                  <span class="field-label">{{ 'songRelease.editor.releaseDate' | translate }}</span>
+                  <div class="readonly-field">{{ formatDate(selectedRelease.release_date) }}</div>
                 </div>
+              }
             </div>
-
-            <!-- Pagination -->
-            <div class="pagination" *ngIf="totalPages > 1">
-                <button
-                        class="pagination-btn"
-                        (click)="changePage(currentPage - 1)"
-                        [disabled]="currentPage === 0 || isLoading">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <span class="pagination-info">
-          {{ 'songRelease.gallery.pagination.info' | translate: {current: currentPage + 1, total: totalPages} }}
-        </span>
-                <button
-                        class="pagination-btn"
-                        (click)="changePage(currentPage + 1)"
-                        [disabled]="currentPage >= totalPages - 1 || isLoading">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+            @if (selectedRelease.downtaken_date) {
+              <div class="detail-field-row">
+                <div class="detail-field">
+                  <span class="field-label">{{ 'songRelease.editor.downtakenDate' | translate }}</span>
+                  <div class="readonly-field">{{ formatDate(selectedRelease.downtaken_date) }}</div>
+                </div>
+              </div>
+            }
+            @if (selectedRelease.created_at || selectedRelease.updated_at) {
+              <div class="detail-field-row">
+                @if (selectedRelease.created_at) {
+                  <div class="detail-field">
+                    <span class="field-label">{{ 'songRelease.gallery.metadata.created' | translate }}</span>
+                    <div class="readonly-field">{{ formatDate(selectedRelease.created_at) }}</div>
+                  </div>
+                }
+                @if (selectedRelease.updated_at) {
+                  <div class="detail-field">
+                    <span class="field-label">{{ 'songRelease.gallery.metadata.updated' | translate }}</span>
+                    <div class="readonly-field">{{ formatDate(selectedRelease.updated_at) }}</div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          <!-- Rejection/Downtaken Reasons -->
+          @if (selectedRelease.rejected_reason || selectedRelease.downtaken_reason) {
+            <div class="detail-section-block"
+              >
+              <h3 class="section-title">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ 'songRelease.gallery.sections.reasons' | translate }}
+              </h3>
+              @if (selectedRelease.rejected_reason) {
+                <div class="detail-field">
+                  <span class="field-label">{{ 'songRelease.editor.rejectedReason' | translate }}</span>
+                  <div class="readonly-field reason-field">{{ selectedRelease.rejected_reason }}</div>
+                </div>
+              }
+              @if (selectedRelease.downtaken_reason) {
+                <div class="detail-field">
+                  <span class="field-label">{{ 'songRelease.editor.downtakenReason' | translate }}</span>
+                  <div class="readonly-field reason-field">{{ selectedRelease.downtaken_reason }}</div>
+                </div>
+              }
             </div>
-        </mat-card>
-    </div>
-
-    <!-- Right Side: Release Detail -->
-    <div class="detail-section">
-        <mat-card class="detail-card">
-            <!-- Detail Loading State -->
-            <div *ngIf="isLoadingDetail" class="loading-state">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p>{{ 'songRelease.gallery.loading' | translate }}</p>
-            </div>
-
-            <!-- No Selection State -->
-            <div *ngIf="!selectedRelease && !isLoadingDetail" class="empty-detail">
-                <i class="fas fa-info-circle"></i>
-                <p>{{ 'songRelease.gallery.selectPrompt' | translate }}</p>
-            </div>
-
-            <!-- Release Details -->
-            <div *ngIf="selectedRelease && !isLoadingDetail" class="detail-content">
-                <!-- Detail Header with Cover -->
-                <div class="detail-header">
-                    <div class="detail-cover">
-                        <!-- Detail view: Show blob URL (authenticated) -->
-                        <img *ngIf="selectedReleaseCoverBlobUrl" [src]="selectedReleaseCoverBlobUrl" alt="Cover">
-                        <div *ngIf="!selectedReleaseCoverBlobUrl" class="cover-placeholder-large"
-                             [style.background-color]="getColorFromString(selectedRelease.name)">
-                            <span class="initials">{{ getInitials(selectedRelease.name) }}</span>
-                        </div>
-                    </div>
-                    <div class="detail-title-group">
-                        <h2>{{ selectedRelease.name }}</h2>
-                        <p class="detail-genre">{{ selectedRelease.genre }}</p>
-                        <span class="status-badge" [ngClass]="getStatusClass(selectedRelease.status)">
-              {{ 'songRelease.statuses.' + selectedRelease.status | translate }}
-            </span>
-                        <!-- Smart Link in Header -->
-                        <div *ngIf="selectedRelease.smart_link" class="smart-link-header">
-                            <a [href]="selectedRelease.smart_link" target="_blank" class="external-link">
-                                <i class="fas fa-external-link-alt"></i>
-                                {{ 'songRelease.editor.smartLink' | translate }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Details Sections -->
-                <div class="detail-section-block">
-                    <h3 class="section-title">
-                        <i class="fas fa-info-circle"></i>
-                        {{ 'songRelease.gallery.sections.general' | translate }}
-                    </h3>
-
-                    <div class="detail-field-row-2col">
-                        <div class="detail-field">
-                            <span class="field-label">{{ 'songRelease.editor.type' | translate }}</span>
-                            <div class="readonly-field">
-                                <i class="fas"
-                                   [ngClass]="selectedRelease.type === ReleaseType.SINGLE ? 'fa-music' : 'fa-compact-disc'"></i>
-                                {{ 'songRelease.types.' + selectedRelease.type | translate }}
-                            </div>
-                        </div>
-                        <div class="detail-field">
-                            <span class="field-label">{{ 'songRelease.editor.genre' | translate }}</span>
-                            <div class="readonly-field">{{ selectedRelease.genre }}</div>
-                        </div>
-                    </div>
-
-                    <div class="detail-field" *ngIf="selectedRelease.description">
-                        <span class="field-label">{{ 'songRelease.editor.description' | translate }}</span>
-                        <div class="readonly-field">{{ selectedRelease.description }}</div>
-                    </div>
-
-                    <div class="detail-field" *ngIf="selectedRelease.tags">
-                        <span class="field-label">{{ 'songRelease.editor.tags' | translate }}</span>
-                        <div class="readonly-field">{{ selectedRelease.tags }}</div>
-                    </div>
-                </div>
-
-                <!-- Assigned Projects -->
-                <div class="detail-section-block"
-                     *ngIf="selectedRelease.assigned_projects && selectedRelease.assigned_projects.length > 0">
-                    <h3 class="section-title">
-                        <i class="fas fa-folder-open"></i>
-                        {{ 'songRelease.gallery.sections.projects' | translate }}
-                    </h3>
-                    <div class="assigned-projects-list">
-                        <div *ngFor="let project of selectedRelease.assigned_projects" class="project-item">
-                            <div class="project-info">
-                                <i class="fas fa-folder"></i>
-                                <span class="project-name">{{ project.project_name }}</span>
-                            </div>
-                            <button
-                                    type="button"
-                                    class="asset-action-button"
-                                    (click)="openProject(project)"
-                                    [title]="'songRelease.gallery.actions.openProject' | translate">
-                                <i class="fas fa-external-link-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Industry Metadata -->
-                <div class="detail-section-block"
-                     *ngIf="selectedRelease.upc || selectedRelease.isrc || selectedRelease.copyright_info">
-                    <h3 class="section-title">
-                        <i class="fas fa-barcode"></i>
-                        {{ 'songRelease.gallery.sections.industry' | translate }}
-                    </h3>
-                    <div class="detail-field-row">
-                        <div class="detail-field" *ngIf="selectedRelease.upc">
-                            <span class="field-label">{{ 'songRelease.editor.upc' | translate }}</span>
-                            <div class="readonly-field">{{ selectedRelease.upc }}</div>
-                        </div>
-                        <div class="detail-field" *ngIf="selectedRelease.isrc">
-                            <span class="field-label">{{ 'songRelease.editor.isrc' | translate }}</span>
-                            <div class="readonly-field">{{ selectedRelease.isrc }}</div>
-                        </div>
-                    </div>
-                    <div class="detail-field" *ngIf="selectedRelease.copyright_info">
-                        <span class="field-label">{{ 'songRelease.editor.copyrightInfo' | translate }}</span>
-                        <div class="readonly-field">{{ selectedRelease.copyright_info }}</div>
-                    </div>
-                </div>
-
-                <!-- Dates -->
-                <div class="detail-section-block">
-                    <h3 class="section-title">
-                        <i class="fas fa-calendar-alt"></i>
-                        {{ 'songRelease.gallery.sections.dates' | translate }}
-                    </h3>
-                    <div class="detail-field-row">
-                        <div class="detail-field" *ngIf="selectedRelease.upload_date">
-                            <span class="field-label">{{ 'songRelease.editor.uploadDate' | translate }}</span>
-                            <div class="readonly-field">{{ formatDate(selectedRelease.upload_date) }}</div>
-                        </div>
-                        <div class="detail-field" *ngIf="selectedRelease.release_date">
-                            <span class="field-label">{{ 'songRelease.editor.releaseDate' | translate }}</span>
-                            <div class="readonly-field">{{ formatDate(selectedRelease.release_date) }}</div>
-                        </div>
-                    </div>
-                    <div class="detail-field-row" *ngIf="selectedRelease.downtaken_date">
-                        <div class="detail-field">
-                            <span class="field-label">{{ 'songRelease.editor.downtakenDate' | translate }}</span>
-                            <div class="readonly-field">{{ formatDate(selectedRelease.downtaken_date) }}</div>
-                        </div>
-                    </div>
-                    <div class="detail-field-row" *ngIf="selectedRelease.created_at || selectedRelease.updated_at">
-                        <div class="detail-field" *ngIf="selectedRelease.created_at">
-                            <span class="field-label">{{ 'songRelease.gallery.metadata.created' | translate }}</span>
-                            <div class="readonly-field">{{ formatDate(selectedRelease.created_at) }}</div>
-                        </div>
-                        <div class="detail-field" *ngIf="selectedRelease.updated_at">
-                            <span class="field-label">{{ 'songRelease.gallery.metadata.updated' | translate }}</span>
-                            <div class="readonly-field">{{ formatDate(selectedRelease.updated_at) }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Rejection/Downtaken Reasons -->
-                <div class="detail-section-block"
-                     *ngIf="selectedRelease.rejected_reason || selectedRelease.downtaken_reason">
-                    <h3 class="section-title">
-                        <i class="fas fa-exclamation-circle"></i>
-                        {{ 'songRelease.gallery.sections.reasons' | translate }}
-                    </h3>
-                    <div class="detail-field" *ngIf="selectedRelease.rejected_reason">
-                        <span class="field-label">{{ 'songRelease.editor.rejectedReason' | translate }}</span>
-                        <div class="readonly-field reason-field">{{ selectedRelease.rejected_reason }}</div>
-                    </div>
-                    <div class="detail-field" *ngIf="selectedRelease.downtaken_reason">
-                        <span class="field-label">{{ 'songRelease.editor.downtakenReason' | translate }}</span>
-                        <div class="readonly-field reason-field">{{ selectedRelease.downtaken_reason }}</div>
-                    </div>
-                </div>
-
-                <!-- Detail Actions -->
-                <div class="detail-actions">
-                    <button mat-button type="button" (click)="editRelease()">
-                        <i class="fas fa-edit"></i> {{ 'songRelease.gallery.actions.edit' | translate }}
-                    </button>
-                    <button mat-button type="button" (click)="deleteRelease()">
-                        <i class="fas fa-trash"></i> {{ 'songRelease.gallery.actions.delete' | translate }}
-                    </button>
-                </div>
-            </div>
-        </mat-card>
-    </div>
+          }
+          <!-- Detail Actions -->
+          <div class="detail-actions">
+            <button mat-button type="button" (click)="editRelease()">
+              <i class="fas fa-edit"></i> {{ 'songRelease.gallery.actions.edit' | translate }}
+            </button>
+            <button mat-button type="button" (click)="deleteRelease()">
+              <i class="fas fa-trash"></i> {{ 'songRelease.gallery.actions.delete' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+    </mat-card>
+  </div>
 </div>

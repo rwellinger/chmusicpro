@@ -1,437 +1,451 @@
 <div class="text-overlay-editor master-detail-layout">
-    <div class="editor-grid">
-        <!-- Left Panel: Form Controls -->
-        <div class="editor-controls-section">
-            <mat-card class="editor-controls-card">
-                <div class="editor-header">
-                    <div class="editor-title">
-                        <h2>
-                            <i class="fas fa-layer-group"></i>
-                            {{ 'textOverlayEditor.title' | translate }}
-                        </h2>
-                    </div>
-                </div>
-                <div class="controls-content">
-                    <form [formGroup]="form" class="form-container">
-                        <!-- Image Selector -->
-                        <mat-form-field appearance="outline" class="form-field">
-                            <mat-label>{{ 'textOverlayEditor.form.selectImage' | translate }}</mat-label>
-                            <mat-select formControlName="imageId" (selectionChange)="onImageSelect($event.value)">
-                                <mat-option *ngFor="let image of images" [value]="image.id">
-                  <span class="image-select-option">
-                    <span class="image-title">
-                      {{ image.title | slice:0:100 }}{{ image.title && image.title.length > 100 ? '...' : '' }}
-                    </span>
-                      @if (image.composition === 'album-cover') {
-                          <span class="badge badge-album-cover">Album Cover</span>
-                      }
-                  </span>
-                                </mat-option>
-                            </mat-select>
-                            <mat-error *ngIf="form.get('imageId')?.hasError('required')">
-                                {{ 'textOverlayEditor.form.imageRequired' | translate }}
-                            </mat-error>
-                        </mat-form-field>
-
-                        <!-- Font Style -->
-                        <mat-form-field appearance="outline" class="form-field">
-                            <mat-label>{{ 'textOverlayEditor.form.fontStyle' | translate }}</mat-label>
-                            <mat-select formControlName="fontStyle">
-                                <mat-option *ngFor="let font of fontStyles" [value]="font.value">
-                  <span class="font-style-option">
-                    <i [class]="font.icon"></i>
-                    <span>{{ font.label }}</span>
-                  </span>
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-
-                        <mat-divider></mat-divider>
-
-                        <!-- Accordion for Title and Artist Settings -->
-                        <mat-accordion>
-                            <!-- Title Section -->
-                            <mat-expansion-panel [expanded]="true">
-                                <mat-expansion-panel-header>
-                                    <mat-panel-title>
-                                        <i class="fas fa-heading"></i>
-                                        {{ 'textOverlayEditor.titleSection' | translate }}
-                                    </mat-panel-title>
-                                </mat-expansion-panel-header>
-
-                                <mat-form-field appearance="outline" class="form-field">
-                                    <mat-label>{{ 'textOverlayEditor.form.title' | translate }}</mat-label>
-                                    <input matInput formControlName="title" maxlength="50"/>
-                                    <mat-error *ngIf="form.get('title')?.hasError('required')">
-                                        {{ 'textOverlayEditor.form.titleRequired' | translate }}
-                                    </mat-error>
-                                </mat-form-field>
-
-                                <!-- Title Position (Custom Only) -->
-                                <div class="position-field">
-                                    <div class="position-field__label">{{ 'textOverlayEditor.form.titlePosition' | translate }}</div>
-
-                                    <div class="custom-position-controls">
-                                        <div class="coordinate-inputs">
-                                            <mat-form-field appearance="outline" class="coord-field">
-                                                <mat-label>{{ 'textOverlayEditor.form.coordinateX' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="titlePositionCustomX"
-                                                       min="0" max="100" step="1">
-                                            </mat-form-field>
-
-                                            <mat-form-field appearance="outline" class="coord-field">
-                                                <mat-label>{{ 'textOverlayEditor.form.coordinateY' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="titlePositionCustomY"
-                                                       min="0" max="100" step="1">
-                                            </mat-form-field>
-
-                                            <mat-form-field appearance="outline" class="font-size-field">
-                                                <mat-label>{{ 'textOverlayEditor.form.fontSize' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="titleFontSize"
-                                                       min="20" max="300" step="5">
-                                                <span matTextSuffix>px</span>
-                                            </mat-form-field>
-                                        </div>
-                                        <span class="drag-hint">{{ 'textOverlayEditor.form.dragMarkerHint' | translate }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="color-group">
-                                    <mat-form-field appearance="outline" class="color-field">
-                                        <mat-label>{{ 'textOverlayEditor.form.textColor' | translate }}</mat-label>
-                                        <input matInput type="color" formControlName="titleColor"/>
-                                    </mat-form-field>
-
-                                    <mat-form-field appearance="outline" class="color-field">
-                                        <mat-label>{{ 'textOverlayEditor.form.outlineColor' | translate }}</mat-label>
-                                        <input matInput type="color" formControlName="titleOutlineColor"/>
-                                    </mat-form-field>
-                                </div>
-                            </mat-expansion-panel>
-
-                            <!-- Artist Section (Optional) -->
-                            <mat-expansion-panel>
-                                <mat-expansion-panel-header>
-                                    <mat-panel-title>
-                                        <i class="fas fa-user-pen"></i>
-                                        {{ 'textOverlayEditor.artistSection' | translate }}
-                                    </mat-panel-title>
-                                </mat-expansion-panel-header>
-
-                                <mat-form-field appearance="outline" class="form-field">
-                                    <mat-label>{{ 'textOverlayEditor.form.artist' | translate }}</mat-label>
-                                    <input matInput formControlName="artist" maxlength="50"/>
-                                </mat-form-field>
-
-                                <!-- Artist Position (Custom Only) -->
-                                <div class="position-field">
-                                    <div class="position-field__label">{{ 'textOverlayEditor.form.artistPosition' | translate }}</div>
-
-                                    <div class="custom-position-controls">
-                                        <div class="coordinate-inputs">
-                                            <mat-form-field appearance="outline" class="coord-field">
-                                                <mat-label>{{ 'textOverlayEditor.form.coordinateX' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="artistPositionCustomX"
-                                                       min="0" max="100" step="1">
-                                            </mat-form-field>
-
-                                            <mat-form-field appearance="outline" class="coord-field">
-                                                <mat-label>{{ 'textOverlayEditor.form.coordinateY' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="artistPositionCustomY"
-                                                       min="0" max="100" step="1">
-                                            </mat-form-field>
-
-                                            <mat-form-field appearance="outline" class="font-size-field">
-                                                <mat-label>{{ 'textOverlayEditor.form.fontSize' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="artistFontSize"
-                                                       min="10" max="200" step="5">
-                                                <span matTextSuffix>px</span>
-                                            </mat-form-field>
-                                        </div>
-                                        <span class="drag-hint">{{ 'textOverlayEditor.form.dragMarkerHint' | translate }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="color-group-with-reset">
-                                    <div class="color-field-wrapper">
-                                        <mat-form-field appearance="outline" class="color-field">
-                                            <mat-label>{{ 'textOverlayEditor.form.artistColor' | translate }}</mat-label>
-                                            <input matInput type="color" formControlName="artistColor"/>
-                                        </mat-form-field>
-                                        <button
-                                                mat-icon-button
-                                                type="button"
-                                                class="color-reset-button"
-                                                [disabled]="!form.get('artistColor')?.value"
-                                                (click)="form.get('artistColor')?.setValue(null)"
-                                                matTooltip="{{ 'textOverlayEditor.form.useTitleColor' | translate }}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-
-                                    <div class="color-field-wrapper">
-                                        <mat-form-field appearance="outline" class="color-field">
-                                            <mat-label>{{ 'textOverlayEditor.form.artistOutlineColor' | translate }}</mat-label>
-                                            <input matInput type="color" formControlName="artistOutlineColor"/>
-                                        </mat-form-field>
-                                        <button
-                                                mat-icon-button
-                                                type="button"
-                                                class="color-reset-button"
-                                                [disabled]="!form.get('artistOutlineColor')?.value"
-                                                (click)="form.get('artistOutlineColor')?.setValue(null)"
-                                                matTooltip="{{ 'textOverlayEditor.form.useTitleColor' | translate }}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Artist Font Override -->
-                                <mat-checkbox formControlName="useCustomArtistFont">
-                                    {{ 'textOverlayEditor.form.useCustomArtistFont' | translate }}
-                                </mat-checkbox>
-
-                                @if (form.get('useCustomArtistFont')?.value) {
-                                    <mat-form-field appearance="outline" class="form-field">
-                                        <mat-label>{{ 'textOverlayEditor.form.artistFontStyle' | translate }}</mat-label>
-                                        <mat-select formControlName="artistFontStyle">
-                                            @for (style of fontStyles; track style.value) {
-                                                <mat-option [value]="style.value">
-                      <span class="font-style-option">
-                        <i [class]="style.icon"></i>
-                        <span>{{ style.label }}</span>
+  <div class="editor-grid">
+    <!-- Left Panel: Form Controls -->
+    <div class="editor-controls-section">
+      <mat-card class="editor-controls-card">
+        <div class="editor-header">
+          <div class="editor-title">
+            <h2>
+              <i class="fas fa-layer-group"></i>
+              {{ 'textOverlayEditor.title' | translate }}
+            </h2>
+          </div>
+        </div>
+        <div class="controls-content">
+          <form [formGroup]="form" class="form-container">
+            <!-- Image Selector -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>{{ 'textOverlayEditor.form.selectImage' | translate }}</mat-label>
+              <mat-select formControlName="imageId" (selectionChange)="onImageSelect($event.value)">
+                @for (image of images; track image) {
+                  <mat-option [value]="image.id">
+                    <span class="image-select-option">
+                      <span class="image-title">
+                        {{ image.title | slice:0:100 }}{{ image.title && image.title.length > 100 ? '...' : '' }}
                       </span>
-                                                </mat-option>
-                                            }
-                                        </mat-select>
-                                    </mat-form-field>
-                                }
-                            </mat-expansion-panel>
+                      @if (image.composition === 'album-cover') {
+                        <span class="badge badge-album-cover">Album Cover</span>
+                      }
+                    </span>
+                  </mat-option>
+                }
+              </mat-select>
+              @if (form.get('imageId')?.hasError('required')) {
+                <mat-error>
+                  {{ 'textOverlayEditor.form.imageRequired' | translate }}
+                </mat-error>
+              }
+            </mat-form-field>
 
-                            <!-- Extra Text 1 (Optional) -->
-                            <mat-expansion-panel>
-                                <mat-expansion-panel-header>
-                                    <mat-panel-title>
-                                        <i class="fas fa-font"></i>
-                                        {{ 'textOverlayEditor.extraText1Section' | translate }}
-                                    </mat-panel-title>
-                                </mat-expansion-panel-header>
+            <!-- Font Style -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>{{ 'textOverlayEditor.form.fontStyle' | translate }}</mat-label>
+              <mat-select formControlName="fontStyle">
+                @for (font of fontStyles; track font) {
+                  <mat-option [value]="font.value">
+                    <span class="font-style-option">
+                      <i [class]="font.icon"></i>
+                      <span>{{ font.label }}</span>
+                    </span>
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
 
-                                <mat-form-field appearance="outline" class="form-field">
-                                    <mat-label>{{ 'textOverlayEditor.form.extraText1' | translate }}</mat-label>
-                                    <input matInput formControlName="extraText1" maxlength="100"/>
-                                </mat-form-field>
+            <mat-divider></mat-divider>
 
-                                <div class="position-field">
-                                    <div class="position-field__label">{{ 'textOverlayEditor.form.extraText1Position' | translate }}</div>
-                                    <div class="custom-position-controls">
-                                        <div class="coordinate-inputs">
-                                            <mat-form-field appearance="outline" class="coord-field">
-                                                <mat-label>{{ 'textOverlayEditor.form.coordinateX' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="extraText1PositionCustomX"
-                                                       min="0" max="100" step="1">
-                                            </mat-form-field>
-                                            <mat-form-field appearance="outline" class="coord-field">
-                                                <mat-label>{{ 'textOverlayEditor.form.coordinateY' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="extraText1PositionCustomY"
-                                                       min="0" max="100" step="1">
-                                            </mat-form-field>
-                                            <mat-form-field appearance="outline" class="font-size-field">
-                                                <mat-label>{{ 'textOverlayEditor.form.fontSize' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="extraText1FontSize"
-                                                       min="10" max="200" step="5">
-                                                <span matTextSuffix>px</span>
-                                            </mat-form-field>
-                                        </div>
-                                        <span class="drag-hint">{{ 'textOverlayEditor.form.dragMarkerHint' | translate }}</span>
-                                    </div>
-                                </div>
+            <!-- Accordion for Title and Artist Settings -->
+            <mat-accordion>
+              <!-- Title Section -->
+              <mat-expansion-panel [expanded]="true">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <i class="fas fa-heading"></i>
+                    {{ 'textOverlayEditor.titleSection' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
 
-                                <div class="color-group-with-reset">
-                                    <div class="color-field-wrapper">
-                                        <mat-form-field appearance="outline" class="color-field">
-                                            <mat-label>{{ 'textOverlayEditor.form.extraText1Color' | translate }}</mat-label>
-                                            <input matInput type="color" formControlName="extraText1Color"/>
-                                        </mat-form-field>
-                                        <button mat-icon-button type="button" class="color-reset-button"
-                                                [disabled]="!form.get('extraText1Color')?.value"
-                                                (click)="form.get('extraText1Color')?.setValue(null)"
-                                                matTooltip="{{ 'textOverlayEditor.form.useTitleColor' | translate }}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                    <div class="color-field-wrapper">
-                                        <mat-form-field appearance="outline" class="color-field">
-                                            <mat-label>{{ 'textOverlayEditor.form.extraText1OutlineColor' | translate }}</mat-label>
-                                            <input matInput type="color" formControlName="extraText1OutlineColor"/>
-                                        </mat-form-field>
-                                        <button mat-icon-button type="button" class="color-reset-button"
-                                                [disabled]="!form.get('extraText1OutlineColor')?.value"
-                                                (click)="form.get('extraText1OutlineColor')?.setValue(null)"
-                                                matTooltip="{{ 'textOverlayEditor.form.useTitleColor' | translate }}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>{{ 'textOverlayEditor.form.title' | translate }}</mat-label>
+                  <input matInput formControlName="title" maxlength="50"/>
+                  @if (form.get('title')?.hasError('required')) {
+                    <mat-error>
+                      {{ 'textOverlayEditor.form.titleRequired' | translate }}
+                    </mat-error>
+                  }
+                </mat-form-field>
 
-                                <mat-checkbox formControlName="useCustomExtraText1Font">
-                                    {{ 'textOverlayEditor.form.useCustomExtraText1Font' | translate }}
-                                </mat-checkbox>
+                <!-- Title Position (Custom Only) -->
+                <div class="position-field">
+                  <div class="position-field__label">{{ 'textOverlayEditor.form.titlePosition' | translate }}</div>
 
-                                @if (form.get('useCustomExtraText1Font')?.value) {
-                                    <mat-form-field appearance="outline" class="form-field">
-                                        <mat-label>{{ 'textOverlayEditor.form.extraText1FontStyle' | translate }}</mat-label>
-                                        <mat-select formControlName="extraText1FontStyle">
-                                            @for (style of fontStyles; track style.value) {
-                                                <mat-option [value]="style.value">
-                                                    <span class="font-style-option">
-                                                        <i [class]="style.icon"></i>
-                                                        <span>{{ style.label }}</span>
-                                                    </span>
-                                                </mat-option>
-                                            }
-                                        </mat-select>
-                                    </mat-form-field>
-                                }
-                            </mat-expansion-panel>
+                  <div class="custom-position-controls">
+                    <div class="coordinate-inputs">
+                      <mat-form-field appearance="outline" class="coord-field">
+                        <mat-label>{{ 'textOverlayEditor.form.coordinateX' | translate }}</mat-label>
+                        <input matInput type="number" formControlName="titlePositionCustomX"
+                          min="0" max="100" step="1">
+                      </mat-form-field>
 
-                            <!-- Extra Text 2 (Optional) -->
-                            <mat-expansion-panel>
-                                <mat-expansion-panel-header>
-                                    <mat-panel-title>
-                                        <i class="fas fa-font"></i>
-                                        {{ 'textOverlayEditor.extraText2Section' | translate }}
-                                    </mat-panel-title>
-                                </mat-expansion-panel-header>
+                      <mat-form-field appearance="outline" class="coord-field">
+                        <mat-label>{{ 'textOverlayEditor.form.coordinateY' | translate }}</mat-label>
+                        <input matInput type="number" formControlName="titlePositionCustomY"
+                          min="0" max="100" step="1">
+                      </mat-form-field>
 
-                                <mat-form-field appearance="outline" class="form-field">
-                                    <mat-label>{{ 'textOverlayEditor.form.extraText2' | translate }}</mat-label>
-                                    <input matInput formControlName="extraText2" maxlength="100"/>
-                                </mat-form-field>
-
-                                <div class="position-field">
-                                    <div class="position-field__label">{{ 'textOverlayEditor.form.extraText2Position' | translate }}</div>
-                                    <div class="custom-position-controls">
-                                        <div class="coordinate-inputs">
-                                            <mat-form-field appearance="outline" class="coord-field">
-                                                <mat-label>{{ 'textOverlayEditor.form.coordinateX' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="extraText2PositionCustomX"
-                                                       min="0" max="100" step="1">
-                                            </mat-form-field>
-                                            <mat-form-field appearance="outline" class="coord-field">
-                                                <mat-label>{{ 'textOverlayEditor.form.coordinateY' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="extraText2PositionCustomY"
-                                                       min="0" max="100" step="1">
-                                            </mat-form-field>
-                                            <mat-form-field appearance="outline" class="font-size-field">
-                                                <mat-label>{{ 'textOverlayEditor.form.fontSize' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="extraText2FontSize"
-                                                       min="10" max="200" step="5">
-                                                <span matTextSuffix>px</span>
-                                            </mat-form-field>
-                                        </div>
-                                        <span class="drag-hint">{{ 'textOverlayEditor.form.dragMarkerHint' | translate }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="color-group-with-reset">
-                                    <div class="color-field-wrapper">
-                                        <mat-form-field appearance="outline" class="color-field">
-                                            <mat-label>{{ 'textOverlayEditor.form.extraText2Color' | translate }}</mat-label>
-                                            <input matInput type="color" formControlName="extraText2Color"/>
-                                        </mat-form-field>
-                                        <button mat-icon-button type="button" class="color-reset-button"
-                                                [disabled]="!form.get('extraText2Color')?.value"
-                                                (click)="form.get('extraText2Color')?.setValue(null)"
-                                                matTooltip="{{ 'textOverlayEditor.form.useTitleColor' | translate }}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                    <div class="color-field-wrapper">
-                                        <mat-form-field appearance="outline" class="color-field">
-                                            <mat-label>{{ 'textOverlayEditor.form.extraText2OutlineColor' | translate }}</mat-label>
-                                            <input matInput type="color" formControlName="extraText2OutlineColor"/>
-                                        </mat-form-field>
-                                        <button mat-icon-button type="button" class="color-reset-button"
-                                                [disabled]="!form.get('extraText2OutlineColor')?.value"
-                                                (click)="form.get('extraText2OutlineColor')?.setValue(null)"
-                                                matTooltip="{{ 'textOverlayEditor.form.useTitleColor' | translate }}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <mat-checkbox formControlName="useCustomExtraText2Font">
-                                    {{ 'textOverlayEditor.form.useCustomExtraText2Font' | translate }}
-                                </mat-checkbox>
-
-                                @if (form.get('useCustomExtraText2Font')?.value) {
-                                    <mat-form-field appearance="outline" class="form-field">
-                                        <mat-label>{{ 'textOverlayEditor.form.extraText2FontStyle' | translate }}</mat-label>
-                                        <mat-select formControlName="extraText2FontStyle">
-                                            @for (style of fontStyles; track style.value) {
-                                                <mat-option [value]="style.value">
-                                                    <span class="font-style-option">
-                                                        <i [class]="style.icon"></i>
-                                                        <span>{{ style.label }}</span>
-                                                    </span>
-                                                </mat-option>
-                                            }
-                                        </mat-select>
-                                    </mat-form-field>
-                                }
-                            </mat-expansion-panel>
-                        </mat-accordion>
-
-                        <mat-divider></mat-divider>
-
-                        <!-- Action Buttons -->
-                        <div class="button-group">
-                            <button mat-flat-button color="primary" type="button"
-                                    (click)="applyTextOverlay()"
-                                    [disabled]="!form.valid || isProcessing">
-                                <mat-spinner *ngIf="isProcessing" diameter="20" class="button-spinner"></mat-spinner>
-                                <span *ngIf="!isProcessing">{{ 'textOverlayEditor.buttons.apply' | translate }}</span>
-                            </button>
-
-                            <button mat-button type="button"
-                                    (click)="downloadResult()"
-                                    [disabled]="!resultImageFilePath">
-                                <i class="fas fa-download"></i>
-                                {{ 'textOverlayEditor.buttons.download' | translate }}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </mat-card>
-        </div>
-
-        <!-- Right Panel: Canvas Preview -->
-        <div class="editor-preview-section">
-            <mat-card class="editor-preview-card">
-                <div class="preview-header">
-                    <div class="preview-title">
-                        <h2>
-                            <i class="fas fa-eye"></i>
-                            {{ 'textOverlayEditor.preview.title' | translate }}
-                        </h2>
+                      <mat-form-field appearance="outline" class="font-size-field">
+                        <mat-label>{{ 'textOverlayEditor.form.fontSize' | translate }}</mat-label>
+                        <input matInput type="number" formControlName="titleFontSize"
+                          min="20" max="300" step="5">
+                        <span matTextSuffix>px</span>
+                      </mat-form-field>
                     </div>
+                    <span class="drag-hint">{{ 'textOverlayEditor.form.dragMarkerHint' | translate }}</span>
+                  </div>
                 </div>
-                <div class="preview-content">
-                    <div class="canvas-wrapper">
-                        <canvas #canvas
-                                class="preview-canvas"
-                                [class.dragging]="isDragging"
-                                [class.hovering-marker]="isHoveringMarker"
-                                (mousedown)="onCanvasMouseDown($event)"
-                                (mousemove)="onCanvasMouseMove($event)">
-                        </canvas>
-                        <p *ngIf="!selectedImage" class="placeholder-text">
-                            {{ 'textOverlayEditor.preview.selectImagePlaceholder' | translate }}
-                        </p>
+
+                <div class="color-group">
+                  <mat-form-field appearance="outline" class="color-field">
+                    <mat-label>{{ 'textOverlayEditor.form.textColor' | translate }}</mat-label>
+                    <input matInput type="color" formControlName="titleColor"/>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="color-field">
+                    <mat-label>{{ 'textOverlayEditor.form.outlineColor' | translate }}</mat-label>
+                    <input matInput type="color" formControlName="titleOutlineColor"/>
+                  </mat-form-field>
+                </div>
+              </mat-expansion-panel>
+
+              <!-- Artist Section (Optional) -->
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <i class="fas fa-user-pen"></i>
+                    {{ 'textOverlayEditor.artistSection' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>{{ 'textOverlayEditor.form.artist' | translate }}</mat-label>
+                  <input matInput formControlName="artist" maxlength="50"/>
+                </mat-form-field>
+
+                <!-- Artist Position (Custom Only) -->
+                <div class="position-field">
+                  <div class="position-field__label">{{ 'textOverlayEditor.form.artistPosition' | translate }}</div>
+
+                  <div class="custom-position-controls">
+                    <div class="coordinate-inputs">
+                      <mat-form-field appearance="outline" class="coord-field">
+                        <mat-label>{{ 'textOverlayEditor.form.coordinateX' | translate }}</mat-label>
+                        <input matInput type="number" formControlName="artistPositionCustomX"
+                          min="0" max="100" step="1">
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline" class="coord-field">
+                        <mat-label>{{ 'textOverlayEditor.form.coordinateY' | translate }}</mat-label>
+                        <input matInput type="number" formControlName="artistPositionCustomY"
+                          min="0" max="100" step="1">
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline" class="font-size-field">
+                        <mat-label>{{ 'textOverlayEditor.form.fontSize' | translate }}</mat-label>
+                        <input matInput type="number" formControlName="artistFontSize"
+                          min="10" max="200" step="5">
+                        <span matTextSuffix>px</span>
+                      </mat-form-field>
                     </div>
+                    <span class="drag-hint">{{ 'textOverlayEditor.form.dragMarkerHint' | translate }}</span>
+                  </div>
                 </div>
-            </mat-card>
+
+                <div class="color-group-with-reset">
+                  <div class="color-field-wrapper">
+                    <mat-form-field appearance="outline" class="color-field">
+                      <mat-label>{{ 'textOverlayEditor.form.artistColor' | translate }}</mat-label>
+                      <input matInput type="color" formControlName="artistColor"/>
+                    </mat-form-field>
+                    <button
+                      mat-icon-button
+                      type="button"
+                      class="color-reset-button"
+                      [disabled]="!form.get('artistColor')?.value"
+                      (click)="form.get('artistColor')?.setValue(null)"
+                      matTooltip="{{ 'textOverlayEditor.form.useTitleColor' | translate }}">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+
+                  <div class="color-field-wrapper">
+                    <mat-form-field appearance="outline" class="color-field">
+                      <mat-label>{{ 'textOverlayEditor.form.artistOutlineColor' | translate }}</mat-label>
+                      <input matInput type="color" formControlName="artistOutlineColor"/>
+                    </mat-form-field>
+                    <button
+                      mat-icon-button
+                      type="button"
+                      class="color-reset-button"
+                      [disabled]="!form.get('artistOutlineColor')?.value"
+                      (click)="form.get('artistOutlineColor')?.setValue(null)"
+                      matTooltip="{{ 'textOverlayEditor.form.useTitleColor' | translate }}">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Artist Font Override -->
+                <mat-checkbox formControlName="useCustomArtistFont">
+                  {{ 'textOverlayEditor.form.useCustomArtistFont' | translate }}
+                </mat-checkbox>
+
+                @if (form.get('useCustomArtistFont')?.value) {
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>{{ 'textOverlayEditor.form.artistFontStyle' | translate }}</mat-label>
+                    <mat-select formControlName="artistFontStyle">
+                      @for (style of fontStyles; track style.value) {
+                        <mat-option [value]="style.value">
+                          <span class="font-style-option">
+                            <i [class]="style.icon"></i>
+                            <span>{{ style.label }}</span>
+                          </span>
+                        </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                }
+              </mat-expansion-panel>
+
+              <!-- Extra Text 1 (Optional) -->
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <i class="fas fa-font"></i>
+                    {{ 'textOverlayEditor.extraText1Section' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>{{ 'textOverlayEditor.form.extraText1' | translate }}</mat-label>
+                  <input matInput formControlName="extraText1" maxlength="100"/>
+                </mat-form-field>
+
+                <div class="position-field">
+                  <div class="position-field__label">{{ 'textOverlayEditor.form.extraText1Position' | translate }}</div>
+                  <div class="custom-position-controls">
+                    <div class="coordinate-inputs">
+                      <mat-form-field appearance="outline" class="coord-field">
+                        <mat-label>{{ 'textOverlayEditor.form.coordinateX' | translate }}</mat-label>
+                        <input matInput type="number" formControlName="extraText1PositionCustomX"
+                          min="0" max="100" step="1">
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="coord-field">
+                        <mat-label>{{ 'textOverlayEditor.form.coordinateY' | translate }}</mat-label>
+                        <input matInput type="number" formControlName="extraText1PositionCustomY"
+                          min="0" max="100" step="1">
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="font-size-field">
+                        <mat-label>{{ 'textOverlayEditor.form.fontSize' | translate }}</mat-label>
+                        <input matInput type="number" formControlName="extraText1FontSize"
+                          min="10" max="200" step="5">
+                        <span matTextSuffix>px</span>
+                      </mat-form-field>
+                    </div>
+                    <span class="drag-hint">{{ 'textOverlayEditor.form.dragMarkerHint' | translate }}</span>
+                  </div>
+                </div>
+
+                <div class="color-group-with-reset">
+                  <div class="color-field-wrapper">
+                    <mat-form-field appearance="outline" class="color-field">
+                      <mat-label>{{ 'textOverlayEditor.form.extraText1Color' | translate }}</mat-label>
+                      <input matInput type="color" formControlName="extraText1Color"/>
+                    </mat-form-field>
+                    <button mat-icon-button type="button" class="color-reset-button"
+                      [disabled]="!form.get('extraText1Color')?.value"
+                      (click)="form.get('extraText1Color')?.setValue(null)"
+                      matTooltip="{{ 'textOverlayEditor.form.useTitleColor' | translate }}">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                  <div class="color-field-wrapper">
+                    <mat-form-field appearance="outline" class="color-field">
+                      <mat-label>{{ 'textOverlayEditor.form.extraText1OutlineColor' | translate }}</mat-label>
+                      <input matInput type="color" formControlName="extraText1OutlineColor"/>
+                    </mat-form-field>
+                    <button mat-icon-button type="button" class="color-reset-button"
+                      [disabled]="!form.get('extraText1OutlineColor')?.value"
+                      (click)="form.get('extraText1OutlineColor')?.setValue(null)"
+                      matTooltip="{{ 'textOverlayEditor.form.useTitleColor' | translate }}">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <mat-checkbox formControlName="useCustomExtraText1Font">
+                  {{ 'textOverlayEditor.form.useCustomExtraText1Font' | translate }}
+                </mat-checkbox>
+
+                @if (form.get('useCustomExtraText1Font')?.value) {
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>{{ 'textOverlayEditor.form.extraText1FontStyle' | translate }}</mat-label>
+                    <mat-select formControlName="extraText1FontStyle">
+                      @for (style of fontStyles; track style.value) {
+                        <mat-option [value]="style.value">
+                          <span class="font-style-option">
+                            <i [class]="style.icon"></i>
+                            <span>{{ style.label }}</span>
+                          </span>
+                        </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                }
+              </mat-expansion-panel>
+
+              <!-- Extra Text 2 (Optional) -->
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <i class="fas fa-font"></i>
+                    {{ 'textOverlayEditor.extraText2Section' | translate }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>{{ 'textOverlayEditor.form.extraText2' | translate }}</mat-label>
+                  <input matInput formControlName="extraText2" maxlength="100"/>
+                </mat-form-field>
+
+                <div class="position-field">
+                  <div class="position-field__label">{{ 'textOverlayEditor.form.extraText2Position' | translate }}</div>
+                  <div class="custom-position-controls">
+                    <div class="coordinate-inputs">
+                      <mat-form-field appearance="outline" class="coord-field">
+                        <mat-label>{{ 'textOverlayEditor.form.coordinateX' | translate }}</mat-label>
+                        <input matInput type="number" formControlName="extraText2PositionCustomX"
+                          min="0" max="100" step="1">
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="coord-field">
+                        <mat-label>{{ 'textOverlayEditor.form.coordinateY' | translate }}</mat-label>
+                        <input matInput type="number" formControlName="extraText2PositionCustomY"
+                          min="0" max="100" step="1">
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" class="font-size-field">
+                        <mat-label>{{ 'textOverlayEditor.form.fontSize' | translate }}</mat-label>
+                        <input matInput type="number" formControlName="extraText2FontSize"
+                          min="10" max="200" step="5">
+                        <span matTextSuffix>px</span>
+                      </mat-form-field>
+                    </div>
+                    <span class="drag-hint">{{ 'textOverlayEditor.form.dragMarkerHint' | translate }}</span>
+                  </div>
+                </div>
+
+                <div class="color-group-with-reset">
+                  <div class="color-field-wrapper">
+                    <mat-form-field appearance="outline" class="color-field">
+                      <mat-label>{{ 'textOverlayEditor.form.extraText2Color' | translate }}</mat-label>
+                      <input matInput type="color" formControlName="extraText2Color"/>
+                    </mat-form-field>
+                    <button mat-icon-button type="button" class="color-reset-button"
+                      [disabled]="!form.get('extraText2Color')?.value"
+                      (click)="form.get('extraText2Color')?.setValue(null)"
+                      matTooltip="{{ 'textOverlayEditor.form.useTitleColor' | translate }}">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                  <div class="color-field-wrapper">
+                    <mat-form-field appearance="outline" class="color-field">
+                      <mat-label>{{ 'textOverlayEditor.form.extraText2OutlineColor' | translate }}</mat-label>
+                      <input matInput type="color" formControlName="extraText2OutlineColor"/>
+                    </mat-form-field>
+                    <button mat-icon-button type="button" class="color-reset-button"
+                      [disabled]="!form.get('extraText2OutlineColor')?.value"
+                      (click)="form.get('extraText2OutlineColor')?.setValue(null)"
+                      matTooltip="{{ 'textOverlayEditor.form.useTitleColor' | translate }}">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <mat-checkbox formControlName="useCustomExtraText2Font">
+                  {{ 'textOverlayEditor.form.useCustomExtraText2Font' | translate }}
+                </mat-checkbox>
+
+                @if (form.get('useCustomExtraText2Font')?.value) {
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>{{ 'textOverlayEditor.form.extraText2FontStyle' | translate }}</mat-label>
+                    <mat-select formControlName="extraText2FontStyle">
+                      @for (style of fontStyles; track style.value) {
+                        <mat-option [value]="style.value">
+                          <span class="font-style-option">
+                            <i [class]="style.icon"></i>
+                            <span>{{ style.label }}</span>
+                          </span>
+                        </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                }
+              </mat-expansion-panel>
+            </mat-accordion>
+
+            <mat-divider></mat-divider>
+
+            <!-- Action Buttons -->
+            <div class="button-group">
+              <button mat-flat-button color="primary" type="button"
+                (click)="applyTextOverlay()"
+                [disabled]="!form.valid || isProcessing">
+                @if (isProcessing) {
+                  <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+                }
+                @if (!isProcessing) {
+                  <span>{{ 'textOverlayEditor.buttons.apply' | translate }}</span>
+                }
+              </button>
+
+              <button mat-button type="button"
+                (click)="downloadResult()"
+                [disabled]="!resultImageFilePath">
+                <i class="fas fa-download"></i>
+                {{ 'textOverlayEditor.buttons.download' | translate }}
+              </button>
+            </div>
+          </form>
         </div>
+      </mat-card>
     </div>
+
+    <!-- Right Panel: Canvas Preview -->
+    <div class="editor-preview-section">
+      <mat-card class="editor-preview-card">
+        <div class="preview-header">
+          <div class="preview-title">
+            <h2>
+              <i class="fas fa-eye"></i>
+              {{ 'textOverlayEditor.preview.title' | translate }}
+            </h2>
+          </div>
+        </div>
+        <div class="preview-content">
+          <div class="canvas-wrapper">
+            <canvas #canvas
+              class="preview-canvas"
+              [class.dragging]="isDragging"
+              [class.hovering-marker]="isHoveringMarker"
+              (mousedown)="onCanvasMouseDown($event)"
+              (mousemove)="onCanvasMouseMove($event)">
+            </canvas>
+            @if (!selectedImage) {
+              <p class="placeholder-text">
+                {{ 'textOverlayEditor.preview.selectImagePlaceholder' | translate }}
+              </p>
+            }
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  </div>
 </div>

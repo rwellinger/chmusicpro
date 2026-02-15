@@ -1,5 +1,5 @@
 import {Component, inject, OnDestroy, OnInit} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Router} from "@angular/router";
 import {Subject, takeUntil} from "rxjs";
@@ -28,16 +28,15 @@ interface ModelOption {
     selector: "app-prompt-template-editor",
     standalone: true,
     imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        TranslateModule,
-        MatCardModule,
-        MatSnackBarModule,
-        MatSelectModule,
-        MatFormFieldModule,
-        MatButtonModule
-    ],
+    FormsModule,
+    ReactiveFormsModule,
+    TranslateModule,
+    MatCardModule,
+    MatSnackBarModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatButtonModule
+],
     templateUrl: "./prompt-template-editor.component.html",
     styleUrl: "./prompt-template-editor.component.scss"
 })

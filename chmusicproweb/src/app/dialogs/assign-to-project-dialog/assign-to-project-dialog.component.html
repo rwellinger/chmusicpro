@@ -1,75 +1,92 @@
 <h2 mat-dialog-title>{{ 'assignToProject.title.' + data.assetType | translate }}</h2>
 
 <mat-dialog-content>
-    <!-- Error Message -->
-    <div *ngIf="errorMessage" class="error-message">
-        {{ errorMessage | translate }}
+  <!-- Error Message -->
+  @if (errorMessage) {
+    <div class="error-message">
+      {{ errorMessage | translate }}
     </div>
+  }
 
-    <!-- Project Selection (Single-Select for non-release or Single release) -->
-    <mat-form-field *ngIf="!isMultiSelect" appearance="outline" class="full-width">
-        <mat-label>{{ 'assignToProject.selectProject' | translate }}</mat-label>
-        <mat-select
-                [(ngModel)]="selectedProjectId"
-                (selectionChange)="onProjectChange()"
-                [disabled]="loading">
-            <mat-option *ngFor="let project of projects" [value]="project.id">
-                {{ project.project_name }}
-            </mat-option>
-        </mat-select>
+  <!-- Project Selection (Single-Select for non-release or Single release) -->
+  @if (!isMultiSelect) {
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'assignToProject.selectProject' | translate }}</mat-label>
+      <mat-select
+        [(ngModel)]="selectedProjectId"
+        (selectionChange)="onProjectChange()"
+        [disabled]="loading">
+        @for (project of projects; track project) {
+          <mat-option [value]="project.id">
+            {{ project.project_name }}
+          </mat-option>
+        }
+      </mat-select>
     </mat-form-field>
+  }
 
-    <!-- Project Selection (Multi-Select for Album release) -->
-    <mat-form-field *ngIf="isMultiSelect" appearance="outline" class="full-width">
-        <mat-label>{{ 'assignToProject.selectProjects' | translate }}</mat-label>
-        <mat-select
-                [(ngModel)]="selectedProjectIds"
-                [multiple]="true"
-                [disabled]="loading">
-            <mat-option *ngFor="let project of projects" [value]="project.id">
-                {{ project.project_name }}
-            </mat-option>
-        </mat-select>
-        <mat-hint *ngIf="data.releaseType === ReleaseType.ALBUM">
-            {{ 'assignToProject.albumMultiSelectHint' | translate }}
+  <!-- Project Selection (Multi-Select for Album release) -->
+  @if (isMultiSelect) {
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'assignToProject.selectProjects' | translate }}</mat-label>
+      <mat-select
+        [(ngModel)]="selectedProjectIds"
+        [multiple]="true"
+        [disabled]="loading">
+        @for (project of projects; track project) {
+          <mat-option [value]="project.id">
+            {{ project.project_name }}
+          </mat-option>
+        }
+      </mat-select>
+      @if (data.releaseType === ReleaseType.ALBUM) {
+        <mat-hint>
+          {{ 'assignToProject.albumMultiSelectHint' | translate }}
         </mat-hint>
+      }
     </mat-form-field>
+  }
 
-    <!-- Folder Selection (only for non-release assets) -->
+  <!-- Folder Selection (only for non-release assets) -->
+  @if (data.assetType !== 'release' && selectedProjectId && folders.length > 0) {
     <mat-form-field
-            *ngIf="data.assetType !== 'release' && selectedProjectId && folders.length > 0"
-            appearance="outline"
-            class="full-width">
-        <mat-label>{{ 'assignToProject.selectFolder' | translate }}</mat-label>
-        <mat-select [(ngModel)]="selectedFolderId" [disabled]="loading">
-            <mat-option [value]="null">{{ 'assignToProject.noFolder' | translate }}</mat-option>
-            <mat-option *ngFor="let folder of folders" [value]="folder.id">
-                {{ folder.folder_name }}
-            </mat-option>
-        </mat-select>
+      appearance="outline"
+      class="full-width">
+      <mat-label>{{ 'assignToProject.selectFolder' | translate }}</mat-label>
+      <mat-select [(ngModel)]="selectedFolderId" [disabled]="loading">
+        <mat-option [value]="null">{{ 'assignToProject.noFolder' | translate }}</mat-option>
+        @for (folder of folders; track folder) {
+          <mat-option [value]="folder.id">
+            {{ folder.folder_name }}
+          </mat-option>
+        }
+      </mat-select>
     </mat-form-field>
+  }
 
-    <!-- No Folders Info (only for non-release assets) -->
-    <div *ngIf="data.assetType !== 'release' && selectedProjectId && folders.length === 0 && !loading"
-         class="info-message">
-        {{ 'assignToProject.noFoldersAvailable' | translate }}
+  <!-- No Folders Info (only for non-release assets) -->
+  @if (data.assetType !== 'release' && selectedProjectId && folders.length === 0 && !loading) {
+    <div
+      class="info-message">
+      {{ 'assignToProject.noFoldersAvailable' | translate }}
     </div>
+  }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button
-            mat-button
-            (click)="cancel()"
-            [disabled]="loading"
-            class="cancel-button">
-        {{ 'common.cancel' | translate }}
-    </button>
-    <button
-            mat-raised-button
-            color="primary"
-            (click)="save()"
-            [disabled]="getSaveButtonDisabled()"
-            class="save-button">
-        {{ loading ? ('common.saving' | translate) : ('common.save' | translate) }}
-    </button>
+  <button
+    mat-button
+    (click)="cancel()"
+    [disabled]="loading"
+    class="cancel-button">
+    {{ 'common.cancel' | translate }}
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="save()"
+    [disabled]="getSaveButtonDisabled()"
+    class="save-button">
+    {{ loading ? ('common.saving' | translate) : ('common.save' | translate) }}
+  </button>
 </mat-dialog-actions>

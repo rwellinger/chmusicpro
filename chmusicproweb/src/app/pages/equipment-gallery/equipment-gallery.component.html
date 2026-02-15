@@ -1,576 +1,622 @@
 <div class="equipment-gallery-container master-detail-layout">
-    <!-- Left Side: Equipment List -->
-    <div class="list-section">
-        <mat-card class="list-card">
-            <!-- Header -->
-            <div class="list-header">
-                <div class="header-title">
-                    <div class="header-title-group">
-                        <h2>
-                            <i class="fas fa-toolbox"></i>
-                            {{ 'equipment.gallery.title' | translate }}
-                        </h2>
-                        <div class="equipment-count-badge" *ngIf="pagination.total > 0">
-                            {{ pagination.total }} {{ 'equipment.gallery.items' | translate }}
-                        </div>
-                    </div>
-                    <p class="subtitle">{{ 'equipment.gallery.subtitle' | translate }}</p>
-                </div>
-                <button
-                        type="button"
-                        class="action-button new-equipment-button"
-                        (click)="createNew()"
-                        [title]="'equipment.gallery.actions.new' | translate">
-                    <i class="fas fa-plus"></i>
-                </button>
+  <!-- Left Side: Equipment List -->
+  <div class="list-section">
+    <mat-card class="list-card">
+      <!-- Header -->
+      <div class="list-header">
+        <div class="header-title">
+          <div class="header-title-group">
+            <h2>
+              <i class="fas fa-toolbox"></i>
+              {{ 'equipment.gallery.title' | translate }}
+            </h2>
+            @if (pagination.total > 0) {
+              <div class="equipment-count-badge">
+                {{ pagination.total }} {{ 'equipment.gallery.items' | translate }}
+              </div>
+            }
+          </div>
+          <p class="subtitle">{{ 'equipment.gallery.subtitle' | translate }}</p>
+        </div>
+        <button
+          type="button"
+          class="action-button new-equipment-button"
+          (click)="createNew()"
+          [title]="'equipment.gallery.actions.new' | translate">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+
+      <!-- Search and Filters -->
+      <div class="filters-section">
+        <!-- Search -->
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            [placeholder]="'equipment.gallery.search' | translate"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange($event)"
+            class="search-input">
+          @if (searchTerm) {
+            <button type="button"
+              class="clear-search-button"
+              (click)="clearSearch()"
+              [title]="'equipment.gallery.clearSearch' | translate">
+              <i class="fas fa-times"></i>
+            </button>
+          }
+        </div>
+
+        <!-- Type Filter -->
+        <div class="type-filter">
+          <button
+            class="filter-btn"
+            [class.active]="selectedType === 'all'"
+            (click)="selectedType = 'all'; onTypeFilterChange()">
+            {{ 'equipment.gallery.filters.all' | translate }}
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="selectedType === EquipmentType.SOFTWARE"
+            (click)="selectedType = EquipmentType.SOFTWARE; onTypeFilterChange()">
+            <mat-icon>desktop_windows</mat-icon>
+            {{ 'equipment.types.software' | translate }}
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="selectedType === EquipmentType.PLUGIN"
+            (click)="selectedType = EquipmentType.PLUGIN; onTypeFilterChange()">
+            <mat-icon>extension</mat-icon>
+            {{ 'equipment.types.plugin' | translate }}
+          </button>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="status-filter">
+          <button
+            class="filter-btn status-all"
+            [class.active]="selectedStatus === 'all'"
+            (click)="selectedStatus = 'all'; onStatusFilterChange()">
+            {{ 'equipment.gallery.filters.allStatuses' | translate }}
+          </button>
+          <button
+            class="filter-btn status-active"
+            [class.active]="selectedStatus === EquipmentStatus.ACTIVE"
+            (click)="selectedStatus = EquipmentStatus.ACTIVE; onStatusFilterChange()">
+            {{ 'equipment.statuses.active' | translate }}
+          </button>
+          <button
+            class="filter-btn status-trial"
+            [class.active]="selectedStatus === EquipmentStatus.TRIAL"
+            (click)="selectedStatus = EquipmentStatus.TRIAL; onStatusFilterChange()">
+            {{ 'equipment.statuses.trial' | translate }}
+          </button>
+          <button
+            class="filter-btn status-expired"
+            [class.active]="selectedStatus === EquipmentStatus.EXPIRED"
+            (click)="selectedStatus = EquipmentStatus.EXPIRED; onStatusFilterChange()">
+            {{ 'equipment.statuses.expired' | translate }}
+          </button>
+          <button
+            class="filter-btn status-archived"
+            [class.active]="selectedStatus === EquipmentStatus.ARCHIVED"
+            (click)="selectedStatus = EquipmentStatus.ARCHIVED; onStatusFilterChange()">
+            {{ 'equipment.statuses.archived' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Equipment List -->
+      <div class="equipment-list">
+        <!-- Loading State -->
+        @if (isLoading) {
+          <div class="loading-state">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>{{ 'equipment.gallery.loading' | translate }}</p>
+          </div>
+        }
+
+        <!-- Empty State -->
+        @if (!isLoading && equipmentList.length === 0) {
+          <div class="empty-state">
+            <i class="fas fa-toolbox"></i>
+            <p>{{ 'equipment.gallery.empty' | translate }}</p>
+            <button class="action-button" (click)="createNew()">
+              <i class="fas fa-plus"></i>
+              {{ 'equipment.gallery.actions.new' | translate }}
+            </button>
+          </div>
+        }
+
+        <!-- Equipment Items -->
+        @for (equipment of equipmentList; track equipment) {
+          <div
+            class="equipment-item"
+            [class.selected]="selectedEquipment?.id === equipment.id"
+            (click)="selectEquipment(equipment)">
+            <div class="equipment-item-header">
+              <div class="equipment-type-icon">
+                <mat-icon>{{ getTypeIcon(equipment.type) }}</mat-icon>
+              </div>
+              <div class="equipment-title-group">
+                <h4 class="equipment-title">{{ equipment.name }}</h4>
+                @if (equipment.manufacturer) {
+                  <p class="equipment-manufacturer">
+                    {{ equipment.manufacturer }}
+                  </p>
+                }
+              </div>
+              <span class="equipment-status" [class]="'status-' + equipment.status">
+                {{ 'equipment.statuses.' + equipment.status | translate }}
+              </span>
             </div>
-
-            <!-- Search and Filters -->
-            <div class="filters-section">
-                <!-- Search -->
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input
-                            type="text"
-                            [placeholder]="'equipment.gallery.search' | translate"
-                            [(ngModel)]="searchTerm"
-                            (ngModelChange)="onSearchChange($event)"
-                            class="search-input">
-                    <button type="button"
-                            class="clear-search-button"
-                            *ngIf="searchTerm"
-                            (click)="clearSearch()"
-                            [title]="'equipment.gallery.clearSearch' | translate">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <!-- Type Filter -->
-                <div class="type-filter">
-                    <button
-                            class="filter-btn"
-                            [class.active]="selectedType === 'all'"
-                            (click)="selectedType = 'all'; onTypeFilterChange()">
-                        {{ 'equipment.gallery.filters.all' | translate }}
-                    </button>
-                    <button
-                            class="filter-btn"
-                            [class.active]="selectedType === EquipmentType.SOFTWARE"
-                            (click)="selectedType = EquipmentType.SOFTWARE; onTypeFilterChange()">
-                        <mat-icon>desktop_windows</mat-icon>
-                        {{ 'equipment.types.software' | translate }}
-                    </button>
-                    <button
-                            class="filter-btn"
-                            [class.active]="selectedType === EquipmentType.PLUGIN"
-                            (click)="selectedType = EquipmentType.PLUGIN; onTypeFilterChange()">
-                        <mat-icon>extension</mat-icon>
-                        {{ 'equipment.types.plugin' | translate }}
-                    </button>
-                </div>
-
-                <!-- Status Filter -->
-                <div class="status-filter">
-                    <button
-                            class="filter-btn status-all"
-                            [class.active]="selectedStatus === 'all'"
-                            (click)="selectedStatus = 'all'; onStatusFilterChange()">
-                        {{ 'equipment.gallery.filters.allStatuses' | translate }}
-                    </button>
-                    <button
-                            class="filter-btn status-active"
-                            [class.active]="selectedStatus === EquipmentStatus.ACTIVE"
-                            (click)="selectedStatus = EquipmentStatus.ACTIVE; onStatusFilterChange()">
-                        {{ 'equipment.statuses.active' | translate }}
-                    </button>
-                    <button
-                            class="filter-btn status-trial"
-                            [class.active]="selectedStatus === EquipmentStatus.TRIAL"
-                            (click)="selectedStatus = EquipmentStatus.TRIAL; onStatusFilterChange()">
-                        {{ 'equipment.statuses.trial' | translate }}
-                    </button>
-                    <button
-                            class="filter-btn status-expired"
-                            [class.active]="selectedStatus === EquipmentStatus.EXPIRED"
-                            (click)="selectedStatus = EquipmentStatus.EXPIRED; onStatusFilterChange()">
-                        {{ 'equipment.statuses.expired' | translate }}
-                    </button>
-                    <button
-                            class="filter-btn status-archived"
-                            [class.active]="selectedStatus === EquipmentStatus.ARCHIVED"
-                            (click)="selectedStatus = EquipmentStatus.ARCHIVED; onStatusFilterChange()">
-                        {{ 'equipment.statuses.archived' | translate }}
-                    </button>
-                </div>
-            </div>
-
-            <!-- Equipment List -->
-            <div class="equipment-list">
-                <!-- Loading State -->
-                <div *ngIf="isLoading" class="loading-state">
-                    <mat-spinner diameter="40"></mat-spinner>
-                    <p>{{ 'equipment.gallery.loading' | translate }}</p>
-                </div>
-
-                <!-- Empty State -->
-                <div *ngIf="!isLoading && equipmentList.length === 0" class="empty-state">
-                    <i class="fas fa-toolbox"></i>
-                    <p>{{ 'equipment.gallery.empty' | translate }}</p>
-                    <button class="action-button" (click)="createNew()">
-                        <i class="fas fa-plus"></i>
-                        {{ 'equipment.gallery.actions.new' | translate }}
-                    </button>
-                </div>
-
-                <!-- Equipment Items -->
-                <div
-                        *ngFor="let equipment of equipmentList"
-                        class="equipment-item"
-                        [class.selected]="selectedEquipment?.id === equipment.id"
-                        (click)="selectEquipment(equipment)">
-                    <div class="equipment-item-header">
-                        <div class="equipment-type-icon">
-                            <mat-icon>{{ getTypeIcon(equipment.type) }}</mat-icon>
-                        </div>
-                        <div class="equipment-title-group">
-                            <h4 class="equipment-title">{{ equipment.name }}</h4>
-                            <p class="equipment-manufacturer" *ngIf="equipment.manufacturer">
-                                {{ equipment.manufacturer }}
-                            </p>
-                        </div>
-                        <span class="equipment-status" [class]="'status-' + equipment.status">
-              {{ 'equipment.statuses.' + equipment.status | translate }}
-            </span>
-                    </div>
-                    <div class="equipment-item-footer">
-            <span class="meta-date">
-              <i class="fas fa-clock"></i>
+            <div class="equipment-item-footer">
+              <span class="meta-date">
+                <i class="fas fa-clock"></i>
                 {{ formatDate(equipment.created_at) }}
-            </span>
-                        <span class="meta-tags" *ngIf="equipment.software_tags || equipment.plugin_tags">
-              <i class="fas fa-tags"></i>
-                            {{ equipment.software_tags || equipment.plugin_tags }}
-            </span>
-                    </div>
-                </div>
+              </span>
+              @if (equipment.software_tags || equipment.plugin_tags) {
+                <span class="meta-tags">
+                  <i class="fas fa-tags"></i>
+                  {{ equipment.software_tags || equipment.plugin_tags }}
+                </span>
+              }
             </div>
+          </div>
+        }
+      </div>
 
-            <!-- Pagination -->
-            <div class="pagination" *ngIf="pagination.total > pagination.limit">
-                <button
-                        class="pagination-btn"
-                        (click)="previousPage()"
-                        [disabled]="currentPage === 0 || isLoading">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <span class="pagination-info">
-          {{
-                        'equipment.gallery.pagination.info' | translate: {
-                            current: currentPage + 1,
-                            total: Math.ceil(pagination.total / pagination.limit)
-                        }
-                    }}
+      <!-- Pagination -->
+      @if (pagination.total > pagination.limit) {
+        <div class="pagination">
+          <button
+            class="pagination-btn"
+            (click)="previousPage()"
+            [disabled]="currentPage === 0 || isLoading">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <span class="pagination-info">
+            {{
+            'equipment.gallery.pagination.info' | translate: {
+            current: currentPage + 1,
+            total: Math.ceil(pagination.total / pagination.limit)
+          }
+          }}
         </span>
-                <button
-                        class="pagination-btn"
-                        (click)="nextPage()"
-                        [disabled]="!pagination.has_more || isLoading">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-        </mat-card>
-    </div>
+        <button
+          class="pagination-btn"
+          (click)="nextPage()"
+          [disabled]="!pagination.has_more || isLoading">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    }
+  </mat-card>
+</div>
 
-    <!-- Right Side: Equipment Details -->
-    <div class="detail-section">
-        <mat-card class="detail-card" *ngIf="selectedEquipment">
-            <!-- Detail Header -->
-            <div class="detail-header">
-                <div class="detail-type-icon">
-                    <mat-icon>{{ getTypeIcon(selectedEquipment.type) }}</mat-icon>
-                </div>
-                <div class="detail-title-group">
-                    <h3>
-                        {{ selectedEquipment.name }}
-                        <span class="equipment-status" [class]="'status-' + selectedEquipment.status">
+<!-- Right Side: Equipment Details -->
+<div class="detail-section">
+  @if (selectedEquipment) {
+    <mat-card class="detail-card">
+      <!-- Detail Header -->
+      <div class="detail-header">
+        <div class="detail-type-icon">
+          <mat-icon>{{ getTypeIcon(selectedEquipment.type) }}</mat-icon>
+        </div>
+        <div class="detail-title-group">
+          <h3>
+            {{ selectedEquipment.name }}
+            <span class="equipment-status" [class]="'status-' + selectedEquipment.status">
               {{ 'equipment.statuses.' + selectedEquipment.status | translate }}
             </span>
-                    </h3>
-                    <p class="detail-manufacturer" *ngIf="selectedEquipment.manufacturer">
-                        {{ selectedEquipment.manufacturer }}
-                    </p>
-                </div>
+          </h3>
+          @if (selectedEquipment.manufacturer) {
+            <p class="detail-manufacturer">
+              {{ selectedEquipment.manufacturer }}
+            </p>
+          }
+        </div>
+      </div>
+      <!-- Detail Content -->
+      <div class="detail-content">
+        <!-- Section 1: Allgemein -->
+        <div class="detail-section-block">
+          <h3 class="section-title">
+            <i class="fas fa-info-circle"></i>
+            {{ 'equipment.gallery.sections.general' | translate }}
+          </h3>
+          <div class="detail-field-row-3col">
+            <div class="detail-field">
+              <span class="field-label">{{ 'equipment.editor.type' | translate }}</span>
+              <div class="readonly-field">
+                <mat-icon class="type-icon">{{ getTypeIcon(selectedEquipment.type) }}</mat-icon>
+                {{ 'equipment.types.' + selectedEquipment.type.toLowerCase() | translate }}
+              </div>
             </div>
-
-            <!-- Detail Content -->
-            <div class="detail-content">
-                <!-- Section 1: Allgemein -->
-                <div class="detail-section-block">
-                    <h3 class="section-title">
-                        <i class="fas fa-info-circle"></i>
-                        {{ 'equipment.gallery.sections.general' | translate }}
-                    </h3>
-
-                    <div class="detail-field-row-3col">
-                        <div class="detail-field">
-                            <span class="field-label">{{ 'equipment.editor.type' | translate }}</span>
-                            <div class="readonly-field">
-                                <mat-icon class="type-icon">{{ getTypeIcon(selectedEquipment.type) }}</mat-icon>
-                                {{ 'equipment.types.' + selectedEquipment.type.toLowerCase() | translate }}
-                            </div>
-                        </div>
-
-                        <div class="detail-field">
-                            <span class="field-label">{{ 'equipment.editor.name' | translate }}</span>
-                            <div class="readonly-field">{{ selectedEquipment.name }}</div>
-                        </div>
-
-                        <div class="detail-field" *ngIf="selectedEquipment.version">
-                            <span class="field-label">{{ 'equipment.editor.version' | translate }}</span>
-                            <div class="readonly-field">{{ selectedEquipment.version }}</div>
-                        </div>
-                    </div>
-
-                    <div class="detail-field" *ngIf="selectedEquipment.description">
-                        <span class="field-label">{{ 'equipment.editor.description' | translate }}</span>
-                        <div class="readonly-field multiline">{{ selectedEquipment.description }}</div>
-                    </div>
-
-                    <div class="detail-field" *ngIf="selectedEquipment.system_requirements">
-                        <span class="field-label">{{ 'equipment.editor.systemRequirements' | translate }}</span>
-                        <div class="readonly-field multiline">{{ selectedEquipment.system_requirements }}</div>
-                    </div>
-                </div>
-
-                <!-- Section 2: Meta Daten (Icon-only, compact) -->
-                <div class="detail-section-block">
-                    <h3 class="section-title">
-                        <i class="fas fa-database"></i>
-                        {{ 'equipment.gallery.sections.metadata' | translate }}
-                    </h3>
-
-                    <div class="metadata-compact">
-                        <!-- ID Row -->
-                        <div class="meta-id-row">
-                            <i class="fas fa-fingerprint meta-icon"></i>
-                            <span class="meta-id" [title]="selectedEquipment.id">{{ selectedEquipment.id }}</span>
-                        </div>
-
-                        <!-- Date Grid (Icons only) -->
-                        <div class="meta-grid">
-                            <div class="meta-item">
-                                <i class="fas fa-calendar-plus meta-icon"></i>
-                                <span class="meta-value">{{ selectedEquipment.created_at | date:'medium' }}</span>
-                            </div>
-                            <div class="meta-item" *ngIf="selectedEquipment.updated_at">
-                                <i class="fas fa-calendar-check meta-icon"></i>
-                                <span class="meta-value">{{ selectedEquipment.updated_at | date:'medium' }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Tags (Icons only) -->
-                        <div class="meta-item" *ngIf="selectedEquipment.software_tags || selectedEquipment.plugin_tags">
-                            <i class="fas fa-tags meta-icon"></i>
-                            <div class="tags-container">
-                                <mat-chip
-                                        *ngFor="let tag of (selectedEquipment.software_tags || selectedEquipment.plugin_tags)!.split(',')">
-                                    {{ tag.trim() }}
-                                </mat-chip>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 3: Login Credentials (Accordion - when both exist) -->
-                <mat-expansion-panel class="detail-section-block" *ngIf="shouldUseAccordion() && hasCredentials()">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            <i class="fas fa-key"></i>
-                            {{ 'equipment.gallery.sections.credentials' | translate }}
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-
-                    <div class="detail-field" *ngIf="selectedEquipment.manufacturer">
-                        <span class="field-label">{{ 'equipment.editor.manufacturer' | translate }}</span>
-                        <div class="readonly-field">{{ selectedEquipment.manufacturer }}</div>
-                    </div>
-
-                    <div class="detail-field" *ngIf="selectedEquipment.url">
-                        <div class="field-header">
-                            <span class="field-label">{{ 'equipment.editor.url' | translate }}</span>
-                            <button class="copy-icon-btn" (click)="copyToClipboard(selectedEquipment.url, 'Url')"
-                                    [title]="'equipment.gallery.actions.copy' | translate">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <div class="readonly-field">
-                            <a [href]="selectedEquipment.url" target="_blank">{{ selectedEquipment.url }}</a>
-                        </div>
-                    </div>
-
-                    <div class="detail-field-row" *ngIf="selectedEquipment.username || selectedEquipment.password">
-                        <div class="detail-field" *ngIf="selectedEquipment.username">
-                            <div class="field-header">
-                                <span class="field-label">{{ 'equipment.editor.username' | translate }}</span>
-                                <button class="copy-icon-btn"
-                                        (click)="copyToClipboard(selectedEquipment.username, 'Username')"
-                                        [title]="'equipment.gallery.actions.copy' | translate">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                            </div>
-                            <div class="readonly-field">{{ selectedEquipment.username }}</div>
-                        </div>
-
-                        <div class="detail-field sensitive-field" *ngIf="selectedEquipment.password">
-                            <div class="field-header">
-                                <span class="field-label">{{ 'equipment.editor.password' | translate }}</span>
-                                <div class="field-actions">
-                                    <button class="visibility-toggle-btn" (click)="togglePasswordVisibility()"
-                                            [title]="(showPassword ? 'equipment.gallery.actions.hidePassword' : 'equipment.gallery.actions.showPassword') | translate">
-                                        <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                                    </button>
-                                    <button class="copy-icon-btn"
-                                            (click)="copyToClipboard(selectedEquipment.password, 'Password')"
-                                            [title]="'equipment.gallery.actions.copy' | translate">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="readonly-field sensitive-value" [class.masked]="!showPassword">
-                                {{ showPassword ? selectedEquipment.password : '••••••••' }}
-                            </div>
-                        </div>
-                    </div>
-                </mat-expansion-panel>
-
-                <!-- Section 3: Login Credentials (Normal - when only one exists) -->
-                <div class="detail-section-block" *ngIf="!shouldUseAccordion() && hasCredentials()">
-                    <h3 class="section-title">
-                        <i class="fas fa-key"></i>
-                        {{ 'equipment.gallery.sections.credentials' | translate }}
-                    </h3>
-
-                    <div class="detail-field" *ngIf="selectedEquipment.manufacturer">
-                        <span class="field-label">{{ 'equipment.editor.manufacturer' | translate }}</span>
-                        <div class="readonly-field">{{ selectedEquipment.manufacturer }}</div>
-                    </div>
-
-                    <div class="detail-field" *ngIf="selectedEquipment.url">
-                        <div class="field-header">
-                            <span class="field-label">{{ 'equipment.editor.url' | translate }}</span>
-                            <button class="copy-icon-btn" (click)="copyToClipboard(selectedEquipment.url, 'Url')"
-                                    [title]="'equipment.gallery.actions.copy' | translate">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-                        <div class="readonly-field">
-                            <a [href]="selectedEquipment.url" target="_blank">{{ selectedEquipment.url }}</a>
-                        </div>
-                    </div>
-
-                    <div class="detail-field-row" *ngIf="selectedEquipment.username || selectedEquipment.password">
-                        <div class="detail-field" *ngIf="selectedEquipment.username">
-                            <div class="field-header">
-                                <span class="field-label">{{ 'equipment.editor.username' | translate }}</span>
-                                <button class="copy-icon-btn"
-                                        (click)="copyToClipboard(selectedEquipment.username, 'Username')"
-                                        [title]="'equipment.gallery.actions.copy' | translate">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                            </div>
-                            <div class="readonly-field">{{ selectedEquipment.username }}</div>
-                        </div>
-
-                        <div class="detail-field sensitive-field" *ngIf="selectedEquipment.password">
-                            <div class="field-header">
-                                <span class="field-label">{{ 'equipment.editor.password' | translate }}</span>
-                                <div class="field-actions">
-                                    <button class="visibility-toggle-btn" (click)="togglePasswordVisibility()"
-                                            [title]="(showPassword ? 'equipment.gallery.actions.hidePassword' : 'equipment.gallery.actions.showPassword') | translate">
-                                        <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                                    </button>
-                                    <button class="copy-icon-btn"
-                                            (click)="copyToClipboard(selectedEquipment.password, 'Password')"
-                                            [title]="'equipment.gallery.actions.copy' | translate">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="readonly-field sensitive-value" [class.masked]="!showPassword">
-                                {{ showPassword ? selectedEquipment.password : '••••••••' }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 4: License Information (Accordion - when both exist) -->
-                <mat-expansion-panel class="detail-section-block" *ngIf="shouldUseAccordion() && hasLicenseInfo()">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            <i class="fas fa-certificate"></i>
-                            {{ 'equipment.gallery.sections.license' | translate }}
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-
-                    <div class="detail-field">
-                        <span class="field-label">{{ 'equipment.editor.licenseManagement' | translate }}</span>
-                        <div class="readonly-field">{{ 'equipment.licenseTypes.' + (selectedEquipment.license_management?.toLowerCase() || '') | translate }}</div>
-                    </div>
-
-                    <div class="detail-field sensitive-field"
-                         *ngIf="selectedEquipment.license_management === LicenseManagement.LICENSE_KEY && selectedEquipment.license_key">
-                        <div class="field-header">
-                            <span class="field-label">{{ 'equipment.editor.licenseKey' | translate }}</span>
-                            <div class="field-actions">
-                                <button class="visibility-toggle-btn" (click)="toggleLicenseKeyVisibility()"
-                                        [title]="(showLicenseKey ? 'equipment.gallery.actions.hideLicenseKey' : 'equipment.gallery.actions.showLicenseKey') | translate">
-                                    <i [class]="showLicenseKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                                </button>
-                                <button class="copy-icon-btn"
-                                        (click)="copyToClipboard(selectedEquipment.license_key, 'LicenseKey')"
-                                        [title]="'equipment.gallery.actions.copy' | translate">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="readonly-field sensitive-value" [class.masked]="!showLicenseKey">
-                            {{ showLicenseKey ? selectedEquipment.license_key : '••••••••' }}
-                        </div>
-                    </div>
-
-                    <div class="detail-field"
-                         *ngIf="selectedEquipment.license_management === LicenseManagement.OTHER && selectedEquipment.license_description">
-                        <span class="field-label">{{ 'equipment.editor.licenseDescription' | translate }}</span>
-                        <div class="readonly-field multiline">{{ selectedEquipment.license_description }}</div>
-                    </div>
-                </mat-expansion-panel>
-
-                <!-- Section 4: License Information (Normal - when only one exists) -->
-                <div class="detail-section-block" *ngIf="!shouldUseAccordion() && hasLicenseInfo()">
-                    <h3 class="section-title">
-                        <i class="fas fa-certificate"></i>
-                        {{ 'equipment.gallery.sections.license' | translate }}
-                    </h3>
-
-                    <div class="detail-field">
-                        <span class="field-label">{{ 'equipment.editor.licenseManagement' | translate }}</span>
-                        <div class="readonly-field">{{ 'equipment.licenseTypes.' + (selectedEquipment.license_management?.toLowerCase() || '') | translate }}</div>
-                    </div>
-
-                    <div class="detail-field sensitive-field"
-                         *ngIf="selectedEquipment.license_management === LicenseManagement.LICENSE_KEY && selectedEquipment.license_key">
-                        <div class="field-header">
-                            <span class="field-label">{{ 'equipment.editor.licenseKey' | translate }}</span>
-                            <div class="field-actions">
-                                <button class="visibility-toggle-btn" (click)="toggleLicenseKeyVisibility()"
-                                        [title]="(showLicenseKey ? 'equipment.gallery.actions.hideLicenseKey' : 'equipment.gallery.actions.showLicenseKey') | translate">
-                                    <i [class]="showLicenseKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                                </button>
-                                <button class="copy-icon-btn"
-                                        (click)="copyToClipboard(selectedEquipment.license_key, 'LicenseKey')"
-                                        [title]="'equipment.gallery.actions.copy' | translate">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="readonly-field sensitive-value" [class.masked]="!showLicenseKey">
-                            {{ showLicenseKey ? selectedEquipment.license_key : '••••••••' }}
-                        </div>
-                    </div>
-
-                    <div class="detail-field"
-                         *ngIf="selectedEquipment.license_management === LicenseManagement.OTHER && selectedEquipment.license_description">
-                        <span class="field-label">{{ 'equipment.editor.licenseDescription' | translate }}</span>
-                        <div class="readonly-field multiline">{{ selectedEquipment.license_description }}</div>
-                    </div>
-                </div>
-
-                <!-- Section 5: Purchase Information -->
-                <div class="detail-section-block" *ngIf="selectedEquipment.purchase_date || selectedEquipment.price">
-                    <h3 class="section-title">
-                        <i class="fas fa-shopping-cart"></i>
-                        {{ 'equipment.gallery.sections.purchase' | translate }}
-                    </h3>
-
-                    <div class="detail-field-row">
-                        <div class="detail-field" *ngIf="selectedEquipment.purchase_date">
-                            <span class="field-label">{{ 'equipment.editor.purchaseDate' | translate }}</span>
-                            <div class="readonly-field">
-                                <i class="fas fa-calendar-alt"></i>
-                                {{ selectedEquipment.purchase_date | date:'mediumDate' }}
-                            </div>
-                        </div>
-
-                        <div class="detail-field" *ngIf="selectedEquipment.price">
-                            <span class="field-label">{{ 'equipment.editor.price' | translate }}</span>
-                            <div class="readonly-field price-value">
-                                <i class="fas fa-dollar-sign"></i>
-                                {{ selectedEquipment.price }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 6: Attachments -->
-                <div class="detail-section-block" *ngIf="attachments.length > 0">
-                    <h3 class="section-title">
-                        <i class="fas fa-paperclip"></i>
-                        {{ 'equipment.attachments.title' | translate }}
-                    </h3>
-
-                    <div class="attachments-list">
-                        <div class="attachment-item" *ngFor="let attachment of attachments">
-                            <div class="attachment-info">
-                                <i class="fas fa-file attachment-icon"></i>
-                                <div class="attachment-details">
-                                    <span class="attachment-name">{{ attachment.filename }}</span>
-                                    <span class="attachment-meta">{{ formatFileSize(attachment.file_size) }}</span>
-                                </div>
-                            </div>
-                            <button class="download-btn" (click)="downloadAttachment(attachment)"
-                                    [title]="'equipment.attachments.download' | translate">
-                                <i class="fas fa-download"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <div class="detail-field">
+              <span class="field-label">{{ 'equipment.editor.name' | translate }}</span>
+              <div class="readonly-field">{{ selectedEquipment.name }}</div>
             </div>
-
-            <!-- Detail Actions -->
-            <div class="detail-actions">
-                <button mat-button type="button" (click)="editEquipment(selectedEquipment.id)">
-                    <i class="fas fa-edit"></i> {{ 'equipment.gallery.actions.edit' | translate }}
-                </button>
-                <button mat-button type="button" (click)="duplicateEquipment(selectedEquipment.id)">
-                    <i class="fas fa-copy"></i> {{ 'equipment.gallery.actions.duplicate' | translate }}
-                </button>
-                <button mat-button type="button" (click)="confirmDelete(selectedEquipment.id, $event)">
-                    <i class="fas fa-trash"></i> {{ 'equipment.gallery.actions.delete' | translate }}
-                </button>
+            @if (selectedEquipment.version) {
+              <div class="detail-field">
+                <span class="field-label">{{ 'equipment.editor.version' | translate }}</span>
+                <div class="readonly-field">{{ selectedEquipment.version }}</div>
+              </div>
+            }
+          </div>
+          @if (selectedEquipment.description) {
+            <div class="detail-field">
+              <span class="field-label">{{ 'equipment.editor.description' | translate }}</span>
+              <div class="readonly-field multiline">{{ selectedEquipment.description }}</div>
             </div>
-        </mat-card>
-
-        <!-- Empty State for Details -->
-        <mat-card class="detail-card empty-detail" *ngIf="!selectedEquipment && equipmentList.length > 0">
-            <div class="empty-detail-content">
-                <i class="fas fa-hand-pointer"></i>
-                <p>{{ 'equipment.gallery.selectPrompt' | translate }}</p>
+          }
+          @if (selectedEquipment.system_requirements) {
+            <div class="detail-field">
+              <span class="field-label">{{ 'equipment.editor.systemRequirements' | translate }}</span>
+              <div class="readonly-field multiline">{{ selectedEquipment.system_requirements }}</div>
             </div>
-        </mat-card>
-    </div>
+          }
+        </div>
+        <!-- Section 2: Meta Daten (Icon-only, compact) -->
+        <div class="detail-section-block">
+          <h3 class="section-title">
+            <i class="fas fa-database"></i>
+            {{ 'equipment.gallery.sections.metadata' | translate }}
+          </h3>
+          <div class="metadata-compact">
+            <!-- ID Row -->
+            <div class="meta-id-row">
+              <i class="fas fa-fingerprint meta-icon"></i>
+              <span class="meta-id" [title]="selectedEquipment.id">{{ selectedEquipment.id }}</span>
+            </div>
+            <!-- Date Grid (Icons only) -->
+            <div class="meta-grid">
+              <div class="meta-item">
+                <i class="fas fa-calendar-plus meta-icon"></i>
+                <span class="meta-value">{{ selectedEquipment.created_at | date:'medium' }}</span>
+              </div>
+              @if (selectedEquipment.updated_at) {
+                <div class="meta-item">
+                  <i class="fas fa-calendar-check meta-icon"></i>
+                  <span class="meta-value">{{ selectedEquipment.updated_at | date:'medium' }}</span>
+                </div>
+              }
+            </div>
+            <!-- Tags (Icons only) -->
+            @if (selectedEquipment.software_tags || selectedEquipment.plugin_tags) {
+              <div class="meta-item">
+                <i class="fas fa-tags meta-icon"></i>
+                <div class="tags-container">
+                  @for (tag of (selectedEquipment.software_tags || selectedEquipment.plugin_tags)!.split(','); track tag) {
+                    <mat-chip
+                      >
+                      {{ tag.trim() }}
+                    </mat-chip>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+        <!-- Section 3: Login Credentials (Accordion - when both exist) -->
+        @if (shouldUseAccordion() && hasCredentials()) {
+          <mat-expansion-panel class="detail-section-block">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <i class="fas fa-key"></i>
+                {{ 'equipment.gallery.sections.credentials' | translate }}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            @if (selectedEquipment.manufacturer) {
+              <div class="detail-field">
+                <span class="field-label">{{ 'equipment.editor.manufacturer' | translate }}</span>
+                <div class="readonly-field">{{ selectedEquipment.manufacturer }}</div>
+              </div>
+            }
+            @if (selectedEquipment.url) {
+              <div class="detail-field">
+                <div class="field-header">
+                  <span class="field-label">{{ 'equipment.editor.url' | translate }}</span>
+                  <button class="copy-icon-btn" (click)="copyToClipboard(selectedEquipment.url, 'Url')"
+                    [title]="'equipment.gallery.actions.copy' | translate">
+                    <i class="fas fa-copy"></i>
+                  </button>
+                </div>
+                <div class="readonly-field">
+                  <a [href]="selectedEquipment.url" target="_blank">{{ selectedEquipment.url }}</a>
+                </div>
+              </div>
+            }
+            @if (selectedEquipment.username || selectedEquipment.password) {
+              <div class="detail-field-row">
+                @if (selectedEquipment.username) {
+                  <div class="detail-field">
+                    <div class="field-header">
+                      <span class="field-label">{{ 'equipment.editor.username' | translate }}</span>
+                      <button class="copy-icon-btn"
+                        (click)="copyToClipboard(selectedEquipment.username, 'Username')"
+                        [title]="'equipment.gallery.actions.copy' | translate">
+                        <i class="fas fa-copy"></i>
+                      </button>
+                    </div>
+                    <div class="readonly-field">{{ selectedEquipment.username }}</div>
+                  </div>
+                }
+                @if (selectedEquipment.password) {
+                  <div class="detail-field sensitive-field">
+                    <div class="field-header">
+                      <span class="field-label">{{ 'equipment.editor.password' | translate }}</span>
+                      <div class="field-actions">
+                        <button class="visibility-toggle-btn" (click)="togglePasswordVisibility()"
+                          [title]="(showPassword ? 'equipment.gallery.actions.hidePassword' : 'equipment.gallery.actions.showPassword') | translate">
+                          <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                        </button>
+                        <button class="copy-icon-btn"
+                          (click)="copyToClipboard(selectedEquipment.password, 'Password')"
+                          [title]="'equipment.gallery.actions.copy' | translate">
+                          <i class="fas fa-copy"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="readonly-field sensitive-value" [class.masked]="!showPassword">
+                      {{ showPassword ? selectedEquipment.password : '••••••••' }}
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </mat-expansion-panel>
+        }
+        <!-- Section 3: Login Credentials (Normal - when only one exists) -->
+        @if (!shouldUseAccordion() && hasCredentials()) {
+          <div class="detail-section-block">
+            <h3 class="section-title">
+              <i class="fas fa-key"></i>
+              {{ 'equipment.gallery.sections.credentials' | translate }}
+            </h3>
+            @if (selectedEquipment.manufacturer) {
+              <div class="detail-field">
+                <span class="field-label">{{ 'equipment.editor.manufacturer' | translate }}</span>
+                <div class="readonly-field">{{ selectedEquipment.manufacturer }}</div>
+              </div>
+            }
+            @if (selectedEquipment.url) {
+              <div class="detail-field">
+                <div class="field-header">
+                  <span class="field-label">{{ 'equipment.editor.url' | translate }}</span>
+                  <button class="copy-icon-btn" (click)="copyToClipboard(selectedEquipment.url, 'Url')"
+                    [title]="'equipment.gallery.actions.copy' | translate">
+                    <i class="fas fa-copy"></i>
+                  </button>
+                </div>
+                <div class="readonly-field">
+                  <a [href]="selectedEquipment.url" target="_blank">{{ selectedEquipment.url }}</a>
+                </div>
+              </div>
+            }
+            @if (selectedEquipment.username || selectedEquipment.password) {
+              <div class="detail-field-row">
+                @if (selectedEquipment.username) {
+                  <div class="detail-field">
+                    <div class="field-header">
+                      <span class="field-label">{{ 'equipment.editor.username' | translate }}</span>
+                      <button class="copy-icon-btn"
+                        (click)="copyToClipboard(selectedEquipment.username, 'Username')"
+                        [title]="'equipment.gallery.actions.copy' | translate">
+                        <i class="fas fa-copy"></i>
+                      </button>
+                    </div>
+                    <div class="readonly-field">{{ selectedEquipment.username }}</div>
+                  </div>
+                }
+                @if (selectedEquipment.password) {
+                  <div class="detail-field sensitive-field">
+                    <div class="field-header">
+                      <span class="field-label">{{ 'equipment.editor.password' | translate }}</span>
+                      <div class="field-actions">
+                        <button class="visibility-toggle-btn" (click)="togglePasswordVisibility()"
+                          [title]="(showPassword ? 'equipment.gallery.actions.hidePassword' : 'equipment.gallery.actions.showPassword') | translate">
+                          <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                        </button>
+                        <button class="copy-icon-btn"
+                          (click)="copyToClipboard(selectedEquipment.password, 'Password')"
+                          [title]="'equipment.gallery.actions.copy' | translate">
+                          <i class="fas fa-copy"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="readonly-field sensitive-value" [class.masked]="!showPassword">
+                      {{ showPassword ? selectedEquipment.password : '••••••••' }}
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+        <!-- Section 4: License Information (Accordion - when both exist) -->
+        @if (shouldUseAccordion() && hasLicenseInfo()) {
+          <mat-expansion-panel class="detail-section-block">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <i class="fas fa-certificate"></i>
+                {{ 'equipment.gallery.sections.license' | translate }}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="detail-field">
+              <span class="field-label">{{ 'equipment.editor.licenseManagement' | translate }}</span>
+              <div class="readonly-field">{{ 'equipment.licenseTypes.' + (selectedEquipment.license_management?.toLowerCase() || '') | translate }}</div>
+            </div>
+            @if (selectedEquipment.license_management === LicenseManagement.LICENSE_KEY && selectedEquipment.license_key) {
+              <div class="detail-field sensitive-field"
+                >
+                <div class="field-header">
+                  <span class="field-label">{{ 'equipment.editor.licenseKey' | translate }}</span>
+                  <div class="field-actions">
+                    <button class="visibility-toggle-btn" (click)="toggleLicenseKeyVisibility()"
+                      [title]="(showLicenseKey ? 'equipment.gallery.actions.hideLicenseKey' : 'equipment.gallery.actions.showLicenseKey') | translate">
+                      <i [class]="showLicenseKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                    </button>
+                    <button class="copy-icon-btn"
+                      (click)="copyToClipboard(selectedEquipment.license_key, 'LicenseKey')"
+                      [title]="'equipment.gallery.actions.copy' | translate">
+                      <i class="fas fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="readonly-field sensitive-value" [class.masked]="!showLicenseKey">
+                  {{ showLicenseKey ? selectedEquipment.license_key : '••••••••' }}
+                </div>
+              </div>
+            }
+            @if (selectedEquipment.license_management === LicenseManagement.OTHER && selectedEquipment.license_description) {
+              <div class="detail-field"
+                >
+                <span class="field-label">{{ 'equipment.editor.licenseDescription' | translate }}</span>
+                <div class="readonly-field multiline">{{ selectedEquipment.license_description }}</div>
+              </div>
+            }
+          </mat-expansion-panel>
+        }
+        <!-- Section 4: License Information (Normal - when only one exists) -->
+        @if (!shouldUseAccordion() && hasLicenseInfo()) {
+          <div class="detail-section-block">
+            <h3 class="section-title">
+              <i class="fas fa-certificate"></i>
+              {{ 'equipment.gallery.sections.license' | translate }}
+            </h3>
+            <div class="detail-field">
+              <span class="field-label">{{ 'equipment.editor.licenseManagement' | translate }}</span>
+              <div class="readonly-field">{{ 'equipment.licenseTypes.' + (selectedEquipment.license_management?.toLowerCase() || '') | translate }}</div>
+            </div>
+            @if (selectedEquipment.license_management === LicenseManagement.LICENSE_KEY && selectedEquipment.license_key) {
+              <div class="detail-field sensitive-field"
+                >
+                <div class="field-header">
+                  <span class="field-label">{{ 'equipment.editor.licenseKey' | translate }}</span>
+                  <div class="field-actions">
+                    <button class="visibility-toggle-btn" (click)="toggleLicenseKeyVisibility()"
+                      [title]="(showLicenseKey ? 'equipment.gallery.actions.hideLicenseKey' : 'equipment.gallery.actions.showLicenseKey') | translate">
+                      <i [class]="showLicenseKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                    </button>
+                    <button class="copy-icon-btn"
+                      (click)="copyToClipboard(selectedEquipment.license_key, 'LicenseKey')"
+                      [title]="'equipment.gallery.actions.copy' | translate">
+                      <i class="fas fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="readonly-field sensitive-value" [class.masked]="!showLicenseKey">
+                  {{ showLicenseKey ? selectedEquipment.license_key : '••••••••' }}
+                </div>
+              </div>
+            }
+            @if (selectedEquipment.license_management === LicenseManagement.OTHER && selectedEquipment.license_description) {
+              <div class="detail-field"
+                >
+                <span class="field-label">{{ 'equipment.editor.licenseDescription' | translate }}</span>
+                <div class="readonly-field multiline">{{ selectedEquipment.license_description }}</div>
+              </div>
+            }
+          </div>
+        }
+        <!-- Section 5: Purchase Information -->
+        @if (selectedEquipment.purchase_date || selectedEquipment.price) {
+          <div class="detail-section-block">
+            <h3 class="section-title">
+              <i class="fas fa-shopping-cart"></i>
+              {{ 'equipment.gallery.sections.purchase' | translate }}
+            </h3>
+            <div class="detail-field-row">
+              @if (selectedEquipment.purchase_date) {
+                <div class="detail-field">
+                  <span class="field-label">{{ 'equipment.editor.purchaseDate' | translate }}</span>
+                  <div class="readonly-field">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ selectedEquipment.purchase_date | date:'mediumDate' }}
+                  </div>
+                </div>
+              }
+              @if (selectedEquipment.price) {
+                <div class="detail-field">
+                  <span class="field-label">{{ 'equipment.editor.price' | translate }}</span>
+                  <div class="readonly-field price-value">
+                    <i class="fas fa-dollar-sign"></i>
+                    {{ selectedEquipment.price }}
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+        <!-- Section 6: Attachments -->
+        @if (attachments.length > 0) {
+          <div class="detail-section-block">
+            <h3 class="section-title">
+              <i class="fas fa-paperclip"></i>
+              {{ 'equipment.attachments.title' | translate }}
+            </h3>
+            <div class="attachments-list">
+              @for (attachment of attachments; track attachment) {
+                <div class="attachment-item">
+                  <div class="attachment-info">
+                    <i class="fas fa-file attachment-icon"></i>
+                    <div class="attachment-details">
+                      <span class="attachment-name">{{ attachment.filename }}</span>
+                      <span class="attachment-meta">{{ formatFileSize(attachment.file_size) }}</span>
+                    </div>
+                  </div>
+                  <button class="download-btn" (click)="downloadAttachment(attachment)"
+                    [title]="'equipment.attachments.download' | translate">
+                    <i class="fas fa-download"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+      <!-- Detail Actions -->
+      <div class="detail-actions">
+        <button mat-button type="button" (click)="editEquipment(selectedEquipment.id)">
+          <i class="fas fa-edit"></i> {{ 'equipment.gallery.actions.edit' | translate }}
+        </button>
+        <button mat-button type="button" (click)="duplicateEquipment(selectedEquipment.id)">
+          <i class="fas fa-copy"></i> {{ 'equipment.gallery.actions.duplicate' | translate }}
+        </button>
+        <button mat-button type="button" (click)="confirmDelete(selectedEquipment.id, $event)">
+          <i class="fas fa-trash"></i> {{ 'equipment.gallery.actions.delete' | translate }}
+        </button>
+      </div>
+    </mat-card>
+  }
+
+  <!-- Empty State for Details -->
+  @if (!selectedEquipment && equipmentList.length > 0) {
+    <mat-card class="detail-card empty-detail">
+      <div class="empty-detail-content">
+        <i class="fas fa-hand-pointer"></i>
+        <p>{{ 'equipment.gallery.selectPrompt' | translate }}</p>
+      </div>
+    </mat-card>
+  }
+</div>
 </div>
 
 <!-- Delete Confirmation Dialog -->
-<div class="delete-confirmation-overlay" *ngIf="showDeleteConfirm" (click)="cancelDelete()">
+@if (showDeleteConfirm) {
+  <div class="delete-confirmation-overlay" (click)="cancelDelete()">
     <div class="delete-confirmation-dialog" (click)="$event.stopPropagation()">
-        <h3>{{ 'equipment.messages.deleteConfirm' | translate }}</h3>
-        <div class="dialog-actions">
-            <button class="action-button secondary-button" (click)="cancelDelete()">
-                {{ 'common.cancel' | translate }}
-            </button>
-            <button class="action-button danger-button" (click)="deleteEquipment()">
-                {{ 'common.delete' | translate }}
-            </button>
-        </div>
+      <h3>{{ 'equipment.messages.deleteConfirm' | translate }}</h3>
+      <div class="dialog-actions">
+        <button class="action-button secondary-button" (click)="cancelDelete()">
+          {{ 'common.cancel' | translate }}
+        </button>
+        <button class="action-button danger-button" (click)="deleteEquipment()">
+          {{ 'common.delete' | translate }}
+        </button>
+      </div>
     </div>
-</div>
+  </div>
+}

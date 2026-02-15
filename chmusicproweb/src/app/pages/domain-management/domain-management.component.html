@@ -1,217 +1,258 @@
 <div class="domain-management-container master-detail-layout">
-    <!-- Left Side: Domain List -->
-    <div class="list-section">
-        <div class="list-card">
-            <div class="list-header">
-                <div class="header-title">
-                    <h2>
-                        <i class="fas fa-layer-group"></i>
-                        {{ 'domainManagement.title' | translate }}
-                    </h2>
-                    <div class="domain-count-badge" *ngIf="domains.length > 0">
-                        {{ domains.length }}
-                    </div>
-                </div>
-                <button type="button" class="new-domain-button"
-                        *ngIf="isSystemAdmin()"
-                        (click)="showCreateForm = !showCreateForm"
-                        [matTooltip]="'domainManagement.create' | translate">
-                    <i class="fas fa-plus"></i>
-                </button>
+  <!-- Left Side: Domain List -->
+  <div class="list-section">
+    <div class="list-card">
+      <div class="list-header">
+        <div class="header-title">
+          <h2>
+            <i class="fas fa-layer-group"></i>
+            {{ 'domainManagement.title' | translate }}
+          </h2>
+          @if (domains.length > 0) {
+            <div class="domain-count-badge">
+              {{ domains.length }}
             </div>
+          }
+        </div>
+        @if (isSystemAdmin()) {
+          <button type="button" class="new-domain-button"
+            (click)="showCreateForm = !showCreateForm"
+            [matTooltip]="'domainManagement.create' | translate">
+            <i class="fas fa-plus"></i>
+          </button>
+        }
+      </div>
 
-            <!-- Create Domain Form -->
-            <div class="create-form" *ngIf="showCreateForm">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>{{ 'domainManagement.domainName' | translate }}</mat-label>
-                    <input matInput [(ngModel)]="newDomainName"
-                           [placeholder]="'domainManagement.domainNamePlaceholder' | translate">
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>{{ 'domainManagement.domainDescription' | translate }}</mat-label>
-                    <input matInput [(ngModel)]="newDomainDescription"
-                           [placeholder]="'domainManagement.domainDescriptionPlaceholder' | translate">
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>{{ 'domainManagement.domainType' | translate }}</mat-label>
-                    <mat-select [(ngModel)]="newDomainType">
-                        <mat-option *ngFor="let t of creatableDomainTypes" [value]="t.value">
-                            {{ t.label }}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <div class="create-actions">
-                    <button mat-button (click)="showCreateForm = false">
-                        {{ 'domainManagement.cancel' | translate }}
-                    </button>
-                    <button mat-raised-button color="primary"
-                            [disabled]="!newDomainName.trim() || isCreatingDomain"
-                            (click)="createDomain()">
-                        <i class="fas fa-spinner fa-spin" *ngIf="isCreatingDomain"></i>
-                        {{ 'domainManagement.createDomain' | translate }}
-                    </button>
-                </div>
-            </div>
-
-            <!-- Loading State -->
-            <div class="loading-state" *ngIf="isLoadingDomains">
+      <!-- Create Domain Form -->
+      @if (showCreateForm) {
+        <div class="create-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'domainManagement.domainName' | translate }}</mat-label>
+            <input matInput [(ngModel)]="newDomainName"
+              [placeholder]="'domainManagement.domainNamePlaceholder' | translate">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'domainManagement.domainDescription' | translate }}</mat-label>
+            <input matInput [(ngModel)]="newDomainDescription"
+              [placeholder]="'domainManagement.domainDescriptionPlaceholder' | translate">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'domainManagement.domainType' | translate }}</mat-label>
+            <mat-select [(ngModel)]="newDomainType">
+              @for (t of creatableDomainTypes; track t) {
+                <mat-option [value]="t.value">
+                  {{ t.label }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <div class="create-actions">
+            <button mat-button (click)="showCreateForm = false">
+              {{ 'domainManagement.cancel' | translate }}
+            </button>
+            <button mat-raised-button color="primary"
+              [disabled]="!newDomainName.trim() || isCreatingDomain"
+              (click)="createDomain()">
+              @if (isCreatingDomain) {
                 <i class="fas fa-spinner fa-spin"></i>
-                <p>{{ 'domainManagement.loading' | translate }}</p>
-            </div>
-
-            <!-- Domain List -->
-            <div class="domain-list" *ngIf="!isLoadingDomains">
-                <div class="domain-list-item"
-                     *ngFor="let dwr of domains"
-                     [class.selected]="selectedDomain?.domain?.id === dwr.domain.id"
-                     (click)="selectDomain(dwr)">
-                    <i [class]="getDomainTypeIcon(dwr.domain.type)" class="domain-icon"></i>
-                    <div class="domain-list-info">
-                        <span class="domain-list-name">{{ dwr.domain.name }}</span>
-                        <div class="domain-list-meta">
-                            <span class="type-badge">{{ domainTypeLabels[dwr.domain.type] }}</span>
-                            <span class="role-badge">{{ dwr.role }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+              }
+              {{ 'domainManagement.createDomain' | translate }}
+            </button>
+          </div>
         </div>
+      }
+
+      <!-- Loading State -->
+      @if (isLoadingDomains) {
+        <div class="loading-state">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>{{ 'domainManagement.loading' | translate }}</p>
+        </div>
+      }
+
+      <!-- Domain List -->
+      @if (!isLoadingDomains) {
+        <div class="domain-list">
+          @for (dwr of domains; track dwr) {
+            <div class="domain-list-item"
+              [class.selected]="selectedDomain?.domain?.id === dwr.domain.id"
+              (click)="selectDomain(dwr)">
+              <i [class]="getDomainTypeIcon(dwr.domain.type)" class="domain-icon"></i>
+              <div class="domain-list-info">
+                <span class="domain-list-name">{{ dwr.domain.name }}</span>
+                <div class="domain-list-meta">
+                  <span class="type-badge">{{ domainTypeLabels[dwr.domain.type] }}</span>
+                  <span class="role-badge">{{ dwr.role }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
     </div>
+  </div>
 
-    <!-- Right Side: Domain Detail -->
-    <div class="detail-section">
-        <!-- No Selection -->
-        <div class="no-selection" *ngIf="!selectedDomain">
-            <i class="fas fa-hand-pointer"></i>
-            <p>{{ 'domainManagement.selectDomain' | translate }}</p>
+  <!-- Right Side: Domain Detail -->
+  <div class="detail-section">
+    <!-- No Selection -->
+    @if (!selectedDomain) {
+      <div class="no-selection">
+        <i class="fas fa-hand-pointer"></i>
+        <p>{{ 'domainManagement.selectDomain' | translate }}</p>
+      </div>
+    }
+
+    <!-- Domain Detail -->
+    @if (selectedDomain) {
+      <div class="detail-card">
+        <!-- Domain Info Header -->
+        <div class="detail-header">
+          <div class="detail-title">
+            <i [class]="getDomainTypeIcon(selectedDomain.domain.type)"></i>
+            <div>
+              <h2>{{ selectedDomain.domain.name }}</h2>
+              @if (selectedDomain.domain.description) {
+                <p class="detail-subtitle">
+                  {{ selectedDomain.domain.description }}
+                </p>
+              }
+            </div>
+          </div>
+          @if (isSystemAdmin() && !isReservedDomain() && !isActiveDomain()) {
+            <button class="deactivate-btn"
+              (click)="deactivateDomain()">
+              <i class="fas fa-ban"></i>
+              {{ 'domainManagement.deactivate' | translate }}
+            </button>
+          }
         </div>
-
-        <!-- Domain Detail -->
-        <div class="detail-card" *ngIf="selectedDomain">
-            <!-- Domain Info Header -->
-            <div class="detail-header">
-                <div class="detail-title">
-                    <i [class]="getDomainTypeIcon(selectedDomain.domain.type)"></i>
-                    <div>
-                        <h2>{{ selectedDomain.domain.name }}</h2>
-                        <p class="detail-subtitle" *ngIf="selectedDomain.domain.description">
-                            {{ selectedDomain.domain.description }}
-                        </p>
-                    </div>
-                </div>
-                <button class="deactivate-btn"
-                        *ngIf="isSystemAdmin() && !isReservedDomain() && !isActiveDomain()"
-                        (click)="deactivateDomain()">
-                    <i class="fas fa-ban"></i>
-                    {{ 'domainManagement.deactivate' | translate }}
-                </button>
-            </div>
-
-            <!-- Domain Info -->
-            <div class="domain-info-grid">
-                <div class="info-item">
-                    <span class="info-label">{{ 'domainManagement.type' | translate }}</span>
-                    <span class="info-value">{{ domainTypeLabels[selectedDomain.domain.type] }}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">{{ 'domainManagement.yourRole' | translate }}</span>
-                    <span class="info-value">{{ selectedDomain.role }}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">{{ 'domainManagement.status' | translate }}</span>
-                    <span class="info-value status-active" *ngIf="selectedDomain.domain.is_active">
-                        {{ 'domainManagement.active' | translate }}
-                    </span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">{{ 'domainManagement.created' | translate }}</span>
-                    <span class="info-value">{{ formatDate(selectedDomain.domain.created_at) }}</span>
-                </div>
-            </div>
-
-            <!-- Members Section -->
-            <div class="members-section">
-                <h3>
-                    <i class="fas fa-users"></i>
-                    {{ 'domainManagement.members' | translate }}
-                    <span class="member-count" *ngIf="members.length > 0">({{ members.length }})</span>
-                </h3>
-
-                <!-- Add Member Form -->
-                <div class="add-member-form" *ngIf="selectedDomain.role === 'owner' || selectedDomain.role === 'admin'">
-                    <mat-form-field appearance="outline" class="member-email-field">
-                        <mat-label>{{ 'domainManagement.memberEmail' | translate }}</mat-label>
-                        <input matInput [(ngModel)]="newMemberEmail"
-                               [placeholder]="'domainManagement.memberEmailPlaceholder' | translate"
-                               (keyup.enter)="addMember()">
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="member-role-field">
-                        <mat-label>{{ 'domainManagement.role' | translate }}</mat-label>
-                        <mat-select [(ngModel)]="newMemberRole">
-                            <mat-option *ngFor="let role of domainRoles" [value]="role">
-                                {{ role }}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <button mat-raised-button color="primary"
-                            class="add-member-btn"
-                            [disabled]="!newMemberEmail.trim() || isAddingMember"
-                            (click)="addMember()">
-                        <i class="fas fa-user-plus" *ngIf="!isAddingMember"></i>
-                        <i class="fas fa-spinner fa-spin" *ngIf="isAddingMember"></i>
-                        {{ 'domainManagement.addMember' | translate }}
-                    </button>
-                </div>
-
-                <!-- Loading Members -->
-                <div class="loading-state" *ngIf="isLoadingMembers">
-                    <i class="fas fa-spinner fa-spin"></i>
-                </div>
-
-                <!-- Members Table -->
-                <div class="members-table" *ngIf="!isLoadingMembers && members.length > 0">
-                    <div class="member-row header-row">
-                        <span class="col-name">{{ 'domainManagement.name' | translate }}</span>
-                        <span class="col-email">{{ 'domainManagement.email' | translate }}</span>
-                        <span class="col-role">{{ 'domainManagement.role' | translate }}</span>
-                        <span class="col-joined">{{ 'domainManagement.joined' | translate }}</span>
-                        <span class="col-actions">{{ 'domainManagement.actions' | translate }}</span>
-                    </div>
-                    <div class="member-row" *ngFor="let member of members">
-                        <span class="col-name">
-                            {{ member.first_name || '' }} {{ member.last_name || '' }}
-                        </span>
-                        <span class="col-email">{{ member.email }}</span>
-                        <span class="col-role">
-                            <mat-select [value]="member.role"
-                                        (selectionChange)="updateMemberRole(member, $event.value)"
-                                        *ngIf="(selectedDomain.role === 'owner' || selectedDomain.role === 'admin') && member.user_id !== currentUserId"
-                                        class="role-select">
-                                <mat-option *ngFor="let role of domainRoles" [value]="role">
-                                    {{ role }}
-                                </mat-option>
-                            </mat-select>
-                            <span *ngIf="(selectedDomain.role !== 'owner' && selectedDomain.role !== 'admin') || member.user_id === currentUserId">
-                                {{ member.role }}
-                            </span>
-                        </span>
-                        <span class="col-joined">{{ formatDate(member.created_at) }}</span>
-                        <span class="col-actions">
-                            <button class="remove-btn"
-                                    *ngIf="(selectedDomain.role === 'owner' || selectedDomain.role === 'admin') && member.user_id !== currentUserId"
-                                    (click)="removeMember(member)"
-                                    [title]="'domainManagement.removeMember' | translate">
-                                <i class="fas fa-user-minus"></i>
-                            </button>
-                        </span>
-                    </div>
-                </div>
-
-                <!-- No Members -->
-                <div class="no-members" *ngIf="!isLoadingMembers && members.length === 0">
-                    <p>{{ 'domainManagement.noMembers' | translate }}</p>
-                </div>
-            </div>
+        <!-- Domain Info -->
+        <div class="domain-info-grid">
+          <div class="info-item">
+            <span class="info-label">{{ 'domainManagement.type' | translate }}</span>
+            <span class="info-value">{{ domainTypeLabels[selectedDomain.domain.type] }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">{{ 'domainManagement.yourRole' | translate }}</span>
+            <span class="info-value">{{ selectedDomain.role }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">{{ 'domainManagement.status' | translate }}</span>
+            @if (selectedDomain.domain.is_active) {
+              <span class="info-value status-active">
+                {{ 'domainManagement.active' | translate }}
+              </span>
+            }
+          </div>
+          <div class="info-item">
+            <span class="info-label">{{ 'domainManagement.created' | translate }}</span>
+            <span class="info-value">{{ formatDate(selectedDomain.domain.created_at) }}</span>
+          </div>
         </div>
-    </div>
+        <!-- Members Section -->
+        <div class="members-section">
+          <h3>
+            <i class="fas fa-users"></i>
+            {{ 'domainManagement.members' | translate }}
+            @if (members.length > 0) {
+              <span class="member-count">({{ members.length }})</span>
+            }
+          </h3>
+          <!-- Add Member Form -->
+          @if (selectedDomain.role === 'owner' || selectedDomain.role === 'admin') {
+            <div class="add-member-form">
+              <mat-form-field appearance="outline" class="member-email-field">
+                <mat-label>{{ 'domainManagement.memberEmail' | translate }}</mat-label>
+                <input matInput [(ngModel)]="newMemberEmail"
+                  [placeholder]="'domainManagement.memberEmailPlaceholder' | translate"
+                  (keyup.enter)="addMember()">
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="member-role-field">
+                <mat-label>{{ 'domainManagement.role' | translate }}</mat-label>
+                <mat-select [(ngModel)]="newMemberRole">
+                  @for (role of domainRoles; track role) {
+                    <mat-option [value]="role">
+                      {{ role }}
+                    </mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <button mat-raised-button color="primary"
+                class="add-member-btn"
+                [disabled]="!newMemberEmail.trim() || isAddingMember"
+                (click)="addMember()">
+                @if (!isAddingMember) {
+                  <i class="fas fa-user-plus"></i>
+                }
+                @if (isAddingMember) {
+                  <i class="fas fa-spinner fa-spin"></i>
+                }
+                {{ 'domainManagement.addMember' | translate }}
+              </button>
+            </div>
+          }
+          <!-- Loading Members -->
+          @if (isLoadingMembers) {
+            <div class="loading-state">
+              <i class="fas fa-spinner fa-spin"></i>
+            </div>
+          }
+          <!-- Members Table -->
+          @if (!isLoadingMembers && members.length > 0) {
+            <div class="members-table">
+              <div class="member-row header-row">
+                <span class="col-name">{{ 'domainManagement.name' | translate }}</span>
+                <span class="col-email">{{ 'domainManagement.email' | translate }}</span>
+                <span class="col-role">{{ 'domainManagement.role' | translate }}</span>
+                <span class="col-joined">{{ 'domainManagement.joined' | translate }}</span>
+                <span class="col-actions">{{ 'domainManagement.actions' | translate }}</span>
+              </div>
+              @for (member of members; track member) {
+                <div class="member-row">
+                  <span class="col-name">
+                    {{ member.first_name || '' }} {{ member.last_name || '' }}
+                  </span>
+                  <span class="col-email">{{ member.email }}</span>
+                  <span class="col-role">
+                    @if ((selectedDomain.role === 'owner' || selectedDomain.role === 'admin') && member.user_id !== currentUserId) {
+                      <mat-select [value]="member.role"
+                        (selectionChange)="updateMemberRole(member, $event.value)"
+                        class="role-select">
+                        @for (role of domainRoles; track role) {
+                          <mat-option [value]="role">
+                            {{ role }}
+                          </mat-option>
+                        }
+                      </mat-select>
+                    }
+                    @if ((selectedDomain.role !== 'owner' && selectedDomain.role !== 'admin') || member.user_id === currentUserId) {
+                      <span>
+                        {{ member.role }}
+                      </span>
+                    }
+                  </span>
+                  <span class="col-joined">{{ formatDate(member.created_at) }}</span>
+                  <span class="col-actions">
+                    @if ((selectedDomain.role === 'owner' || selectedDomain.role === 'admin') && member.user_id !== currentUserId) {
+                      <button class="remove-btn"
+                        (click)="removeMember(member)"
+                        [title]="'domainManagement.removeMember' | translate">
+                        <i class="fas fa-user-minus"></i>
+                      </button>
+                    }
+                  </span>
+                </div>
+              }
+            </div>
+          }
+          <!-- No Members -->
+          @if (!isLoadingMembers && members.length === 0) {
+            <div class="no-members">
+              <p>{{ 'domainManagement.noMembers' | translate }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
 </div>

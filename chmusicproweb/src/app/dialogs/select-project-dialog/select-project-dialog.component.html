@@ -1,26 +1,27 @@
 <h2 mat-dialog-title>
-    <i class="fas fa-folder-open"></i>
-    {{ 'selectProject.title' | translate }}
+  <i class="fas fa-folder-open"></i>
+  {{ 'selectProject.title' | translate }}
 </h2>
 
 <mat-dialog-content>
-    <p class="dialog-subtitle">{{ 'selectProject.subtitle' | translate }}</p>
+  <p class="dialog-subtitle">{{ 'selectProject.subtitle' | translate }}</p>
 
-    <mat-selection-list [multiple]="false">
-        <mat-list-option
-                *ngFor="let project of data.projects"
-                (click)="selectProject(project.project_id)"
-                class="project-option">
-            <div class="project-item">
-                <i class="fas fa-folder"></i>
-                <span class="project-name">{{ project.project_name }}</span>
-            </div>
-        </mat-list-option>
-    </mat-selection-list>
+  <mat-selection-list [multiple]="false">
+    @for (project of data.projects; track project) {
+      <mat-list-option
+        (click)="selectProject(project.project_id)"
+        class="project-option">
+        <div class="project-item">
+          <i class="fas fa-folder"></i>
+          <span class="project-name">{{ project.project_name }}</span>
+        </div>
+      </mat-list-option>
+    }
+  </mat-selection-list>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button mat-button (click)="cancel()">
-        {{ 'common.cancel' | translate }}
-    </button>
+  <button mat-button (click)="cancel()">
+    {{ 'common.cancel' | translate }}
+  </button>
 </mat-dialog-actions>

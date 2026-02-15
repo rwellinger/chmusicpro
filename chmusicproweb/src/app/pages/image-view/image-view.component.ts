@@ -8,7 +8,7 @@ import {
     ViewChild,
     ViewEncapsulation
 } from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {FormsModule} from "@angular/forms";
 import {HttpClient} from "@angular/common/http";
 import {Router} from "@angular/router";
@@ -58,7 +58,7 @@ interface PaginationInfo {
 @Component({
     selector: "app-image-view",
     standalone: true,
-    imports: [CommonModule, FormsModule, TranslateModule, MatSnackBarModule, MatCardModule, MatButtonModule, DisplayNamePipe, ImageDetailPanelComponent],
+    imports: [FormsModule, TranslateModule, MatSnackBarModule, MatCardModule, MatButtonModule, DisplayNamePipe, ImageDetailPanelComponent],
     templateUrl: "./image-view.component.html",
     styleUrl: "./image-view.component.scss",
     encapsulation: ViewEncapsulation.None

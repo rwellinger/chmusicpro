@@ -1,286 +1,333 @@
 <div class="release-editor-container">
-    <mat-card class="editor-card">
-        <!-- Header -->
-        <div class="editor-header">
-            <div class="header-title">
-                <i class="fas fa-compact-disc"></i>
-                <h2 *ngIf="!isEditMode">{{ 'songRelease.editor.titleCreate' | translate }}</h2>
-                <h2 *ngIf="isEditMode">{{ 'songRelease.editor.titleEdit' | translate }}</h2>
-            </div>
+  <mat-card class="editor-card">
+    <!-- Header -->
+    <div class="editor-header">
+      <div class="header-title">
+        <i class="fas fa-compact-disc"></i>
+        @if (!isEditMode) {
+          <h2>{{ 'songRelease.editor.titleCreate' | translate }}</h2>
+        }
+        @if (isEditMode) {
+          <h2>{{ 'songRelease.editor.titleEdit' | translate }}</h2>
+        }
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading) {
+      <div class="loading-state">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>{{ 'songRelease.editor.loading' | translate }}</p>
+      </div>
+    }
+
+    <!-- Form -->
+    @if (!isLoading) {
+      <form [formGroup]="releaseForm" (ngSubmit)="save()" class="editor-form">
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="fas fa-info-circle"></i>
+            {{ 'songRelease.editor.sections.basic' | translate }}
+          </h3>
+          <div class="form-row">
+            <!-- Type -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>{{ 'songRelease.editor.type' | translate }}</mat-label>
+              <mat-select formControlName="type" required>
+                @for (type of releaseTypes; track type) {
+                  <mat-option [value]="type">
+                    {{ 'songRelease.types.' + type | translate }}
+                  </mat-option>
+                }
+              </mat-select>
+              @if (releaseForm.get('type')?.invalid) {
+                <mat-error>
+                  {{ getFieldError('type') }}
+                </mat-error>
+              }
+            </mat-form-field>
+            <!-- Status -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>{{ 'songRelease.editor.status' | translate }}</mat-label>
+              <mat-select formControlName="status" required>
+                @for (status of releaseStatuses; track status) {
+                  <mat-option [value]="status">
+                    {{ 'songRelease.statuses.' + status | translate }}
+                  </mat-option>
+                }
+              </mat-select>
+              @if (releaseForm.get('status')?.invalid) {
+                <mat-error>
+                  {{ getFieldError('status') }}
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+          <!-- Name -->
+          <mat-form-field appearance="outline" class="form-field-full">
+            <mat-label>{{ 'songRelease.editor.name' | translate }}</mat-label>
+            <input matInput formControlName="name" maxlength="200" required>
+            @if (releaseForm.get('name')?.invalid) {
+              <mat-error>
+                {{ getFieldError('name') }}
+              </mat-error>
+            }
+          </mat-form-field>
+          <!-- Genre -->
+          <mat-form-field appearance="outline" class="form-field-full">
+            <mat-label>{{ 'songRelease.editor.genre' | translate }}</mat-label>
+            <input matInput formControlName="genre" maxlength="100" required>
+            @if (releaseForm.get('genre')?.invalid) {
+              <mat-error>
+                {{ getFieldError('genre') }}
+              </mat-error>
+            }
+          </mat-form-field>
+          <!-- Description -->
+          <mat-form-field appearance="outline" class="form-field-full">
+            <mat-label>{{ 'songRelease.editor.description' | translate }}</mat-label>
+            <textarea matInput formControlName="description" rows="4" maxlength="2000"></textarea>
+          </mat-form-field>
+          <!-- Tags -->
+          <mat-form-field appearance="outline" class="form-field-full">
+            <mat-label>{{ 'songRelease.editor.tags' | translate }}</mat-label>
+            <input matInput formControlName="tags" maxlength="500"
+              [placeholder]="'songRelease.editor.tagsPlaceholder' | translate">
+            <mat-hint>{{ 'songRelease.editor.tagsHint' | translate }}</mat-hint>
+          </mat-form-field>
         </div>
-
-        <!-- Loading State -->
-        <div *ngIf="isLoading" class="loading-state">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>{{ 'songRelease.editor.loading' | translate }}</p>
+        <!-- Project Assignment -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="fas fa-folder-open"></i>
+            {{ 'songRelease.editor.sections.projects' | translate }}
+          </h3>
+          <div class="project-assignment">
+            @if (assignedProjectNames.length > 0) {
+              <div class="assigned-projects">
+                <div class="project-chips">
+                  @for (projectName of assignedProjectNames; track projectName) {
+                    <span class="project-chip">
+                      <i class="fas fa-folder"></i>
+                      {{ projectName }}
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+            @if (assignedProjectNames.length === 0) {
+              <div class="no-projects">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>{{ 'songRelease.editor.noProjectsAssigned' | translate }}</p>
+              </div>
+            }
+            <button type="button" class="assign-button" (click)="openAssignToProjectDialog()">
+              <i class="fas fa-link"></i>
+              <span>{{ 'songRelease.editor.assignProjects' | translate }}</span>
+            </button>
+          </div>
         </div>
-
-        <!-- Form -->
-        <form *ngIf="!isLoading" [formGroup]="releaseForm" (ngSubmit)="save()" class="editor-form">
-            <!-- Basic Information -->
-            <div class="form-section">
-                <h3 class="section-title">
-                    <i class="fas fa-info-circle"></i>
-                    {{ 'songRelease.editor.sections.basic' | translate }}
-                </h3>
-
-                <div class="form-row">
-                    <!-- Type -->
-                    <mat-form-field appearance="outline" class="form-field">
-                        <mat-label>{{ 'songRelease.editor.type' | translate }}</mat-label>
-                        <mat-select formControlName="type" required>
-                            <mat-option *ngFor="let type of releaseTypes" [value]="type">
-                                {{ 'songRelease.types.' + type | translate }}
-                            </mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="releaseForm.get('type')?.invalid">
-                            {{ getFieldError('type') }}
-                        </mat-error>
-                    </mat-form-field>
-
-                    <!-- Status -->
-                    <mat-form-field appearance="outline" class="form-field">
-                        <mat-label>{{ 'songRelease.editor.status' | translate }}</mat-label>
-                        <mat-select formControlName="status" required>
-                            <mat-option *ngFor="let status of releaseStatuses" [value]="status">
-                                {{ 'songRelease.statuses.' + status | translate }}
-                            </mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="releaseForm.get('status')?.invalid">
-                            {{ getFieldError('status') }}
-                        </mat-error>
-                    </mat-form-field>
-                </div>
-
-                <!-- Name -->
-                <mat-form-field appearance="outline" class="form-field-full">
-                    <mat-label>{{ 'songRelease.editor.name' | translate }}</mat-label>
-                    <input matInput formControlName="name" maxlength="200" required>
-                    <mat-error *ngIf="releaseForm.get('name')?.invalid">
-                        {{ getFieldError('name') }}
+        <!-- Industry Metadata (conditional based on status) -->
+        @if (shouldShowField('upc')) {
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="fas fa-barcode"></i>
+              {{ 'songRelease.editor.sections.industry' | translate }}
+            </h3>
+            <div class="form-row">
+              <!-- UPC -->
+              @if (shouldShowField('upc')) {
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>{{ 'songRelease.editor.upc' | translate }}</mat-label>
+                  <input matInput formControlName="upc" maxlength="50">
+                  @if (releaseForm.get('upc')?.invalid) {
+                    <mat-error>
+                      {{ getFieldError('upc') }}
                     </mat-error>
+                  }
                 </mat-form-field>
-
-                <!-- Genre -->
-                <mat-form-field appearance="outline" class="form-field-full">
-                    <mat-label>{{ 'songRelease.editor.genre' | translate }}</mat-label>
-                    <input matInput formControlName="genre" maxlength="100" required>
-                    <mat-error *ngIf="releaseForm.get('genre')?.invalid">
-                        {{ getFieldError('genre') }}
+              }
+              <!-- ISRC -->
+              @if (shouldShowField('isrc')) {
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>{{ 'songRelease.editor.isrc' | translate }}</mat-label>
+                  <input matInput formControlName="isrc" maxlength="50">
+                  @if (releaseForm.get('isrc')?.invalid) {
+                    <mat-error>
+                      {{ getFieldError('isrc') }}
                     </mat-error>
+                  }
                 </mat-form-field>
-
-                <!-- Description -->
-                <mat-form-field appearance="outline" class="form-field-full">
-                    <mat-label>{{ 'songRelease.editor.description' | translate }}</mat-label>
-                    <textarea matInput formControlName="description" rows="4" maxlength="2000"></textarea>
-                </mat-form-field>
-
-                <!-- Tags -->
-                <mat-form-field appearance="outline" class="form-field-full">
-                    <mat-label>{{ 'songRelease.editor.tags' | translate }}</mat-label>
-                    <input matInput formControlName="tags" maxlength="500"
-                           [placeholder]="'songRelease.editor.tagsPlaceholder' | translate">
-                    <mat-hint>{{ 'songRelease.editor.tagsHint' | translate }}</mat-hint>
-                </mat-form-field>
+              }
             </div>
-
-            <!-- Project Assignment -->
-            <div class="form-section">
-                <h3 class="section-title">
-                    <i class="fas fa-folder-open"></i>
-                    {{ 'songRelease.editor.sections.projects' | translate }}
-                </h3>
-
-                <div class="project-assignment">
-                    <div class="assigned-projects" *ngIf="assignedProjectNames.length > 0">
-                        <div class="project-chips">
-              <span *ngFor="let projectName of assignedProjectNames" class="project-chip">
-                <i class="fas fa-folder"></i>
-                  {{ projectName }}
-              </span>
-                        </div>
-                    </div>
-
-                    <div class="no-projects" *ngIf="assignedProjectNames.length === 0">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>{{ 'songRelease.editor.noProjectsAssigned' | translate }}</p>
-                    </div>
-
-                    <button type="button" class="assign-button" (click)="openAssignToProjectDialog()">
-                        <i class="fas fa-link"></i>
-                        <span>{{ 'songRelease.editor.assignProjects' | translate }}</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Industry Metadata (conditional based on status) -->
-            <div class="form-section" *ngIf="shouldShowField('upc')">
-                <h3 class="section-title">
-                    <i class="fas fa-barcode"></i>
-                    {{ 'songRelease.editor.sections.industry' | translate }}
-                </h3>
-
-                <div class="form-row">
-                    <!-- UPC -->
-                    <mat-form-field appearance="outline" class="form-field" *ngIf="shouldShowField('upc')">
-                        <mat-label>{{ 'songRelease.editor.upc' | translate }}</mat-label>
-                        <input matInput formControlName="upc" maxlength="50">
-                        <mat-error *ngIf="releaseForm.get('upc')?.invalid">
-                            {{ getFieldError('upc') }}
-                        </mat-error>
-                    </mat-form-field>
-
-                    <!-- ISRC -->
-                    <mat-form-field appearance="outline" class="form-field" *ngIf="shouldShowField('isrc')">
-                        <mat-label>{{ 'songRelease.editor.isrc' | translate }}</mat-label>
-                        <input matInput formControlName="isrc" maxlength="50">
-                        <mat-error *ngIf="releaseForm.get('isrc')?.invalid">
-                            {{ getFieldError('isrc') }}
-                        </mat-error>
-                    </mat-form-field>
-                </div>
-
-                <!-- Copyright Info -->
-                <mat-form-field appearance="outline" class="form-field-full" *ngIf="shouldShowField('copyright_info')">
-                    <mat-label>{{ 'songRelease.editor.copyrightInfo' | translate }}</mat-label>
-                    <textarea matInput formControlName="copyright_info" rows="3" maxlength="500"></textarea>
-                    <mat-error *ngIf="releaseForm.get('copyright_info')?.invalid">
-                        {{ getFieldError('copyright_info') }}
+            <!-- Copyright Info -->
+            @if (shouldShowField('copyright_info')) {
+              <mat-form-field appearance="outline" class="form-field-full">
+                <mat-label>{{ 'songRelease.editor.copyrightInfo' | translate }}</mat-label>
+                <textarea matInput formControlName="copyright_info" rows="3" maxlength="500"></textarea>
+                @if (releaseForm.get('copyright_info')?.invalid) {
+                  <mat-error>
+                    {{ getFieldError('copyright_info') }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            }
+            <!-- Smart Link (conditional - ab "uploaded") -->
+            @if (shouldShowField('smart_link')) {
+              <mat-form-field appearance="outline" class="form-field-full">
+                <mat-label>{{ 'songRelease.editor.smartLink' | translate }}</mat-label>
+                <input matInput formControlName="smart_link" maxlength="1000"
+                  [placeholder]="'songRelease.editor.smartLinkPlaceholder' | translate">
+                <mat-hint>{{ 'songRelease.editor.smartLinkHint' | translate }}</mat-hint>
+                @if (releaseForm.get('smart_link')?.invalid) {
+                  <mat-error>
+                    {{ getFieldError('smart_link') }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            }
+          </div>
+        }
+        <!-- Dates (conditional based on status) -->
+        @if (shouldShowField('upload_date') || shouldShowField('release_date')) {
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="fas fa-calendar-alt"></i>
+              {{ 'songRelease.editor.sections.dates' | translate }}
+            </h3>
+            <div class="form-row">
+              <!-- Upload Date -->
+              @if (shouldShowField('upload_date')) {
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>{{ 'songRelease.editor.uploadDate' | translate }}</mat-label>
+                  <input matInput [matDatepicker]="uploadDatePicker" formControlName="upload_date">
+                  <mat-datepicker-toggle matIconSuffix [for]="uploadDatePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #uploadDatePicker></mat-datepicker>
+                  @if (releaseForm.get('upload_date')?.invalid) {
+                    <mat-error>
+                      {{ getFieldError('upload_date') }}
                     </mat-error>
+                  }
                 </mat-form-field>
-
-                <!-- Smart Link (conditional - ab "uploaded") -->
-                <mat-form-field appearance="outline" class="form-field-full" *ngIf="shouldShowField('smart_link')">
-                    <mat-label>{{ 'songRelease.editor.smartLink' | translate }}</mat-label>
-                    <input matInput formControlName="smart_link" maxlength="1000"
-                           [placeholder]="'songRelease.editor.smartLinkPlaceholder' | translate">
-                    <mat-hint>{{ 'songRelease.editor.smartLinkHint' | translate }}</mat-hint>
-                    <mat-error *ngIf="releaseForm.get('smart_link')?.invalid">
-                        {{ getFieldError('smart_link') }}
+              }
+              <!-- Release Date -->
+              @if (shouldShowField('release_date')) {
+                <mat-form-field appearance="outline" class="form-field">
+                  <mat-label>{{ 'songRelease.editor.releaseDate' | translate }}</mat-label>
+                  <input matInput [matDatepicker]="releaseDatePicker" formControlName="release_date">
+                  <mat-datepicker-toggle matIconSuffix [for]="releaseDatePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #releaseDatePicker></mat-datepicker>
+                  @if (releaseForm.get('release_date')?.invalid) {
+                    <mat-error>
+                      {{ getFieldError('release_date') }}
                     </mat-error>
+                  }
                 </mat-form-field>
+              }
             </div>
-
-            <!-- Dates (conditional based on status) -->
-            <div class="form-section" *ngIf="shouldShowField('upload_date') || shouldShowField('release_date')">
-                <h3 class="section-title">
-                    <i class="fas fa-calendar-alt"></i>
-                    {{ 'songRelease.editor.sections.dates' | translate }}
-                </h3>
-
-                <div class="form-row">
-                    <!-- Upload Date -->
-                    <mat-form-field appearance="outline" class="form-field" *ngIf="shouldShowField('upload_date')">
-                        <mat-label>{{ 'songRelease.editor.uploadDate' | translate }}</mat-label>
-                        <input matInput [matDatepicker]="uploadDatePicker" formControlName="upload_date">
-                        <mat-datepicker-toggle matIconSuffix [for]="uploadDatePicker"></mat-datepicker-toggle>
-                        <mat-datepicker #uploadDatePicker></mat-datepicker>
-                        <mat-error *ngIf="releaseForm.get('upload_date')?.invalid">
-                            {{ getFieldError('upload_date') }}
-                        </mat-error>
-                    </mat-form-field>
-
-                    <!-- Release Date -->
-                    <mat-form-field appearance="outline" class="form-field" *ngIf="shouldShowField('release_date')">
-                        <mat-label>{{ 'songRelease.editor.releaseDate' | translate }}</mat-label>
-                        <input matInput [matDatepicker]="releaseDatePicker" formControlName="release_date">
-                        <mat-datepicker-toggle matIconSuffix [for]="releaseDatePicker"></mat-datepicker-toggle>
-                        <mat-datepicker #releaseDatePicker></mat-datepicker>
-                        <mat-error *ngIf="releaseForm.get('release_date')?.invalid">
-                            {{ getFieldError('release_date') }}
-                        </mat-error>
-                    </mat-form-field>
-                </div>
-
-                <!-- Downtaken Date -->
-                <mat-form-field appearance="outline" class="form-field-full" *ngIf="shouldShowField('downtaken_date')">
-                    <mat-label>{{ 'songRelease.editor.downtakenDate' | translate }}</mat-label>
-                    <input matInput [matDatepicker]="downtakenDatePicker" formControlName="downtaken_date">
-                    <mat-datepicker-toggle matIconSuffix [for]="downtakenDatePicker"></mat-datepicker-toggle>
-                    <mat-datepicker #downtakenDatePicker></mat-datepicker>
-                    <mat-error *ngIf="releaseForm.get('downtaken_date')?.invalid">
-                        {{ getFieldError('downtaken_date') }}
-                    </mat-error>
-                </mat-form-field>
-            </div>
-
-            <!-- Rejection/Downtaken Reasons (conditional) -->
-            <div class="form-section" *ngIf="shouldShowField('rejected_reason') || shouldShowField('downtaken_reason')">
-                <h3 class="section-title">
-                    <i class="fas fa-exclamation-circle"></i>
-                    {{ 'songRelease.editor.sections.reasons' | translate }}
-                </h3>
-
-                <!-- Rejected Reason -->
-                <mat-form-field appearance="outline" class="form-field-full" *ngIf="shouldShowField('rejected_reason')">
-                    <mat-label>{{ 'songRelease.editor.rejectedReason' | translate }}</mat-label>
-                    <textarea matInput formControlName="rejected_reason" rows="4" maxlength="500"></textarea>
-                    <mat-error *ngIf="releaseForm.get('rejected_reason')?.invalid">
-                        {{ getFieldError('rejected_reason') }}
-                    </mat-error>
-                </mat-form-field>
-
-                <!-- Downtaken Reason -->
-                <mat-form-field appearance="outline" class="form-field-full"
-                                *ngIf="shouldShowField('downtaken_reason')">
-                    <mat-label>{{ 'songRelease.editor.downtakenReason' | translate }}</mat-label>
-                    <textarea matInput formControlName="downtaken_reason" rows="4" maxlength="500"></textarea>
-                    <mat-error *ngIf="releaseForm.get('downtaken_reason')?.invalid">
-                        {{ getFieldError('downtaken_reason') }}
-                    </mat-error>
-                </mat-form-field>
-            </div>
-
-            <!-- Cover Image (always visible) -->
-            <div class="form-section">
-                <h3 class="section-title">
-                    <i class="fas fa-image"></i>
-                    {{ 'songRelease.editor.sections.cover' | translate }}
-                </h3>
-
-                <div class="cover-upload">
-                    <div class="cover-preview" *ngIf="coverPreviewUrl">
-                        <img [src]="coverPreviewUrl" alt="Cover Preview">
-                        <button type="button" class="remove-cover-button" (click)="removeCoverImage()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-
-                    <div class="cover-preview cover-placeholder-preview"
-                         *ngIf="!coverPreviewUrl && releaseForm.get('name')?.value"
-                         [style.background-color]="getColorFromString(releaseForm.get('name')?.value)">
-                        <span class="initials">{{ getInitials(releaseForm.get('name')?.value) }}</span>
-                    </div>
-
-                    <div class="cover-upload-controls">
-                        <label for="coverFileInput" class="upload-label">
-                            <i class="fas fa-upload"></i>
-                            <span>{{ 'songRelease.editor.uploadCover' | translate }}</span>
-                        </label>
-                        <input
-                                id="coverFileInput"
-                                type="file"
-                                accept="image/*"
-                                (change)="onCoverFileSelected($event)"
-                                class="file-input">
-                        <p class="upload-hint">{{ 'songRelease.editor.coverHint' | translate }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="editor-actions">
-                <button mat-button type="button" (click)="cancel()" [disabled]="isSaving">
-                    <i class="fas fa-times"></i> {{ 'common.cancel' | translate }}
+            <!-- Downtaken Date -->
+            @if (shouldShowField('downtaken_date')) {
+              <mat-form-field appearance="outline" class="form-field-full">
+                <mat-label>{{ 'songRelease.editor.downtakenDate' | translate }}</mat-label>
+                <input matInput [matDatepicker]="downtakenDatePicker" formControlName="downtaken_date">
+                <mat-datepicker-toggle matIconSuffix [for]="downtakenDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #downtakenDatePicker></mat-datepicker>
+                @if (releaseForm.get('downtaken_date')?.invalid) {
+                  <mat-error>
+                    {{ getFieldError('downtaken_date') }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            }
+          </div>
+        }
+        <!-- Rejection/Downtaken Reasons (conditional) -->
+        @if (shouldShowField('rejected_reason') || shouldShowField('downtaken_reason')) {
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="fas fa-exclamation-circle"></i>
+              {{ 'songRelease.editor.sections.reasons' | translate }}
+            </h3>
+            <!-- Rejected Reason -->
+            @if (shouldShowField('rejected_reason')) {
+              <mat-form-field appearance="outline" class="form-field-full">
+                <mat-label>{{ 'songRelease.editor.rejectedReason' | translate }}</mat-label>
+                <textarea matInput formControlName="rejected_reason" rows="4" maxlength="500"></textarea>
+                @if (releaseForm.get('rejected_reason')?.invalid) {
+                  <mat-error>
+                    {{ getFieldError('rejected_reason') }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            }
+            <!-- Downtaken Reason -->
+            @if (shouldShowField('downtaken_reason')) {
+              <mat-form-field appearance="outline" class="form-field-full"
+                >
+                <mat-label>{{ 'songRelease.editor.downtakenReason' | translate }}</mat-label>
+                <textarea matInput formControlName="downtaken_reason" rows="4" maxlength="500"></textarea>
+                @if (releaseForm.get('downtaken_reason')?.invalid) {
+                  <mat-error>
+                    {{ getFieldError('downtaken_reason') }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            }
+          </div>
+        }
+        <!-- Cover Image (always visible) -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <i class="fas fa-image"></i>
+            {{ 'songRelease.editor.sections.cover' | translate }}
+          </h3>
+          <div class="cover-upload">
+            @if (coverPreviewUrl) {
+              <div class="cover-preview">
+                <img [src]="coverPreviewUrl" alt="Cover Preview">
+                <button type="button" class="remove-cover-button" (click)="removeCoverImage()">
+                  <i class="fas fa-times"></i>
                 </button>
-
-                <button mat-flat-button color="primary" type="submit" [disabled]="isSaving || releaseForm.invalid">
-                    <i class="fas fa-save"></i>
-                    <span *ngIf="!isSaving">{{ 'common.save' | translate }}</span>
-                    <span *ngIf="isSaving">{{ 'common.saving' | translate }}</span>
-                </button>
+              </div>
+            }
+            @if (!coverPreviewUrl && releaseForm.get('name')?.value) {
+              <div class="cover-preview cover-placeholder-preview"
+                [style.background-color]="getColorFromString(releaseForm.get('name')?.value)">
+                <span class="initials">{{ getInitials(releaseForm.get('name')?.value) }}</span>
+              </div>
+            }
+            <div class="cover-upload-controls">
+              <label for="coverFileInput" class="upload-label">
+                <i class="fas fa-upload"></i>
+                <span>{{ 'songRelease.editor.uploadCover' | translate }}</span>
+              </label>
+              <input
+                id="coverFileInput"
+                type="file"
+                accept="image/*"
+                (change)="onCoverFileSelected($event)"
+                class="file-input">
+              <p class="upload-hint">{{ 'songRelease.editor.coverHint' | translate }}</p>
             </div>
-        </form>
-    </mat-card>
+          </div>
+        </div>
+        <!-- Actions -->
+        <div class="editor-actions">
+          <button mat-button type="button" (click)="cancel()" [disabled]="isSaving">
+            <i class="fas fa-times"></i> {{ 'common.cancel' | translate }}
+          </button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="isSaving || releaseForm.invalid">
+            <i class="fas fa-save"></i>
+            @if (!isSaving) {
+              <span>{{ 'common.save' | translate }}</span>
+            }
+            @if (isSaving) {
+              <span>{{ 'common.saving' | translate }}</span>
+            }
+          </button>
+        </div>
+      </form>
+    }
+  </mat-card>
 </div>

@@ -1,6 +1,6 @@
 import {Component, HostListener, inject, OnInit, ViewChild, ViewEncapsulation} from "@angular/core";
 import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
-import {CommonModule} from "@angular/common";
+
 import {MatDialog} from "@angular/material/dialog";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -19,7 +19,7 @@ import {MusicStyleChooserService} from "../../services/music-style-chooser.servi
 @Component({
     selector: "app-music-style-prompt",
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, MatSnackBarModule, MatCardModule, MatButtonModule, TranslateModule, MusicStyleChooserInlineComponent],
+    imports: [ReactiveFormsModule, MatSnackBarModule, MatCardModule, MatButtonModule, TranslateModule, MusicStyleChooserInlineComponent],
     templateUrl: "./music-style-prompt.component.html",
     styleUrl: "./music-style-prompt.component.scss",
     encapsulation: ViewEncapsulation.None

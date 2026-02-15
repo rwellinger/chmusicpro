@@ -1,5 +1,5 @@
 import {Component, ElementRef, inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {FormsModule} from "@angular/forms";
 import {Router} from "@angular/router";
 import {debounceTime, distinctUntilChanged, Subject, takeUntil} from "rxjs";
@@ -16,7 +16,7 @@ import {TranslateModule, TranslateService} from "@ngx-translate/core";
 @Component({
     selector: "app-prompt-templates",
     standalone: true,
-    imports: [CommonModule, FormsModule, MatSnackBarModule, MatCardModule, MatButtonModule, TranslateModule],
+    imports: [FormsModule, MatSnackBarModule, MatCardModule, MatButtonModule, TranslateModule],
     templateUrl: "./prompt-templates.component.html",
     styleUrl: "./prompt-templates.component.scss"
 })

@@ -1,5 +1,5 @@
 import {Component, inject, OnDestroy, OnInit} from "@angular/core";
-import {CommonModule} from "@angular/common";
+
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {MatDialog} from "@angular/material/dialog";
 import {MatButtonModule} from "@angular/material/button";
@@ -30,17 +30,16 @@ import {Language, UserSettings} from "../../models/user-settings.model";
     selector: "app-user-profile",
     standalone: true,
     imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        MatButtonModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatCardModule,
-        MatIconModule,
-        MatSnackBarModule,
-        MatSelectModule,
-        TranslateModule
-    ],
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatCardModule,
+    MatIconModule,
+    MatSnackBarModule,
+    MatSelectModule,
+    TranslateModule
+],
     templateUrl: "./user-profile.component.html",
     styleUrl: "./user-profile.component.scss"
 })
