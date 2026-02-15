@@ -241,7 +241,7 @@
             <div class="messages-container" #messagesContainer>
                 @for (message of messages; track message.id) {
                     @if (message.role !== 'system') {
-                        <div class="message" [ngClass]="getMessageClass(message)">
+                        <div class="message" [class]="getMessageClass(message)">
                             <div class="message-role">{{ message.role }}</div>
                             <div class="message-content" [innerHTML]="message.content | messageContent"></div>
                             <div class="message-footer">

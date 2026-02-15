@@ -81,7 +81,7 @@
                 <div class="item-header">
                   <h4 class="item-title">{{ workshop.title }}</h4>
                   <div class="item-badges">
-                    <span class="phase-badge" [ngClass]="'phase-' + workshop.current_phase">
+                    <span class="phase-badge" [class]="'phase-' + workshop.current_phase">
                       {{ getPhaseLabel(workshop.current_phase) }}
                     </span>
                   </div>
@@ -170,7 +170,7 @@
                   [disabled]="isGeneratingTitle"
                   [title]="'workshop.editor.generateTitle' | translate"
                   >
-                  <i class="fas" [ngClass]="isGeneratingTitle ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
+                  <i class="fas" [class]="isGeneratingTitle ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
                 </button>
               </div>
             </div>
@@ -213,7 +213,7 @@
                       [disabled]="isGeneratingInspirations"
                       [title]="'workshop.connect.generateInspirations' | translate"
                       >
-                      <i class="fas" [ngClass]="isGeneratingInspirations ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
+                      <i class="fas" [class]="isGeneratingInspirations ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
                     </button>
                   </div>
                 </div>
@@ -232,7 +232,7 @@
                           [class.selected]="item.selected"
                           (click)="toggleInspirationItem(item)">
                           <div class="card-check">
-                            <i class="fas" [ngClass]="item.selected ? 'fa-check-circle' : 'fa-circle'"></i>
+                            <i class="fas" [class]="item.selected ? 'fa-check-circle' : 'fa-circle'"></i>
                           </div>
                           <div class="card-content">
                             <strong>{{ item.heading }}</strong>
@@ -316,7 +316,7 @@
                       [disabled]="isGeneratingMindmap"
                       [title]="'workshop.collect.generateMindmap' | translate"
                       >
-                      <i class="fas" [ngClass]="isGeneratingMindmap ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
+                      <i class="fas" [class]="isGeneratingMindmap ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
                     </button>
                   </div>
                 </div>
@@ -335,7 +335,7 @@
                           [class.selected]="item.selected"
                           (click)="toggleStoryItem(item)">
                           <div class="card-check">
-                            <i class="fas" [ngClass]="item.selected ? 'fa-check-circle' : 'fa-circle'"></i>
+                            <i class="fas" [class]="item.selected ? 'fa-check-circle' : 'fa-circle'"></i>
                           </div>
                           <div class="card-content">
                             <strong>{{ item.heading }}</strong>
@@ -384,7 +384,7 @@
                         [disabled]="isGeneratingStories"
                         [title]="'workshop.collect.generateStories' | translate"
                         >
-                        <i class="fas" [ngClass]="isGeneratingStories ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
+                        <i class="fas" [class]="isGeneratingStories ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
                       </button>
                     </div>
                   </div>
@@ -415,7 +415,7 @@
                       [disabled]="isGeneratingWords"
                       [title]="'workshop.collect.generateWords' | translate"
                       >
-                      <i class="fas" [ngClass]="isGeneratingWords ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
+                      <i class="fas" [class]="isGeneratingWords ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
                     </button>
                   </div>
                 </div>
@@ -488,7 +488,7 @@
                       [disabled]="isGeneratingRhymes"
                       [title]="'workshop.shape.generateRhymes' | translate"
                       >
-                      <i class="fas" [ngClass]="isGeneratingRhymes ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
+                      <i class="fas" [class]="isGeneratingRhymes ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
                     </button>
                   </div>
                 </div>
@@ -531,7 +531,7 @@
                       [disabled]="isGeneratingDraft"
                       [title]="'workshop.shape.generateDraft' | translate"
                       >
-                      <i class="fas" [ngClass]="isGeneratingDraft ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
+                      <i class="fas" [class]="isGeneratingDraft ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
                     </button>
                   </div>
                 </div>
@@ -544,7 +544,7 @@
               <button mat-button type="button"
                 [class.active]="isPreviewMode"
                 (click)="togglePreviewMode()">
-                <i class="fas" [ngClass]="isPreviewMode ? 'fa-edit' : 'fa-eye'"></i>
+                <i class="fas" [class]="isPreviewMode ? 'fa-edit' : 'fa-eye'"></i>
                 {{ (isPreviewMode ? 'workshop.preview.exitPreview' : 'workshop.preview.enterPreview') | translate }}
               </button>
               <button mat-button type="button"
@@ -557,14 +557,14 @@
             <div class="submit-actions">
               @if (saveStatus !== 'idle') {
                 <span class="save-status">
-                  <i class="fas" [ngClass]="saveStatus === 'saving' ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+                  <i class="fas" [class]="saveStatus === 'saving' ? 'fa-spinner fa-spin' : 'fa-check'"></i>
                   {{ (saveStatus === 'saving' ? 'workshop.editor.saving' : 'workshop.editor.saved') | translate }}
                 </span>
               }
               <button mat-flat-button color="primary" type="button"
                 (click)="exportToSketch()"
                 [disabled]="isExporting || currentPhase === 'completed'">
-                <i class="fas" [ngClass]="isExporting ? 'fa-spinner fa-spin' : 'fa-file-export'"></i>
+                <i class="fas" [class]="isExporting ? 'fa-spinner fa-spin' : 'fa-file-export'"></i>
                 {{ 'workshop.editor.exportToSketch' | translate }}
               </button>
             </div>

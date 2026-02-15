@@ -122,11 +122,11 @@
                   <h4 class="release-title">{{ release.name }}</h4>
                   <p class="release-genre">{{ release.genre }}</p>
                   <div class="release-badges">
-                    <span class="status-badge" [ngClass]="getStatusClass(release.status)">
+                    <span class="status-badge" [class]="getStatusClass(release.status)">
                       {{ 'songRelease.statuses.' + release.status | translate }}
                     </span>
                     <span class="type-badge">
-                      <i class="fas" [ngClass]="release.type === ReleaseType.SINGLE ? 'fa-music' : 'fa-compact-disc'"></i>
+                      <i class="fas" [class]="release.type === ReleaseType.SINGLE ? 'fa-music' : 'fa-compact-disc'"></i>
                       {{ 'songRelease.types.' + release.type | translate }}
                     </span>
                   </div>
@@ -199,7 +199,7 @@
             <div class="detail-title-group">
               <h2>{{ selectedRelease.name }}</h2>
               <p class="detail-genre">{{ selectedRelease.genre }}</p>
-              <span class="status-badge" [ngClass]="getStatusClass(selectedRelease.status)">
+              <span class="status-badge" [class]="getStatusClass(selectedRelease.status)">
                 {{ 'songRelease.statuses.' + selectedRelease.status | translate }}
               </span>
               <!-- Smart Link in Header -->
@@ -224,7 +224,7 @@
                 <span class="field-label">{{ 'songRelease.editor.type' | translate }}</span>
                 <div class="readonly-field">
                   <i class="fas"
-                  [ngClass]="selectedRelease.type === ReleaseType.SINGLE ? 'fa-music' : 'fa-compact-disc'"></i>
+                  [class]="selectedRelease.type === ReleaseType.SINGLE ? 'fa-music' : 'fa-compact-disc'"></i>
                   {{ 'songRelease.types.' + selectedRelease.type | translate }}
                 </div>
               </div>

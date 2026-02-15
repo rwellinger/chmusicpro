@@ -137,40 +137,15 @@ deploy-check:
 # Run unit tests (single run)
 test: check-node
 	@echo "Running unit tests..."
-	@if [ -f "/Applications/Chromium.app/Contents/MacOS/Chromium" ]; then \
-		CHROME_BIN="/Applications/Chromium.app/Contents/MacOS/Chromium" npm run test -- --watch=false --browsers=ChromeHeadless; \
-	elif [ -f "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]; then \
-		CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npm run test -- --watch=false --browsers=ChromeHeadless; \
-	else \
-		echo "ERROR: Neither Chromium nor Chrome found!"; \
-		echo "Install with: brew install --cask chromium"; \
-		exit 1; \
-	fi
+	npm run test -- --watch=false
 
 # Run tests in watch mode (development)
 test-watch: check-node
 	@echo "Running tests in watch mode..."
-	@if [ -f "/Applications/Chromium.app/Contents/MacOS/Chromium" ]; then \
-		CHROME_BIN="/Applications/Chromium.app/Contents/MacOS/Chromium" npm run test; \
-	elif [ -f "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]; then \
-		CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npm run test; \
-	else \
-		echo "ERROR: Neither Chromium nor Chrome found!"; \
-		echo "Install with: brew install --cask chromium"; \
-		exit 1; \
-	fi
+	npm run test
 
 # Run tests with coverage report
 test-coverage: check-node
 	@echo "Running tests with coverage..."
-	@if [ -f "/Applications/Chromium.app/Contents/MacOS/Chromium" ]; then \
-		CHROME_BIN="/Applications/Chromium.app/Contents/MacOS/Chromium" npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage; \
-	elif [ -f "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]; then \
-		CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage; \
-	else \
-		echo "ERROR: Neither Chromium nor Chrome found!"; \
-		echo "Install with: brew install --cask chromium"; \
-		exit 1; \
-	fi
-	@echo ""
+	npm run test -- --watch=false --coverage
 	@echo "Coverage report generated at: coverage/"

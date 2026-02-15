@@ -34,7 +34,7 @@ describe("TextWorkshopComponent", () => {
     });
 
     it("should initialize in library mode", () => {
-        expect(component.isEditorMode).toBeFalse();
+        expect(component.isEditorMode).toBe(false);
         expect(component.currentWorkshopId).toBeNull();
     });
 
@@ -67,7 +67,7 @@ describe("TextWorkshopComponent", () => {
             expect(items.length).toBe(2);
             expect(items[0].heading).toBe("Heading One");
             expect(items[1].heading).toBe("Heading Two");
-            expect(items[0].selected).toBeTrue();
+            expect(items[0].selected).toBe(true);
         });
 
         it("should return empty array for single item", () => {
@@ -107,26 +107,26 @@ describe("TextWorkshopComponent", () => {
     describe("pagination", () => {
         it("should not have previous page on first page", () => {
             component.currentPage = 0;
-            expect(component.hasPreviousPage).toBeFalse();
+            expect(component.hasPreviousPage).toBe(false);
         });
 
         it("should have previous page when not on first page", () => {
             component.currentPage = 1;
-            expect(component.hasPreviousPage).toBeTrue();
+            expect(component.hasPreviousPage).toBe(true);
         });
 
         it("should not have next page when all items shown", () => {
             component.currentPage = 0;
             component.pageSize = 20;
             component.totalWorkshops = 15;
-            expect(component.hasNextPage).toBeFalse();
+            expect(component.hasNextPage).toBe(false);
         });
 
         it("should have next page when more items exist", () => {
             component.currentPage = 0;
             component.pageSize = 20;
             component.totalWorkshops = 25;
-            expect(component.hasNextPage).toBeTrue();
+            expect(component.hasNextPage).toBe(true);
         });
     });
 
@@ -135,28 +135,28 @@ describe("TextWorkshopComponent", () => {
             component.inspirationItems = [
                 {id: 0, heading: "A", content: "B", selected: true}
             ];
-            expect(component.hasSelectedInspirations).toBeTrue();
+            expect(component.hasSelectedInspirations).toBe(true);
         });
 
         it("should detect no selected inspirations", () => {
             component.inspirationItems = [
                 {id: 0, heading: "A", content: "B", selected: false}
             ];
-            expect(component.hasSelectedInspirations).toBeFalse();
+            expect(component.hasSelectedInspirations).toBe(false);
         });
 
         it("should toggle inspiration item selection", () => {
             const item = {id: 0, heading: "A", content: "B", selected: true};
             component.toggleInspirationItem(item);
-            expect(item.selected).toBeFalse();
+            expect(item.selected).toBe(false);
             component.toggleInspirationItem(item);
-            expect(item.selected).toBeTrue();
+            expect(item.selected).toBe(true);
         });
 
         it("should toggle story item selection", () => {
             const item = {id: 0, heading: "A", content: "B", selected: false};
             component.toggleStoryItem(item);
-            expect(item.selected).toBeTrue();
+            expect(item.selected).toBe(true);
         });
     });
 });

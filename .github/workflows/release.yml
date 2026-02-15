@@ -42,7 +42,7 @@ jobs:
 
       - name: Run Unit Tests
         working-directory: chmusicproweb
-        run: npm run test -- --watch=false --browsers=ChromeHeadless
+        run: npm run test -- --watch=false
 
   # ─────────────────────────────────────────────────────────
   # Code Quality: Backend (Ruff + pytest)

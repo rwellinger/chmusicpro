@@ -3,24 +3,26 @@ import {ChatExportService} from "./chat-export.service";
 import {ConversationService} from "./conversation.service";
 import {Conversation, Message} from "../../models/conversation.model";
 import {of} from "rxjs";
+import {vi} from "vitest";
 
 describe("ChatExportService", () => {
     let service: ChatExportService;
-    let conversationServiceSpy: jasmine.SpyObj<ConversationService>;
+    let conversationServiceSpy: { getConversationForExport: ReturnType<typeof vi.fn> };
 
     beforeEach(() => {
         // Create spy for ConversationService
-        const spy = jasmine.createSpyObj("ConversationService", ["getConversationForExport"]);
+        conversationServiceSpy = {
+            getConversationForExport: vi.fn()
+        };
 
         TestBed.configureTestingModule({
             providers: [
                 ChatExportService,
-                {provide: ConversationService, useValue: spy}
+                {provide: ConversationService, useValue: conversationServiceSpy}
             ]
         });
 
         service = TestBed.inject(ChatExportService);
-        conversationServiceSpy = TestBed.inject(ConversationService) as jasmine.SpyObj<ConversationService>;
     });
 
     it("should be created", () => {
@@ -30,7 +32,7 @@ describe("ChatExportService", () => {
     describe("generateMarkdownContent (via exportToMarkdown)", () => {
         let mockConversation: Conversation;
         let mockMessages: Message[];
-        let downloadSpy: jasmine.Spy;
+        let downloadSpy: ReturnType<typeof vi.spyOn>;
 
         beforeEach(() => {
             // Mock conversation
@@ -70,20 +72,20 @@ describe("ChatExportService", () => {
             ];
 
             // Spy on private methods via exportToMarkdown
-            downloadSpy = spyOn<any>(service as any, "downloadFile");
+            downloadSpy = vi.spyOn(service as any, "downloadFile").mockImplementation(() => {});
         });
 
         it("should generate markdown with conversation title", () => {
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const generatedContent = downloadSpy.calls.mostRecent().args[0];
+            const generatedContent = vi.mocked(downloadSpy).mock.lastCall![0];
             expect(generatedContent).toContain("# Test Chat");
         });
 
         it("should include model and provider metadata", () => {
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const generatedContent = downloadSpy.calls.mostRecent().args[0];
+            const generatedContent = vi.mocked(downloadSpy).mock.lastCall![0];
             expect(generatedContent).toContain("**Model:** gpt-4");
             expect(generatedContent).toContain("**Provider:** external");
         });
@@ -91,14 +93,14 @@ describe("ChatExportService", () => {
         it("should include token count information", () => {
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const generatedContent = downloadSpy.calls.mostRecent().args[0];
+            const generatedContent = vi.mocked(downloadSpy).mock.lastCall![0];
             expect(generatedContent).toContain("**Tokens:** 150 / 8000");
         });
 
         it("should include system context if present", () => {
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const generatedContent = downloadSpy.calls.mostRecent().args[0];
+            const generatedContent = vi.mocked(downloadSpy).mock.lastCall![0];
             expect(generatedContent).toContain("## System Context");
             expect(generatedContent).toContain("You are a helpful assistant");
         });
@@ -107,14 +109,14 @@ describe("ChatExportService", () => {
             mockConversation.system_context = undefined;
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const generatedContent = downloadSpy.calls.mostRecent().args[0];
+            const generatedContent = vi.mocked(downloadSpy).mock.lastCall![0];
             expect(generatedContent).not.toContain("## System Context");
         });
 
         it("should format user messages correctly", () => {
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const generatedContent = downloadSpy.calls.mostRecent().args[0];
+            const generatedContent = vi.mocked(downloadSpy).mock.lastCall![0];
             expect(generatedContent).toContain("**USER**");
             expect(generatedContent).toContain("Hello, how are you?");
         });
@@ -122,7 +124,7 @@ describe("ChatExportService", () => {
         it("should format assistant messages correctly", () => {
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const generatedContent = downloadSpy.calls.mostRecent().args[0];
+            const generatedContent = vi.mocked(downloadSpy).mock.lastCall![0];
             expect(generatedContent).toContain("**ASSISTANT**");
             expect(generatedContent).toContain("I am doing well, thank you!");
         });
@@ -143,14 +145,14 @@ describe("ChatExportService", () => {
 
             service.exportToMarkdown(mockConversation, messagesWithSystem);
 
-            const generatedContent = downloadSpy.calls.mostRecent().args[0];
+            const generatedContent = vi.mocked(downloadSpy).mock.lastCall![0];
             expect(generatedContent).not.toContain("System message");
         });
 
         it("should include message separators", () => {
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const generatedContent = downloadSpy.calls.mostRecent().args[0];
+            const generatedContent = vi.mocked(downloadSpy).mock.lastCall![0] as string;
             const separatorCount = (generatedContent.match(/---/g) || []).length;
             expect(separatorCount).toBeGreaterThan(0);
         });
@@ -159,7 +161,7 @@ describe("ChatExportService", () => {
     describe("generateFilename (via exportToMarkdown)", () => {
         let mockConversation: Conversation;
         let mockMessages: Message[];
-        let downloadSpy: jasmine.Spy;
+        let downloadSpy: ReturnType<typeof vi.spyOn>;
 
         beforeEach(() => {
             mockConversation = {
@@ -172,14 +174,14 @@ describe("ChatExportService", () => {
             } as Conversation;
 
             mockMessages = [];
-            downloadSpy = spyOn<any>(service as any, "downloadFile");
+            downloadSpy = vi.spyOn(service as any, "downloadFile").mockImplementation(() => {});
         });
 
         it("should generate filename with sanitized title", () => {
             mockConversation.title = "My Test Chat!";
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const filename = downloadSpy.calls.mostRecent().args[1];
+            const filename = vi.mocked(downloadSpy).mock.lastCall![1];
             expect(filename).toMatch(/^chat-My-Test-Chat-\d{4}-\d{2}-\d{2}\.md$/);
         });
 
@@ -187,7 +189,7 @@ describe("ChatExportService", () => {
             mockConversation.title = "Test@Chat#With$Special%Characters!";
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const filename = downloadSpy.calls.mostRecent().args[1];
+            const filename = vi.mocked(downloadSpy).mock.lastCall![1] as string;
             expect(filename).not.toContain("@");
             expect(filename).not.toContain("#");
             expect(filename).not.toContain("$");
@@ -199,7 +201,7 @@ describe("ChatExportService", () => {
             mockConversation.title = "Test Chat With Spaces";
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const filename = downloadSpy.calls.mostRecent().args[1];
+            const filename = vi.mocked(downloadSpy).mock.lastCall![1] as string;
             expect(filename).toContain("Test-Chat-With-Spaces");
         });
 
@@ -207,7 +209,7 @@ describe("ChatExportService", () => {
             mockConversation.title = "Testöäü ÖÄÜß Chat";
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const filename = downloadSpy.calls.mostRecent().args[1];
+            const filename = vi.mocked(downloadSpy).mock.lastCall![1] as string;
             expect(filename).toContain("öäü");
             expect(filename).toContain("ÖÄÜß");
         });
@@ -216,7 +218,7 @@ describe("ChatExportService", () => {
             mockConversation.title = "A".repeat(100);
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const filename = downloadSpy.calls.mostRecent().args[1];
+            const filename = vi.mocked(downloadSpy).mock.lastCall![1] as string;
             const titlePart = filename.replace(/^chat-/, "").replace(/-\d{4}-\d{2}-\d{2}\.md$/, "");
             expect(titlePart.length).toBeLessThanOrEqual(50);
         });
@@ -224,14 +226,14 @@ describe("ChatExportService", () => {
         it("should include date in ISO format", () => {
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const filename = downloadSpy.calls.mostRecent().args[1];
+            const filename = vi.mocked(downloadSpy).mock.lastCall![1] as string;
             expect(filename).toMatch(/-\d{4}-\d{2}-\d{2}\.md$/);
         });
 
         it("should have .md extension", () => {
             service.exportToMarkdown(mockConversation, mockMessages);
 
-            const filename = downloadSpy.calls.mostRecent().args[1];
+            const filename = vi.mocked(downloadSpy).mock.lastCall![1] as string;
             expect(filename).toMatch(/\.md$/);
         });
     });
@@ -258,8 +260,8 @@ describe("ChatExportService", () => {
                 ]
             };
 
-            conversationServiceSpy.getConversationForExport.and.returnValue(of(mockResponse));
-            spyOn<any>(service as any, "downloadFile");
+            conversationServiceSpy.getConversationForExport.mockReturnValue(of(mockResponse));
+            vi.spyOn(service as any, "downloadFile").mockImplementation(() => {});
 
             await service.exportFullToMarkdown("123", "Test Chat");
 
@@ -296,30 +298,32 @@ describe("ChatExportService", () => {
                 ]
             };
 
-            conversationServiceSpy.getConversationForExport.and.returnValue(of(mockResponse));
-            const downloadSpy = spyOn<any>(service as any, "downloadFile");
+            conversationServiceSpy.getConversationForExport.mockReturnValue(of(mockResponse));
+            const downloadSpy = vi.spyOn(service as any, "downloadFile").mockImplementation(() => {});
 
             await service.exportFullToMarkdown("123", "Test Chat");
 
-            const generatedContent = downloadSpy.calls.mostRecent().args[0];
+            const generatedContent = vi.mocked(downloadSpy).mock.lastCall![0];
             expect(generatedContent).toContain("Real message");
             expect(generatedContent).not.toContain("Summary message");
         });
 
         it("should throw error if export fails", async () => {
             // Suppress console.error output during error handling test
-            spyOn(console, "error");
+            vi.spyOn(console, "error").mockImplementation(() => {});
 
-            conversationServiceSpy.getConversationForExport.and.throwError("Network error");
+            conversationServiceSpy.getConversationForExport.mockImplementation(() => {
+                throw new Error("Network error");
+            });
 
-            await expectAsync(
+            await expect(
                 service.exportFullToMarkdown("123", "Test Chat")
-            ).toBeRejected();
+            ).rejects.toThrow();
 
             // Verify error was logged
             expect(console.error).toHaveBeenCalledWith(
                 "Error exporting full conversation:",
-                jasmine.any(Error)
+                expect.any(Error)
             );
         });
     });

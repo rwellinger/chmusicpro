@@ -1,5 +1,5 @@
 <h2 mat-dialog-title>
-  <i class="fas" [ngClass]="isEditMode ? 'fa-edit' : 'fa-folder-plus'"></i>
+  <i class="fas" [class]="isEditMode ? 'fa-edit' : 'fa-folder-plus'"></i>
   {{ (isEditMode ? 'songProjects.editor.editTitle' : 'songProjects.editor.createTitle') | translate }}
 </h2>
 
@@ -68,7 +68,7 @@
           @if (totalAssignments > 0) {
             <span class="assignments-count">({{ totalAssignments }})</span>
           }
-          <i class="fas" [ngClass]="showAdvanced ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
+          <i class="fas" [class]="showAdvanced ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
         </button>
       }
     </div>

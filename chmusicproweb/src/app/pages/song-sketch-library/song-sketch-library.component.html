@@ -94,7 +94,7 @@
                 {{ sketch.title || ('songSketch.library.untitled' | translate) }}
               </h4>
               <div class="sketch-badges">
-                <span class="workflow-badge" [ngClass]="getWorkflowClass(sketch.workflow)">
+                <span class="workflow-badge" [class]="getWorkflowClass(sketch.workflow)">
                   {{ getWorkflowLabel(sketch.workflow) }}
                 </span>
                 @if (sketch.project_id) {
@@ -183,7 +183,7 @@
                   <i class="fas fa-copy"></i>
                 </button>
               </h2>
-              <span class="workflow-badge" [ngClass]="getWorkflowClass(selectedSketch.workflow)">
+              <span class="workflow-badge" [class]="getWorkflowClass(selectedSketch.workflow)">
                 {{ getWorkflowLabel(selectedSketch.workflow) }}
               </span>
             </div>
