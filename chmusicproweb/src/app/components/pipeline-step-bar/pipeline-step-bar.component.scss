@@ -1,0 +1,99 @@
+@use '../../../scss/variables' as *;
+
+.step-bar {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: $background-white;
+  border-bottom: 1px solid $border-light;
+}
+
+.home-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid $border-standard;
+  border-radius: $border-radius-md;
+  background: $background-white;
+  color: $text-muted;
+  cursor: pointer;
+  transition: $transition-fast;
+  flex-shrink: 0;
+
+  &:hover {
+    color: $primary-color;
+    border-color: $primary-color;
+    background: $background-selected;
+  }
+
+  i {
+    font-size: $font-sm;
+  }
+}
+
+.steps-track {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.connector {
+  flex: 1;
+  height: 2px;
+  background: $border-light;
+
+  &.first {
+    flex: 0;
+    width: 0;
+  }
+}
+
+.step-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: $font-xs;
+  font-weight: $font-weight-semibold;
+  flex-shrink: 0;
+  transition: $transition-fast;
+  border: 2px solid;
+  padding: 0;
+  cursor: default;
+}
+
+.step-item.enabled .step-circle {
+  border-color: var(--step-color);
+  background: $background-white;
+  color: var(--step-color);
+  cursor: pointer;
+
+  &:hover {
+    background: color-mix(in srgb, var(--step-color) 10%, white);
+  }
+}
+
+.step-item.disabled .step-circle {
+  border-color: $border-light;
+  background: $background-light;
+  color: $text-muted;
+}
+
+.step-item.active .step-circle {
+  background: var(--step-color);
+  border-color: var(--step-color);
+  color: white;
+  transform: scale(1.15);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--step-color) 40%, transparent);
+}

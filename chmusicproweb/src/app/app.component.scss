@@ -153,6 +153,13 @@
   overflow-x: hidden;
   height: 100vh;
   background: $background-white;
+
+  app-pipeline-step-bar {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
   
   /* Grid for master-detail pages */
   &.master-detail {

@@ -193,7 +193,7 @@
       "minAgo": "{{min}} min ago",
       "yesterday": "Yesterday"
     },
-    "title": "Ollama Chat (Internal)"
+    "title": "Local AI Chat"
   },
   "auth": {
     "email": "Email",
@@ -799,10 +799,10 @@
   },
   "openaiChat": {
     "costInfo": "Pay-per-use: costs vary by model (~$0.001-0.06 per 1K tokens)",
-    "title": "External Chat"
+    "title": "Cloud AI Chat"
   },
   "externalChat": {
-    "title": "External Chat",
+    "title": "Cloud AI Chat",
     "subtitle": "Chat with OpenAI or Claude models",
     "providerLabel": "Provider"
   },
@@ -969,8 +969,8 @@
     "musicStylePrompt": "Music Style Prompt",
     "newEquipment": "New",
     "newSketch": "New Sketch",
-    "ollamaChat": "Ollama Chat",
-    "openaiChat": "External Chat",
+    "ollamaChat": "Local AI",
+    "openaiChat": "Cloud AI",
     "picture": "Picture",
     "profile": "Profile",
     "promptTemplates": "Prompt Templates",
@@ -981,7 +981,10 @@
     "songReleases": "Song Releases",
     "textOverlayEditor": "Text Overlay",
     "textWorkshop": "Text Workshop",
-    "workshopLibrary": "Workshop Library"
+    "workshopLibrary": "Workshop Library",
+    "coverArt": "Cover Art",
+    "distribution": "Distribution",
+    "manageProjects": "Manage Projects"
   },
   "musicStylePrompt": {
     "title": "Music Style Prompt",

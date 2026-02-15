@@ -47,6 +47,9 @@
     }
     <!-- Main Content Area (80%) -->
     <main class="main-content" [class.full-width]="!(authState$ | async)?.isAuthenticated">
+      @if ((authState$ | async)?.isAuthenticated) {
+        <app-pipeline-step-bar />
+      }
       <router-outlet/>
     </main>
   </div>

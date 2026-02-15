@@ -3,6 +3,7 @@ import {RouterOutlet} from "@angular/router";
 import {CommonModule} from "@angular/common";
 import {TranslateModule} from "@ngx-translate/core";
 import {SideMenuComponent} from "./components/side-menu/side-menu.component";
+import {PipelineStepBarComponent} from "./components/pipeline-step-bar/pipeline-step-bar.component";
 import {AuthService} from "./services/business/auth.service";
 import {VersionCheckService} from "./services/config/version-check.service";
 import {DeviceService} from "./services/ui/device.service";
@@ -10,7 +11,7 @@ import {DeviceService} from "./services/ui/device.service";
 @Component({
     selector: "app-root",
     standalone: true,
-    imports: [RouterOutlet, SideMenuComponent, CommonModule, TranslateModule],
+    imports: [RouterOutlet, SideMenuComponent, PipelineStepBarComponent, CommonModule, TranslateModule],
     templateUrl: "./app.component.html",
     styleUrl: "./app.component.scss"
 })

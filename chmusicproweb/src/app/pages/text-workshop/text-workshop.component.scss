@@ -3,7 +3,7 @@
 
 // ===== Container =====
 .text-workshop-container {
-  height: 100%;
+  height: calc(100vh - $step-bar-height);
   overflow: hidden;
   padding: $spacing-md;
   background: $background-white;
@@ -20,7 +20,7 @@
 }
 
 .list-card {
-  height: calc(100vh - 2rem);
+  height: calc(100vh - $step-bar-height - 2rem);
   display: flex;
   flex-direction: column;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);

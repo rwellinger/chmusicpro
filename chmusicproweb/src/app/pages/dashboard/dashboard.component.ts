@@ -9,6 +9,7 @@ import {WorkshopService} from "../../services/business/workshop.service";
 import {SongProjectService} from "../../services/business/song-project.service";
 import {SongReleaseService} from "../../services/business/song-release.service";
 import {ApiConfigService} from "../../services/config/api-config.service";
+import {PIPELINE_STEPS} from "../../services/config/pipeline.config";
 import {Workshop, WorkshopListResponse} from "../../models/workshop.model";
 import {SongProjectListItem, SongProjectListResponse} from "../../models/song-project.model";
 import {SongReleaseListItem, SongReleaseListResponse} from "../../models/song-release.model";
@@ -64,72 +65,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private destroy$ = new Subject<void>();
 
     ngOnInit(): void {
-        this.tiles = [
-            {
-                titleKey: "dashboard.tiles.workshop.title",
-                descriptionKey: "dashboard.tiles.workshop.description",
-                icon: "fa-pen-fancy",
-                iconColor: "#AD1457",
-                enabled: true,
-                action: () => this.router.navigate(["/text-workshop"])
-            },
-            {
-                titleKey: "dashboard.tiles.composition.title",
-                descriptionKey: "dashboard.tiles.composition.description",
-                icon: "fa-sliders-h",
-                iconColor: "#6c757d",
-                enabled: false,
-                action: () => {}
-            },
-            {
-                titleKey: "dashboard.tiles.cover.title",
-                descriptionKey: "dashboard.tiles.cover.description",
-                icon: "fa-image",
-                iconColor: "#28a745",
-                enabled: true,
-                action: () => this.router.navigate(["/imageview"])
-            },
-            {
-                titleKey: "dashboard.tiles.mixing.title",
-                descriptionKey: "dashboard.tiles.mixing.description",
-                icon: "fa-headphones",
-                iconColor: "#6c757d",
-                enabled: false,
-                action: () => {}
-            },
-            {
-                titleKey: "dashboard.tiles.mastering.title",
-                descriptionKey: "dashboard.tiles.mastering.description",
-                icon: "fa-compact-disc",
-                iconColor: "#6c757d",
-                enabled: false,
-                action: () => {}
-            },
-            {
-                titleKey: "dashboard.tiles.distribute.title",
-                descriptionKey: "dashboard.tiles.distribute.description",
-                icon: "fa-share-alt",
-                iconColor: "#ff9800",
-                enabled: true,
-                action: () => this.router.navigate(["/song-releases"])
-            },
-            {
-                titleKey: "dashboard.tiles.promote.title",
-                descriptionKey: "dashboard.tiles.promote.description",
-                icon: "fa-bullhorn",
-                iconColor: "#6c757d",
-                enabled: false,
-                action: () => {}
-            },
-            {
-                titleKey: "dashboard.tiles.project.title",
-                descriptionKey: "dashboard.tiles.project.description",
-                icon: "fa-folder-open",
-                iconColor: "#D32F2F",
-                enabled: true,
-                action: () => this.router.navigate(["/song-projects"])
-            }
-        ];
+        this.tiles = PIPELINE_STEPS.map(step => ({
+            titleKey: step.titleKey,
+            descriptionKey: step.descriptionKey,
+            icon: step.icon,
+            iconColor: step.iconColor,
+            enabled: step.enabled,
+            action: step.primaryRoute ? () => this.router.navigate([step.primaryRoute]) : () => {}
+        }));
 
         this.loadRecentWork();
     }
