@@ -3,9 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-
-from config.allowed_models import OLLAMA_ALLOWED_MODELS
+from pydantic import BaseModel, ConfigDict, Field
 
 from .common_schemas import BaseResponse
 
@@ -33,13 +31,6 @@ class ChatRequest(BaseModel):
     pre_condition: str | None = Field("", description="Text before user input")
     post_condition: str | None = Field("", description="Text after user input")
     options: ChatOptions | None = Field(default_factory=ChatOptions, description="Generation options")
-
-    @field_validator("model")
-    @classmethod
-    def validate_model(cls, v):
-        if v not in OLLAMA_ALLOWED_MODELS:
-            raise ValueError(f"model must be one of: {', '.join(OLLAMA_ALLOWED_MODELS)}")
-        return v
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -99,13 +90,6 @@ class UnifiedChatRequest(BaseModel):
     model: str | None = Field(None, description="AI model to use (overrides template)")
     category: str | None = Field(None, description="Template category (for logging/tracking)")
     action: str | None = Field(None, description="Template action (for logging/tracking)")
-
-    @field_validator("model")
-    @classmethod
-    def validate_model(cls, v):
-        if v is not None and v not in OLLAMA_ALLOWED_MODELS:
-            raise ValueError(f"model must be one of: {', '.join(OLLAMA_ALLOWED_MODELS)}")
-        return v
 
     model_config = ConfigDict(
         json_schema_extra={

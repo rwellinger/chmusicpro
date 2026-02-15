@@ -15,6 +15,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from utils.logger import logger
 
+from .routes.ai_config_routes import api_ai_config_v1
 from .routes.chat_routes import api_chat_v1
 from .routes.claude_chat_routes import api_claude_chat_v1
 from .routes.conversation_routes import api_conversation_v1
@@ -313,6 +314,7 @@ def create_app():
                     "api_equipment_v1": "Equipment",
                     "api_user_v1": "User Management",
                     "api_domain_v1": "Domains",
+                    "api_ai_config_v1": "AI Config",
                     "api_ollama_v1": "Ollama",
                     "api_v1": "System",
                 }
@@ -337,6 +339,7 @@ def create_app():
                             "api_equipment_v1",
                             "api_user_v1",
                             "api_domain_v1",
+                            "api_ai_config_v1",
                             "api_ollama_v1",
                             "api_v1",
                         )
@@ -568,5 +571,6 @@ def create_app():
     app.register_blueprint(api_equipment_v1)
     app.register_blueprint(api_workshop_v1)
     app.register_blueprint(api_domain_v1)
+    app.register_blueprint(api_ai_config_v1)
 
     return app

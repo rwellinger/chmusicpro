@@ -368,6 +368,7 @@
     "maxLength": "Darf maximal {{length}} Zeichen lang sein",
     "minLength": "Muss mindestens {{length}} Zeichen lang sein",
     "networkError": "Netzwerkfehler aufgetreten",
+    "providerNotAvailable": "Dieser KI-Anbieter ist in der aktuellen Konfiguration nicht verfügbar",
     "required": "Dieses Feld ist erforderlich",
     "savingError": "Fehler beim Speichern der Daten"
   },
@@ -900,15 +901,19 @@
     "title": "Prompt Vorlagen Editor",
     "fields": {
       "description": "Beschreibung",
+      "provider": "KI-Anbieter",
       "model": "Modell",
       "temperature": "Temperatur",
       "maxTokens": "Max. Token",
       "preCondition": "Vorbedingung",
       "postCondition": "Nachbedingung"
     },
+    "labels": {
+      "loadingModels": "Modelle werden geladen..."
+    },
     "placeholders": {
       "description": "Optionale Beschreibung...",
-      "model": "z.B. llama3.2:3b",
+      "model": "Modell auswählen",
       "temperature": "0.0 - 2.0",
       "maxTokens": "Max 3000 (leer = kein Limit)",
       "preCondition": "Vorbedingung eingeben...",

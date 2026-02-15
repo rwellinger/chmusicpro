@@ -159,6 +159,7 @@ export class ApiConfigService {
             uploadFile: (id: string) => `${this.baseUrl}/api/v1/song-projects/${id}/files`,
             clearFolder: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/clear`
         },
+        aiConfig: `${this.baseUrl}/api/v1/ai-config/`,
         domain: {
             list: `${this.baseUrl}/api/v1/domains`,
             detail: (id: string) => `${this.baseUrl}/api/v1/domains/${id}`,

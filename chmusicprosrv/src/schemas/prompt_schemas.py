@@ -2,9 +2,7 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-
-from config.allowed_models import OLLAMA_ALLOWED_MODELS
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class PromptTemplateBase(BaseModel):
@@ -16,19 +14,13 @@ class PromptTemplateBase(BaseModel):
     post_condition: str = Field(..., description="Text after user input")
     description: str | None = Field(None, description="Human-readable description of the template")
     version: str | None = Field(None, max_length=10, description="Template version")
+    provider: str = Field("ollama", max_length=50, description="AI provider (ollama, openai, claude)")
     model: str | None = Field(None, max_length=50, description="AI model for this template")
     temperature: float | None = Field(None, description="Temperature for text generation (validated by frontend)")
     max_tokens: int | None = Field(
         None, description="Maximum tokens to generate (None or <=0 means no limit, let model decide)"
     )
     active: bool = Field(True, description="Whether the template is active")
-
-    @field_validator("model")
-    @classmethod
-    def validate_model(cls, v):
-        if v is not None and v not in OLLAMA_ALLOWED_MODELS:
-            raise ValueError(f"model must be one of: {', '.join(OLLAMA_ALLOWED_MODELS)}")
-        return v
 
 
 class PromptTemplateCreate(PromptTemplateBase):
@@ -44,19 +36,13 @@ class PromptTemplateUpdate(BaseModel):
     post_condition: str | None = Field(None, description="Text after user input")
     description: str | None = Field(None, description="Human-readable description of the template")
     version: str | None = Field(None, max_length=10, description="Template version")
+    provider: str | None = Field(None, max_length=50, description="AI provider (ollama, openai, claude)")
     model: str | None = Field(None, max_length=50, description="AI model for this template")
     temperature: float | None = Field(None, description="Temperature for text generation (validated by frontend)")
     max_tokens: int | None = Field(
         None, description="Maximum tokens to generate (None or <=0 means no limit, let model decide)"
     )
     active: bool | None = Field(None, description="Whether the template is active")
-
-    @field_validator("model")
-    @classmethod
-    def validate_model(cls, v):
-        if v is not None and v not in OLLAMA_ALLOWED_MODELS:
-            raise ValueError(f"model must be one of: {', '.join(OLLAMA_ALLOWED_MODELS)}")
-        return v
 
 
 class PromptTemplateResponse(PromptTemplateBase):

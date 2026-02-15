@@ -8,6 +8,7 @@ export interface PromptTemplate {
     post_condition: string;
     description?: string;
     version?: string;
+    provider?: string;
     model?: string;
     temperature?: number;
     max_tokens?: number;
@@ -61,6 +62,7 @@ export class PromptConfigService {
                     post_condition: template.post_condition,
                     description: template.description,
                     version: template.version,
+                    provider: template.provider,
                     model: template.model,
                     temperature: template.temperature,
                     max_tokens: template.max_tokens

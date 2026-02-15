@@ -190,6 +190,7 @@ omit = [
     # Orchestrators - per CLAUDE.md: NOT testable (only call other services)
     "src/business/*_orchestrator.py",      # Orchestrators (coordination only, no business logic)
     "src/business/external_api_service.py", # OpenAI API client (external API, mock hell)
+    "src/business/ai_adapter.py",          # AI adapter factory (wraps external API clients, infrastructure)
     # Data Models - no logic to test
     "src/db/models.py",                    # SQLAlchemy models (no business logic)
     "src/schemas/*.py",                    # Pydantic schemas (validation only)

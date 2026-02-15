@@ -368,6 +368,7 @@
     "maxLength": "Must be at most {{length}} characters",
     "minLength": "Must be at least {{length}} characters",
     "networkError": "Network error occurred",
+    "providerNotAvailable": "This AI provider is not available in the current configuration",
     "required": "This field is required",
     "savingError": "Error saving data"
   },
@@ -900,15 +901,19 @@
     "title": "Prompt Template Editor",
     "fields": {
       "description": "Description",
+      "provider": "AI Provider",
       "model": "Model",
       "temperature": "Temperature",
       "maxTokens": "Max Tokens",
       "preCondition": "Pre-Condition",
       "postCondition": "Post-Condition"
     },
+    "labels": {
+      "loadingModels": "Loading models..."
+    },
     "placeholders": {
       "description": "Optional description...",
-      "model": "e.g., llama3.2:3b",
+      "model": "Select model",
       "temperature": "0.0 - 2.0",
       "maxTokens": "Max 3000 (empty = no limit)",
       "preCondition": "Enter the pre-condition prompt...",

@@ -5,6 +5,7 @@ import {TranslateModule} from "@ngx-translate/core";
 import {Subject} from "rxjs";
 import {takeUntil} from "rxjs/operators";
 import {AuthService} from "../../services/business/auth.service";
+import {AIConfigService} from "../../services/config/ai-config.service";
 import {AuthState, User} from "../../models/user.model";
 import appVersion from "../../../assets/app-version.json";
 
@@ -22,9 +23,12 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     firstName = "Guest"; // Computed property to avoid method calls in template
     activeDomainName = ""; // Active domain name from JWT
     isAdmin = false;
+    showInternalChat = true;
+    showExternalChat = true;
 
     private destroy$ = new Subject<void>();
     private authService = inject(AuthService);
+    private aiConfigService = inject(AIConfigService);
     private router = inject(Router);
 
     ngOnInit(): void {
@@ -39,6 +43,21 @@ export class SideMenuComponent implements OnInit, OnDestroy {
                 const cleanName = rawName.includes(":") ? rawName.split(":").slice(1).join(":") : rawName;
                 this.activeDomainName = cleanName.toLowerCase();
                 this.updateFirstName(); // Update computed property
+            });
+
+        // Load AI config for chat menu visibility
+        this.aiConfigService.getConfig()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (config) => {
+                    this.showInternalChat = config.ollama_enabled;
+                    this.showExternalChat = config.external_enabled;
+                },
+                error: () => {
+                    // Fallback: show both
+                    this.showInternalChat = true;
+                    this.showExternalChat = true;
+                }
             });
     }
 

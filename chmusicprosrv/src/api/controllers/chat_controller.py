@@ -23,21 +23,23 @@ class ChatController:
         category: str | None = None,
         action: str | None = None,
         user_id: str | None = None,
+        provider: str = "ollama",
     ) -> tuple[dict[str, Any], int]:
         """
-        Generate chat response with Ollama.
+        Generate chat response via AI provider.
 
         Args:
-            model: Ollama model to use (e.g. "llama3.2:3b")
+            model: AI model to use (e.g. "llama3.2:3b", "gpt-4.1-mini")
             pre_condition: Text to prepend to prompt
             prompt: Main prompt text
             post_condition: Text to append to prompt
             temperature: Sampling temperature (default 0.3)
-            max_tokens: Maximum tokens to generate (None or <=0 means no limit, let model decide)
-            user_instructions: Optional user-specific instructions (placed between prompt and post_condition)
+            max_tokens: Maximum tokens to generate (None or <=0 means no limit)
+            user_instructions: Optional user-specific instructions
             category: Template category for logging (optional)
             action: Template action for logging (optional)
             user_id: User ID for usage tracking (optional)
+            provider: AI provider (ollama, openai, claude)
 
         Returns:
             Tuple of (response_data, status_code)
@@ -53,4 +55,5 @@ class ChatController:
             category,
             action,
             user_id,
+            provider,
         )

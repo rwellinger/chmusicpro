@@ -1,5 +1,6 @@
 import {Routes} from "@angular/router";
 import {AuthGuard} from "./guards/auth.guard";
+import {aiProviderGuard} from "./guards/ai-provider.guard";
 import {domainRoleGuard} from "./guards/domain-role.guard";
 
 export const routes: Routes = [
@@ -19,12 +20,12 @@ export const routes: Routes = [
     },
     {
         path: "ai-chat",
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard, aiProviderGuard("ollama")],
         loadComponent: () => import("./pages/ai-chat/ai-chat.component").then(m => m.AiChatComponent)
     },
     {
         path: "external-chat",
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard, aiProviderGuard("external")],
         loadComponent: () => import("./pages/external-chat/external-chat.component").then(m => m.ExternalChatComponent)
     },
     {

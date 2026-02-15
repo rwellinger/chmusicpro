@@ -256,8 +256,9 @@ class PromptTemplate(Base):
     post_condition = Column(Text, nullable=False)
     description = Column(Text, nullable=True)
     version = Column(String(10), nullable=True)
+    provider = Column(String(50), nullable=False, server_default="ollama", index=True)
     model = Column(String(50), nullable=True)  # Renamed from model_hint
-    temperature = Column(Float, nullable=True)  # For Ollama Chat API (0.0-2.0)
+    temperature = Column(Float, nullable=True)  # For AI Chat API (0.0-2.0)
     max_tokens = Column(Integer, nullable=True)  # Maximum tokens to generate
     active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

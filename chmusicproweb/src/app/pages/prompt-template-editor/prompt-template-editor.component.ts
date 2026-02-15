@@ -11,12 +11,18 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatButtonModule} from "@angular/material/button";
 
 import {PromptTemplate, PromptTemplateUpdate} from "../../models/prompt-template.model";
+import {AIProvider} from "../../models/ai-config.model";
 import {PromptTemplateService} from "../../services/config/prompt-template.service";
 import {NotificationService} from "../../services/ui/notification.service";
 import {ChatService} from "../../services/config/chat.service";
 import {ConversationService} from "../../services/business/conversation.service";
-import {OllamaChatModel} from "../../models/conversation.model";
+import {AIConfigService} from "../../services/config/ai-config.service";
+import {ModelCacheService} from "../../services/config/model-cache.service";
 import {TemperatureOption, TemperatureOptionsService} from "../../services/config/temperature-options.service";
+
+interface ModelOption {
+    name: string;
+}
 
 @Component({
     selector: "app-prompt-template-editor",
@@ -44,8 +50,9 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
     category: string = "";
     action: string = "";
 
-    // Model data
-    models: OllamaChatModel[] = [];
+    // Provider + Model data
+    availableProviders: AIProvider[] = [];
+    models: ModelOption[] = [];
 
     // Temperature options
     temperatureOptions: TemperatureOption[] = [];
@@ -70,6 +77,8 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
     private translate = inject(TranslateService);
     private chatService = inject(ChatService);
     private conversationService = inject(ConversationService);
+    private aiConfigService = inject(AIConfigService);
+    private modelCacheService = inject(ModelCacheService);
     private temperatureOptionsService = inject(TemperatureOptionsService);
 
     constructor() {
@@ -82,6 +91,7 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
             pre_condition: ["", Validators.required],
             post_condition: ["", Validators.required],
             description: [""],
+            provider: ["ollama"],
             model: [""],
             temperature: [null],
             max_tokens: [null]
@@ -92,8 +102,18 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
         // Load temperature options
         this.temperatureOptions = this.temperatureOptionsService.getOptions();
 
-        // Load models
-        this.loadModels();
+        // Load available providers from AI config
+        this.aiConfigService.getAvailableProviders()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (providers) => {
+                    this.availableProviders = providers;
+                },
+                error: () => {
+                    // Fallback: show ollama only
+                    this.availableProviders = ["ollama"];
+                }
+            });
 
         // Load template from navigation state
         if (this.navigationState?.["template"]) {
@@ -112,25 +132,61 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
         this.destroy$.complete();
     }
 
-    private loadModels(): void {
+    onProviderChange(provider: string): void {
+        // Clear current model selection when provider changes
+        this.editorForm.patchValue({model: ""});
+        this.loadModelsForProvider(provider);
+    }
+
+    private loadModelsForProvider(provider: string): void {
         this.isLoadingModels = true;
-        this.conversationService
-            .getChatModels()
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (models) => {
-                    this.models = models || [];
-                },
-                error: (error) => {
-                    console.error("Error loading models:", error);
-                    this.notificationService.error(
-                        this.translate.instant("promptTemplateEditor.errors.modelsFailed")
-                    );
-                },
-                complete: () => {
-                    this.isLoadingModels = false;
-                }
-            });
+        this.models = [];
+
+        switch (provider) {
+            case "openai":
+                this.modelCacheService.getOpenAIModels()
+                    .pipe(takeUntil(this.destroy$))
+                    .subscribe({
+                        next: (models) => {
+                            this.models = models.map(m => ({name: m.name}));
+                            this.isLoadingModels = false;
+                        },
+                        error: () => this.handleModelLoadError()
+                    });
+                break;
+
+            case "claude":
+                this.modelCacheService.getClaudeModels()
+                    .pipe(takeUntil(this.destroy$))
+                    .subscribe({
+                        next: (models) => {
+                            this.models = models.map(m => ({name: m.name}));
+                            this.isLoadingModels = false;
+                        },
+                        error: () => this.handleModelLoadError()
+                    });
+                break;
+
+            default: // ollama
+                this.conversationService
+                    .getChatModels()
+                    .pipe(takeUntil(this.destroy$))
+                    .subscribe({
+                        next: (models) => {
+                            this.models = (models || []).map(m => ({name: m.name}));
+                            this.isLoadingModels = false;
+                        },
+                        error: () => this.handleModelLoadError()
+                    });
+                break;
+        }
+    }
+
+    private handleModelLoadError(): void {
+        this.isLoadingModels = false;
+        this.notificationService.error(
+            this.translate.instant("promptTemplateEditor.errors.modelsFailed")
+        );
     }
 
     private loadTemplate(template: PromptTemplate): void {
@@ -138,15 +194,21 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
         this.category = template.category;
         this.action = template.action;
 
+        const provider = template.provider || "ollama";
+
         // Populate form
         this.editorForm.patchValue({
             pre_condition: template.pre_condition || "",
             post_condition: template.post_condition || "",
             description: template.description || "",
+            provider: provider,
             model: template.model || "",
             temperature: template.temperature,
             max_tokens: template.max_tokens
         });
+
+        // Load models for the template's provider
+        this.loadModelsForProvider(provider);
     }
 
     async save(): Promise<void> {
@@ -167,6 +229,7 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
                 pre_condition: this.editorForm.get("pre_condition")?.value.trim(),
                 post_condition: this.editorForm.get("post_condition")?.value.trim(),
                 description: this.editorForm.get("description")?.value?.trim() || undefined,
+                provider: this.editorForm.get("provider")?.value || undefined,
                 model: this.editorForm.get("model")?.value || undefined,
                 temperature: this.editorForm.get("temperature")?.value || undefined,
                 max_tokens: maxTokens

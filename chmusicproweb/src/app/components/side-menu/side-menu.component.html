@@ -22,17 +22,17 @@
             </div>
         </div>
 
-        <div class="nav-group">
+        <div class="nav-group" *ngIf="showInternalChat || showExternalChat">
             <span class="group-label">
                 <i class="fas fa-robot"></i>
                 {{ 'sideMenu.aiChat' | translate }}
             </span>
             <div class="group-items">
-                <a routerLink="/ai-chat" routerLinkActive="active">
+                <a routerLink="/ai-chat" routerLinkActive="active" *ngIf="showInternalChat">
                     <i class="fas fa-server"></i>
                     {{ 'sideMenu.ollamaChat' | translate }}
                 </a>
-                <a routerLink="/openai-chat" routerLinkActive="active">
+                <a routerLink="/openai-chat" routerLinkActive="active" *ngIf="showExternalChat">
                     <i class="fas fa-cloud"></i>
                     {{ 'sideMenu.openaiChat' | translate }}
                 </a>

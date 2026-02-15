@@ -50,6 +50,14 @@ CLAUDE_TIMEOUT = int(os.getenv("CLAUDE_TIMEOUT", "120"))
 CLAUDE_MAX_TOKENS = int(os.getenv("CLAUDE_MAX_TOKENS", "4096"))
 
 # --------------------------------------------------
+# AI Agent Config (Multi-Provider Support)
+# --------------------------------------------------
+USE_AI_AGENT_GENERAL = os.getenv("USE_AI_AGENT_GENERAL", "internal")  # internal | external | hybrid
+AGENT_EXTERNAL_PROVIDER = os.getenv("AGENT_EXTERNAL_PROVIDER", "openai")  # openai | claude
+AGENT_EXTERNAL_MODEL_OPENAI = os.getenv("AGENT_EXTERNAL_MODEL_OPENAI", "gpt-4.1-mini")
+AGENT_EXTERNAL_MODEL_CLAUDE = os.getenv("AGENT_EXTERNAL_MODEL_CLAUDE", "claude-haiku-4-5-20250929")
+
+# --------------------------------------------------
 # Image URL Config
 # --------------------------------------------------
 IMAGE_BASE_URL = os.getenv("IMAGE_BASE_URL", "http://localhost:8000/api/v1/image")

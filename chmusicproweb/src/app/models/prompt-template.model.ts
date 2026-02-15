@@ -6,8 +6,9 @@ export interface PromptTemplate {
     post_condition: string;
     description?: string;
     version?: string;
+    provider?: string;  // AI provider (ollama, openai, claude)
     model?: string;  // Renamed from model_hint
-    temperature?: number;  // Ollama Chat API temperature (0.0-2.0)
+    temperature?: number;  // AI Chat API temperature (0.0-2.0)
     max_tokens?: number;  // Maximum tokens to generate
     active: boolean;
     created_at: string;
@@ -18,8 +19,9 @@ export interface PromptTemplateUpdate {
     pre_condition?: string;
     post_condition?: string;
     description?: string;
+    provider?: string;  // AI provider (ollama, openai, claude)
     model?: string;  // AI model for this template
-    temperature?: number;  // Ollama Chat API temperature (0.0-2.0)
+    temperature?: number;  // AI Chat API temperature (0.0-2.0)
     max_tokens?: number;  // Maximum tokens to generate
 }
 

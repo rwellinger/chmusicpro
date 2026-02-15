@@ -42,12 +42,28 @@
                         </div>
 
                         <div class="metadata-field">
+                            <label for="provider">{{ 'promptTemplateEditor.fields.provider' | translate }}</label>
+                            <mat-form-field appearance="outline" class="provider-select">
+                                <mat-select
+                                        id="provider"
+                                        formControlName="provider"
+                                        (selectionChange)="onProviderChange($event.value)">
+                                    @for (provider of availableProviders; track provider) {
+                                        <mat-option [value]="provider">{{ provider }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="metadata-field">
                             <label for="model">{{ 'promptTemplateEditor.fields.model' | translate }}</label>
                             <mat-form-field appearance="outline" class="model-select">
                                 <mat-select
                                         id="model"
                                         formControlName="model"
-                                        [placeholder]="'promptTemplateEditor.placeholders.model' | translate">
+                                        [placeholder]="isLoadingModels
+                                            ? ('promptTemplateEditor.labels.loadingModels' | translate)
+                                            : ('promptTemplateEditor.placeholders.model' | translate)">
                                     @for (model of models; track model.name) {
                                         <mat-option [value]="model.name">{{ model.name }}</mat-option>
                                     }

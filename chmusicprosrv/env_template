@@ -125,6 +125,19 @@ CLAUDE_TIMEOUT=120
 CLAUDE_MAX_TOKENS=4096
 
 # ==================================================
+# AI AGENT CONFIGURATION (Multi-Provider Support)
+# ==================================================
+# Mode: internal (Ollama only), external (OpenAI/Claude only), hybrid (both)
+USE_AI_AGENT_GENERAL=internal
+
+# External provider: openai | claude (used when mode is external or hybrid)
+AGENT_EXTERNAL_PROVIDER=openai
+
+# Default external models per provider (used for template override in external-only mode)
+AGENT_EXTERNAL_MODEL_OPENAI=gpt-4.1-mini
+AGENT_EXTERNAL_MODEL_CLAUDE=claude-haiku-4-5-20250929
+
+# ==================================================
 # APPLICATION SETTINGS
 # ==================================================
 # Debug Mode (true/false)
