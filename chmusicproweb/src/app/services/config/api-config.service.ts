@@ -81,6 +81,14 @@ export class ApiConfigService {
             delete: (id: number) => `${this.baseUrl}/api/v1/lyric-parsing-rules/${id}`,
             reorder: `${this.baseUrl}/api/v1/lyric-parsing-rules/reorder`
         },
+        systemContextTemplate: {
+            list: `${this.baseUrl}/api/v1/system-context-templates`,
+            active: `${this.baseUrl}/api/v1/system-context-templates/active`,
+            detail: (id: string) => `${this.baseUrl}/api/v1/system-context-templates/${id}`,
+            create: `${this.baseUrl}/api/v1/system-context-templates`,
+            update: (id: string) => `${this.baseUrl}/api/v1/system-context-templates/${id}`,
+            delete: (id: string) => `${this.baseUrl}/api/v1/system-context-templates/${id}`
+        },
         sketch: {
             create: () => `${this.baseUrl}/api/v1/sketches`,
             list: (limit?: number, offset?: number, workflow?: string, search?: string, sketchType?: string) => {

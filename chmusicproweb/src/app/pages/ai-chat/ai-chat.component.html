@@ -44,6 +44,18 @@
                         </mat-panel-title>
                     </mat-expansion-panel-header>
 
+                    @if (activeTemplates.length > 0) {
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{ 'aiChat.form.templateSelect' | translate }}</mat-label>
+                            <mat-select (selectionChange)="applySystemContextTemplate($event.value)">
+                                @for (template of activeTemplates; track template.id) {
+                                    <mat-option [value]="template.content">{{ template.name }}</mat-option>
+                                }
+                            </mat-select>
+                            <mat-hint>{{ 'aiChat.form.templateSelectHint' | translate }}</mat-hint>
+                        </mat-form-field>
+                    }
+
                     <mat-form-field appearance="outline">
                         <mat-label>{{ 'aiChat.form.systemContext' | translate }}</mat-label>
                         <textarea matInput [(ngModel)]="systemContext" (ngModelChange)="onSystemContextChange()"

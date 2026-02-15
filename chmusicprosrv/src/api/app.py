@@ -31,6 +31,7 @@ from .routes.prompt_routes import api_prompt_v1
 from .routes.sketch_routes import api_sketch_v1
 from .routes.song_project_routes import api_song_projects_v1
 from .routes.song_release_routes import api_song_releases_v1
+from .routes.system_context_template_routes import api_system_context_template_v1
 from .routes.user_routes import api_user_v1
 from .routes.workshop_routes import api_workshop_v1
 
@@ -87,7 +88,7 @@ def create_app():
 
     # OpenAPI/Swagger Configuration
     spec = APISpec(
-        title="Swiss Music Production API",
+        title="My Music Production API",
         version=get_version(),
         openapi_version="3.0.2",
         info={
@@ -315,6 +316,7 @@ def create_app():
                     "api_user_v1": "User Management",
                     "api_domain_v1": "Domains",
                     "api_ai_config_v1": "AI Config",
+                    "api_system_context_template_v1": "System Context Templates",
                     "api_ollama_v1": "Ollama",
                     "api_v1": "System",
                 }
@@ -340,6 +342,7 @@ def create_app():
                             "api_user_v1",
                             "api_domain_v1",
                             "api_ai_config_v1",
+                            "api_system_context_template_v1",
                             "api_ollama_v1",
                             "api_v1",
                         )
@@ -572,5 +575,6 @@ def create_app():
     app.register_blueprint(api_workshop_v1)
     app.register_blueprint(api_domain_v1)
     app.register_blueprint(api_ai_config_v1)
+    app.register_blueprint(api_system_context_template_v1)
 
     return app

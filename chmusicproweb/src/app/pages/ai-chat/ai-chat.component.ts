@@ -19,7 +19,9 @@ import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {ConversationService} from "../../services/business/conversation.service";
 import {NotificationService} from "../../services/ui/notification.service";
 import {ChatExportService} from "../../services/business/chat-export.service";
+import {SystemContextTemplateService} from "../../services/config/system-context-template.service";
 import {Conversation, ConversationDetailResponse, Message, OllamaChatModel} from "../../models/conversation.model";
+import {SystemContextTemplate} from "../../models/system-context-template.model";
 import {MessageContentPipe} from "../../pipes/message-content.pipe";
 
 @Component({
@@ -51,6 +53,7 @@ export class AiChatComponent implements OnInit, OnDestroy {
     private conversationService = inject(ConversationService);
     private notificationService = inject(NotificationService);
     private chatExportService = inject(ChatExportService);
+    private systemContextTemplateService = inject(SystemContextTemplateService);
     private translate = inject(TranslateService);
     private messageContentPipe = new MessageContentPipe();
     private destroy$ = new Subject<void>();
@@ -60,6 +63,7 @@ export class AiChatComponent implements OnInit, OnDestroy {
     currentConversation: Conversation | null = null;
     messages: Message[] = [];
     models: OllamaChatModel[] = [];
+    activeTemplates: SystemContextTemplate[] = [];
 
     // UI State
     isLoading = false;
@@ -88,6 +92,7 @@ export class AiChatComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.loadConversations();
+        this.loadActiveTemplates();
 
         // Load saved system context from localStorage
         this.systemContext = this.conversationService.loadSystemContext();
@@ -457,6 +462,30 @@ export class AiChatComponent implements OnInit, OnDestroy {
     public clearSystemContext(): void {
         this.systemContext = "";
         this.conversationService.clearSystemContext();
+    }
+
+    /**
+     * Load active system context templates
+     */
+    private loadActiveTemplates(): void {
+        this.systemContextTemplateService.getActive()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (templates) => {
+                    this.activeTemplates = templates;
+                },
+                error: (error) => {
+                    console.error("Error loading system context templates:", error);
+                }
+            });
+    }
+
+    /**
+     * Apply a system context template to the textarea
+     */
+    public applySystemContextTemplate(content: string): void {
+        this.systemContext = content;
+        this.onSystemContextChange();
     }
 
     /**

@@ -87,6 +87,12 @@ export const routes: Routes = [
         loadComponent: () => import("./pages/lyric-parsing-rules/lyric-parsing-rules.component").then(m => m.LyricParsingRulesComponent)
     },
     {
+        path: "system-context-templates",
+        canActivate: [AuthGuard, domainRoleGuard],
+        data: {requiredDomainRoles: ["owner", "admin"]},
+        loadComponent: () => import("./pages/system-context-templates/system-context-templates.component").then(m => m.SystemContextTemplatesComponent)
+    },
+    {
         path: "domain-management",
         canActivate: [AuthGuard, domainRoleGuard],
         data: {requiredDomainRoles: ["owner", "admin"]},

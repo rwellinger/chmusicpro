@@ -21,7 +21,9 @@ import {OpenaiChatService} from "../../services/business/openai-chat.service";
 import {ClaudeChatService} from "../../services/business/claude-chat.service";
 import {NotificationService} from "../../services/ui/notification.service";
 import {ChatExportService} from "../../services/business/chat-export.service";
+import {SystemContextTemplateService} from "../../services/config/system-context-template.service";
 import {ClaudeModel, Conversation, ConversationDetailResponse, Message, OpenAIModel} from "../../models/conversation.model";
+import {SystemContextTemplate} from "../../models/system-context-template.model";
 import {MessageContentPipe} from "../../pipes/message-content.pipe";
 
 @Component({
@@ -55,6 +57,7 @@ export class ExternalChatComponent implements OnInit, OnDestroy {
     private claudeChatService = inject(ClaudeChatService);
     private notificationService = inject(NotificationService);
     private chatExportService = inject(ChatExportService);
+    private systemContextTemplateService = inject(SystemContextTemplateService);
     private translate = inject(TranslateService);
     private messageContentPipe = new MessageContentPipe();
     private destroy$ = new Subject<void>();
@@ -64,6 +67,7 @@ export class ExternalChatComponent implements OnInit, OnDestroy {
     currentConversation: Conversation | null = null;
     messages: Message[] = [];
     models: (OpenAIModel | ClaudeModel)[] = [];
+    activeTemplates: SystemContextTemplate[] = [];
 
     // Provider Selection
     selectedProvider: "openai" | "claude" = "openai";
@@ -99,6 +103,7 @@ export class ExternalChatComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.loadConversations();
+        this.loadActiveTemplates();
 
         // Load saved system context from localStorage based on default provider
         this.loadSystemContextForProvider();
@@ -510,6 +515,30 @@ export class ExternalChatComponent implements OnInit, OnDestroy {
         } else if (this.selectedProvider === "claude") {
             this.claudeChatService.clearSystemContext();
         }
+    }
+
+    /**
+     * Load active system context templates
+     */
+    private loadActiveTemplates(): void {
+        this.systemContextTemplateService.getActive()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (templates) => {
+                    this.activeTemplates = templates;
+                },
+                error: (error) => {
+                    console.error("Error loading system context templates:", error);
+                }
+            });
+    }
+
+    /**
+     * Apply a system context template to the textarea
+     */
+    public applySystemContextTemplate(content: string): void {
+        this.systemContext = content;
+        this.onSystemContextChange();
     }
 
     /**

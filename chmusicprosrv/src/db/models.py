@@ -843,6 +843,34 @@ class SongRelease(Base):
         return f"<SongRelease(id={self.id}, name='{self.name}', type='{self.type}', status='{self.status}')>"
 
 
+class SystemContextTemplate(Base):
+    """Model for predefined system context templates for AI chat conversations"""
+
+    __tablename__ = "system_context_templates"
+    __table_args__ = (UniqueConstraint("domain_id", "name", name="uq_sct_domain_name"),)
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+
+    # Domain ownership (multi-tenancy: belongs to KI Templates domain)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id"), nullable=True, index=True)
+
+    name = Column(String(100), nullable=False)
+    description = Column(Text, nullable=True)
+    content = Column(Text, nullable=False)
+    sort_order = Column(Integer, nullable=False, default=0)
+    active = Column(Boolean, default=True, nullable=False)
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Relationships
+    domain = relationship("Domain")
+
+    def __repr__(self):
+        return f"<SystemContextTemplate(id={self.id}, name='{self.name}', active={self.active})>"
+
+
 class ReleaseProjectReference(Base):
     """Model for N:M relationship between releases and song projects"""
 

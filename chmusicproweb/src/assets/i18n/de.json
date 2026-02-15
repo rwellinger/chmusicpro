@@ -144,6 +144,8 @@
       "systemContextHint": "Wird automatisch im Browser gespeichert",
       "systemContextOptional": "System-Kontext (Optional)",
       "systemContextPlaceholder": "Systemverhalten festlegen...",
+      "templateSelect": "Vorlage anwenden",
+      "templateSelectHint": "Vorlage auswaehlen, um den System-Kontext zu befuellen",
       "title": "Titel",
       "titlePlaceholder": "Chat-Titel"
     },
@@ -205,7 +207,7 @@
   },
   "register": {
     "title": "Konto erstellen",
-    "subtitle": "Swiss Music Production beitreten",
+    "subtitle": "Meine Music Production beitreten",
     "steps": {
       "step1": "Sprache",
       "step2": "Person",
@@ -955,7 +957,7 @@
   },
   "sideMenu": {
     "aiChat": "KI Chat",
-    "brandName": "Swiss Music Production",
+    "brandName": "Meine Music Production",
     "dashboard": "Dashboard",
     "createImage": "Erstellen",
     "equipment": "Equipment",
@@ -984,7 +986,8 @@
     "workshopLibrary": "Workshop-Bibliothek",
     "coverArt": "Cover Art",
     "distribution": "Distribution",
-    "manageProjects": "Projekte verwalten"
+    "manageProjects": "Projekte verwalten",
+    "systemContextTemplates": "System-Kontext-Vorlagen"
   },
   "musicStylePrompt": {
     "title": "Music Style Prompt",
@@ -1204,6 +1207,55 @@
     "messages": {
       "noRules": "Noch keine Parsing-Regeln definiert",
       "loading": "Lade Parsing-Regeln..."
+    }
+  },
+  "systemContextTemplates": {
+    "title": "System-Kontext-Vorlagen",
+    "header": {
+      "countSingular": "{{count}} Vorlage",
+      "countPlural": "{{count}} Vorlagen"
+    },
+    "table": {
+      "sortOrder": "Reihenfolge",
+      "name": "Name",
+      "description": "Beschreibung",
+      "active": "Aktiv",
+      "actions": "Aktionen"
+    },
+    "actions": {
+      "add": "Vorlage hinzufuegen",
+      "edit": "Bearbeiten",
+      "delete": "Loeschen"
+    },
+    "dialog": {
+      "createTitle": "Neue Vorlage erstellen",
+      "editTitle": "Vorlage bearbeiten",
+      "deleteConfirm": "Sind Sie sicher, dass Sie diese Vorlage loeschen moechten?"
+    },
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "Vorlagenname eingeben...",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Beschreibung eingeben (optional)...",
+      "content": "System-Prompt-Inhalt",
+      "contentPlaceholder": "System-Prompt-Inhalt eingeben...",
+      "sortOrder": "Reihenfolge",
+      "active": "Aktiv"
+    },
+    "notifications": {
+      "created": "Vorlage erfolgreich erstellt",
+      "updated": "Vorlage erfolgreich aktualisiert",
+      "deleted": "Vorlage erfolgreich geloescht",
+      "loadError": "Fehler beim Laden der Vorlagen: {{message}}",
+      "saveError": "Fehler beim Speichern der Vorlage: {{message}}",
+      "deleteError": "Fehler beim Loeschen der Vorlage: {{message}}"
+    },
+    "errors": {
+      "required": "Dieses Feld ist erforderlich"
+    },
+    "messages": {
+      "noTemplates": "Noch keine System-Kontext-Vorlagen definiert",
+      "loading": "Lade Vorlagen..."
     }
   },
   "songSketch": {
