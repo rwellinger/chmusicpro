@@ -132,9 +132,8 @@
                             <div class="char-count" *ngIf="characterCountPre > 0">
                                 {{ characterCountPre }} {{ 'promptTemplateEditor.charactersCount' | translate }}
                             </div>
-                            <button
-                                    type="button"
-                                    class="improve-button"
+                            <button mat-stroked-button type="button"
+                                    class="ai-accent"
                                     (click)="improvePreCondition()"
                                     [disabled]="isSaving || isImprovingPre || characterCountPre === 0"
                                     [title]="'promptTemplateEditor.actions.improvePre' | translate">
@@ -163,9 +162,8 @@
                             <div class="char-count" *ngIf="characterCountPost > 0">
                                 {{ characterCountPost }} {{ 'promptTemplateEditor.charactersCount' | translate }}
                             </div>
-                            <button
-                                    type="button"
-                                    class="improve-button"
+                            <button mat-stroked-button type="button"
+                                    class="ai-accent"
                                     (click)="improvePostCondition()"
                                     [disabled]="isSaving || isImprovingPost || characterCountPost === 0"
                                     [title]="'promptTemplateEditor.actions.improvePost' | translate">

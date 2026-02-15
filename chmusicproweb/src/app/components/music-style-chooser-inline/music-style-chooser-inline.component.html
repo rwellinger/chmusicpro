@@ -40,16 +40,14 @@
                     </div>
                 </div>
                 <div class="accordion-content" *ngIf="isCategoryExpanded('styles')">
-                    <div class="tag-grid">
-                        <button
+                    <mat-chip-listbox multiple class="tag-grid">
+                        <mat-chip-option
                                 *ngFor="let style of availableStyles"
-                                type="button"
-                                class="tag-button"
-                                [class.selected]="isStyleSelected(style)"
+                                [selected]="isStyleSelected(style)"
                                 (click)="toggleStyle(style)">
                             {{ style }}
-                        </button>
-                    </div>
+                        </mat-chip-option>
+                    </mat-chip-listbox>
                 </div>
             </div>
 
@@ -66,16 +64,14 @@
                     </div>
                 </div>
                 <div class="accordion-content" *ngIf="isCategoryExpanded('instruments')">
-                    <div class="tag-grid">
-                        <button
+                    <mat-chip-listbox multiple class="tag-grid">
+                        <mat-chip-option
                                 *ngFor="let instrument of availableInstruments"
-                                type="button"
-                                class="tag-button"
-                                [class.selected]="isInstrumentSelected(instrument)"
+                                [selected]="isInstrumentSelected(instrument)"
                                 (click)="toggleInstrument(instrument)">
                             {{ instrument }}
-                        </button>
-                    </div>
+                        </mat-chip-option>
+                    </mat-chip-listbox>
                 </div>
             </div>
 
@@ -92,24 +88,20 @@
                     </div>
                 </div>
                 <div class="accordion-content" *ngIf="isCategoryExpanded('themes')">
-                    <div class="tag-grid">
-                        <button
+                    <mat-chip-listbox multiple class="tag-grid">
+                        <mat-chip-option
                                 *ngFor="let theme of availableThemes"
-                                type="button"
-                                class="tag-button"
-                                [class.selected]="isThemeSelected(theme)"
+                                [selected]="isThemeSelected(theme)"
                                 (click)="toggleTheme(theme)">
                             {{ theme }}
-                        </button>
-                    </div>
+                        </mat-chip-option>
+                    </mat-chip-listbox>
                 </div>
             </div>
 
             <!-- Actions -->
             <div class="chooser-actions" *ngIf="mode === 'manual'">
-                <button
-                        type="button"
-                        class="apply-btn"
+                <button mat-flat-button color="primary" type="button"
                         (click)="applyStylesClick()">
                     <i class="fas fa-check"></i>
                     {{ 'musicStylePrompt.styleChooser.applyButton' | translate }}

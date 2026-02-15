@@ -64,11 +64,10 @@
                     <div class="ai-actions">
                         <!-- Enhancer Dropdown -->
                         <div class="enhancer-dropdown-container">
-                            <button
-                                    type="button"
+                            <button mat-stroked-button type="button"
+                                    class="ai-accent"
                                     (click)="toggleEnhancerDropdown()"
-                                    [disabled]="isAnyOperationInProgress || !promptForm.get('prompt')?.value?.trim()"
-                                    class="ai-action-button">
+                                    [disabled]="isAnyOperationInProgress || !promptForm.get('prompt')?.value?.trim()">
                                 <i class="fas fa-wand-magic-sparkles" *ngIf="!isEnhancingPrompt"></i>
                                 <i class="fas fa-spinner fa-spin" *ngIf="isEnhancingPrompt"></i>
                                 <span>{{ 'musicStylePrompt.enhancePrompt' | translate }}</span>
@@ -95,11 +94,10 @@
                             </div>
                         </div>
 
-                        <button
-                                type="button"
+                        <button mat-stroked-button type="button"
+                                class="ai-accent"
                                 (click)="translatePrompt()"
-                                [disabled]="isAnyOperationInProgress || !promptForm.get('prompt')?.value?.trim()"
-                                class="ai-action-button">
+                                [disabled]="isAnyOperationInProgress || !promptForm.get('prompt')?.value?.trim()">
                             <i class="fas fa-language" *ngIf="!isTranslatingPrompt"></i>
                             <i class="fas fa-spinner fa-spin" *ngIf="isTranslatingPrompt"></i>
                             <span>{{ 'musicStylePrompt.translateToEnglish' | translate }}</span>

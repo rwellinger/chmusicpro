@@ -94,11 +94,10 @@
 
                                 <!-- Cleanup Button + Character Count Row -->
                                 <div class="section-footer-row" *ngIf="activeSection">
-                                    <button
-                                            type="button"
+                                    <button mat-stroked-button type="button"
+                                            class="ai-accent"
                                             (click)="cleanupSectionContent()"
-                                            [disabled]="isAnySectionOperationInProgress || !activeSection.content.trim()"
-                                            class="cleanup-button">
+                                            [disabled]="isAnySectionOperationInProgress || !activeSection.content.trim()">
                                         <i class="fas fa-broom"></i>
                                         {{ 'lyricCreation.cleanupLyrics' | translate }}
                                     </button>
@@ -125,41 +124,37 @@
                             </div>
 
                             <div class="section-ai-actions">
-                                <button
-                                        type="button"
+                                <button mat-stroked-button type="button"
+                                        class="ai-accent"
                                         (click)="improveSectionAI()"
-                                        [disabled]="isAnySectionOperationInProgress"
-                                        class="ai-action-button">
+                                        [disabled]="isAnySectionOperationInProgress">
                                     <i class="fas fa-magic" *ngIf="!isImprovingSection"></i>
                                     <i class="fas fa-spinner fa-spin" *ngIf="isImprovingSection"></i>
                                     {{ 'lyricCreation.sectionEditor.improve' | translate }}
                                 </button>
 
-                                <button
-                                        type="button"
+                                <button mat-stroked-button type="button"
+                                        class="ai-accent"
                                         (click)="rewriteSectionAI()"
-                                        [disabled]="isAnySectionOperationInProgress"
-                                        class="ai-action-button">
+                                        [disabled]="isAnySectionOperationInProgress">
                                     <i class="fas fa-sync-alt" *ngIf="!isRewritingSection"></i>
                                     <i class="fas fa-spinner fa-spin" *ngIf="isRewritingSection"></i>
                                     {{ 'lyricCreation.sectionEditor.rewrite' | translate }}
                                 </button>
 
-                                <button
-                                        type="button"
+                                <button mat-stroked-button type="button"
+                                        class="ai-accent"
                                         (click)="condenseSectionAI()"
-                                        [disabled]="isAnySectionOperationInProgress"
-                                        class="ai-action-button">
+                                        [disabled]="isAnySectionOperationInProgress">
                                     <i class="fas fa-compress-alt" *ngIf="!isCondensingSection"></i>
                                     <i class="fas fa-spinner fa-spin" *ngIf="isCondensingSection"></i>
                                     {{ 'lyricCreation.sectionEditor.condense' | translate }}
                                 </button>
 
-                                <button
-                                        type="button"
+                                <button mat-stroked-button type="button"
+                                        class="ai-accent"
                                         (click)="optimizeSectionAI()"
-                                        [disabled]="isAnySectionOperationInProgress"
-                                        class="ai-action-button">
+                                        [disabled]="isAnySectionOperationInProgress">
                                     <i class="fas fa-align-left" *ngIf="!isOptimizingSection"></i>
                                     <i class="fas fa-spinner fa-spin" *ngIf="isOptimizingSection"></i>
                                     {{ 'lyricCreation.sectionEditor.optimize' | translate }}
@@ -181,20 +176,18 @@
                                 [disabled]="isAnyLyricOperationInProgress || sectionEditorMode">
                             <i class="fas fa-layer-group"></i> {{ 'lyricCreation.lyricArchitecture' | translate }}
                         </button>
-                        <button
-                                type="button"
+                        <button mat-stroked-button type="button"
+                                class="ai-accent"
                                 (click)="generateLyrics()"
-                                [disabled]="isAnyLyricOperationInProgress || sectionEditorMode || !lyricForm.get('lyrics')?.value?.trim()"
-                                class="ai-action-button">
+                                [disabled]="isAnyLyricOperationInProgress || sectionEditorMode || !lyricForm.get('lyrics')?.value?.trim()">
                             <i class="fas fa-music" *ngIf="!isGeneratingLyrics"></i>
                             <i class="fas fa-spinner fa-spin" *ngIf="isGeneratingLyrics"></i>
                             <span>{{ 'lyricCreation.createLyrics' | translate }}</span>
                         </button>
-                        <button
-                                type="button"
+                        <button mat-stroked-button type="button"
+                                class="ai-accent"
                                 (click)="translateLyrics()"
-                                [disabled]="isAnyLyricOperationInProgress || sectionEditorMode || !lyricForm.get('lyrics')?.value?.trim()"
-                                class="ai-action-button">
+                                [disabled]="isAnyLyricOperationInProgress || sectionEditorMode || !lyricForm.get('lyrics')?.value?.trim()">
                             <i class="fas fa-language" *ngIf="!isTranslatingLyrics"></i>
                             <i class="fas fa-spinner fa-spin" *ngIf="isTranslatingLyrics"></i>
                             <span>{{ 'lyricCreation.translateToEnglish' | translate }}</span>

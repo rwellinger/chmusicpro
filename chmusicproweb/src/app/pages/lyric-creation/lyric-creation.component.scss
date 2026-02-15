@@ -155,22 +155,18 @@
   overflow: visible;
 }
 
-.ai-action-button {
-  @include button-ai('base');
-  background-color: $ai-color !important;
-  display: flex;
-  align-items: center;
-  gap: $spacing-xs;
-  font-weight: $font-weight-medium !important;
-  
+.ai-accent {
+  color: $ai-color !important;
+  border-color: rgba($ai-color, 0.5) !important;
+
   i {
-    font-size: $font-base;
+    color: $ai-color;
+    margin-right: $spacing-xs;
   }
-  
+
   &:hover:not(:disabled) {
-    background-color: $ai-hover !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background-color: rgba($ai-color, 0.06) !important;
+    border-color: $ai-color !important;
   }
 }
 
@@ -427,25 +423,6 @@
     align-items: center;
     margin-top: $spacing-xs;
     
-    .cleanup-button {
-      @include button-secondary('base');
-      font-weight: $font-weight-medium !important;
-      display: flex;
-      align-items: center;
-      gap: $spacing-xs;
-      padding: $spacing-xs $spacing-sm;
-      font-size: $font-sm;
-      
-      i {
-        font-size: $font-sm;
-      }
-      
-      &:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      }
-    }
-    
     .section-char-count {
       font-size: $font-sm;
       color: $text-muted;
@@ -609,7 +586,7 @@
     flex-direction: column;
     gap: $spacing-xs;
     
-    .ai-action-button {
+    .ai-accent {
       width: 100%;
       justify-content: center;
     }

@@ -61,6 +61,9 @@
     "title": "Dashboard",
     "subtitle": "Your music production workflow at a glance",
     "comingSoon": "Coming soon",
+    "pipeline": {
+      "title": "From Idea to Release"
+    },
     "tiles": {
       "workshop": {
         "title": "Lyric Creation",

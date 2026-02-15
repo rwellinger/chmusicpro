@@ -324,7 +324,7 @@ export class LyricCreationComponent implements OnInit {
             return false;
         }
 
-        const lyrics = this.lyricForm.get("lyrics")?.value || "";
+        const lyrics = (this.lyricForm.get("lyrics")?.value || "").replace(/[\u2010-\u2015]/g, "-");
         this.sectionDetectionPattern.lastIndex = 0;
         return this.sectionDetectionPattern.test(lyrics);
     }
@@ -509,7 +509,7 @@ export class LyricCreationComponent implements OnInit {
             lyrics = lyrics.replace(stripPattern, "");
         }
         // Also handle colon format labels (Intro:, Verse 1:, etc.)
-        lyrics = lyrics.replace(/^(Intro|Verse\s*\d*|Chorus\s*\d*|Bridge\s*\d*|Outro|Pre[-_\s]?Chorus|Post[-_\s]?Chorus)\s*:\s*$/gmi, "");
+        lyrics = lyrics.replace(/^(Intro|Verse\s*\d*|Chorus\s*\d*|Bridge\s*\d*|Outro|Pre[-_\s\u2010-\u2015]?Chorus|Post[-_\s\u2010-\u2015]?Chorus)\s*:\s*$/gmi, "");
 
         // Split into paragraphs (separated by blank lines)
         const paragraphs = lyrics.split(/\n\s*\n/).filter((p: string) => p.trim());
@@ -570,8 +570,10 @@ export class LyricCreationComponent implements OnInit {
         const sectionRegex = new RegExp(this.sectionDetectionPattern.source, this.sectionDetectionPattern.flags);
 
         for (const line of lines) {
+            // Normalize unicode dashes (U+2010-U+2015) to regular hyphen for section detection
+            const normalizedLine = line.replace(/[\u2010-\u2015]/g, "-");
             sectionRegex.lastIndex = 0;
-            const match = sectionRegex.exec(line);
+            const match = sectionRegex.exec(normalizedLine);
 
             if (match) {
                 // Found a section label

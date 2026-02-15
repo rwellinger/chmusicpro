@@ -193,66 +193,8 @@
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
-    align-items: flex-start;
-    line-height: 1;
   }
-  
-  .tag-grid button.tag-button {
-    position: relative;
-    padding: 3px 10px;
-    border: 1px solid rgba($border-light, 0.8);
-    background: transparent;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: $font-weight-medium;
-    color: $text-secondary;
-    transition: all 0.15s ease;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    height: 22px;
-    line-height: 1;
-    box-shadow: none;
-    min-height: unset;
-    
-    &:hover:not(.selected) {
-      border-color: rgba($primary-color, 0.5);
-      background: rgba($primary-color, 0.05);
-      color: $text-primary;
-      transform: none;
-    }
-    
-    &.selected {
-      background: rgba($primary-color, 0.15);
-      color: $primary-color;
-      border-color: rgba($primary-color, 0.4);
-      font-weight: $font-weight-semibold;
-      
-      &::before {
-        content: '✓';
-        font-size: 13px;
-        margin-right: 2px;
-      }
-      
-      &:hover {
-        background: rgba($primary-color, 0.22);
-        border-color: rgba($primary-color, 0.5);
-        transform: none;
-      }
-    }
-    
-    &:focus {
-      outline: 1px solid rgba($primary-color, 0.4);
-      outline-offset: 1px;
-    }
-    
-    &:active {
-      transform: scale(0.98);
-    }
-  }
-  
+
   .chooser-actions {
     display: flex;
     justify-content: flex-end;
@@ -260,92 +202,37 @@
     margin-top: $spacing-md;
     padding-top: $spacing-sm;
     border-top: 1px solid rgba($border-light, 0.5);
-    
-    .apply-btn {
-      padding: 8px 20px;
-      border: none;
-      background: $primary-color;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: $font-weight-semibold;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      height: 36px;
-      box-shadow: 0 2px 4px rgba($primary-color, 0.2);
-      min-height: auto;
-      
-      &:hover {
-        background: color.adjust($primary-color, $lightness: -8%);
-        transform: translateY(-1px);
-        box-shadow: 0 3px 6px rgba($primary-color, 0.3);
-      }
-      
-      &:active {
-        transform: translateY(0);
-        box-shadow: 0 1px 2px rgba($primary-color, 0.2);
-      }
-      
-      i {
-        font-size: 12px;
-      }
-    }
   }
   
   @media (max-width: 768px) {
     .style-chooser-container {
       padding: $spacing-xs;
     }
-    
+
     .accordion-title {
       font-size: 11px;
-      
+
       .accordion-icon {
         font-size: 11px;
       }
-      
+
       .category-icon {
         font-size: 11px;
       }
-      
+
       .count-badge {
         font-size: 11px;
         padding: 1px 4px;
       }
     }
-    
+
     .tag-grid {
       gap: 3px;
     }
-    
-    .tag-grid button.tag-button {
-      height: 20px;
-      padding: 2px 8px;
-      font-size: 13px;
-      border-radius: 20px;
-      
-      &.selected::before {
-        font-size: 13px;
-        margin-right: 1px;
-      }
-    }
-    
+
     .chooser-actions {
       margin-top: $spacing-sm;
       padding-top: $spacing-xs;
-      
-      .apply-btn {
-        font-size: 11px;
-        padding: 6px 12px;
-        height: 32px;
-        
-        i {
-          font-size: 11px;
-        }
-      }
     }
   }
 }
