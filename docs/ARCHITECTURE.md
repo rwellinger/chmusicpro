@@ -25,14 +25,14 @@ This project uses the **arc42 architecture template** for comprehensive document
 ## Quick Reference
 
 ### Tech Stack
-- **Frontend**: Angular 20, Material Design, TypeScript, RxJS, ngx-translate
+- **Frontend**: Angular 21, Material Design, TypeScript, RxJS, ngx-translate
 - **Backend**: FastAPI, Python 3.12.12, Celery, SQLAlchemy, Alembic
 - **Database**: PostgreSQL, Redis
 - **Deployment**: Docker (Colima), Nginx
 - **Hardware**: Apple Silicon (M1/M4)
 
 ### Key Components
-- **chmusicproweb**: Angular 20 frontend with Material Design
+- **chmusicproweb**: Angular 21 frontend with Material Design
 - **chmusicprosrv**: FastAPI backend + proxy for external APIs (OpenAI, Ollama)
 - **forwardproxy**: Nginx reverse proxy (production)
 

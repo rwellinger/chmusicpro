@@ -1,7 +1,7 @@
 # Claude Code Configuration
 
 **Language:** English
-**Last Updated:** 2025-11-10
+**Last Updated:** 2026-02-17
 
 ---
 
@@ -231,7 +231,7 @@ cat scripts/db/seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U ch
 # 📖 Full Documentation
 
 **When you need details:**
-- **Project Overview:** `README.md` (803 lines - Build, Features, Commands)
+- **Project Overview:** `README.md` (Build, Features, Commands)
 - **Architecture Deep-Dive:** `docs/arch42/README.md` (2000+ lines - arc42, ADRs, Workflows)
 - **UI Patterns:** `docs/UI_PATTERNS.md` (CRITICAL - Read before new UI!)
 - **Code Patterns:** `docs/CODE_PATTERNS.md`
@@ -285,4 +285,4 @@ cat scripts/db/seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U ch
 
 ---
 
-**Last Review:** 2025-11-10
+**Last Review:** 2026-02-17

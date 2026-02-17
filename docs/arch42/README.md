@@ -1,4 +1,4 @@
-# ARC42 Architecture Documentation - Mac AI Service
+# ARC42 Architecture Documentation - My Music Production
 
 ## Table of Contents
 
@@ -27,7 +27,7 @@
    - [6.5 Text Overlay Workflow](#65-text-overlay-workflow)
    - [6.6 S3 Storage Migration (Hybrid Storage Architecture)](#66-s3-storage-migration-hybrid-storage-architecture)
    - [6.7 Lyric Parsing Rules Engine](#67-lyric-parsing-rules-engine)
-   - [6.8 CLI Tool (chmusicpro-cli)](#68-cli-tool-chmusicpro-cli)
+   - [6.8 Mirror Sync (Browser-based)](#68-mirror-sync-browser-based)
    - [6.9 Song Projects (Music Production Project Management)](#69-song-projects-music-production-project-management)
 7. [Deployment View](#7-deployment-view)
    - [7.1 Development Environment](#71-development-environment)
@@ -71,7 +71,7 @@
 - [Figure 6.3: AI Chat Conversation (Persistent)](#63-ai-chat-conversation-persistent) - `images/6.3_ai_chat_workflow.png`
 - [Figure 6.6.1: Storage Migration Architecture](#66-s3-storage-migration-hybrid-storage-architecture) - `images/6.7_storage_migration.png`
 - [Figure 6.6.2: S3 Migration Workflow](#66-s3-storage-migration-hybrid-storage-architecture) - `images/6.8_s3_migration_workflow.png`
-- [Figure 6.8: CLI Tool Workflow](#68-cli-tool-chmusicpro-cli) - Command-line interaction diagrams
+- [Figure 6.8: Mirror Sync Workflow](#68-mirror-sync-browser-based) - Browser-based file synchronization
 - [Figure 7.3: Network Architecture](#73-network-architecture) - `images/7.3_netzwerk_architektur.png`
 - [Figure 10.1: Development Deployment](#101-development-deployment) - `images/9.1_entwicklungs_deployment.png`
 - [Figure 10.2: Production Deployment](#102-production-deployment) - `images/9.2_produktions_deployment.png`
@@ -86,16 +86,16 @@
 ## 1. Introduction and Goals
 
 ### 1.1 Requirements Overview
-The Mac AI Service System is a personal AI-based multimedia generation platform offering the following main features:
+My Music Production is a personal AI-based multimedia generation platform offering the following main features:
 - **AI Chat Conversations** - Interactive conversational AI via Ollama with persistent conversation history
-  - Integrated chat UI as part of Swiss Music Production (replaced Open WebUI dependency)
+  - Integrated chat UI as part of My Music Production (replaced Open WebUI dependency)
   - Direct Ollama integration with full conversation management
 - **Lyric Creation Editor** - Professional songwriting tool with AI-powered assistance
   - Section-based editing (Intro, Verse, Pre-Chorus, Chorus, Bridge, Outro)
   - Song architecture builder with drag & drop reordering
   - AI-powered section improvement, rewriting, and extension via Ollama
   - Text tools: cleanup, structure application, section navigation, undo functionality
-- **Song Sketch Library** - Organize and develop song ideas before generation
+- **Song Composition Library** - Organize and develop song ideas before generation (internally "sketches" in codebase)
   - Create and manage song sketches (title, lyrics, music style prompt, tags)
   - Workflow management (draft, used, archived)
   - Master-detail view with search and filtering
@@ -135,6 +135,8 @@ The Mac AI Service System is a personal AI-based multimedia generation platform 
 - **Song Management**: Sketches, Styles, FLAC/MP3/Stems, Playback
 - **Asynchronous Processing** for time-intensive generation processes
 - **Ollama Model Chat** for prompt improvements via prompt templates
+- **System Context Templates** - Reusable AI behavior presets for consistent system context configuration
+- **Pipeline Workflow** - Guided 8-step production pipeline with sticky progress bar
 - **Web-based User Interface** for easy operation
 
 ### 1.2 Quality Goals
@@ -262,7 +264,7 @@ ApiCostService (src/db/api_cost_service.py)
 - **Code Review**: Violations easily detectable during PR review
 
 ### 4.2 Technology Stack
-- **Frontend**: Angular 20.0.0 + TypeScript + Angular Material + SCSS + RxJS
+- **Frontend**: Angular 21 + TypeScript + Angular Material + SCSS + RxJS
 - **Backend**: Python 3.12.12 + FastAPI + SQLAlchemy 2.0 + Pydantic 2.0 + Alembic 1.13
 - **Image Processing**: Pillow (PIL) 11.0.0 - Text overlay rendering, font handling, image manipulation
 - **Object Storage**: Boto3 + S3-compatible storage (MinIO, AWS S3, Backblaze B2, Wasabi)
@@ -293,11 +295,12 @@ ApiCostService (src/db/api_cost_service.py)
 
 *Figure 5.2.1: Angular Project Structure - Components, services and modules of the frontend*
 
-- **Technology**: Angular 20.0.0 + TypeScript + SCSS + Angular Material
+- **Technology**: Angular 21 + TypeScript + SCSS + Angular Material
 - **Structure**:
   ```
   src/app/
   ├── components/    # Shared Components
+  │   ├── pipeline-step-bar/       # Sticky 8-step production pipeline progress bar
   │   ├── lyric-architect-modal/  # Song architecture builder with drag & drop
   │   ├── image-detail-panel/     # Image detail view component
   │   ├── song-detail-panel/      # Song detail view component
@@ -318,7 +321,9 @@ ApiCostService (src/db/api_cost_service.py)
   │   ├── song-generator/     # UI for music generation
   │   ├── song-view/          # Display of generated songs
   │   ├── user-profile/       # User profile page
-  │   └── prompt-templates/   # Template management for prompts
+  │   ├── text-workshop/      # Lyric workspace with project assignment
+  │   ├── prompt-templates/   # Template management for prompts
+  │   └── system-context-templates/  # Reusable AI behavior presets (admin)
   ├── services/      # API Services & Business Logic
   │   ├── business/           # ImageService, ConversationService, SketchService, SongService, EquipmentService
   │   ├── config/             # ChatService, ApiConfigService
@@ -1005,331 +1010,52 @@ The fundamental difference is that **RegEx patterns have an interpreter (the Reg
 
 ---
 
-### 6.8 CLI Tool (chmusicpro-cli)
+### 6.8 Mirror Sync (Browser-based)
 
-**Overview**: Command-line tool for managing song projects, batch uploading/downloading files, and one-way syncing with the backend. Built with Python Click framework for local file operations with S3-backed remote storage.
-
-**Location:** `scripts/cli/chmusicpro-cli.py` (1,177 lines)
+**Overview**: Browser-based drag & drop file synchronization that replaced the previous CLI tool. Users drop files directly into project folders in the web UI for automatic hash-based comparison and selective sync operations.
 
 **Key Components:**
 
-1. **CLI Framework & Dependencies**
-   - **Technology:** Python Click 8.1.0+ (command-line interface framework)
-   - **HTTP Client:** requests 2.31.0+ with SSL self-signed certificate support
-   - **Terminal UI:** rich 13.7.0+ for progress bars, color output, and formatting
-   - **Hashing:** hashlib (SHA256) for file comparison in mirror operations
-   - **Configuration:** JSON-based config in `~/.chmusicpro/config.json` (0600 permissions)
-
-2. **Authentication System**
-   - JWT token-based authentication via `/api/v1/user/login`
-   - Token storage: `~/.chmusicpro/config.json` with strict file permissions (0600)
-   - Token expiry tracking (ISO 8601 or RFC 2822 format)
-   - Pre-flight token validation before all commands (except `login`)
-   - SSL verification configurable (disabled for self-signed certs in dev)
-
-3. **Ignore Pattern Engine**
-   - Global ignore file: `~/.chmusicpro/.chmusicproignore`
-   - Local ignore file: `{upload_dir}/.chmusicproignore` (higher priority)
+1. **FileIgnoreService** (`services/business/file-ignore.service.ts`)
+   - Loads `.chmusicproignore` patterns
    - Gitignore-compatible syntax (wildcards, directory patterns, exact matches)
-   - Patterns applied recursively during directory scans
+   - Filters dropped files before processing
 
-**Commands:**
+2. **FileHashService** (`services/business/file-hash.service.ts`)
+   - SHA-256 hashing via Web Crypto API
+   - Progress reporting during hash computation
+   - Runs in browser (no server round-trip for hashing)
 
-#### 6.8.1 `login` - JWT Authentication
-
-**Endpoint:** `POST /api/v1/user/login`
-
-**Workflow:**
-1. User provides email + password (interactive input)
-2. POST credentials to backend API
-3. Receive JWT token + expiry timestamp
-4. Store in `~/.chmusicpro/config.json` with 0600 permissions
-5. Future commands use token via `Authorization: Bearer {jwt_token}` header
-
-**Configuration Structure:**
-```json
-{
-  "api_url": "https://macstudio/musicproapi",
-  "jwt_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "email": "user@example.com",
-  "expires_at": "2024-11-03T10:30:00Z",
-  "ssl_verify": false
-}
-```
-
-#### 6.8.2 `upload` - Batch File Upload
-
-**Endpoint:** `POST /api/v1/song-projects/{id}/folders/{folder_id}/batch-upload`
-
-**Parameters:**
-- `PROJECT_ID` (required): Projekt-UUID
-- `FOLDER_ID` (required): Ordner-UUID (e.g., "01-arrangement", "02-mixing")
-- `LOCAL_PATH` (optional, default: "."): Local directory to upload
-- `--debug` (flag): Show HTTP request/response details
-
-**Workflow:**
-1. **Directory Scan:** Recursively collect all files from `LOCAL_PATH`
-2. **Ignore Filter:** Apply `.chmusicproignore` patterns (global + local merge)
-3. **Batch Grouping:** Group files into batches of 3 (conservative: 3 × 150MB = 450MB < 500MB Nginx limit)
-4. **Upload:** For each batch:
-   - Open files as `multipart/form-data`
-   - Send POST with relative paths preserved (e.g., "Media/drums.flac")
-   - Timeout: 10 minutes per batch
-   - Parse response: `{"uploaded": 3, "failed": 0, "errors": []}`
-5. **Progress:** Rich library progress bar with file count + percentage
-6. **Summary:** Total uploaded + failed files
-
-**Why Batch Size = 3?**
-- Nginx `client_max_body_size` limit: 500MB
-- Typical FLAC stems: ~150MB each
-- 3 files = 450MB (safe margin below limit)
-
-**Error Handling:**
-- Individual file failures tracked in batch response
-- Maximum 10 failed file details shown in summary
-- Continues with remaining batches after failure
-
-#### 6.8.3 `download` - Folder Download
-
-**Endpoint:** `GET /api/v1/song-projects/{id}/folders/{folder_id}/files`
-
-**Parameters:**
-- `PROJECT_ID` (required): Projekt-UUID
-- `FOLDER_ID` (required): Ordner-UUID
-- `LOCAL_PATH` (optional, default: "."): Local destination directory
-
-**Workflow:**
-1. **Fetch File List:** GET folder metadata with all file records
-2. **Path Transformation:**
-   - Backend returns: `relative_path = "01 Arrangement/Media/drums.wav"`
-   - CLI removes folder prefix: `"Media/drums.wav"`
-   - Local path: `{LOCAL_PATH}/Media/drums.wav`
-3. **Download:** Stream files in chunks (8KB per chunk)
-4. **Progress:** Rich library progress bar with file count
-5. **Timeout:** 10 minutes per file
-
-**Path Reconstruction:**
-```python
-# Backend: relative_path = "01 Arrangement/Media/stems/kick.flac"
-# CLI: strip "01 Arrangement/" → "Media/stems/kick.flac"
-# Local: ~/Downloads/Media/stems/kick.flac
-```
-
-#### 6.8.4 `clone` - Complete Project Clone
-
-**Endpoint:** `GET /api/v1/song-projects/{id}/files/all`
-
-**Parameters:**
-- `PROJECT_ID` (required): Projekt-UUID
-- `LOCAL_PATH` (optional, default: "."): Local destination
-- `-d, --create-dir` (flag): Auto-create subdirectory with project name
-
-**Workflow:**
-1. **Fetch Complete Structure:** GET all folders + files in project
-2. **Create Folders:** Create all folder paths (including empty folders)
-3. **Download Files:** Stream all files with **full relative paths preserved**
-   - **CRITICAL:** Unlike `download`, does NOT trim folder prefix!
-   - Backend path: `"01 Arrangement/Media/drums.flac"`
-   - Local path: `{LOCAL_PATH}/01 Arrangement/Media/drums.flac`
-4. **Use Case:** "Create project in Web UI → Clone → Ready to work locally!"
-
-**Difference from `download`:**
-- `download`: Downloads single folder, strips folder prefix from paths
-- `clone`: Downloads entire project, preserves complete S3 structure 1:1
-
-#### 6.8.5 `mirror` - One-Way Sync (Local → Remote)
-
-**Endpoints:**
-- Phase 1: `POST /api/v1/song-projects/{id}/folders/{folder_id}/mirror` (compare)
-- Phase 2: `POST /api/v1/song-projects/{id}/folders/{folder_id}/batch-upload` (upload)
-- Phase 3: `DELETE /api/v1/song-projects/{id}/files/batch-delete` (delete)
-
-**Parameters:**
-- `PROJECT_ID` (required): Projekt-UUID
-- `FOLDER_ID` (required): Ordner-UUID
-- `LOCAL_PATH` (required): Local sync directory
-- `--dry-run` (flag): Preview changes without execution
-- `--yes` (flag): Skip confirmation prompt (automation)
-- `--debug` (flag): Show HTTP details
+3. **MirrorPreviewDialogComponent** (`components/mirror-preview-dialog/`)
+   - Diff preview showing new, updated, moved, deleted, and unchanged files
+   - User confirms or cancels before execution
 
 **Workflow:**
 
-**Phase 1: Local Analysis**
-1. Scan directory recursively
-2. Calculate SHA256 hash for each file
-3. Apply `.chmusicproignore` patterns
-4. Collect file metadata: `{path: str, hash: str, size: int}`
-
-**Phase 2: Remote Comparison**
-1. POST local file list to `/mirror` endpoint
-2. Backend compares with remote files (S3-backed)
-3. Response contains:
-   - `to_upload`: New files (not in remote)
-   - `to_update`: Hash mismatch (content changed)
-   - `to_delete`: Remote-only files (not in local)
-   - `unchanged`: Identical (no action needed)
-
-**Phase 3: Preview**
 ```
-📊 Mirror Preview:
-  ✅ Unchanged: 125 files
-  ⬆️  Upload: 5 files (new)
-  🔄 Update: 2 files (hash mismatch)
-  🗑️  Delete: 3 files (remote only)
-
-Files to DELETE:
-  - old_mix_v2.flac
-  - unused_stem.wav
-  - backup/archive.zip
+User drops files into folder
+    → FileIgnoreService filters by .chmusicproignore patterns
+    → FileHashService computes SHA-256 hashes (with progress bar)
+    → POST /api/v1/song-projects/{id}/folders/{folder_id}/mirror
+        (sends local file list for server-side comparison)
+    → MirrorPreviewDialog shows diff:
+        - New files (upload)
+        - Updated files (hash mismatch, re-upload)
+        - Moved files (path changed)
+        - Deleted files (remote-only, remove)
+        - Unchanged files (skip)
+    → User confirms → Execute upload/move/delete operations
 ```
 
-**Phase 4: Confirmation**
-- `--dry-run`: Exit after preview (no changes)
-- `--yes`: Skip confirmation (proceed automatically)
-- Default: Interactive prompt with file list to delete
-
-**Phase 5: Execution**
-1. **Upload:** Batch upload new + updated files (same as `upload` command)
-2. **Delete:** Batch delete remote-only files via `/batch-delete` endpoint
-3. **Summary:** Display counts for uploaded/updated/deleted/unchanged
-
-**Security Warning:**
-- Mirror is **destructive** (deletes remote files!)
-- Always use `--dry-run` first
-- Confirmation shows files to delete before proceeding
-
-**Use Case:**
-```bash
-# Workflow: Local editing with periodic sync
-chmusicpro-cli clone proj-id ~/Projects/ -d           # Initial clone
-# [work locally, edit stems, add effects, export]
-chmusicpro-cli mirror proj-id 01-arrangement ~/Projects/"My Song"/01-arrangement --dry-run  # Preview
-chmusicpro-cli mirror proj-id 01-arrangement ~/Projects/"My Song"/01-arrangement --yes      # Sync
-```
-
-**Technical Details:**
-
-**File Comparison:**
-```python
-# SHA256 hash for content comparison (NOT modification time!)
-import hashlib
-
-def calculate_hash(file_path):
-    sha256 = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        for chunk in iter(lambda: f.read(8192), b""):
-            sha256.update(chunk)
-    return sha256.hexdigest()
-```
-
-**Batch Upload Format:**
-```python
-# multipart/form-data with relative paths
-files = [
-    ("files", ("Media/stems/kick.flac", open("kick.flac", "rb"))),
-    ("files", ("Media/stems/snare.flac", open("snare.flac", "rb"))),
-    ("files", ("Media/stems/bass.flac", open("bass.flac", "rb")))
-]
-```
-
-**Backend Integration:**
-
-| CLI Operation | Backend Controller | Database Table | S3 Storage |
-|---------------|-------------------|----------------|-----------|
-| `login` | `UserController.login()` | `users` | - |
-| `upload` | `SongProjectController.batch_upload()` | `project_files` | ✅ Upload to S3 |
-| `download` | `SongProjectController.get_folder_files()` | `project_files` | ✅ Download from S3 |
-| `clone` | `SongProjectController.get_all_files()` | `project_files` + `project_folders` | ✅ Download from S3 |
-| `mirror` | `SongProjectController.mirror_folder()`<br>`SongProjectController.batch_delete()` | `project_files` | ✅ Upload/Delete in S3 |
-
-**Security:**
-
-| Risk | Mitigation |
-|------|-----------|
-| JWT Token Plaintext | File permissions: 0600 (owner-only) |
-| Token on Shared System | Documentation warning: NOT for multi-user systems |
-| Token in Cloud Sync | Documentation warning: Exclude `~/.chmusicpro/` from Dropbox/iCloud |
-| SSL Man-in-the-Middle | SSL verification configurable (dev: disabled, prod: enabled) |
-| Token Expiry | 24h TTL, automatic expiry check before commands |
-
-**Installation:**
-
-**Via Makefile (Recommended):**
-```bash
-make install-cli              # CLI only
-make install-cli-dev          # CLI + DEV config (localhost:5050)
-make install-cli-prod         # CLI + PROD config (macstudio)
-```
-
-**Manual:**
-```bash
-mkdir -p ~/bin
-cp scripts/cli/chmusicpro-cli.py ~/bin/chmusicpro-cli
-chmod +x ~/bin/chmusicpro-cli
-pip install -r scripts/cli/requirements.txt
-
-# Add to PATH (in ~/.zshrc or ~/.bashrc)
-export PATH="$HOME/bin:$PATH"
-```
-
-**Configuration Files:**
-- CLI script: `scripts/cli/chmusicpro-cli.py` (1,177 lines)
-- User docs: `scripts/cli/README.md`
-- Dependencies: `scripts/cli/requirements.txt`
-- Default ignores: `scripts/cli/.chmusicproignore.default`
-- Runtime config: `~/.chmusicpro/config.json` (created on first login)
+**API Endpoints** (unchanged from previous CLI):
+- `POST /mirror` - Compare local file list with remote
+- `POST /batch-upload` - Upload new/updated files
+- `DELETE /batch-delete` - Remove remote-only files
 
 **Related Database Tables:**
 - `project_files` - File metadata (path, size, hash, S3 key)
 - `project_folders` - Folder structure (name, order, parent relationships)
 - `song_projects` - Project metadata (name, description, user_id)
-
-**Architecture Pattern:**
-
-```
-┌─────────────────────────────────────────────────────┐
-│         chmusicpro-cli (Python Click CLI)              │
-├─────────────────────────────────────────────────────┤
-│  Commands:                                          │
-│  ├── login    → JWT Auth                            │
-│  ├── upload   → Batch Upload (3 files/batch)        │
-│  ├── download → Folder Download                     │
-│  ├── clone    → Complete Project Clone              │
-│  └── mirror   → One-Way Sync (Hash-based)           │
-│                                                     │
-├─────────────────────────────────────────────────────┤
-│              Config Management                      │
-│  - ~/.chmusicpro/config.json (0600)                   │
-│  - Token Expiry Check                              │
-│  - .chmusicproignore Pattern Loading                  │
-│                                                     │
-├─────────────────────────────────────────────────────┤
-│            HTTP Client (requests)                   │
-│  - SSL Self-Signed Support                         │
-│  - JWT Bearer Token Auth                           │
-│  - Multipart Form Data Upload                      │
-│  - Stream Download (8KB Chunks)                    │
-│                                                     │
-├─────────────────────────────────────────────────────┤
-│     Backend API (chmusicprosrv)                       │
-│  - /api/v1/user/login                              │
-│  - /api/v1/song-projects/{id}/folders/{id}/       │
-│    - batch-upload (POST)                           │
-│    - files (GET)                                   │
-│    - mirror (POST)                                 │
-│  - /api/v1/song-projects/{id}/files/               │
-│    - all (GET)                                     │
-│    - batch-delete (DELETE)                         │
-│                                                     │
-├─────────────────────────────────────────────────────┤
-│        S3-Compatible Storage (Backend)             │
-│  - MinIO (Dev)                                     │
-│  - AWS S3 / Backblaze B2 / Wasabi (Prod)          │
-│  - Pre-signed URLs (1h TTL)                        │
-│  - Storage Backend: `storage_backend='s3'`         │
-│                                                     │
-└─────────────────────────────────────────────────────┘
-```
 
 ---
 
@@ -1465,13 +1191,14 @@ Request: {"file_ids": ["uuid1", "uuid2", "uuid3"]}
 - Updates project stats
 ```
 
-#### 6.9.3 Asset Assignment (Songs, Sketches, Images)
+#### 6.9.3 Asset Assignment (Songs, Sketches, Workshops, Images)
 
-**Purpose**: Link generated content (songs, sketches, images) to project folders for organization.
+**Purpose**: Link generated content (songs, sketches, workshops, images) to project folders for organization.
 
 **Use Cases:**
 - Assign generated song to "01 Arrangement" folder
-- Link sketch to "00 Ideas" folder
+- Link sketch/composition to "00 Ideas" folder
+- Assign text workshop to a project folder
 - Attach cover image to "05 Artwork" folder
 
 **Backend Relationships:**
@@ -1618,11 +1345,10 @@ Backend: Creates Song record with project_id + folder_id
 Frontend: Shows song in project folder's assigned_songs list
 ```
 
-**Step 3: Clone Project via CLI**
-```bash
-chmusicpro-cli clone proj-id ~/Music/Projects/ -d
-# → Creates ~/Music/Projects/My Rock Song/
-# → Downloads all files with full directory structure
+**Step 3: Download Project Files**
+```
+User: Downloads files from project folders via Web UI
+User: Or downloads ZIP of folder/template structure
 ```
 
 **Step 4: Work in DAW (Logic Pro)**
@@ -1632,24 +1358,20 @@ User: Adds stems, mixes tracks, exports mixdown
 Local: ~/Music/Projects/My Rock Song/02 Mixing/mixdown_v3.wav
 ```
 
-**Step 5: Mirror Sync via CLI**
-```bash
-chmusicpro-cli mirror proj-id 02-mixing ~/Music/Projects/"My Rock Song"/02 Mixing/ --dry-run
-# Output:
-# ⬆️  Upload: 1 file (new): mixdown_v3.wav
-# ✅ Unchanged: 0 files
-
-chmusicpro-cli mirror proj-id 02-mixing ~/Music/Projects/"My Rock Song"/02 Mixing/ --yes
-# Uploads mixdown_v3.wav to S3
-# Creates ProjectFile record
-# Updates project stats
+**Step 5: Mirror Sync via Browser**
+```
+User: Drags local folder into project folder in Web UI
+Frontend: FileIgnoreService filters, FileHashService hashes files
+Frontend: POST /mirror compares with remote
+MirrorPreviewDialog: Shows diff (new/updated/deleted/unchanged)
+User: Confirms → files uploaded/deleted automatically
 ```
 
 **Step 6: Access from Another Machine**
 ```
 User: Opens Web UI on MacBook
 Frontend: Shows "My Rock Song" project with mixdown_v3.wav in 02 Mixing folder
-User: Downloads via pre-signed URL
+User: Downloads via pre-signed URL or ZIP download
 ```
 
 #### 6.9.8 Architecture Integration
@@ -1678,14 +1400,14 @@ ProjectFile Upload Flow:
 5. Update project stats (total_files, total_size_bytes)
 ```
 
-**CLI Integration:**
+**Mirror Sync Integration (Browser-based):**
 
 ```
-CLI Commands → Backend API → S3 Storage
-  ├─ chmusicpro-cli upload   → POST /batch-upload → S3
-  ├─ chmusicpro-cli download → GET /files → S3 pre-signed URL
-  ├─ chmusicpro-cli clone    → GET /files/all → S3 batch download
-  └─ chmusicpro-cli mirror   → POST /mirror → Compare → Upload/Delete
+Browser Drag & Drop → Backend API → S3 Storage
+  ├─ Drop files       → POST /mirror (compare)
+  ├─ Preview dialog   → Shows diff (new/updated/moved/deleted)
+  ├─ Confirm          → POST /batch-upload (new/updated files) → S3
+  └─ Confirm          → DELETE /batch-delete (remote-only files) → S3
 ```
 
 #### 6.9.9 Storage Providers
@@ -1804,7 +1526,7 @@ Only deployment configuration: docker-compose.yml, .env, runtime scripts
 1. **DEV (aiproxy):** Code changes → Commit → GitHub Actions builds images → Push to GHCR
 2. **PROD:** Update docker-compose.yml image versions → `docker compose pull` → `docker compose up -d`
 
-**Note:** Chat functionality previously provided by Open WebUI is now integrated directly into the Swiss Music Production Angular frontend.
+**Note:** Chat functionality previously provided by Open WebUI is now integrated directly into the My Music Production Angular frontend.
 
 ### 7.3 Network Architecture
 
@@ -2076,7 +1798,7 @@ All buttons MUST use mixins from `src/scss/_mixins.scss`:
 - **BOTH** `en.json` AND `de.json` must be updated
 - **Example:** `{{ 'featureName.subsection.key' | translate }}`
 
-**Angular 20 Modern Patterns:**
+**Angular 21 Modern Patterns:**
 - **ALWAYS** use `inject()` function instead of constructor injection
 - Pattern: `private service = inject(ServiceName)`
 - Use Angular's `HttpClient` (NOT fetch API)
@@ -2446,17 +2168,13 @@ services:
 | **Hybrid Storage** | Dual backend system supporting both filesystem and S3 during migration          |
 | **Storage Interface** | Abstract base class for pluggable storage backends (filesystem, S3)            |
 | **Boto3** | AWS SDK for Python, used for S3-compatible storage operations                  |
-| **chmusicpro-cli** | Command-line tool for song project file management (upload, download, clone, mirror) |
-| **CLI Login** | JWT-based authentication command storing token in `~/.chmusicpro/config.json`      |
-| **Batch Upload** | CLI upload strategy grouping 3 files/batch (450MB) to comply with Nginx 500MB limit |
-| **Mirror Command** | One-way sync (local → remote) with SHA256 hash-based comparison and destructive delete |
-| **Clone Command** | Complete project download preserving full S3 directory structure (1:1 replication) |
-| **.chmusicproignore** | Gitignore-style pattern file for excluding files from CLI upload operations      |
-| **Click Framework** | Python CLI framework (8.1.0+) used for chmusicpro-cli command-line interface       |
-| **Rich Library** | Python terminal UI library (13.7.0+) providing progress bars and color formatting |
-| **SHA256 Hash** | File content hashing algorithm used by mirror command for change detection       |
-| **Dry-Run Mode** | CLI mirror preview mode showing changes without executing upload/delete operations |
-| **JWT Token Expiry** | 24-hour token lifetime with automatic validation before each CLI command         |
+| **Mirror Sync** | Browser-based drag & drop file synchronization replacing the previous CLI tool    |
+| **FileIgnoreService** | Angular service that filters files by `.chmusicproignore` patterns during Mirror Sync |
+| **FileHashService** | Angular service computing SHA-256 hashes via Web Crypto API for file comparison   |
+| **MirrorPreviewDialog** | Dialog component showing diff preview (new/updated/moved/deleted) before sync execution |
+| **Batch Upload** | Upload strategy grouping 3 files/batch (450MB) to comply with Nginx 500MB limit  |
+| **.chmusicproignore** | Gitignore-style pattern file for excluding files from upload operations           |
+| **SHA256 Hash** | File content hashing algorithm used by Mirror Sync for change detection           |
 | **Song Project** | Complete music production project management with hierarchical folders and S3 storage |
 | **Project Folder** | Organizational unit within project (Arrangement, Mixing, Stems, etc.) with S3 prefix |
 | **Project File** | File metadata record tracking S3 storage, hash, size, and sync status             |

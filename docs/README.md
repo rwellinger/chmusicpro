@@ -1,6 +1,6 @@
 # Documentation Overview
 
-This directory contains technical documentation for the Mac AI Service project.
+This directory contains technical documentation for the My Music Production project.
 
 ## Architecture Documentation
 
@@ -25,7 +25,7 @@ The arc42 documentation includes:
 Documentation for individual services and components:
 
 - [**chmusicprosrv**](../chmusicprosrv/README.md) - Backend API service (FastAPI/Python)
-- [**chmusicproweb**](../chmusicproweb/README.md) - Angular 20 frontend application
+- [**chmusicproweb**](../chmusicproweb/README.md) - Angular 21 frontend application
 - [**forwardproxy**](../forwardproxy/README.md) - Nginx reverse proxy configuration
 - [**ollamasrv**](../ollamasrv/README.md) - Ollama LLM backend service
 

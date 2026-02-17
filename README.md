@@ -1,11 +1,11 @@
-# Swiss Music Production
+# My Music Production
 
 **Your AI-powered music production workflow** — from first idea to finished release.
 
 Capture song ideas, write lyrics with AI assistance, generate full songs, create cover art, and manage your music projects — all in one self-hosted application.
 
 [![Build Status](https://github.com/rwellinger/chmusicpro/actions/workflows/release.yml/badge.svg)](https://github.com/rwellinger/chmusicpro/actions)
-[![Angular](https://img.shields.io/badge/Angular-20-red.svg)](https://angular.io/)
+[![Angular](https://img.shields.io/badge/Angular-21-red.svg)](https://angular.dev/)
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 
 ---
@@ -13,24 +13,27 @@ Capture song ideas, write lyrics with AI assistance, generate full songs, create
 ## The Workflow
 
 ```
-Idea → Sketch → Lyrics → Song → Cover → Project
+Idea → Composition → Lyrics → Song → Cover → Project
 ```
 
 | Stage | What happens | AI helps with |
 |-------|--------------|---------------|
 | **Idea** | Capture a musical concept or mood | — |
-| **Sketch** | Structure your idea with title, genre, mood | Generate catchy titles |
+| **Composition** | Structure your idea with title, genre, mood | Generate catchy titles |
 | **Lyrics** | Write verses, chorus, bridge | Improve, rewrite, extend lyrics |
 | **Song** | Generate full audio from lyrics | Use your own tool (Suno, Udio, etc.) |
 | **Cover** | Create album artwork | Image generation (DALL-E 3) |
-| **Project** | Organize files, sync with DAW | S3 storage, CLI integration |
+| **Project** | Organize files, sync with DAW | S3 storage, browser-based Mirror Sync |
 
 ---
 
 ## Features
 
-### Song Sketches
-Capture and organize your song ideas before they slip away. Tag with genre, mood, and tempo. Track workflow status (draft, ready, used, archived). Convert sketches directly to full songs when you're ready.
+### Song Compositions
+Capture and organize your song ideas before they slip away. Tag with genre, mood, and tempo. Track workflow status (draft, ready, used, archived). Convert compositions directly to full songs when you're ready. Internally referred to as "sketches" in the codebase.
+
+### Text Workshop
+Dedicated lyric workspace for writing, editing, and refining song texts. Assign workshops to project folders for organized content management. Integrates with AI tools for lyric improvement and creative assistance.
 
 ### Lyric Creation
 Section-based editor for verses, choruses, bridges, and more. AI-powered tools help you improve phrasing, rewrite weak lines, or extend sections. Build your song architecture with drag & drop, then export to the music generator.
@@ -42,10 +45,13 @@ Use your preferred AI music generation tool (such as Suno, Udio, or others) to g
 DALL-E 3 integration creates album artwork. One-click AI prompt enhancement for better results. Built-in text overlay editor adds titles and artist names. Gallery view keeps all your artwork organized.
 
 ### Project Management
-Complete file management for music production. Hierarchical folder structure (Arrangement, Mixing, Stems, etc.) mirrors your DAW project. S3 cloud storage with batch upload/download. CLI tool syncs files between cloud and local DAW folder.
+Complete file management for music production. Hierarchical folder structure (Arrangement, Mixing, Stems, etc.) mirrors your DAW project. S3 cloud storage with batch upload/download. Browser-based Mirror Sync for drag & drop file synchronization. ZIP download for project templates and individual folders.
+
+### Pipeline Workflow
+Guided 8-step production pipeline from lyric creation through distribution. Sticky step-bar with numbered circles shows your current progress. Dashboard tiles link directly to each pipeline stage.
 
 ### AI Chat Assistant
-Multi-model support via Ollama (Llama, Mistral, etc.). Persistent conversation history. Use it for brainstorming, research, or general creative assistance.
+Multi-provider support: Ollama (local, free), OpenAI GPT, and Anthropic Claude. Persistent conversation history. Reusable system context templates for consistent AI behavior. Use it for brainstorming, research, or general creative assistance.
 
 ### Equipment Tracking
 Track your music production software, plugins, and gear. Secure credential storage (encrypted). License management for iLok, online activations, and serial keys.
@@ -126,12 +132,12 @@ Track your music production software, plugins, and gear. Secure credential stora
 
 | Layer | Technologies |
 |-------|-------------|
-| **Frontend** | Angular 20, TypeScript, Angular Material, SCSS, RxJS |
+| **Frontend** | Angular 21, TypeScript, Angular Material, SCSS, RxJS |
 | **Backend** | Python 3.12, FastAPI, SQLAlchemy 2.0, Pydantic 2.0 |
 | **Async Processing** | Celery 5.4, Redis |
 | **Database** | PostgreSQL 15 |
 | **Storage** | S3-compatible (MinIO, AWS S3, Backblaze B2) |
-| **AI Services** | OpenAI (DALL-E 3, GPT), Ollama |
+| **AI Services** | OpenAI (DALL-E 3, GPT), Anthropic Claude, Ollama |
 | **Deployment** | Docker, Docker Compose, Nginx, GitHub Actions |
 | **Code Quality** | Ruff (Python), ESLint (TypeScript), import-linter |
 
@@ -141,7 +147,7 @@ This project follows a **3-layer architecture** with strict separation of concer
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Frontend (Angular 20)                     │
+│                    Frontend (Angular 21)                     │
 │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────────────┐ │
 │  │  Pages  │  │Services │  │Components│  │ ApiConfigService│ │
 │  └────┬────┘  └────┬────┘  └─────────┘  └────────┬────────┘ │
@@ -182,16 +188,15 @@ chmusicpro/
 │   │   └── celery_app/  # Async task processing
 │   └── fonts/           # Font files for text overlays
 │
-├── chmusicproweb/             # Angular 20 Frontend
+├── chmusicproweb/             # Angular 21 Frontend
 │   └── src/app/
 │       ├── pages/       # Feature pages
 │       ├── services/    # API services
-│       ├── components/  # Shared components
+│       ├── components/  # Shared components (pipeline-step-bar, etc.)
 │       └── models/      # TypeScript interfaces
 │
 ├── scripts/
 │   ├── build/           # Release & build automation
-│   ├── cli/             # CLI tool (chmusicpro-cli)
 │   └── db/              # Database seeding
 │
 ├── forwardproxy/        # Nginx reverse proxy
@@ -204,25 +209,9 @@ The backend provides auto-generated OpenAPI documentation:
 - **Swagger UI**: `http://localhost:5050/docs`
 - **ReDoc**: `http://localhost:5050/redoc`
 
-### CLI Tool
+### Mirror Sync
 
-The CLI tool integrates with your local DAW workflow:
-
-```bash
-# Install
-make install-cli
-
-# Login
-chmusicpro-cli login
-
-# Clone project to local folder
-chmusicpro-cli clone <project-id> ~/Music/Projects/ -d
-
-# Mirror sync (local to cloud)
-chmusicpro-cli mirror <project-id> <folder-id> ~/path --dry-run
-```
-
-See [scripts/cli/README.md](scripts/cli/README.md) for full documentation.
+Browser-based drag & drop file synchronization. Drop files into project folders for automatic hash-based comparison and selective upload, update, or delete. Files are filtered through `.chmusicproignore` patterns and compared via SHA-256 hashing. A preview dialog shows the diff before executing changes.
 
 ### Testing & Code Quality
 
@@ -249,8 +238,6 @@ For production deployment instructions including Docker Compose configurations, 
 - **Architecture**: [docs/arch42/README.md](docs/arch42/README.md) - Comprehensive arc42 documentation
 - **UI Patterns**: [docs/UI_PATTERNS.md](docs/UI_PATTERNS.md) - Frontend component patterns
 - **Code Patterns**: [docs/CODE_PATTERNS.md](docs/CODE_PATTERNS.md) - Backend patterns
-- **CLI Tool**: [scripts/cli/README.md](scripts/cli/README.md) - Command-line interface
-
 ---
 
 ## License
@@ -278,5 +265,5 @@ This project is licensed under the [Elastic License 2.0 (ELv2)](LICENSE).
 
 - [OpenAI](https://openai.com/) - DALL-E 3 and GPT APIs
 - [Ollama](https://ollama.ai/) - Local LLM infrastructure
-- [Angular](https://angular.io/) - Frontend framework
+- [Angular](https://angular.dev/) - Frontend framework
 - [FastAPI](https://fastapi.tiangolo.com/) - Backend framework
