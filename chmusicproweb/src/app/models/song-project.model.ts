@@ -78,6 +78,14 @@ export interface AssignedRelease {
     created_at: string | null;
 }
 
+export interface AssignedWorkshop {
+    id: string;
+    title: string;
+    current_phase: string;
+    draft_language?: string | null;
+    created_at: string | null;
+}
+
 export interface ProjectFolderWithFiles extends ProjectFolder {
     files: ProjectFile[];
 }
@@ -85,6 +93,7 @@ export interface ProjectFolderWithFiles extends ProjectFolder {
 export interface ProjectFolderWithAssets extends ProjectFolderWithFiles {
     assigned_sketches?: AssignedSketch[];
     assigned_images?: AssignedImage[];
+    assigned_workshops?: AssignedWorkshop[];
 }
 
 export interface SongProjectDetail extends SongProject {
@@ -95,6 +104,7 @@ export interface SongProjectDetail extends SongProject {
     // All assigned assets (regardless of folder) - for Metadata tab
     all_assigned_sketches?: AssignedSketch[];
     all_assigned_images?: AssignedImage[];
+    all_assigned_workshops?: AssignedWorkshop[];
 }
 
 export interface SongProjectListItem {
@@ -141,4 +151,47 @@ export interface SongProjectUpdateRequest {
 export interface FileUploadRequest {
     file: File;
     folder_id: string;
+}
+
+export interface BatchUploadResponse {
+    data: {
+        uploaded: number;
+        failed: number;
+        errors: { filename?: string; error: string }[];
+    };
+    message: string;
+}
+
+export interface MirrorFileEntry {
+    relative_path: string;
+    file_hash: string;
+    file_size_bytes: number;
+}
+
+export interface MirrorMoveAction {
+    file_id: string;
+    old_path: string;
+    new_path: string;
+    file_hash: string;
+    file_size_bytes: number;
+    s3_key_old: string;
+    s3_key_new: string;
+}
+
+export interface MirrorFileAction {
+    file_id: string;
+    relative_path: string;
+    file_size_bytes: number;
+}
+
+export interface MirrorCompareResult {
+    to_upload: string[];
+    to_update: string[];
+    to_move: MirrorMoveAction[];
+    to_delete: MirrorFileAction[];
+    unchanged: string[];
+}
+
+export interface BatchMoveResponse {
+    data: { moved: number; failed: number; errors: { file_id: string; error: string }[] };
 }

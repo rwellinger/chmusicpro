@@ -19,7 +19,6 @@ export class PipelineStepBarComponent {
 
     readonly steps = this.pipelineService.steps;
     readonly currentStep$ = this.pipelineService.currentStep$;
-    readonly isOnPipelinePage$ = this.pipelineService.isOnPipelinePage$;
 
     goHome(): void {
         this.router.navigate(["/dashboard"]);

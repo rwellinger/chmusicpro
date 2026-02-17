@@ -11,11 +11,12 @@ import {firstValueFrom} from "rxjs";
 import {SongProjectService} from "../../services/business/song-project.service";
 import {ImageService} from "../../services/business/image.service";
 import {SketchService} from "../../services/business/sketch.service";
+import {WorkshopService} from "../../services/business/workshop.service";
 import {SongReleaseService} from "../../services/business/song-release.service";
 import {ReleaseType} from "../../models/song-release.model";
 
 export interface AssignToProjectDialogData {
-    assetType: "image" | "sketch" | "release";
+    assetType: "image" | "sketch" | "workshop" | "release";
     assetId: string;
     releaseType?: ReleaseType; // For release: SINGLE or ALBUM
     currentProjectIds?: string[]; // For release: already assigned projects
@@ -63,6 +64,7 @@ export class AssignToProjectDialogComponent implements OnInit {
     private projectService = inject(SongProjectService);
     private imageService = inject(ImageService);
     private sketchService = inject(SketchService);
+    private workshopService = inject(WorkshopService);
     private releaseService = inject(SongReleaseService);
 
     async ngOnInit(): Promise<void> {
@@ -194,6 +196,13 @@ export class AssignToProjectDialogComponent implements OnInit {
                     break;
                 case "sketch":
                     await this.sketchService.assignToProject(
+                        this.data.assetId,
+                        this.selectedProjectId!,
+                        this.selectedFolderId || undefined
+                    );
+                    break;
+                case "workshop":
+                    await this.workshopService.assignToProject(
                         this.data.assetId,
                         this.selectedProjectId!,
                         this.selectedFolderId || undefined

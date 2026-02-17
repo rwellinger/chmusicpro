@@ -380,6 +380,27 @@ def transform_sketch_to_assigned_response(sketch: Any) -> dict[str, Any]:  # pra
     }
 
 
+def transform_workshop_to_assigned_response(workshop: Any) -> dict[str, Any]:  # pragma: no cover
+    """
+    Transform LyricWorkshop DB model to assigned workshop API response format (pure function)
+
+    NOTE: No unit tests - Simple attribute mapper without business logic.
+
+    Args:
+        workshop: LyricWorkshop DB model instance
+
+    Returns:
+        Dictionary with workshop data for API response
+    """
+    return {
+        "id": str(workshop.id),
+        "title": workshop.title,
+        "current_phase": workshop.current_phase if hasattr(workshop, "current_phase") else "connect",
+        "draft_language": workshop.draft_language if hasattr(workshop, "draft_language") else None,
+        "created_at": workshop.created_at.isoformat() if workshop.created_at else None,
+    }
+
+
 def transform_image_to_assigned_response(image: Any) -> dict[str, Any]:  # pragma: no cover
     """
     Transform GeneratedImage DB model to assigned image API response format (pure function)

@@ -87,6 +87,12 @@
                   </div>
                 </div>
                 <div class="item-meta">
+                  @if (workshop.project_name) {
+                    <span class="meta-project">
+                      <i class="fas fa-folder-open"></i>
+                      {{ workshop.project_name }}
+                    </span>
+                  }
                   @if (workshop.connect_topic) {
                     <span class="meta-date">
                       <i class="fas fa-comment"></i>
@@ -99,12 +105,29 @@
                   </span>
                 </div>
               </div>
-              <button
-                class="delete-item-btn"
-                (click)="deleteWorkshop($event, workshop)"
-                [title]="'common.delete' | translate">
-                <i class="fas fa-trash"></i>
-              </button>
+              <div class="item-actions">
+                @if (workshop.project_id) {
+                  <button
+                    class="action-icon-btn"
+                    (click)="unassignFromProject($event, workshop)"
+                    [title]="'textWorkshop.unassignFromProject' | translate">
+                    <i class="fas fa-link-slash"></i>
+                  </button>
+                } @else {
+                  <button
+                    class="action-icon-btn"
+                    (click)="openAssignToProjectDialog($event, workshop)"
+                    [title]="'textWorkshop.assignToProject' | translate">
+                    <i class="fas fa-link"></i>
+                  </button>
+                }
+                <button
+                  class="delete-item-btn"
+                  (click)="deleteWorkshop($event, workshop)"
+                  [title]="'common.delete' | translate">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
             </div>
           }
         </div>

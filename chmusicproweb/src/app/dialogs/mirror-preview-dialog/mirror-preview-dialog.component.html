@@ -1,0 +1,163 @@
+<h2 mat-dialog-title class="dialog-title">
+  <i class="fas fa-sync-alt"></i>
+  {{ 'songProjects.mirror.preview.title' | translate }} - {{ data.folderName }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <!-- Summary -->
+  <div class="summary">
+    {{ 'songProjects.mirror.preview.summary' | translate: {total: totalChanges} }}
+  </div>
+
+  <!-- Ignored files info -->
+  @if (data.ignoredCount > 0) {
+    <div class="ignored-info">
+      <i class="fas fa-filter"></i>
+      {{ 'songProjects.mirror.ignoredFiles' | translate: {count: data.ignoredCount} }}
+    </div>
+  }
+
+  <!-- Upload size -->
+  @if (data.totalUploadSize > 0) {
+    <div class="upload-size-info">
+      <i class="fas fa-cloud-upload-alt"></i>
+      {{ 'songProjects.mirror.preview.totalUploadSize' | translate: {size: formatFileSize(data.totalUploadSize)} }}
+    </div>
+  }
+
+  <!-- Delete Warning -->
+  @if (hasDeletions) {
+    <div class="delete-warning">
+      <i class="fas fa-exclamation-triangle"></i>
+      {{ 'songProjects.mirror.preview.deleteWarning' | translate: {count: data.toDelete.length} }}
+    </div>
+  }
+
+  <mat-accordion multi>
+    <!-- New Files -->
+    @if (data.toUpload.length > 0) {
+      <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="section-new">
+            <i class="fas fa-plus-circle"></i>
+            {{ 'songProjects.mirror.preview.newFiles' | translate: {count: data.toUpload.length} }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="file-list">
+          @for (path of data.toUpload.slice(0, maxVisibleItems); track path) {
+            <div class="file-entry">{{ path }}</div>
+          }
+          @if (data.toUpload.length > maxVisibleItems) {
+            <div class="more-items">
+              {{ 'songProjects.mirror.preview.andMore' | translate: {count: data.toUpload.length - maxVisibleItems} }}
+            </div>
+          }
+        </div>
+      </mat-expansion-panel>
+    }
+
+    <!-- Updated Files -->
+    @if (data.toUpdate.length > 0) {
+      <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="section-updated">
+            <i class="fas fa-sync-alt"></i>
+            {{ 'songProjects.mirror.preview.updatedFiles' | translate: {count: data.toUpdate.length} }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="file-list">
+          @for (path of data.toUpdate.slice(0, maxVisibleItems); track path) {
+            <div class="file-entry">{{ path }}</div>
+          }
+          @if (data.toUpdate.length > maxVisibleItems) {
+            <div class="more-items">
+              {{ 'songProjects.mirror.preview.andMore' | translate: {count: data.toUpdate.length - maxVisibleItems} }}
+            </div>
+          }
+        </div>
+      </mat-expansion-panel>
+    }
+
+    <!-- Moved Files -->
+    @if (data.toMove.length > 0) {
+      <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="section-moved">
+            <i class="fas fa-arrows-alt"></i>
+            {{ 'songProjects.mirror.preview.movedFiles' | translate: {count: data.toMove.length} }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="file-list">
+          @for (move of data.toMove.slice(0, maxVisibleItems); track move.file_id) {
+            <div class="file-entry move-entry">
+              <span class="old-path">{{ move.old_path }}</span>
+              <i class="fas fa-long-arrow-alt-right"></i>
+              <span class="new-path">{{ move.new_path }}</span>
+            </div>
+          }
+          @if (data.toMove.length > maxVisibleItems) {
+            <div class="more-items">
+              {{ 'songProjects.mirror.preview.andMore' | translate: {count: data.toMove.length - maxVisibleItems} }}
+            </div>
+          }
+        </div>
+      </mat-expansion-panel>
+    }
+
+    <!-- Deleted Files -->
+    @if (data.toDelete.length > 0) {
+      <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="section-deleted">
+            <i class="fas fa-trash-alt"></i>
+            {{ 'songProjects.mirror.preview.deletedFiles' | translate: {count: data.toDelete.length} }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="file-list">
+          @for (file of data.toDelete.slice(0, maxVisibleItems); track file.file_id) {
+            <div class="file-entry delete-entry">{{ file.relative_path }}</div>
+          }
+          @if (data.toDelete.length > maxVisibleItems) {
+            <div class="more-items">
+              {{ 'songProjects.mirror.preview.andMore' | translate: {count: data.toDelete.length - maxVisibleItems} }}
+            </div>
+          }
+        </div>
+      </mat-expansion-panel>
+    }
+
+    <!-- Unchanged Files -->
+    @if (data.unchanged.length > 0) {
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title class="section-unchanged">
+            <i class="fas fa-check-circle"></i>
+            {{ 'songProjects.mirror.preview.unchangedFiles' | translate: {count: data.unchanged.length} }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="file-list">
+          @for (path of data.unchanged.slice(0, maxVisibleItems); track path) {
+            <div class="file-entry unchanged-entry">{{ path }}</div>
+          }
+          @if (data.unchanged.length > maxVisibleItems) {
+            <div class="more-items">
+              {{ 'songProjects.mirror.preview.andMore' | translate: {count: data.unchanged.length - maxVisibleItems} }}
+            </div>
+          }
+        </div>
+      </mat-expansion-panel>
+    }
+  </mat-accordion>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="cancel()">
+    {{ 'songProjects.mirror.preview.cancel' | translate }}
+  </button>
+  <button mat-flat-button
+    [color]="hasDeletions ? 'warn' : 'primary'"
+    (click)="confirm()">
+    <i class="fas fa-sync-alt"></i>
+    {{ 'songProjects.mirror.preview.confirm' | translate }}
+  </button>
+</mat-dialog-actions>

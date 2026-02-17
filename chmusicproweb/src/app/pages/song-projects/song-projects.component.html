@@ -319,6 +319,28 @@
                     }
                   </div>
                 }
+                <!-- All Assigned Workshops -->
+                @if (selectedProject.all_assigned_workshops?.length) {
+                  <div class="assigned-assets-section">
+                    <h3 class="section-title">
+                      <i class="fas fa-pen-fancy"></i>
+                      {{ 'songProjects.detail.allAssignedWorkshops' | translate }}
+                    </h3>
+                    @for (workshop of selectedProject.all_assigned_workshops; track workshop) {
+                      <div class="asset-item">
+                        <div class="asset-info">
+                          <i class="fas fa-pen-fancy"></i>
+                          <span class="asset-title">{{ workshop.title }}</span>
+                          <span class="asset-badge">{{ workshop.current_phase }}</span>
+                        </div>
+                        <button type="button" class="asset-action-button" (click)="openWorkshop(workshop)"
+                          [matTooltip]="'songProjects.detail.actions.openWorkshop' | translate">
+                          <i class="fas fa-external-link-alt"></i>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
                 <div class="detail-field-row">
                   <div class="detail-field">
                     <span class="field-label">{{ 'songProjects.detail.stats.created' | translate }}</span>
@@ -327,6 +349,60 @@
                   <div class="detail-field">
                     <span class="field-label">{{ 'songProjects.detail.stats.updated' | translate }}</span>
                     <div class="readonly-field">{{ selectedProject.updated_at | date:'medium' }}</div>
+                  </div>
+                </div>
+                <!-- File Workflow Diagram -->
+                <div class="workflow-diagram">
+                  <h3 class="section-title">
+                    <i class="fas fa-project-diagram"></i>
+                    {{ 'songProjects.workflow.title' | translate }}
+                  </h3>
+                  <div class="workflow-steps">
+                    <div class="workflow-step workflow-step--clickable"
+                      (click)="downloadTemplateZip()"
+                      [matTooltip]="'songProjects.download.templateZip' | translate">
+                      <div class="workflow-icon template-icon">
+                        <i class="fas fa-file-archive"></i>
+                      </div>
+                      <span class="workflow-label">{{ 'songProjects.workflow.template' | translate }}</span>
+                      <span class="workflow-desc">{{ 'songProjects.workflow.templateDesc' | translate }}</span>
+                    </div>
+                    <div class="workflow-connector"><div class="connector-arrow"></div></div>
+                    <div class="workflow-step">
+                      <div class="workflow-icon upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                      </div>
+                      <span class="workflow-label">{{ 'songProjects.workflow.upload' | translate }}</span>
+                      <span class="workflow-desc">{{ 'songProjects.workflow.uploadDesc' | translate }}</span>
+                    </div>
+                    <div class="workflow-connector"><div class="connector-arrow"></div></div>
+                    <div class="workflow-step workflow-step--auto">
+                      <div class="workflow-icon sync-icon">
+                        <i class="fas fa-sync-alt"></i>
+                      </div>
+                      <span class="workflow-badge-auto">
+                        <i class="fas fa-cog"></i>
+                        {{ 'songProjects.workflow.auto' | translate }}
+                      </span>
+                      <span class="workflow-label">{{ 'songProjects.workflow.sync' | translate }}</span>
+                      <span class="workflow-desc">{{ 'songProjects.workflow.syncDesc' | translate }}</span>
+                    </div>
+                    <div class="workflow-connector"><div class="connector-arrow"></div></div>
+                    <div class="workflow-step">
+                      <div class="workflow-icon manage-icon">
+                        <i class="fas fa-folder-open"></i>
+                      </div>
+                      <span class="workflow-label">{{ 'songProjects.workflow.manage' | translate }}</span>
+                      <span class="workflow-desc">{{ 'songProjects.workflow.manageDesc' | translate }}</span>
+                    </div>
+                    <div class="workflow-connector"><div class="connector-arrow"></div></div>
+                    <div class="workflow-step">
+                      <div class="workflow-icon download-icon">
+                        <i class="fas fa-download"></i>
+                      </div>
+                      <span class="workflow-label">{{ 'songProjects.workflow.download' | translate }}</span>
+                      <span class="workflow-desc">{{ 'songProjects.workflow.downloadDesc' | translate }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -404,59 +480,171 @@
                               }
                             </div>
                           }
+                          <!-- Assigned Workshops -->
+                          @if (folder.assigned_workshops && folder.assigned_workshops.length > 0) {
+                            <div class="assigned-assets-section">
+                              <h4 class="assets-section-title">
+                                <i class="fas fa-pen-fancy"></i>
+                                {{ 'songProjects.detail.assignedWorkshops' | translate }}
+                              </h4>
+                              @for (workshop of folder.assigned_workshops; track workshop) {
+                                <div class="asset-item">
+                                  <div class="asset-info">
+                                    <i class="fas fa-pen-fancy"></i>
+                                    <span class="asset-title">{{ workshop.title }}</span>
+                                    <span class="asset-badge">{{ workshop.current_phase }}</span>
+                                  </div>
+                                  <button type="button" class="asset-action-button"
+                                    (click)="openWorkshop(workshop)"
+                                    [matTooltip]="'songProjects.detail.actions.openWorkshop' | translate">
+                                    <i class="fas fa-external-link-alt"></i>
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          }
                         </div>
                         <!-- Files in Folder -->
-                        <div class="folder-files">
+                        <div class="folder-files"
+                          (dragover)="onDragOver($event, folder.id)"
+                          (dragleave)="onDragLeave($event, folder.id)"
+                          (drop)="onDrop($event, folder)">
+                          <!-- Drop Zone Overlay -->
+                          @if (isDragOver === folder.id) {
+                            <div class="drop-zone-overlay">
+                              <i class="fas fa-sync-alt"></i>
+                              <span>{{ 'songProjects.mirror.dropToSync' | translate }}</span>
+                            </div>
+                          }
                           <!-- Upload & CLI Commands -->
                           <div class="folder-upload-section">
                             <button
                               type="button"
                               class="upload-button"
-                              (click)="uploadFile(folder)"
-                              [disabled]="selectedProject.project_status === 'archived'"
-                              [matTooltip]="selectedProject.project_status === 'archived' ? ('songProjects.warnings.uploadBlocked' | translate) : ''"
+                              (click)="uploadFiles(folder)"
+                              [disabled]="selectedProject.project_status === 'archived' || uploadingFolderId === folder.id"
+                              [matTooltip]="selectedProject.project_status === 'archived' ? ('songProjects.warnings.uploadBlocked' | translate) : ('songProjects.upload.uploadFilesTooltip' | translate)"
                               >
                               <i class="fas fa-upload"></i>
-                              <span>{{ 'songProjects.detail.actions.uploadFile' | translate }}</span>
+                              <span>{{ 'songProjects.upload.uploadFiles' | translate }}</span>
                             </button>
                             <button
                               type="button"
-                              class="cli-commands-button"
-                              [matMenuTriggerFor]="cliMenu"
-                              [title]="'songProjects.detail.actions.cliCommands' | translate"
+                              class="upload-folder-button"
+                              (click)="uploadFolder(folder)"
+                              [disabled]="selectedProject.project_status === 'archived' || uploadingFolderId === folder.id"
+                              [matTooltip]="selectedProject.project_status === 'archived' ? ('songProjects.warnings.uploadBlocked' | translate) : ('songProjects.upload.uploadFolderTooltip' | translate)"
                               >
-                              <i class="fas fa-code"></i>
-                              <span>{{ 'songProjects.detail.actions.cliCommands' | translate }}</span>
-                              <i class="fas fa-angle-down dropdown-icon"></i>
+                              <i class="fas fa-folder-plus"></i>
+                              <span>{{ 'songProjects.upload.uploadFolder' | translate }}</span>
                             </button>
-                            <mat-menu #cliMenu="matMenu">
-                              <button
-                                mat-menu-item
-                                (click)="copyCLICommand(folder)"
-                                [disabled]="selectedProject.project_status === 'archived'"
-                                [matTooltip]="selectedProject.project_status === 'archived' ? ('songProjects.warnings.uploadBlocked' | translate) : ''"
-                                >
-                                <i class="fas fa-upload"></i>
-                                <span>{{ 'songProjects.detail.actions.copyCLIUploadCommand' | translate }}</span>
-                              </button>
-                              <button mat-menu-item (click)="copyCLIDownloadCommand(folder)">
-                                <i class="fas fa-download"></i>
-                                <span>{{ 'songProjects.detail.actions.copyCLIDownloadCommand' | translate }}</span>
-                              </button>
-                              <button
-                                mat-menu-item
-                                (click)="copyCLIMirrorCommand(folder)"
-                                [disabled]="selectedProject.project_status === 'archived'"
-                                [matTooltip]="selectedProject.project_status === 'archived' ? ('songProjects.warnings.uploadBlocked' | translate) : ''"
-                                >
-                                <i class="fas fa-sync-alt"></i>
-                                <span>{{ 'songProjects.detail.actions.copyCLIMirrorCommand' | translate }}</span>
-                              </button>
-                            </mat-menu>
+                            <button
+                              type="button"
+                              class="download-folder-button"
+                              (click)="downloadFolderZip(folder)"
+                              [disabled]="!folder.files.length"
+                              [matTooltip]="'songProjects.download.folderZip' | translate"
+                              >
+                              <i class="fas fa-download"></i>
+                              <span>{{ 'songProjects.download.folderZip' | translate }}</span>
+                            </button>
+                            <button
+                              type="button"
+                              class="clear-folder-button"
+                              (click)="clearFolder(folder.id)"
+                              [disabled]="!folder.files.length || selectedProject.project_status === 'archived'"
+                              [matTooltip]="'songProjects.actions.clearFolder' | translate"
+                              >
+                              <i class="fas fa-trash-alt"></i>
+                              <span>{{ 'songProjects.actions.clearFolder' | translate }}</span>
+                            </button>
                           </div>
+                          <!-- Mirror / Upload Progress Section -->
+                          @if (uploadingFolderId === folder.id) {
+                            <div class="upload-progress-section">
+                              <!-- Mirror phase indicators -->
+                              @if (mirrorPhase === 'filtering') {
+                                <div class="mirror-phase-info">
+                                  <mat-spinner diameter="20"></mat-spinner>
+                                  <span>{{ 'songProjects.mirror.filtering' | translate }}</span>
+                                </div>
+                              }
+                              @if (mirrorPhase === 'hashing') {
+                                <div class="mirror-phase-info">
+                                  <mat-spinner diameter="20"></mat-spinner>
+                                  <span>{{ 'songProjects.mirror.analyzing' | translate: {current: mirrorHashProgress.current, total: mirrorHashProgress.total} }}</span>
+                                </div>
+                                <mat-progress-bar mode="determinate" [value]="mirrorHashProgress.total > 0 ? (mirrorHashProgress.current / mirrorHashProgress.total * 100) : 0"></mat-progress-bar>
+                              }
+                              @if (mirrorPhase === 'comparing') {
+                                <div class="mirror-phase-info">
+                                  <mat-spinner diameter="20"></mat-spinner>
+                                  <span>{{ 'songProjects.mirror.comparing' | translate }}</span>
+                                </div>
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                              }
+                              @if (mirrorPhase === 'moving') {
+                                <div class="mirror-phase-info">
+                                  <mat-spinner diameter="20"></mat-spinner>
+                                  <span>{{ 'songProjects.mirror.moving' | translate }}</span>
+                                </div>
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                              }
+                              @if (mirrorPhase === 'deleting') {
+                                <div class="mirror-phase-info">
+                                  <mat-spinner diameter="20"></mat-spinner>
+                                  <span>{{ 'songProjects.mirror.deleting' | translate }}</span>
+                                </div>
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                              }
+                              <!-- Regular upload progress (during mirror upload phase or standalone) -->
+                              @if (!isUploadComplete && (mirrorPhase === 'uploading' || mirrorPhase === 'idle')) {
+                                @if (uploadTotalFileCount > 0) {
+                                  <div class="upload-progress-info">
+                                    <span>{{ 'songProjects.mirror.uploading' | translate }} {{ uploadedFileCount }} / {{ uploadTotalFileCount }} {{ 'songProjects.upload.files' | translate }}</span>
+                                    <span>{{ uploadProgress }}%</span>
+                                  </div>
+                                  <mat-progress-bar mode="determinate" [value]="uploadProgress"></mat-progress-bar>
+                                }
+                              }
+                              @if (isUploadComplete) {
+                                <div class="upload-complete-section">
+                                  @if (uploadErrors.length === 0) {
+                                    <div class="upload-success">
+                                      <i class="fas fa-check-circle"></i>
+                                      <span>{{ 'songProjects.upload.completeMessage' | translate: {count: uploadedFileCount} }}</span>
+                                    </div>
+                                  }
+                                  @if (uploadErrors.length > 0) {
+                                    <div class="upload-errors">
+                                      <div class="upload-errors-title">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>{{ 'songProjects.upload.errorsTitle' | translate }} ({{ uploadErrors.length }})</span>
+                                      </div>
+                                      @for (err of uploadErrors; track err) {
+                                        <div class="upload-error-item">
+                                          @if (err.filename) {
+                                            <strong>{{ err.filename }}:</strong>
+                                          }
+                                          {{ err.error }}
+                                        </div>
+                                      }
+                                    </div>
+                                  }
+                                  <button type="button" class="dismiss-button" (click)="dismissUploadStatus()">
+                                    {{ 'songProjects.upload.dismiss' | translate }}
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          }
                           @if (!folder.files || folder.files.length === 0) {
-                            <div class="empty-folder">
+                            <div class="empty-folder" [class.drop-zone-hint]="canUploadFiles()">
+                              <i class="fas fa-cloud-upload-alt"></i>
                               <p>{{ 'songProjects.detail.noFiles' | translate }}</p>
+                              @if (canUploadFiles()) {
+                                <p class="drop-hint-text">{{ 'songProjects.upload.dropZoneHint' | translate }}</p>
+                              }
                             </div>
                           }
                           @for (file of folder.files; track file) {
@@ -465,17 +653,31 @@
                                 <i class="fas fa-file"></i>
                                 <span class="filename"
                                 [title]="file.relative_path">{{ getFilePathInFolder(file.relative_path, folder.folder_name) }}</span>
+                                <span class="file-date">{{ file.created_at | date:'dd.MM.yyyy HH:mm' }}</span>
                                 <span class="filesize">{{ formatFileSize(file.file_size_bytes) }}</span>
                               </div>
-                              @if (file.download_url) {
-                                <button
-                                  type="button"
-                                  class="file-download-button"
-                                  (click)="downloadFile(file.download_url!)"
-                                  >
-                                  <i class="fas fa-download"></i>
-                                </button>
-                              }
+                              <div class="file-actions">
+                                @if (file.download_url) {
+                                  <button
+                                    type="button"
+                                    class="file-download-button"
+                                    (click)="downloadFile(file.download_url!)"
+                                    [matTooltip]="'songProjects.detail.actions.downloadFile' | translate"
+                                    >
+                                    <i class="fas fa-download"></i>
+                                  </button>
+                                }
+                                @if (canUploadFiles()) {
+                                  <button
+                                    type="button"
+                                    class="file-delete-button"
+                                    (click)="deleteFile(file)"
+                                    [matTooltip]="'songProjects.detail.actions.deleteFile' | translate"
+                                    >
+                                    <i class="fas fa-trash-alt"></i>
+                                  </button>
+                                }
+                              </div>
                             </div>
                           }
                         </div>
@@ -527,9 +729,6 @@
           <div class="detail-actions">
             <button mat-button type="button" (click)="refreshProject()">
               <i class="fas fa-sync-alt"></i> {{ 'common.refresh' | translate }}
-            </button>
-            <button mat-button type="button" (click)="copyCLICompleteCloneCommand()">
-              <i class="fas fa-code"></i> {{ 'songProjects.detail.copyCompleteClone' | translate }}
             </button>
             @if (selectedProject.project_status !== 'archived') {
               <button mat-button type="button"

@@ -15,6 +15,7 @@ import {WorkshopService} from "../../services/business/workshop.service";
 import {NotificationService} from "../../services/ui/notification.service";
 import {ChatService} from "../../services/config/chat.service";
 import {LyricArchitectModalComponent} from "../../components/lyric-architect-modal/lyric-architect-modal.component";
+import {AssignToProjectDialogComponent} from "../../dialogs/assign-to-project-dialog/assign-to-project-dialog.component";
 import {LyricArchitectureService} from "../../services/lyric-architecture.service";
 import {Workshop, WorkshopPhase} from "../../models/workshop.model";
 
@@ -486,6 +487,37 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
             this.notificationService.error(this.translate.instant("workshop.errors.exportFailed"));
         } finally {
             this.isExporting = false;
+        }
+    }
+
+    // --- Project Assignment ---
+
+    openAssignToProjectDialog(event: Event, workshop: Workshop): void {
+        event.stopPropagation();
+        const dialogRef = this.dialog.open(AssignToProjectDialogComponent, {
+            width: "500px",
+            data: {
+                assetType: "workshop",
+                assetId: workshop.id
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result?.success) {
+                this.notificationService.success(this.translate.instant("textWorkshop.assignSuccess"));
+                this.loadWorkshops();
+            }
+        });
+    }
+
+    async unassignFromProject(event: Event, workshop: Workshop): Promise<void> {
+        event.stopPropagation();
+        try {
+            await this.workshopService.unassignFromProject(workshop.id);
+            this.notificationService.success(this.translate.instant("textWorkshop.unassignSuccess"));
+            this.loadWorkshops();
+        } catch {
+            this.notificationService.error(this.translate.instant("textWorkshop.errors.unassignFailed"));
         }
     }
 

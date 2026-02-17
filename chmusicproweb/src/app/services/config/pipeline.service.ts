@@ -1,6 +1,6 @@
 import {inject, Injectable} from "@angular/core";
 import {NavigationEnd, Router} from "@angular/router";
-import {filter, map, startWith} from "rxjs";
+import {filter, map, shareReplay, startWith} from "rxjs";
 import {PIPELINE_STEPS, PipelineStep} from "./pipeline.config";
 
 @Injectable({providedIn: "root"})
@@ -12,7 +12,8 @@ export class PipelineService {
     readonly currentStep$ = this.router.events.pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
         startWith({urlAfterRedirects: this.router.url} as NavigationEnd),
-        map(event => this.findStep(event.urlAfterRedirects))
+        map(event => this.findStep(event.urlAfterRedirects)),
+        shareReplay(1)
     );
 
     readonly isOnPipelinePage$ = this.currentStep$.pipe(

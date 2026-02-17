@@ -83,10 +83,13 @@ class WorkshopResponse(BaseModel):
     current_phase: str = Field(..., description="Current workshop phase")
     draft_language: str | None = Field(None, description="Draft generation language code")
     exported_sketch_id: UUID | None = Field(None, description="Exported sketch ID")
+    project_id: UUID | None = Field(None, description="Assigned project ID")
+    project_folder_id: UUID | None = Field(None, description="Assigned project folder ID")
+    project_name: str | None = Field(None, description="Assigned project name")
     created_at: datetime = Field(..., description="Creation timestamp")
     updated_at: datetime | None = Field(None, description="Last update timestamp")
 
-    @field_serializer("id", "exported_sketch_id")
+    @field_serializer("id", "exported_sketch_id", "project_id", "project_folder_id")
     def serialize_uuid(self, value: UUID | None) -> str | None:
         """Convert UUID to string for JSON serialization"""
         return str(value) if value else None

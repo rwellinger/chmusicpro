@@ -1,8 +1,8 @@
-# AiProxy CLI - Global Ignore Patterns
+# CH Music Pro CLI - Global Ignore Patterns
 # Syntax like .gitignore (supports wildcards: *, ?, [])
 #
-# This file is located at: ~/.aiproxy/.aiproxyignore
-# You can also create .aiproxyignore in your upload directory for project-specific ignores
+# This file is located at: ~/.chmusicpro/.chmusicproignore
+# You can also create .chmusicproignore in your upload directory for project-specific ignores
 
 # macOS system files
 .DS_Store

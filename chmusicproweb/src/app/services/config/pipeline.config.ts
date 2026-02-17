@@ -17,7 +17,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
         icon: "fa-pen-fancy",
         iconColor: "#AD1457",
         enabled: true,
-        routes: ["/text-workshop", "/song-sketch-library", "/song-sketch-creator", "/lyriccreation", "/music-style-prompt"],
+        routes: ["/text-workshop", "/lyriccreation"],
         primaryRoute: "/text-workshop"
     },
     {
@@ -25,10 +25,10 @@ export const PIPELINE_STEPS: PipelineStep[] = [
         titleKey: "dashboard.tiles.composition.title",
         descriptionKey: "dashboard.tiles.composition.description",
         icon: "fa-sliders-h",
-        iconColor: "#6c757d",
-        enabled: false,
-        routes: [],
-        primaryRoute: ""
+        iconColor: "#7B1FA2",
+        enabled: true,
+        routes: ["/song-sketch-library", "/song-sketch-creator", "/music-style-prompt"],
+        primaryRoute: "/song-sketch-library"
     },
     {
         step: 3,

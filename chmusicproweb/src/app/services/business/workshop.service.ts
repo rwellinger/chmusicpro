@@ -1,6 +1,6 @@
 import {inject, Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {firstValueFrom, Observable} from "rxjs";
 import {ApiConfigService} from "../config/api-config.service";
 import {Workshop, WorkshopDetailResponse, WorkshopListResponse} from "../../models/workshop.model";
 
@@ -52,6 +52,22 @@ export class WorkshopService {
         return this.http.post(
             this.apiConfig.endpoints.workshop.exportToSketch(id),
             {}
+        );
+    }
+
+    async assignToProject(workshopId: string, projectId: string, projectFolderId?: string): Promise<any> {
+        const body: any = {
+            project_id: projectId,
+            folder_id: projectFolderId || null
+        };
+        return firstValueFrom(
+            this.http.post(this.apiConfig.endpoints.workshop.assignToProject(workshopId), body)
+        );
+    }
+
+    async unassignFromProject(workshopId: string): Promise<any> {
+        return firstValueFrom(
+            this.http.delete(this.apiConfig.endpoints.workshop.unassignFromProject(workshopId))
         );
     }
 }

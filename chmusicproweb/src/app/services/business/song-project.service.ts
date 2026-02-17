@@ -8,10 +8,15 @@
  */
 
 import {inject, Injectable} from "@angular/core";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpEvent} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {ApiConfigService} from "../config/api-config.service";
 import {
+    BatchMoveResponse,
+    BatchUploadResponse,
+    MirrorCompareResult,
+    MirrorFileEntry,
+    MirrorMoveAction,
     SongProjectCreateRequest,
     SongProjectDetailResponse,
     SongProjectListResponse,
@@ -162,6 +167,28 @@ export class SongProjectService {
     }
 
     /**
+     * Batch upload multiple files to a project folder.
+     * Uses reportProgress for progress tracking.
+     */
+    batchUploadFiles(projectId: string, folderId: string, formData: FormData): Observable<HttpEvent<BatchUploadResponse>> {
+        return this.http.post<BatchUploadResponse>(
+            this.apiConfig.endpoints.songProject.batchUpload(projectId, folderId),
+            formData,
+            {reportProgress: true, observe: "events"}
+        );
+    }
+
+    /**
+     * Delete specific files from a project (S3 + DB).
+     */
+    deleteFiles(projectId: string, fileIds: string[]): Observable<{ data: { deleted: number; errors: unknown[] } }> {
+        return this.http.delete<{ data: { deleted: number; errors: unknown[] } }>(
+            this.apiConfig.endpoints.songProject.batchDelete(projectId),
+            {body: {file_ids: fileIds}}
+        );
+    }
+
+    /**
      * Clear all files in a folder (Bereinigung).
      *
      * @param projectId Project UUID
@@ -178,5 +205,33 @@ export class SongProjectService {
         return this.http.delete<{ data: { deleted: number; errors: unknown[] } }>(
             this.apiConfig.endpoints.songProject.clearFolder(projectId, folderId)
         );
+    }
+
+    /**
+     * Mirror compare: send local file hashes to server, get diff result.
+     */
+    mirrorCompare(projectId: string, folderId: string, files: MirrorFileEntry[]): Observable<{ data: MirrorCompareResult }> {
+        return this.http.post<{ data: MirrorCompareResult }>(
+            this.apiConfig.endpoints.songProject.mirror(projectId, folderId),
+            {files}
+        );
+    }
+
+    /**
+     * Batch move files (server-side S3 move for renamed/moved files).
+     */
+    batchMoveFiles(projectId: string, moveActions: MirrorMoveAction[]): Observable<BatchMoveResponse> {
+        return this.http.post<BatchMoveResponse>(
+            this.apiConfig.endpoints.songProject.batchMove(projectId),
+            {moves: moveActions}
+        );
+    }
+
+    downloadTemplateZip(projectId: string): Observable<Blob> {
+        return this.http.get(this.apiConfig.endpoints.songProject.templateZip(projectId), {responseType: 'blob'});
+    }
+
+    downloadFolderZip(projectId: string, folderId: string): Observable<Blob> {
+        return this.http.get(this.apiConfig.endpoints.songProject.folderZip(projectId, folderId), {responseType: 'blob'});
     }
 }

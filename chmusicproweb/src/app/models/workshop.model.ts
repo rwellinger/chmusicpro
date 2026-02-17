@@ -12,6 +12,9 @@ export interface Workshop {
     current_phase: WorkshopPhase;
     draft_language?: string;
     exported_sketch_id?: string;
+    project_id?: string;
+    project_folder_id?: string;
+    project_name?: string;
     created_at: string;
     updated_at?: string;
 }

@@ -707,79 +707,98 @@ mat-accordion {
   align-items: center;
   gap: $spacing-xs;
   font-weight: $font-weight-medium !important;
-  
+
   i {
     font-size: $font-sm;
   }
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 }
 
-.cli-commands-button {
+.upload-folder-button {
   @include button-storage('base');
   display: inline-flex;
   align-items: center;
   gap: $spacing-xs;
   font-weight: $font-weight-medium !important;
-  
+
   i {
     font-size: $font-sm;
   }
-  
-  .dropdown-icon {
-    margin-left: 4px;
-    font-size: 0.75rem;
-  }
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 }
 
-// Target the specific menu items in the CLI dropdown
-::ng-deep .mat-mdc-menu-panel {
-  .mat-mdc-menu-item-text {
-    i.fas {
-      margin-right: $spacing-sm !important;
-    }
-  }
-}
-
-.copy-cli-button,
-.copy-cli-download-button {
-  @include button-secondary('base');
+.download-folder-button {
+  @include button-storage('base');
   display: inline-flex;
   align-items: center;
   gap: $spacing-xs;
   font-weight: $font-weight-medium !important;
-  
+
   i {
     font-size: $font-sm;
   }
-  
+
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
+}
+
+.clear-folder-button {
+  @include button-storage('base');
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-weight: $font-weight-medium !important;
+  color: var(--warn-color, #f44336);
+
+  i {
+    font-size: $font-sm;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    background-color: rgba(244, 67, 54, 0.08);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Mirror sync phase indicator
+.mirror-phase-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  font-size: $font-sm;
+  color: $text-secondary;
+  margin-bottom: $spacing-sm;
 }
 
 .file-item {
@@ -812,20 +831,55 @@ mat-accordion {
     font-weight: $font-weight-medium;
   }
   
+  .file-date {
+    color: $text-muted;
+    font-size: $font-xs;
+    white-space: nowrap;
+  }
+
   .filesize {
     color: $text-muted;
     font-size: $font-sm;
     margin-left: auto;
+    white-space: nowrap;
   }
+}
+
+.file-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  flex-shrink: 0;
 }
 
 .file-download-button {
   @include button-secondary('base');
   padding: $spacing-xs $spacing-sm !important;
   min-width: auto !important;
-  
+
   i {
     font-size: $font-sm;
+  }
+}
+
+.file-delete-button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: $text-muted;
+  padding: $spacing-xs $spacing-sm;
+  min-width: auto;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i {
+    font-size: $font-sm;
+  }
+
+  &:hover {
+    color: #991b1b;
+    background-color: #fef2f2;
+    border-color: #fecaca;
   }
 }
 
@@ -1119,6 +1173,280 @@ mat-accordion {
     &.release-status-archived {
       background-color: #f5f5f5;
       color: #757575;
+    }
+  }
+}
+
+// Drop Zone
+.folder-files {
+  position: relative;
+}
+
+.drop-zone-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  background-color: rgba($primary-color, 0.08);
+  border: 2px dashed $primary-color;
+  border-radius: $border-radius-md;
+  z-index: 10;
+  pointer-events: none;
+
+  i {
+    font-size: 2.5rem;
+    color: $primary-color;
+  }
+
+  span {
+    font-size: $font-base;
+    font-weight: $font-weight-semibold;
+    color: $primary-color;
+  }
+}
+
+.empty-folder {
+  &.drop-zone-hint {
+    border: 2px dashed $border-standard;
+    border-radius: $border-radius-md;
+    padding: $spacing-lg;
+
+    i {
+      font-size: 1.5rem;
+      color: $text-muted;
+      margin-bottom: $spacing-xs;
+    }
+
+    .drop-hint-text {
+      font-size: $font-xs;
+      color: $text-muted;
+      margin-top: $spacing-xs;
+    }
+  }
+}
+
+// Upload Progress
+.upload-progress-section {
+  background-color: $background-light;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.upload-progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+  font-size: $font-sm;
+  color: $text-secondary;
+}
+
+.upload-complete-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.upload-success {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  color: #065f46;
+
+  i {
+    font-size: 1.25rem;
+  }
+}
+
+.upload-errors {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: $border-radius-sm;
+  padding: $spacing-sm;
+}
+
+.upload-errors-title {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  color: #991b1b;
+  font-weight: $font-weight-semibold;
+  font-size: $font-sm;
+  margin-bottom: $spacing-xs;
+
+  i {
+    font-size: $font-sm;
+  }
+}
+
+.upload-error-item {
+  font-size: $font-xs;
+  color: #991b1b;
+  padding: 2px 0;
+}
+
+.dismiss-button {
+  @include button-secondary('sm');
+  align-self: flex-start;
+  margin-top: $spacing-xs;
+}
+
+// File Workflow Diagram
+.workflow-diagram {
+  margin-top: $spacing-lg;
+  padding: $spacing-md;
+  background: $background-light;
+  border: 1px solid $border-light;
+  border-radius: $border-radius-xl;
+}
+
+.workflow-steps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  margin-top: $spacing-md;
+}
+
+.workflow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  max-width: 120px;
+}
+
+.workflow-step--clickable {
+  cursor: pointer;
+
+  &:hover {
+    .workflow-icon {
+      transform: scale(1.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .workflow-label {
+      color: $primary-color;
+    }
+  }
+
+  .workflow-icon {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .workflow-label {
+    transition: color 0.2s ease;
+  }
+}
+
+.workflow-step--auto {
+  .workflow-icon {
+    border-style: dashed;
+  }
+}
+
+.workflow-badge-auto {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  font-weight: $font-weight-semibold;
+  color: $info-color;
+  background: rgba($info-color, 0.1);
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  i {
+    font-size: 0.55rem;
+  }
+}
+
+.workflow-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-lg;
+  margin-bottom: $spacing-sm;
+  border: 2px solid;
+
+  &.template-icon {
+    border-color: #8b5cf6;
+    color: #8b5cf6;
+    background: rgba(#8b5cf6, 0.08);
+  }
+
+  &.upload-icon {
+    border-color: $primary-color;
+    color: $primary-color;
+    background: rgba($primary-color, 0.08);
+  }
+
+  &.sync-icon {
+    border-color: $info-color;
+    color: $info-color;
+    background: rgba($info-color, 0.08);
+  }
+
+  &.manage-icon {
+    border-color: #f59e0b;
+    color: #f59e0b;
+    background: $storage-bg;
+  }
+
+  &.download-icon {
+    border-color: $success-color;
+    color: $success-color;
+    background: rgba($success-color, 0.08);
+  }
+}
+
+.workflow-label {
+  font-size: $font-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin-bottom: 2px;
+}
+
+.workflow-desc {
+  font-size: $font-xs;
+  color: $text-secondary;
+  line-height: 1.3;
+}
+
+.workflow-connector {
+  display: flex;
+  align-items: center;
+  padding-top: 20px;
+  flex: 0 0 auto;
+
+  .connector-arrow {
+    width: 32px;
+    height: 2px;
+    background: $border-darker;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      right: -1px;
+      top: -4px;
+      border: 5px solid transparent;
+      border-left-color: $border-darker;
     }
   }
 }

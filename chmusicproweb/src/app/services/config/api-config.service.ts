@@ -122,7 +122,9 @@ export class ApiConfigService {
             detail: (id: string) => `${this.baseUrl}/api/v1/workshops/${id}`,
             update: (id: string) => `${this.baseUrl}/api/v1/workshops/${id}`,
             delete: (id: string) => `${this.baseUrl}/api/v1/workshops/${id}`,
-            exportToSketch: (id: string) => `${this.baseUrl}/api/v1/workshops/${id}/export-to-sketch`
+            exportToSketch: (id: string) => `${this.baseUrl}/api/v1/workshops/${id}/export-to-sketch`,
+            assignToProject: (id: string) => `${this.baseUrl}/api/v1/workshops/${id}/assign-to-project`,
+            unassignFromProject: (id: string) => `${this.baseUrl}/api/v1/workshops/${id}/unassign-from-project`
         },
         equipment: {
             create: () => `${this.baseUrl}/api/v1/equipment`,
@@ -165,7 +167,13 @@ export class ApiConfigService {
             update: (id: string) => `${this.baseUrl}/api/v1/song-projects/${id}`,
             delete: (id: string) => `${this.baseUrl}/api/v1/song-projects/${id}`,
             uploadFile: (id: string) => `${this.baseUrl}/api/v1/song-projects/${id}/files`,
-            clearFolder: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/clear`
+            batchUpload: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/batch-upload`,
+            batchDelete: (projectId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/files/batch-delete`,
+            clearFolder: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/clear`,
+            mirror: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/mirror`,
+            batchMove: (projectId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/files/batch-move`,
+            templateZip: (projectId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/template-zip`,
+            folderZip: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/download-zip`
         },
         aiConfig: `${this.baseUrl}/api/v1/ai-config/`,
         domain: {

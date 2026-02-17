@@ -12,16 +12,20 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatDialog, MatDialogModule} from "@angular/material/dialog";
 import {MatTooltipModule} from "@angular/material/tooltip";
-import {MatMenuModule} from "@angular/material/menu";
 import {MatTabsModule} from "@angular/material/tabs";
+import {MatProgressBarModule} from "@angular/material/progress-bar";
+import {HttpEventType} from "@angular/common/http";
 
 import {SongProjectService} from "../../services/business/song-project.service";
 import {NotificationService} from "../../services/ui/notification.service";
 import {UserSettingsService} from "../../services/user-settings.service";
 import {ApiConfigService} from "../../services/config/api-config.service";
 import {ResourceBlobService} from "../../services/ui/resource-blob.service";
+import {FileIgnoreService} from "../../services/utils/file-ignore.service";
+import {FileHashService} from "../../services/utils/file-hash.service";
 import {CreateProjectDialogComponent} from "../../dialogs/create-project-dialog/create-project-dialog.component";
-import {AssignedSketch, SongProjectDetail, SongProjectListItem} from "../../models/song-project.model";
+import {MirrorPreviewDialogComponent} from "../../dialogs/mirror-preview-dialog/mirror-preview-dialog.component";
+import {AssignedSketch, AssignedWorkshop, BatchUploadResponse, MirrorFileEntry, SongProjectDetail, SongProjectListItem} from "../../models/song-project.model";
 import {getColorFromString, getInitials} from "../../services/utils/cover-utils";
 
 @Component({
@@ -39,8 +43,8 @@ import {getColorFromString, getInitials} from "../../services/utils/cover-utils"
         MatExpansionModule,
         MatDialogModule,
         MatTooltipModule,
-        MatMenuModule,
-        MatTabsModule
+        MatTabsModule,
+        MatProgressBarModule
     ],
     templateUrl: "./song-projects.component.html",
     styleUrl: "./song-projects.component.scss"
@@ -68,6 +72,19 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     isLoadingDetail = false;
     selectedTabIndex = 0;
 
+    // Upload state
+    uploadingFolderId: string | null = null;
+    uploadProgress = 0;
+    uploadedFileCount = 0;
+    uploadTotalFileCount = 0;
+    uploadErrors: { filename?: string; error: string }[] = [];
+    isUploadComplete = false;
+    isDragOver: string | null = null;
+
+    // Mirror sync state
+    mirrorPhase: "idle" | "filtering" | "hashing" | "comparing" | "uploading" | "moving" | "deleting" = "idle";
+    mirrorHashProgress = {current: 0, total: 0};
+
     // Math for template
     Math = Math;
 
@@ -84,6 +101,8 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     private apiConfig = inject(ApiConfigService);
     private route = inject(ActivatedRoute);
     private resourceBlobService = inject(ResourceBlobService);
+    private fileIgnoreService = inject(FileIgnoreService);
+    private fileHashService = inject(FileHashService);
 
     // Navigation state (must be captured in constructor)
     private navigationState: any = null;
@@ -411,10 +430,40 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Upload file to project folder.
+     * Delete a single file from the project.
      */
-    async uploadFile(folder: any): Promise<void> {
-        // Check if uploads are allowed
+    async deleteFile(file: any): Promise<void> {
+        if (!this.selectedProject) return;
+
+        const filename = file.filename || file.relative_path || "file";
+        const confirmed = confirm(
+            this.translate.instant("songProjects.messages.deleteFileConfirm", {filename})
+        );
+        if (!confirmed) return;
+
+        try {
+            await firstValueFrom(
+                this.projectService.deleteFiles(this.selectedProject.id, [file.id])
+            );
+
+            this.notificationService.success(
+                this.translate.instant("songProjects.messages.fileDeleted", {filename})
+            );
+
+            // Refresh project to show updated file list
+            await this.selectProject(this.selectedProject);
+        } catch (error) {
+            console.error("Failed to delete file:", error);
+            this.notificationService.error(
+                this.translate.instant("songProjects.messages.deleteFileError")
+            );
+        }
+    }
+
+    /**
+     * Upload multiple files to project folder.
+     */
+    uploadFiles(folder: any): void {
         if (!this.canUploadFiles()) {
             this.notificationService.error(
                 this.translate.instant("songProjects.warnings.uploadBlocked")
@@ -422,138 +471,447 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // Create hidden file input
         const input = document.createElement("input");
         input.type = "file";
+        input.multiple = true;
         input.accept = "*";
 
         input.onchange = async (e: any) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Validate file size (500MB max)
-            const maxSizeBytes = 500 * 1024 * 1024; // 500MB
-            if (file.size > maxSizeBytes) {
-                this.notificationService.error(
-                    this.translate.instant("songProjects.messages.fileTooLarge", {size: "500MB"})
-                );
-                return;
-            }
-
-            // Create FormData
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("folder_id", folder.id);
-
-            try {
-                await firstValueFrom(
-                    this.projectService.uploadFile(this.selectedProject!.id, formData)
-                );
-
-                this.notificationService.success(
-                    this.translate.instant("songProjects.messages.uploadSuccess")
-                );
-
-                // Reload project details to show new file
-                if (this.selectedProject) {
-                    await this.selectProject(this.selectedProject);
-                }
-            } catch (error) {
-                console.error("Upload failed:", error);
-                this.notificationService.error(
-                    this.translate.instant("songProjects.messages.uploadError")
-                );
-            }
+            const files: File[] = Array.from(e.target.files || []);
+            if (files.length === 0) return;
+            await this.processMirrorSync(folder, files);
         };
 
-        // Trigger file selection dialog
         input.click();
     }
 
     /**
-     * Copy CLI upload command to clipboard.
+     * Upload an entire folder to project folder.
      */
-    async copyCLICommand(folder: any): Promise<void> {
-        if (!this.selectedProject) return;
-
-        const command = `chmusicpro-cli upload ${this.selectedProject.id} ${folder.id}`;
-
-        try {
-            await navigator.clipboard.writeText(command);
-            this.notificationService.success(
-                this.translate.instant("songProjects.messages.cliUploadCommandCopied")
-            );
-        } catch (error) {
-            console.error("Failed to copy to clipboard:", error);
+    uploadFolder(folder: any): void {
+        if (!this.canUploadFiles()) {
             this.notificationService.error(
-                this.translate.instant("songProjects.messages.clipboardError")
+                this.translate.instant("songProjects.warnings.uploadBlocked")
             );
+            return;
+        }
+
+        const input = document.createElement("input");
+        input.type = "file";
+        input.setAttribute("webkitdirectory", "");
+        input.multiple = true;
+
+        input.onchange = async (e: any) => {
+            const files: File[] = Array.from(e.target.files || []);
+            if (files.length === 0) return;
+            await this.processMirrorSync(folder, files);
+        };
+
+        input.click();
+    }
+
+    /**
+     * Core batch upload engine. Splits files into batches of 3 and uploads sequentially.
+     */
+    async processBatchUpload(folder: any, files: File[]): Promise<void> {
+        const maxSizeBytes = 500 * 1024 * 1024; // 500MB
+        const validFiles: File[] = [];
+        const sizeErrors: { filename?: string; error: string }[] = [];
+
+        // Validate file sizes
+        for (const file of files) {
+            if (file.size > maxSizeBytes) {
+                sizeErrors.push({
+                    filename: (file as any).webkitRelativePath || file.name,
+                    error: this.translate.instant("songProjects.messages.fileTooLarge", {size: "500MB"})
+                });
+            } else {
+                validFiles.push(file);
+            }
+        }
+
+        if (validFiles.length === 0 && sizeErrors.length > 0) {
+            this.uploadErrors = sizeErrors;
+            this.isUploadComplete = true;
+            this.uploadingFolderId = folder.id;
+            return;
+        }
+
+        // Initialize upload state
+        this.uploadingFolderId = folder.id;
+        this.uploadProgress = 0;
+        this.uploadedFileCount = 0;
+        this.uploadTotalFileCount = validFiles.length;
+        this.uploadErrors = [...sizeErrors];
+        this.isUploadComplete = false;
+
+        // Split into batches of 3
+        const batchSize = 3;
+        const batches: File[][] = [];
+        for (let i = 0; i < validFiles.length; i += batchSize) {
+            batches.push(validFiles.slice(i, i + batchSize));
+        }
+
+        let totalUploaded = 0;
+        let totalFailed = 0;
+
+        for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+            const batch = batches[batchIndex];
+            const formData = new FormData();
+
+            for (const file of batch) {
+                const filename = (file as any).webkitRelativePath || file.name;
+                formData.append("files", file, filename);
+            }
+
+            try {
+                const result = await new Promise<BatchUploadResponse>((resolve, reject) => {
+                    this.projectService.batchUploadFiles(
+                        this.selectedProject!.id,
+                        folder.id,
+                        formData
+                    ).subscribe({
+                        next: (event) => {
+                            if (event.type === HttpEventType.UploadProgress && event.total) {
+                                // Calculate overall progress across all batches
+                                const batchProgress = event.loaded / event.total;
+                                const overallProgress = ((batchIndex + batchProgress) / batches.length) * 100;
+                                this.uploadProgress = Math.round(overallProgress);
+                            } else if (event.type === HttpEventType.Response) {
+                                resolve(event.body!);
+                            }
+                        },
+                        error: (error) => reject(error)
+                    });
+                });
+
+                totalUploaded += result.data.uploaded;
+                totalFailed += result.data.failed;
+                this.uploadedFileCount = totalUploaded;
+
+                if (result.data.errors?.length) {
+                    this.uploadErrors.push(...result.data.errors);
+                }
+            } catch (error: any) {
+                console.error(`Batch ${batchIndex + 1} failed:`, error);
+                totalFailed += batch.length;
+                this.uploadErrors.push({
+                    error: `Batch ${batchIndex + 1} failed: ${error?.message || "Unknown error"}`
+                });
+            }
+        }
+
+        // Complete
+        this.uploadProgress = 100;
+        this.isUploadComplete = true;
+
+        if (totalFailed === 0) {
+            this.notificationService.success(
+                this.translate.instant("songProjects.upload.batchUploadSuccess", {count: totalUploaded})
+            );
+        } else if (totalUploaded > 0) {
+            this.notificationService.info(
+                this.translate.instant("songProjects.upload.batchUploadPartial", {
+                    uploaded: totalUploaded,
+                    failed: totalFailed
+                })
+            );
+        } else {
+            this.notificationService.error(
+                this.translate.instant("songProjects.upload.batchUploadError")
+            );
+        }
+
+        // Refresh project to show new files
+        if (this.selectedProject) {
+            await this.selectProject(this.selectedProject);
         }
     }
 
     /**
-     * Copy CLI download command to clipboard.
+     * Drag-and-drop: dragover handler.
      */
-    async copyCLIDownloadCommand(folder: any): Promise<void> {
-        if (!this.selectedProject) return;
-
-        const command = `chmusicpro-cli download ${this.selectedProject.id} ${folder.id}`;
-
-        try {
-            await navigator.clipboard.writeText(command);
-            this.notificationService.success(
-                this.translate.instant("songProjects.messages.cliDownloadCommandCopied")
-            );
-        } catch (error) {
-            console.error("Clipboard copy failed:", error);
-            this.notificationService.error(
-                this.translate.instant("songProjects.messages.cliCommandCopyFailed")
-            );
+    onDragOver(event: DragEvent, folderId: string): void {
+        event.preventDefault();
+        event.stopPropagation();
+        if (this.canUploadFiles()) {
+            this.isDragOver = folderId;
         }
     }
 
     /**
-     * Copy CLI mirror command to clipboard.
+     * Drag-and-drop: dragleave handler.
      */
-    async copyCLIMirrorCommand(folder: any): Promise<void> {
-        if (!this.selectedProject) return;
-
-        const command = `chmusicpro-cli mirror ${this.selectedProject.id} ${folder.id} . --dry-run`;
-
-        try {
-            await navigator.clipboard.writeText(command);
-            this.notificationService.success(
-                this.translate.instant("songProjects.messages.cliMirrorCommandCopied")
-            );
-        } catch (error) {
-            console.error("Clipboard copy failed:", error);
-            this.notificationService.error(
-                this.translate.instant("songProjects.messages.cliCommandCopyFailed")
-            );
+    onDragLeave(event: DragEvent, folderId: string): void {
+        event.preventDefault();
+        event.stopPropagation();
+        // Only clear if leaving the drop zone (not entering a child element)
+        const relatedTarget = event.relatedTarget as HTMLElement;
+        const currentTarget = event.currentTarget as HTMLElement;
+        if (!currentTarget.contains(relatedTarget)) {
+            if (this.isDragOver === folderId) {
+                this.isDragOver = null;
+            }
         }
     }
 
     /**
-     * Copy CLI clone command to clipboard (complete clone).
+     * Drag-and-drop: drop handler. Supports files and directories.
      */
-    async copyCLICompleteCloneCommand(): Promise<void> {
-        if (!this.selectedProject) return;
+    async onDrop(event: DragEvent, folder: any): Promise<void> {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isDragOver = null;
 
-        const command = `chmusicpro-cli clone ${this.selectedProject.id} .`;
-
-        try {
-            await navigator.clipboard.writeText(command);
-            this.notificationService.success(
-                this.translate.instant("songProjects.messages.cliCompleteCloneCommandCopied")
-            );
-        } catch (error) {
-            console.error("Clipboard copy failed:", error);
+        if (!this.canUploadFiles()) {
             this.notificationService.error(
-                this.translate.instant("songProjects.messages.cliCommandCopyFailed")
+                this.translate.instant("songProjects.warnings.uploadBlocked")
             );
+            return;
+        }
+
+        const items = event.dataTransfer?.items;
+        if (items) {
+            const files: File[] = [];
+            const promises: Promise<void>[] = [];
+
+            for (const item of Array.from(items)) {
+                const entry = item.webkitGetAsEntry?.();
+                if (entry) {
+                    promises.push(this.readEntry(entry, "", files));
+                }
+            }
+
+            await Promise.all(promises);
+
+            if (files.length > 0) {
+                await this.processMirrorSync(folder, files);
+            }
+            return;
+        }
+
+        // Fallback: plain file list
+        const fileList = event.dataTransfer?.files;
+        if (fileList && fileList.length > 0) {
+            const files: File[] = Array.from(fileList);
+            await this.processMirrorSync(folder, files);
         }
     }
 
+    /**
+     * Recursively read a FileSystemEntry (file or directory).
+     */
+    private readEntry(entry: FileSystemEntry, path: string, files: File[]): Promise<void> {
+        return new Promise((resolve) => {
+            if (entry.isFile) {
+                (entry as FileSystemFileEntry).file((file) => {
+                    // Create a new file with the relative path as name
+                    const relativePath = path ? `${path}/${file.name}` : file.name;
+                    const renamedFile = new File([file], relativePath, {type: file.type, lastModified: file.lastModified});
+                    files.push(renamedFile);
+                    resolve();
+                }, () => resolve());
+            } else if (entry.isDirectory) {
+                const reader = (entry as FileSystemDirectoryEntry).createReader();
+                const dirPath = path ? `${path}/${entry.name}` : entry.name;
+                const readAllEntries = (allEntries: FileSystemEntry[]) => {
+                    reader.readEntries((entries) => {
+                        if (entries.length === 0) {
+                            // Done reading - process all entries
+                            Promise.all(allEntries.map(e => this.readEntry(e, dirPath, files)))
+                                .then(() => resolve());
+                        } else {
+                            // readEntries may return partial results, keep reading
+                            readAllEntries([...allEntries, ...entries]);
+                        }
+                    }, () => resolve());
+                };
+                readAllEntries([]);
+            } else {
+                resolve();
+            }
+        });
+    }
+
+    /**
+     * Dismiss the upload status section.
+     */
+    dismissUploadStatus(): void {
+        this.uploadingFolderId = null;
+        this.uploadProgress = 0;
+        this.uploadedFileCount = 0;
+        this.uploadTotalFileCount = 0;
+        this.uploadErrors = [];
+        this.isUploadComplete = false;
+    }
+
+    /**
+     * Mirror sync: filter, hash, compare, preview, execute.
+     * Replaces direct batch upload with intelligent sync.
+     */
+    async processMirrorSync(folder: any, rawFiles: File[]): Promise<void> {
+        if (!this.selectedProject) return;
+
+        const projectId = this.selectedProject.id;
+        const folderId = folder.id;
+
+        // Build file entries with relative paths
+        const fileEntries = rawFiles.map(file => ({
+            file,
+            relativePath: (file as any).webkitRelativePath || file.name
+        }));
+
+        // Phase 1: Filter
+        this.mirrorPhase = "filtering";
+        this.uploadingFolderId = folderId;
+        this.isUploadComplete = false;
+        this.uploadErrors = [];
+
+        const {accepted, ignored} = this.fileIgnoreService.filterFiles(fileEntries);
+
+        if (accepted.length === 0) {
+            this.mirrorPhase = "idle";
+            this.uploadingFolderId = null;
+            this.notificationService.info(
+                this.translate.instant("songProjects.mirror.noFilesAfterFilter")
+            );
+            return;
+        }
+
+        // Phase 2: Hash
+        this.mirrorPhase = "hashing";
+        this.mirrorHashProgress = {current: 0, total: accepted.length};
+
+        const hashes = await this.fileHashService.hashFiles(accepted, (current, total) => {
+            this.mirrorHashProgress = {current, total};
+        });
+
+        // Build MirrorFileEntry[]
+        const mirrorEntries: MirrorFileEntry[] = accepted.map(entry => ({
+            relative_path: entry.relativePath,
+            file_hash: hashes.get(entry.relativePath)!,
+            file_size_bytes: entry.file.size
+        }));
+
+        // Phase 3: Compare
+        this.mirrorPhase = "comparing";
+
+        let compareResult;
+        try {
+            const response = await firstValueFrom(
+                this.projectService.mirrorCompare(projectId, folderId, mirrorEntries)
+            );
+            compareResult = response.data;
+        } catch (error) {
+            console.error("Mirror compare failed:", error);
+            this.mirrorPhase = "idle";
+            this.uploadingFolderId = null;
+            this.notificationService.error(
+                this.translate.instant("songProjects.messages.syncError")
+            );
+            return;
+        }
+
+        // Check if already up to date
+        const totalChanges = compareResult.to_upload.length + compareResult.to_update.length +
+            compareResult.to_move.length + compareResult.to_delete.length;
+
+        if (totalChanges === 0) {
+            this.mirrorPhase = "idle";
+            this.uploadingFolderId = null;
+            this.notificationService.success(
+                this.translate.instant("songProjects.mirror.alreadyUpToDate")
+            );
+            return;
+        }
+
+        // Phase 4: Preview Dialog
+        this.mirrorPhase = "idle";
+
+        // Calculate total upload size for new + updated files
+        const uploadPaths = new Set([...compareResult.to_upload, ...compareResult.to_update]);
+        const totalUploadSize = accepted
+            .filter(e => uploadPaths.has(e.relativePath))
+            .reduce((sum, e) => sum + e.file.size, 0);
+
+        const dialogRef = this.dialog.open(MirrorPreviewDialogComponent, {
+            width: "700px",
+            maxHeight: "80vh",
+            data: {
+                folderName: folder.folder_name,
+                toUpload: compareResult.to_upload,
+                toUpdate: compareResult.to_update,
+                toMove: compareResult.to_move,
+                toDelete: compareResult.to_delete,
+                unchanged: compareResult.unchanged,
+                totalUploadSize,
+                ignoredCount: ignored.length
+            }
+        });
+
+        const confirmed = await firstValueFrom(dialogRef.afterClosed());
+        if (!confirmed) {
+            this.uploadingFolderId = null;
+            return;
+        }
+
+        // Phase 5: Execute sync
+        const filesToUpload = accepted.filter(e =>
+            compareResult.to_upload.includes(e.relativePath) ||
+            compareResult.to_update.includes(e.relativePath)
+        );
+
+        // 5a: Upload new + updated files
+        if (filesToUpload.length > 0) {
+            this.mirrorPhase = "uploading";
+            const uploadFiles = filesToUpload.map(e => {
+                // Create file with relativePath as name for batch upload
+                return new File([e.file], e.relativePath, {
+                    type: e.file.type,
+                    lastModified: e.file.lastModified
+                });
+            });
+            await this.processBatchUpload(folder, uploadFiles);
+        }
+
+        // 5b: Move files
+        if (compareResult.to_move.length > 0) {
+            this.mirrorPhase = "moving";
+            try {
+                await firstValueFrom(
+                    this.projectService.batchMoveFiles(projectId, compareResult.to_move)
+                );
+            } catch (error) {
+                console.error("Batch move failed:", error);
+                this.uploadErrors.push({error: "Move operation failed"});
+            }
+        }
+
+        // 5c: Delete files
+        if (compareResult.to_delete.length > 0) {
+            this.mirrorPhase = "deleting";
+            const deleteIds = compareResult.to_delete.map(f => f.file_id);
+            try {
+                await firstValueFrom(
+                    this.projectService.deleteFiles(projectId, deleteIds)
+                );
+            } catch (error) {
+                console.error("Batch delete failed:", error);
+                this.uploadErrors.push({error: "Delete operation failed"});
+            }
+        }
+
+        // Phase 6: Complete
+        this.mirrorPhase = "idle";
+        this.notificationService.success(
+            this.translate.instant("songProjects.mirror.syncComplete")
+        );
+
+        // Refresh project
+        if (this.selectedProject) {
+            await this.selectProject(this.selectedProject);
+        }
+    }
 
     /**
      * Open dialog to create new project.
@@ -604,6 +962,15 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Navigate to Text Workshop with workshop ID in state.
+     */
+    openWorkshop(workshop: AssignedWorkshop): void {
+        this.router.navigate(["/text-workshop"], {
+            state: {selectedWorkshopId: workshop.id}
+        });
+    }
+
+    /**
      * Navigate to Image View with image ID in state.
      */
     openImage(imageId: string): void {
@@ -619,7 +986,8 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
         const fileCount = folder.files?.length || 0;
         const sketchCount = folder.assigned_sketches?.length || 0;
         const imageCount = folder.assigned_images?.length || 0;
-        const totalAssets = sketchCount + imageCount;
+        const workshopCount = folder.assigned_workshops?.length || 0;
+        const totalAssets = sketchCount + imageCount + workshopCount;
 
         // Only images (specific type)
         if (totalAssets > 0 && fileCount === 0 && sketchCount === 0 && imageCount > 0) {
@@ -669,7 +1037,8 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
                 tags: this.selectedProject.tags,
                 // Pass assigned elements for Advanced section
                 all_assigned_sketches: this.selectedProject.all_assigned_sketches,
-                all_assigned_images: this.selectedProject.all_assigned_images
+                all_assigned_images: this.selectedProject.all_assigned_images,
+                all_assigned_workshops: this.selectedProject.all_assigned_workshops
             }
         });
 
@@ -867,6 +1236,54 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
             this.notificationService.error(
                 this.translate.instant("songProjects.messages.clipboardError")
             );
+        }
+    }
+
+    async downloadTemplateZip(): Promise<void> {
+        if (!this.selectedProject) return;
+
+        try {
+            const blob = await firstValueFrom(
+                this.projectService.downloadTemplateZip(this.selectedProject.id)
+            );
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${this.selectedProject.project_name}-template.zip`;
+            a.click();
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Failed to download template ZIP:", error);
+            this.notificationService.error(
+                this.translate.instant("songProjects.download.zipDownloadError")
+            );
+        }
+    }
+
+    async downloadFolderZip(folder: any): Promise<void> {
+        if (!this.selectedProject) return;
+
+        try {
+            const blob = await firstValueFrom(
+                this.projectService.downloadFolderZip(this.selectedProject.id, folder.id)
+            );
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${folder.folder_name}.zip`;
+            a.click();
+            URL.revokeObjectURL(url);
+        } catch (error: any) {
+            if (error?.status === 413) {
+                this.notificationService.error(
+                    this.translate.instant("songProjects.download.folderTooLarge")
+                );
+            } else {
+                console.error("Failed to download folder ZIP:", error);
+                this.notificationService.error(
+                    this.translate.instant("songProjects.download.zipDownloadError")
+                );
+            }
         }
     }
 }

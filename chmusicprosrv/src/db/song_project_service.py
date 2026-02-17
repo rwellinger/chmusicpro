@@ -892,6 +892,75 @@ class SongProjectService:
             )
             return []
 
+    def get_assigned_workshops_for_folder(self, db: Session, project_id: UUID, folder_id: UUID) -> list[Any]:
+        """
+        Get all assigned workshops for a project folder (CRUD only)
+
+        Args:
+            db: Database session
+            project_id: Project UUID
+            folder_id: Folder UUID
+
+        Returns:
+            List of LyricWorkshop instances
+        """
+        try:
+            from db.models import LyricWorkshop
+
+            workshops = (
+                db.query(LyricWorkshop)
+                .filter(LyricWorkshop.project_id == project_id, LyricWorkshop.project_folder_id == folder_id)
+                .order_by(LyricWorkshop.created_at.desc())
+                .all()
+            )
+            logger.debug(
+                "Assigned workshops retrieved for folder",
+                project_id=str(project_id),
+                folder_id=str(folder_id),
+                count=len(workshops),
+            )
+            return workshops
+        except SQLAlchemyError as e:
+            logger.error(
+                "Failed to get assigned workshops for folder",
+                error=str(e),
+                error_type=type(e).__name__,
+                project_id=str(project_id),
+                folder_id=str(folder_id),
+            )
+            return []
+
+    def get_all_assigned_workshops_for_project(self, db: Session, project_id: UUID) -> list[Any]:
+        """
+        Get ALL assigned workshops for a project (regardless of folder assignment)
+
+        Args:
+            db: Database session
+            project_id: Project UUID
+
+        Returns:
+            List of LyricWorkshop instances
+        """
+        try:
+            from db.models import LyricWorkshop
+
+            workshops = (
+                db.query(LyricWorkshop)
+                .filter(LyricWorkshop.project_id == project_id)
+                .order_by(LyricWorkshop.created_at.desc())
+                .all()
+            )
+            logger.debug("All assigned workshops retrieved", project_id=str(project_id), count=len(workshops))
+            return workshops
+        except SQLAlchemyError as e:
+            logger.error(
+                "Failed to get all assigned workshops",
+                error=str(e),
+                error_type=type(e).__name__,
+                project_id=str(project_id),
+            )
+            return []
+
 
 # Global service instance
 song_project_service = SongProjectService()

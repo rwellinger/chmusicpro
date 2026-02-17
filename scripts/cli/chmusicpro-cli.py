@@ -105,11 +105,11 @@ def save_config(config):
 
 def load_ignore_patterns(upload_dir):
     """
-    Load ignore patterns from .aiproxyignore files
+    Load ignore patterns from .chmusicproignore files
 
     Checks two locations:
-    1. ~/.aiproxy/.aiproxyignore (global)
-    2. {upload_dir}/.aiproxyignore (local, higher priority)
+    1. ~/.chmusicpro/.chmusicproignore (global)
+    2. {upload_dir}/.chmusicproignore (local, higher priority)
 
     Returns list of patterns (glob-style like .gitignore)
     """
@@ -124,11 +124,11 @@ def load_ignore_patterns(upload_dir):
                     patterns.append(line)
         except Exception as e:
             console.print(
-                f"[dim yellow]Warning: Could not read global .aiproxyignore: {e}[/dim yellow]"
+                f"[dim yellow]Warning: Could not read global .chmusicproignore: {e}[/dim yellow]"
             )
 
     # Load local ignore file (in upload directory)
-    local_ignore = Path(upload_dir) / ".aiproxyignore"
+    local_ignore = Path(upload_dir) / ".chmusicproignore"
     if local_ignore.exists():
         try:
             for line in local_ignore.read_text().splitlines():
@@ -137,7 +137,7 @@ def load_ignore_patterns(upload_dir):
                     patterns.append(line)
         except Exception as e:
             console.print(
-                f"[dim yellow]Warning: Could not read local .aiproxyignore: {e}[/dim yellow]"
+                f"[dim yellow]Warning: Could not read local .chmusicproignore: {e}[/dim yellow]"
             )
 
     return patterns
@@ -412,7 +412,7 @@ def upload(project_id, folder_id, local_path, debug):
     ignore_patterns = load_ignore_patterns(local_path)
     if ignore_patterns:
         console.print(
-            f"[dim]Loaded {len(ignore_patterns)} ignore patterns from .aiproxyignore[/dim]"
+            f"[dim]Loaded {len(ignore_patterns)} ignore patterns from .chmusicproignore[/dim]"
         )
 
     for file_path in local_path.rglob("*"):
@@ -427,7 +427,7 @@ def upload(project_id, folder_id, local_path, debug):
         console.print("[yellow]✗ No files found (or all files ignored)[/yellow]")
         if ignored_files:
             console.print(
-                f"[dim]Ignored {len(ignored_files)} files based on .aiproxyignore[/dim]"
+                f"[dim]Ignored {len(ignored_files)} files based on .chmusicproignore[/dim]"
             )
         sys.exit(0)
 
@@ -438,7 +438,7 @@ def upload(project_id, folder_id, local_path, debug):
     )
     if ignored_files:
         console.print(
-            f"[dim]Ignored {len(ignored_files)} files based on .aiproxyignore[/dim]"
+            f"[dim]Ignored {len(ignored_files)} files based on .chmusicproignore[/dim]"
         )
     console.print()
 
@@ -1037,7 +1037,7 @@ def mirror(project_id, folder_id, local_path, dry_run, yes, debug):
     ignore_patterns = load_ignore_patterns(local_path)
     if ignore_patterns:
         console.print(
-            f"[dim]Loaded {len(ignore_patterns)} ignore patterns from .aiproxyignore[/dim]"
+            f"[dim]Loaded {len(ignore_patterns)} ignore patterns from .chmusicproignore[/dim]"
         )
 
     local_files = []
@@ -1082,7 +1082,7 @@ def mirror(project_id, folder_id, local_path, dry_run, yes, debug):
         console.print("[yellow]✗ No files found (or all files ignored)[/yellow]")
         if ignored_files:
             console.print(
-                f"[dim]Ignored {len(ignored_files)} files based on .aiproxyignore[/dim]"
+                f"[dim]Ignored {len(ignored_files)} files based on .chmusicproignore[/dim]"
             )
         sys.exit(0)
 
@@ -1093,7 +1093,7 @@ def mirror(project_id, folder_id, local_path, dry_run, yes, debug):
     )
     if ignored_files:
         console.print(
-            f"[dim]Ignored {len(ignored_files)} files based on .aiproxyignore[/dim]"
+            f"[dim]Ignored {len(ignored_files)} files based on .chmusicproignore[/dim]"
         )
     console.print()
 

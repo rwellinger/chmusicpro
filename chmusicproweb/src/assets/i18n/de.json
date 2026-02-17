@@ -317,12 +317,12 @@
     "advanced": {
       "title": "Zuweisungen",
       "hint": "Hier kannst du die Zuweisungen von Elementen zu diesem Projekt verwalten. Das Entfernen löscht nur die Zuweisung - die Elemente selbst bleiben erhalten.",
-      "assignedSketches": "Zugewiesene Sketches",
+      "assignedSketches": "Zugewiesene Kompositionen",
       "assignedImages": "Zugewiesene Bilder",
       "noAssignments": "Keine Zuweisungen vorhanden",
       "unassign": "Zuweisung entfernen",
       "confirmUnassign": "Soll die Zuweisung von {{type}} \"{{name}}\" entfernt werden? Das Element selbst bleibt erhalten.",
-      "typeSketch": "Sketch",
+      "typeSketch": "Komposition",
       "typeImage": "Bild",
       "unassignSuccess": "Zuweisung erfolgreich entfernt",
       "unassignError": "Fehler beim Entfernen der Zuweisung"
@@ -332,7 +332,8 @@
     "title": {
       "image": "Bild zu Projekt zuweisen",
       "song": "Song zu Projekt zuweisen",
-      "sketch": "Sketch zu Projekt zuweisen",
+      "sketch": "Komposition zu Projekt zuweisen",
+      "workshop": "Workshop zu Projekt zuweisen",
       "release": "Release zu Projekt zuweisen"
     },
     "selectProject": "Projekt auswählen",
@@ -978,7 +979,7 @@
     "promptTemplates": "Prompt Vorlagen",
     "settings": "Einstellungen",
     "domainManagement": "Domain-Verwaltung",
-    "sketchLibrary": "Skizzen-Bibliothek",
+    "sketchLibrary": "Kompositionen",
     "songProjects": "Song Projekte",
     "songReleases": "Song-Releases",
     "textOverlayEditor": "Text-Overlay",
@@ -1260,8 +1261,8 @@
   },
   "songSketch": {
     "creator": {
-      "title": "Song-Skizze erstellen",
-      "titleEdit": "Song-Skizze bearbeiten",
+      "title": "Komposition erstellen",
+      "titleEdit": "Komposition bearbeiten",
       "subtitle": "Entwickle deine Song-Idee vor der Generierung",
       "tabs": {
         "general": "Allgemein",
@@ -1269,7 +1270,7 @@
       },
       "fields": {
         "title": "Titel",
-        "titlePlaceholder": "Titel für deine Skizze eingeben...",
+        "titlePlaceholder": "Titel für deine Komposition eingeben...",
         "titleCharCounter": "{{count}}/{{max}} Zeichen",
         "lyrics": "Songtext",
         "lyricsPlaceholder": "Gib deinen Songtext hier ein...",
@@ -1278,7 +1279,7 @@
         "promptPlaceholder": "Beschreibe den Musikstil...",
         "promptCharCounter": "{{count}}/{{max}} Zeichen",
         "workflow": "Workflow-Status",
-        "workflowHint": "Organisiere deine Skizzen nach Workflow-Status",
+        "workflowHint": "Organisiere deine Kompositionen nach Workflow-Status",
         "workflowReadonlyHint": "Workflow kann nur in der Bibliotheksansicht geändert werden",
         "sketchType": "Sketch-Typ",
         "sketchTypeInspiration": "Inspiration",
@@ -1317,8 +1318,8 @@
         "selectedCount": "{{count}} Tags ausgewählt"
       },
       "buttons": {
-        "save": "Skizze erstellen",
-        "update": "Skizze aktualisieren",
+        "save": "Komposition erstellen",
+        "update": "Komposition aktualisieren",
         "cancel": "Abbrechen",
         "reset": "Zurücksetzen",
         "editLyrics": "Im Lyric Creator bearbeiten",
@@ -1328,10 +1329,10 @@
         "generateTitle": "Titel mit KI generieren"
       },
       "messages": {
-        "saved": "Skizze erfolgreich gespeichert",
-        "updated": "Skizze erfolgreich aktualisiert",
-        "loadError": "Fehler beim Laden der Skizze",
-        "error": "Fehler beim Speichern der Skizze",
+        "saved": "Komposition erfolgreich gespeichert",
+        "updated": "Komposition erfolgreich aktualisiert",
+        "loadError": "Fehler beim Laden der Komposition",
+        "error": "Fehler beim Speichern der Komposition",
         "resetSuccess": "Formular erfolgreich zurückgesetzt",
         "validationError": "Bitte fülle alle erforderlichen Felder aus",
         "generatingTitle": "Titel wird generiert...",
@@ -1357,14 +1358,14 @@
       }
     },
     "library": {
-      "title": "Song-Skizzen Bibliothek",
-      "subtitle": "Verwalte deine Song-Ideen",
+      "title": "Kompositionen",
+      "subtitle": "Verwalte deine Song-Kompositionen",
       "header": {
-        "count": "{{count}} Entwürfe"
+        "count": "{{count}} Kompositionen"
       },
-      "untitled": "Unbenannte Skizze",
+      "untitled": "Unbenannte Komposition",
       "search": {
-        "placeholder": "Skizzen durchsuchen..."
+        "placeholder": "Kompositionen durchsuchen..."
       },
       "filters": {
         "all": "Alle",
@@ -1379,8 +1380,8 @@
       "actions": {
         "assignToProject": "Zu Projekt zuweisen",
         "unassignFromProject": "Vom Projekt entfernen",
-        "newSketch": "Neue Skizze",
-        "createFirst": "Erste Skizze erstellen",
+        "newSketch": "Neue Komposition",
+        "createFirst": "Erste Komposition erstellen",
         "edit": "Bearbeiten",
         "editDisabled": "Bearbeiten deaktiviert (nur für Entwürfe verfügbar)",
         "delete": "Löschen",
@@ -1412,7 +1413,7 @@
         "tags": "Tags",
         "musicStyle": "Musikstil-Prompt",
         "lyrics": "Songtext",
-        "noLyrics": "Kein Songtext für diese Skizze definiert",
+        "noLyrics": "Kein Songtext für diese Komposition definiert",
         "descriptionLong": "Lange Beschreibung",
         "descriptionShort": "Kurze Beschreibung",
         "descriptionTags": "Beschreibungs-Tags",
@@ -1421,38 +1422,38 @@
         "noDescriptionShort": "Keine kurze Beschreibung verfügbar",
         "noDescriptionTags": "Keine Beschreibungs-Tags verfügbar",
         "noInfo": "Keine Arbeitsinformationen verfügbar",
-        "selectSketch": "Wähle eine Skizze aus der Liste, um Details anzuzeigen"
+        "selectSketch": "Wähle eine Komposition aus der Liste, um Details anzuzeigen"
       },
       "pagination": {
         "info": "Seite {{current}} von {{total}}"
       },
       "confirmations": {
-        "deleteTitle": "Skizze löschen",
-        "deleteMessage": "Möchtest du diese Skizze wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "deleteTitle": "Komposition löschen",
+        "deleteMessage": "Möchtest du diese Komposition wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
         "cancel": "Abbrechen",
         "confirm": "Löschen",
-        "unassignFromProject": "Soll die Skizze \"{{sketch}}\" vom Projekt \"{{project}}\" entfernt werden? Die Skizze selbst bleibt erhalten."
+        "unassignFromProject": "Soll die Komposition \"{{sketch}}\" vom Projekt \"{{project}}\" entfernt werden? Die Komposition selbst bleibt erhalten."
       },
       "messages": {
-        "noSketches": "Keine Skizzen gefunden",
-        "loading": "Lade Skizzen...",
-        "loadingError": "Fehler beim Laden der Skizzen",
-        "deleted": "Skizze erfolgreich gelöscht",
-        "deleteError": "Fehler beim Löschen der Skizze",
-        "archived": "Skizze erfolgreich archiviert",
-        "archiveError": "Fehler beim Archivieren der Skizze",
+        "noSketches": "Keine Kompositionen gefunden",
+        "loading": "Lade Kompositionen...",
+        "loadingError": "Fehler beim Laden der Kompositionen",
+        "deleted": "Komposition erfolgreich gelöscht",
+        "deleteError": "Fehler beim Löschen der Komposition",
+        "archived": "Komposition erfolgreich archiviert",
+        "archiveError": "Fehler beim Archivieren der Komposition",
         "copyError": "Fehler beim Kopieren in die Zwischenablage",
-        "markedAsUsed": "Skizze als verwendet markiert",
+        "markedAsUsed": "Komposition als verwendet markiert",
         "markAsUsedError": "Fehler beim Markieren als verwendet",
-        "markedAsDraft": "Skizze als Entwurf markiert",
+        "markedAsDraft": "Komposition als Entwurf markiert",
         "markAsDraftError": "Fehler beim Markieren als Entwurf",
-        "sketchSaved": "Skizze erfolgreich gespeichert",
+        "sketchSaved": "Komposition erfolgreich gespeichert",
         "duplicateConfirm": "Möchtest du '{{title}}' wirklich duplizieren?",
-        "duplicated": "Skizze erfolgreich dupliziert",
+        "duplicated": "Komposition erfolgreich dupliziert",
         "duplicateError": "Fehler beim Duplizieren",
-        "cannotDeleteAssigned": "Skizze kann nicht geloescht werden - zugewiesen an Projekt '{{project}}'",
-        "unassignedFromProject": "Skizze erfolgreich vom Projekt entfernt",
-        "unassignFromProjectError": "Fehler beim Entfernen der Skizze vom Projekt"
+        "cannotDeleteAssigned": "Komposition kann nicht geloescht werden - zugewiesen an Projekt '{{project}}'",
+        "unassignedFromProject": "Komposition erfolgreich vom Projekt entfernt",
+        "unassignFromProjectError": "Fehler beim Entfernen der Komposition vom Projekt"
       }
     },
     "workflow": {
@@ -1831,11 +1832,13 @@
       "folders": "Ordner",
       "files": "Dateien",
       "noFiles": "Keine Dateien in diesem Ordner",
-      "assignedSketches": "Zugewiesene Sketches",
+      "assignedSketches": "Zugewiesene Kompositionen",
       "assignedImages": "Zugewiesene Bilder",
+      "assignedWorkshops": "Zugewiesene Workshops",
       "assignedReleases": "Zugewiesene Releases",
-      "allAssignedSketches": "Zugewiesene Sketches",
+      "allAssignedSketches": "Zugewiesene Kompositionen",
       "allAssignedImages": "Zugewiesene Bilder",
+      "allAssignedWorkshops": "Zugewiesene Workshops",
       "noAssignedAssets": "Keine zugewiesenen Assets in diesem Ordner",
       "folderContent": {
         "images": "{{count}} Bilder",
@@ -1854,21 +1857,17 @@
       },
       "actions": {
         "uploadFile": "Datei hochladen",
-        "cliCommands": "CLI Befehle",
-        "copyCLIUploadCommand": "Upload Befehl kopieren",
-        "copyCLIDownloadCommand": "Download Befehl kopieren",
-        "copyCLIMirrorCommand": "Mirror Befehl kopieren",
         "downloadFile": "Herunterladen",
         "deleteFile": "Datei löschen",
         "syncProject": "Projekt synchronisieren",
         "editProject": "Projekt bearbeiten",
         "deleteProject": "Projekt löschen",
         "backToList": "Zurück zu Projekten",
-        "openSketch": "Sketch öffnen",
+        "openSketch": "Komposition öffnen",
         "openImage": "Bild öffnen",
+        "openWorkshop": "Workshop öffnen",
         "viewRelease": "Release anzeigen"
       },
-      "copyCompleteClone": "Clone Command kopieren",
       "sections": {
         "general": "Allgemeine Informationen",
         "metadata": "Metadaten",
@@ -1955,12 +1954,10 @@
       "filesDeleted": "{{count}} Dateien gelöscht",
       "uploadSuccess": "Datei erfolgreich hochgeladen",
       "uploadError": "Fehler beim Hochladen der Datei",
+      "deleteFileConfirm": "Datei \"{{filename}}\" loeschen?",
+      "fileDeleted": "\"{{filename}}\" geloescht",
+      "deleteFileError": "Fehler beim Loeschen der Datei",
       "fileTooLarge": "Datei ist zu groß (max {{size}})",
-      "cliUploadCommandCopied": "CLI Upload-Befehl kopiert! Im Terminal einfügen um Dateien hochzuladen.",
-      "cliDownloadCommandCopied": "CLI Download-Befehl kopiert! Im Terminal einfügen um Dateien herunterzuladen.",
-      "cliMirrorCommandCopied": "CLI Mirror-Befehl kopiert! Führe zuerst mit --dry-run aus um Änderungen zu prüfen.",
-      "cliCompleteCloneCommandCopied": "Complete Clone-Befehl kopiert! Lädt alle Ordner und Dateien mit vollständiger Verzeichnisstruktur herunter.",
-      "cliCommandCopyFailed": "Fehler beim Kopieren des Befehls in die Zwischenablage",
       "clipboardError": "Fehler beim Kopieren in die Zwischenablage",
       "downloadSuccess": "Datei heruntergeladen",
       "downloadError": "Fehler beim Herunterladen der Datei",
@@ -1969,6 +1966,69 @@
       "loadError": "Fehler beim Laden des Projekts",
       "saveError": "Fehler beim Speichern des Projekts",
       "deleteError": "Fehler beim Löschen des Projekts"
+    },
+    "upload": {
+      "uploadFiles": "Dateien hochladen",
+      "uploadFolder": "Ordner hochladen",
+      "uploadFilesTooltip": "Mehrere Dateien zum Hochladen auswählen",
+      "uploadFolderTooltip": "Einen Ordner mit Verzeichnisstruktur hochladen",
+      "dropHere": "Dateien hier ablegen",
+      "dropZoneHint": "Dateien oder Ordner hierher ziehen, oder die Buttons oben verwenden",
+      "uploading": "Hochladen",
+      "files": "Dateien",
+      "completeMessage": "{{count}} Dateien erfolgreich hochgeladen",
+      "errorsTitle": "Upload-Fehler",
+      "dismiss": "Schließen",
+      "batchUploadSuccess": "{{count}} Dateien erfolgreich hochgeladen",
+      "batchUploadPartial": "{{uploaded}} Dateien hochgeladen, {{failed}} fehlgeschlagen",
+      "batchUploadError": "Upload fehlgeschlagen"
+    },
+    "download": {
+      "templateZip": "Vorlage herunterladen",
+      "folderZip": "ZIP herunterladen",
+      "zipDownloadError": "Download fehlgeschlagen",
+      "folderTooLarge": "Ordner zu gross fuer ZIP (max 500MB)"
+    },
+    "mirror": {
+      "dropToSync": "Ablegen zum Synchronisieren",
+      "filtering": "Dateien werden gefiltert...",
+      "analyzing": "Analysiere {{current}}/{{total}}...",
+      "comparing": "Vergleiche mit Remote...",
+      "uploading": "Dateien hochladen...",
+      "moving": "Dateien verschieben...",
+      "deleting": "Veraltete Dateien loeschen...",
+      "alreadyUpToDate": "Bereits aktuell",
+      "syncComplete": "Sync abgeschlossen",
+      "noFilesAfterFilter": "Keine Dateien zum Sync (alle gefiltert)",
+      "ignoredFiles": "{{count}} Dateien durch Filter ignoriert",
+      "preview": {
+        "title": "Sync Vorschau",
+        "summary": "{{total}} Aenderungen erkannt",
+        "newFiles": "Neu ({{count}})",
+        "updatedFiles": "Aktualisiert ({{count}})",
+        "movedFiles": "Verschoben ({{count}})",
+        "deletedFiles": "Geloescht ({{count}})",
+        "unchangedFiles": "Unveraendert ({{count}})",
+        "deleteWarning": "WARNUNG: {{count}} Dateien werden permanent geloescht!",
+        "confirm": "Sync ausfuehren",
+        "cancel": "Abbrechen",
+        "totalUploadSize": "Upload-Groesse: {{size}}",
+        "andMore": "...und {{count}} weitere"
+      }
+    },
+    "workflow": {
+      "title": "Datei-Workflow",
+      "template": "Vorlage",
+      "templateDesc": "Ordnerstruktur herunterladen",
+      "upload": "Hochladen",
+      "uploadDesc": "Drag & Drop oder Buttons",
+      "auto": "Auto",
+      "sync": "Mirror Sync",
+      "syncDesc": "Vergleichen & Synchronisieren",
+      "manage": "Verwalten",
+      "manageDesc": "Durchsuchen & Loeschen",
+      "download": "Download",
+      "downloadDesc": "ZIP oder Einzeldatei"
     },
     "validation": {
       "required": "Dieses Feld ist erforderlich",
@@ -1982,7 +2042,12 @@
       "subtitle": "Erstelle und verwalte deine Songwriting-Workshops",
       "newWorkshop": "Neuer Workshop",
       "searchPlaceholder": "Workshops suchen...",
-      "empty": "Noch keine Workshops. Erstelle deinen ersten!"
+      "empty": "Noch keine Workshops. Erstelle deinen ersten!",
+      "assignToProject": "Zu Projekt zuweisen",
+      "unassignFromProject": "Vom Projekt entfernen",
+      "assignSuccess": "Workshop dem Projekt zugewiesen",
+      "unassignSuccess": "Workshop vom Projekt entfernt",
+      "unassignFailed": "Fehler beim Entfernen des Workshops vom Projekt"
     },
     "newWorkshopTitle": "Neuer Workshop",
     "confirmDelete": "Diesen Workshop loeschen? Das kann nicht rueckgaengig gemacht werden.",

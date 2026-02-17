@@ -317,12 +317,12 @@
     "advanced": {
       "title": "Assignments",
       "hint": "Here you can manage the assignments of elements to this project. Removing only removes the assignment - the elements themselves are preserved.",
-      "assignedSketches": "Assigned Sketches",
+      "assignedSketches": "Assigned Compositions",
       "assignedImages": "Assigned Images",
       "noAssignments": "No assignments",
       "unassign": "Remove assignment",
       "confirmUnassign": "Remove the assignment of {{type}} \"{{name}}\"? The element itself will be preserved.",
-      "typeSketch": "Sketch",
+      "typeSketch": "Composition",
       "typeImage": "Image",
       "unassignSuccess": "Assignment successfully removed",
       "unassignError": "Error removing assignment"
@@ -332,7 +332,8 @@
     "title": {
       "image": "Assign Pictures to Project",
       "song": "Assign Song to Project",
-      "sketch": "Assign Sketch to Project",
+      "sketch": "Assign Composition to Project",
+      "workshop": "Assign Workshop to Project",
       "release": "Assign Release to Project"
     },
     "selectProject": "Select Project",
@@ -978,7 +979,7 @@
     "promptTemplates": "Prompt Templates",
     "settings": "Settings",
     "domainManagement": "Domain Management",
-    "sketchLibrary": "Sketch Library",
+    "sketchLibrary": "Compositions",
     "songProjects": "Song Projects",
     "songReleases": "Song Releases",
     "textOverlayEditor": "Text Overlay",
@@ -1260,8 +1261,8 @@
   },
   "songSketch": {
     "creator": {
-      "title": "Create Song Sketch",
-      "titleEdit": "Edit Song Sketch",
+      "title": "Create Composition",
+      "titleEdit": "Edit Composition",
       "subtitle": "Develop your song idea before generating",
       "tabs": {
         "general": "General",
@@ -1269,7 +1270,7 @@
       },
       "fields": {
         "title": "Title",
-        "titlePlaceholder": "Enter a title for your sketch...",
+        "titlePlaceholder": "Enter a title for your composition...",
         "titleCharCounter": "{{count}}/{{max}} characters",
         "lyrics": "Lyrics",
         "lyricsPlaceholder": "Enter your lyrics here...",
@@ -1278,7 +1279,7 @@
         "promptPlaceholder": "Describe the music style...",
         "promptCharCounter": "{{count}}/{{max}} characters",
         "workflow": "Workflow Status",
-        "workflowHint": "Organize your sketches by workflow status",
+        "workflowHint": "Organize your compositions by workflow status",
         "workflowReadonlyHint": "Workflow can only be changed in the library view",
         "sketchType": "Sketch Type",
         "sketchTypeInspiration": "Inspiration",
@@ -1317,8 +1318,8 @@
         "selectedCount": "{{count}} tags selected"
       },
       "buttons": {
-        "save": "Create Sketch",
-        "update": "Update Sketch",
+        "save": "Create Composition",
+        "update": "Update Composition",
         "cancel": "Cancel",
         "reset": "Reset",
         "editLyrics": "Edit in Lyric Creator",
@@ -1328,10 +1329,10 @@
         "generateTitle": "Generate Title with AI"
       },
       "messages": {
-        "saved": "Sketch saved successfully",
-        "updated": "Sketch updated successfully",
-        "loadError": "Error loading sketch",
-        "error": "Error saving sketch",
+        "saved": "Composition saved successfully",
+        "updated": "Composition updated successfully",
+        "loadError": "Error loading composition",
+        "error": "Error saving composition",
         "resetSuccess": "Form reset successfully",
         "validationError": "Please fill in all required fields",
         "generatingTitle": "Generating Title...",
@@ -1357,14 +1358,14 @@
       }
     },
     "library": {
-      "title": "Song Sketch Library",
-      "subtitle": "Manage your song ideas",
+      "title": "Compositions",
+      "subtitle": "Manage your song compositions",
       "header": {
-        "count": "{{count}} sketches"
+        "count": "{{count}} compositions"
       },
-      "untitled": "Untitled Sketch",
+      "untitled": "Untitled Composition",
       "search": {
-        "placeholder": "Search sketches..."
+        "placeholder": "Search compositions..."
       },
       "filters": {
         "all": "All",
@@ -1379,8 +1380,8 @@
       "actions": {
         "assignToProject": "Assign to Project",
         "unassignFromProject": "Remove from Project",
-        "newSketch": "New Sketch",
-        "createFirst": "Create Your First Sketch",
+        "newSketch": "New Composition",
+        "createFirst": "Create Your First Composition",
         "edit": "Edit",
         "editDisabled": "Edit disabled (only available for drafts)",
         "delete": "Delete",
@@ -1412,7 +1413,7 @@
         "tags": "Tags",
         "musicStyle": "Music Style Prompt",
         "lyrics": "Lyrics",
-        "noLyrics": "No lyrics defined for this sketch",
+        "noLyrics": "No lyrics defined for this composition",
         "descriptionLong": "Long Description",
         "descriptionShort": "Short Description",
         "descriptionTags": "Description Tags",
@@ -1421,38 +1422,38 @@
         "noDescriptionShort": "No short description available",
         "noDescriptionTags": "No description tags available",
         "noInfo": "No work information available",
-        "selectSketch": "Select a sketch from the list to view details"
+        "selectSketch": "Select a composition from the list to view details"
       },
       "pagination": {
         "info": "Page {{current}} of {{total}}"
       },
       "confirmations": {
-        "deleteTitle": "Delete Sketch",
-        "deleteMessage": "Are you sure you want to delete this sketch? This action cannot be undone.",
+        "deleteTitle": "Delete Composition",
+        "deleteMessage": "Are you sure you want to delete this composition? This action cannot be undone.",
         "cancel": "Cancel",
         "confirm": "Delete",
-        "unassignFromProject": "Remove sketch \"{{sketch}}\" from project \"{{project}}\"? The sketch itself will be preserved."
+        "unassignFromProject": "Remove composition \"{{sketch}}\" from project \"{{project}}\"? The composition itself will be preserved."
       },
       "messages": {
-        "noSketches": "No sketches found",
-        "loading": "Loading sketches...",
-        "loadingError": "Error loading sketches",
-        "deleted": "Sketch deleted successfully",
-        "deleteError": "Error deleting sketch",
-        "archived": "Sketch archived successfully",
-        "archiveError": "Error archiving sketch",
+        "noSketches": "No compositions found",
+        "loading": "Loading compositions...",
+        "loadingError": "Error loading compositions",
+        "deleted": "Composition deleted successfully",
+        "deleteError": "Error deleting composition",
+        "archived": "Composition archived successfully",
+        "archiveError": "Error archiving composition",
         "copyError": "Failed to copy to clipboard",
-        "markedAsUsed": "Sketch marked as used",
-        "markAsUsedError": "Error marking sketch as used",
-        "markedAsDraft": "Sketch marked as draft",
-        "markAsDraftError": "Error marking sketch as draft",
-        "sketchSaved": "Sketch saved successfully",
+        "markedAsUsed": "Composition marked as used",
+        "markAsUsedError": "Error marking composition as used",
+        "markedAsDraft": "Composition marked as draft",
+        "markAsDraftError": "Error marking composition as draft",
+        "sketchSaved": "Composition saved successfully",
         "duplicateConfirm": "Do you really want to duplicate '{{title}}'?",
-        "duplicated": "Sketch duplicated successfully",
-        "duplicateError": "Error duplicating sketch",
-        "cannotDeleteAssigned": "Cannot delete sketch assigned to project '{{project}}'",
-        "unassignedFromProject": "Sketch successfully removed from project",
-        "unassignFromProjectError": "Error removing sketch from project"
+        "duplicated": "Composition duplicated successfully",
+        "duplicateError": "Error duplicating composition",
+        "cannotDeleteAssigned": "Cannot delete composition assigned to project '{{project}}'",
+        "unassignedFromProject": "Composition successfully removed from project",
+        "unassignFromProjectError": "Error removing composition from project"
       }
     },
     "workflow": {
@@ -1831,11 +1832,13 @@
       "folders": "Folders",
       "files": "Files",
       "noFiles": "No files in this folder",
-      "assignedSketches": "Assigned Sketches",
+      "assignedSketches": "Assigned Compositions",
       "assignedImages": "Assigned Pictures",
+      "assignedWorkshops": "Assigned Workshops",
       "assignedReleases": "Assigned Releases",
-      "allAssignedSketches": "Assigned Sketches",
+      "allAssignedSketches": "Assigned Compositions",
       "allAssignedImages": "Assigned Pictures",
+      "allAssignedWorkshops": "Assigned Workshops",
       "noAssignedAssets": "No assigned assets in this folder",
       "folderContent": {
         "images": "{{count}} pictures",
@@ -1854,21 +1857,17 @@
       },
       "actions": {
         "uploadFile": "Upload File",
-        "cliCommands": "CLI Commands",
-        "copyCLIUploadCommand": "Copy Upload Command",
-        "copyCLIDownloadCommand": "Copy Download Command",
-        "copyCLIMirrorCommand": "Copy Mirror Command",
         "downloadFile": "Download",
         "deleteFile": "Delete File",
         "syncProject": "Sync Project",
         "editProject": "Edit Project",
         "deleteProject": "Delete Project",
         "backToList": "Back to Projects",
-        "openSketch": "Open Sketch",
+        "openSketch": "Open Composition",
         "openImage": "Open Picture",
+        "openWorkshop": "Open Workshop",
         "viewRelease": "View Release"
       },
-      "copyCompleteClone": "Copy Clone Command",
       "sections": {
         "general": "General Information",
         "metadata": "Metadata",
@@ -1955,12 +1954,10 @@
       "filesDeleted": "{{count}} files deleted",
       "uploadSuccess": "File uploaded successfully",
       "uploadError": "Failed to upload file",
+      "deleteFileConfirm": "Delete file \"{{filename}}\"?",
+      "fileDeleted": "\"{{filename}}\" deleted",
+      "deleteFileError": "Failed to delete file",
       "fileTooLarge": "File is too large (max {{size}})",
-      "cliUploadCommandCopied": "CLI upload command copied! Paste in terminal to upload files.",
-      "cliDownloadCommandCopied": "CLI download command copied! Paste in terminal to download files.",
-      "cliMirrorCommandCopied": "CLI mirror command copied! Run with --dry-run first to preview changes.",
-      "cliCompleteCloneCommandCopied": "Complete clone command copied! This downloads all folders and files with full directory structure.",
-      "cliCommandCopyFailed": "Failed to copy command to clipboard",
       "clipboardError": "Failed to copy to clipboard",
       "downloadSuccess": "File downloaded",
       "downloadError": "Failed to download file",
@@ -1969,6 +1966,69 @@
       "loadError": "Failed to load project",
       "saveError": "Failed to save project",
       "deleteError": "Failed to delete project"
+    },
+    "upload": {
+      "uploadFiles": "Upload Files",
+      "uploadFolder": "Upload Folder",
+      "uploadFilesTooltip": "Select multiple files to upload",
+      "uploadFolderTooltip": "Select a folder to upload with directory structure",
+      "dropHere": "Drop files here",
+      "dropZoneHint": "Drag & drop files or folders here, or use the buttons above",
+      "uploading": "Uploading",
+      "files": "files",
+      "completeMessage": "{{count}} files uploaded successfully",
+      "errorsTitle": "Upload errors",
+      "dismiss": "Dismiss",
+      "batchUploadSuccess": "{{count}} files uploaded successfully",
+      "batchUploadPartial": "{{uploaded}} files uploaded, {{failed}} failed",
+      "batchUploadError": "Upload failed"
+    },
+    "download": {
+      "templateZip": "Download Template",
+      "folderZip": "Download ZIP",
+      "zipDownloadError": "Download failed",
+      "folderTooLarge": "Folder too large for ZIP (max 500MB)"
+    },
+    "mirror": {
+      "dropToSync": "Drop to sync",
+      "filtering": "Filtering files...",
+      "analyzing": "Analyzing {{current}}/{{total}}...",
+      "comparing": "Comparing with remote...",
+      "uploading": "Uploading files...",
+      "moving": "Moving files...",
+      "deleting": "Deleting obsolete files...",
+      "alreadyUpToDate": "Already up to date",
+      "syncComplete": "Mirror sync completed",
+      "noFilesAfterFilter": "No files to sync (all filtered)",
+      "ignoredFiles": "{{count}} files ignored by filter",
+      "preview": {
+        "title": "Mirror Sync Preview",
+        "summary": "{{total}} changes detected",
+        "newFiles": "New ({{count}})",
+        "updatedFiles": "Updated ({{count}})",
+        "movedFiles": "Moved ({{count}})",
+        "deletedFiles": "Deleted ({{count}})",
+        "unchangedFiles": "Unchanged ({{count}})",
+        "deleteWarning": "WARNING: {{count}} files will be permanently deleted!",
+        "confirm": "Execute Sync",
+        "cancel": "Cancel",
+        "totalUploadSize": "Upload size: {{size}}",
+        "andMore": "...and {{count}} more"
+      }
+    },
+    "workflow": {
+      "title": "File Workflow",
+      "template": "Template",
+      "templateDesc": "Download Folder Structure",
+      "upload": "Upload",
+      "uploadDesc": "Drag & Drop or Buttons",
+      "auto": "Auto",
+      "sync": "Mirror Sync",
+      "syncDesc": "Compare & Sync",
+      "manage": "Manage",
+      "manageDesc": "Browse & Delete",
+      "download": "Download",
+      "downloadDesc": "ZIP or Single File"
     },
     "validation": {
       "required": "This field is required",
@@ -1982,7 +2042,12 @@
       "subtitle": "Create and manage your songwriting workshops",
       "newWorkshop": "New Workshop",
       "searchPlaceholder": "Search workshops...",
-      "empty": "No workshops yet. Create your first one!"
+      "empty": "No workshops yet. Create your first one!",
+      "assignToProject": "Assign to Project",
+      "unassignFromProject": "Remove from Project",
+      "assignSuccess": "Workshop assigned to project",
+      "unassignSuccess": "Workshop removed from project",
+      "unassignFailed": "Failed to remove workshop from project"
     },
     "newWorkshopTitle": "New Workshop",
     "confirmDelete": "Delete this workshop? This cannot be undone.",

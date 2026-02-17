@@ -97,6 +97,13 @@ class WorkshopController:
             workshops = result.get("items", [])
             total = result.get("total", 0)
 
+            # Enrich workshops with project_name from relationship
+            for workshop in workshops:
+                if hasattr(workshop, "project") and workshop.project:
+                    workshop.project_name = workshop.project.project_name
+                else:
+                    workshop.project_name = None
+
             workshop_responses = [WorkshopResponse.model_validate(w) for w in workshops]
 
             pagination = PaginationMeta(
@@ -218,6 +225,89 @@ class WorkshopController:
         except Exception as e:
             logger.error("workshop_delete_error", workshop_id=workshop_id, error=str(e), error_type=type(e).__name__)
             return {"error": f"Failed to delete workshop: {str(e)}"}, 500
+
+    @staticmethod
+    def assign_to_project(
+        db: Session,
+        domain_id: str,
+        workshop_id: str,
+        project_id: str,
+        folder_id: str | None = None,
+    ) -> tuple[dict[str, Any], int]:
+        """Assign workshop to a project (1:1 relationship)"""
+        try:
+            try:
+                UUID(workshop_id)
+                UUID(project_id)
+                if folder_id:
+                    UUID(folder_id)
+            except ValueError as e:
+                return {"error": f"Invalid UUID format: {str(e)}"}, 400
+
+            orchestrator = WorkshopOrchestrator()
+            result = orchestrator.assign_to_project(
+                db=db,
+                domain_id=domain_id,
+                workshop_id=workshop_id,
+                project_id=project_id,
+                folder_id=folder_id,
+            )
+
+            if not result:
+                return {"error": "Workshop not found"}, 404
+
+            logger.info(
+                "Workshop assigned to project",
+                workshop_id=workshop_id,
+                project_id=project_id,
+                folder_id=folder_id,
+            )
+
+            return {"success": True, "data": result}, 200
+
+        except ValueError as e:
+            logger.warning("Workshop assignment validation failed", workshop_id=workshop_id, error=str(e))
+            return {"error": str(e)}, 404
+        except Exception as e:
+            logger.error(
+                "Failed to assign workshop to project",
+                workshop_id=workshop_id,
+                project_id=project_id,
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            return {"error": f"Failed to assign workshop to project: {str(e)}"}, 500
+
+    @staticmethod
+    def unassign_from_project(db: Session, domain_id: str, workshop_id: str) -> tuple[dict[str, Any], int]:
+        """Remove workshop from its assigned project (link only, workshop remains)"""
+        try:
+            try:
+                UUID(workshop_id)
+            except ValueError:
+                return {"error": "Invalid workshop ID format"}, 400
+
+            orchestrator = WorkshopOrchestrator()
+            result = orchestrator.unassign_from_project(db=db, domain_id=domain_id, workshop_id=workshop_id)
+
+            if not result:
+                return {"error": "Workshop not found"}, 404
+
+            logger.info("Workshop unassigned from project", workshop_id=workshop_id)
+
+            return {"success": True, "data": result}, 200
+
+        except ValueError as e:
+            logger.warning("Workshop unassign validation failed", workshop_id=workshop_id, error=str(e))
+            return {"error": str(e)}, 404
+        except Exception as e:
+            logger.error(
+                "Failed to unassign workshop from project",
+                workshop_id=workshop_id,
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            return {"error": f"Failed to unassign workshop from project: {str(e)}"}, 500
 
     @staticmethod
     def export_to_sketch(db: Session, user_id: str, domain_id: str, workshop_id: str) -> tuple[dict[str, Any], int]:

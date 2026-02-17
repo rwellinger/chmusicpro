@@ -180,6 +180,14 @@ class LyricWorkshop(Base):
     draft_language = Column(String(5), nullable=True, server_default="EN", default="EN")
     exported_sketch_id = Column(UUID(as_uuid=True), ForeignKey("song_sketches.id", ondelete="SET NULL"), nullable=True)
 
+    # Project relationship (optional)
+    project_id = Column(
+        UUID(as_uuid=True), ForeignKey("song_projects.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    project_folder_id = Column(
+        UUID(as_uuid=True), ForeignKey("project_folders.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -188,6 +196,8 @@ class LyricWorkshop(Base):
     domain = relationship("Domain")
     user = relationship("User", back_populates="workshops")
     exported_sketch = relationship("SongSketch", foreign_keys=[exported_sketch_id])
+    project = relationship("SongProject", back_populates="workshops")
+    project_folder = relationship("ProjectFolder", foreign_keys=[project_folder_id])
 
     def __repr__(self):
         return f"<LyricWorkshop(id={self.id}, title='{self.title}', phase='{self.current_phase}')>"
@@ -690,6 +700,7 @@ class SongProject(Base):
     )
     files = relationship("ProjectFile", back_populates="project", cascade="all, delete-orphan")
     sketches = relationship("SongSketch", back_populates="project")
+    workshops = relationship("LyricWorkshop", back_populates="project")
     image_references = relationship("ProjectImageReference", back_populates="project", cascade="all, delete-orphan")
     release_references = relationship("ReleaseProjectReference", back_populates="project", cascade="all, delete-orphan")
 

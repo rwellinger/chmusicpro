@@ -7,7 +7,7 @@ from uuid import UUID
 
 from sqlalchemy import or_
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from db.models import LyricWorkshop
 from utils.logger import logger
@@ -121,7 +121,7 @@ class WorkshopService:
             Dictionary with 'items' (list of workshops) and 'total' (count)
         """
         try:
-            query = db.query(LyricWorkshop)
+            query = db.query(LyricWorkshop).options(joinedload(LyricWorkshop.project))
 
             # Apply domain filter (tenant isolation)
             query = query.filter(LyricWorkshop.domain_id == domain_id)
@@ -202,6 +202,9 @@ class WorkshopService:
         current_phase: str | None = None,
         draft_language: str | None = None,
         exported_sketch_id: str | UUID | None = None,
+        project_id: str | None = None,
+        project_folder_id: str | None = None,
+        clear_project: bool = False,
     ) -> LyricWorkshop | None:
         """
         Update an existing workshop
@@ -261,6 +264,19 @@ class WorkshopService:
             if exported_sketch_id is not None:
                 workshop.exported_sketch_id = exported_sketch_id
                 updated_fields.append("exported_sketch_id")
+            # Handle project assignment/unassignment
+            if clear_project:
+                workshop.project_id = None
+                workshop.project_folder_id = None
+                updated_fields.append("project_id")
+                updated_fields.append("project_folder_id")
+            else:
+                if project_id is not None:
+                    workshop.project_id = project_id
+                    updated_fields.append("project_id")
+                if project_folder_id is not None:
+                    workshop.project_folder_id = project_folder_id
+                    updated_fields.append("project_folder_id")
 
             # Update timestamp
             workshop.updated_at = datetime.utcnow()

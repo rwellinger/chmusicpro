@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from api.auth_middleware import get_current_domain_id, get_current_user_id, jwt_required
 from api.controllers.workshop_controller import WorkshopController
 from db.database import get_db
+from schemas.project_asset_schemas import AssignToProjectRequest
 from schemas.workshop_schemas import WorkshopCreateRequest, WorkshopUpdateRequest
 
 
@@ -135,6 +136,49 @@ def delete_workshop(workshop_id: str):
     db: Session = next(get_db())
     try:
         result, status_code = WorkshopController.delete_workshop(db, str(domain_id), workshop_id)
+        return jsonify(result), status_code
+    finally:
+        db.close()
+
+
+@api_workshop_v1.route("/<workshop_id>/assign-to-project", methods=["POST"])
+@jwt_required
+def assign_to_project(workshop_id: str):
+    """Assign workshop to project"""
+    domain_id = get_current_domain_id()
+    if not domain_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        assign_data = AssignToProjectRequest.model_validate(request.json)
+    except ValidationError as e:
+        return jsonify({"error": f"Validation error: {e}"}), 400
+
+    db: Session = next(get_db())
+    try:
+        result, status_code = WorkshopController.assign_to_project(
+            db,
+            str(domain_id),
+            workshop_id,
+            str(assign_data.project_id),
+            str(assign_data.folder_id) if assign_data.folder_id else None,
+        )
+        return jsonify(result), status_code
+    finally:
+        db.close()
+
+
+@api_workshop_v1.route("/<workshop_id>/unassign-from-project", methods=["DELETE"])
+@jwt_required
+def unassign_from_project(workshop_id: str):
+    """Remove workshop from its assigned project (link only, workshop remains)"""
+    domain_id = get_current_domain_id()
+    if not domain_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    db: Session = next(get_db())
+    try:
+        result, status_code = WorkshopController.unassign_from_project(db, str(domain_id), workshop_id)
         return jsonify(result), status_code
     finally:
         db.close()

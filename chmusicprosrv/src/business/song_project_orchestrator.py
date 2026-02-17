@@ -8,6 +8,8 @@ This orchestrator is NOT unit-tested (orchestration only).
 from __future__ import annotations
 
 import contextlib
+import zipfile
+from io import BytesIO
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
@@ -32,6 +34,7 @@ from business.song_project_transformer import (
     transform_project_to_response,
     transform_release_to_assigned_response,
     transform_sketch_to_assigned_response,
+    transform_workshop_to_assigned_response,
 )
 from db.song_project_service import song_project_service
 from utils.logger import logger
@@ -208,11 +211,18 @@ class SongProjectOrchestrator:
                 images = self.db_service.get_assigned_images_for_folder(db, project_id, folder_id)
                 folder_data["assigned_images"] = [transform_image_to_assigned_response(image) for image in images]
 
+                # Load assigned workshops from DB
+                workshops = self.db_service.get_assigned_workshops_for_folder(db, project_id, folder_id)
+                folder_data["assigned_workshops"] = [
+                    transform_workshop_to_assigned_response(workshop) for workshop in workshops
+                ]
+
                 logger.debug(
                     "Assigned assets loaded for folder",
                     folder_id=str(folder_id),
                     sketches_count=len(sketches),
                     images_count=len(images),
+                    workshops_count=len(workshops),
                 )
 
         except Exception as e:
@@ -281,11 +291,18 @@ class SongProjectOrchestrator:
             images = self.db_service.get_all_assigned_images_for_project(db, project_id)
             response_data["all_assigned_images"] = [transform_image_to_assigned_response(image) for image in images]
 
+            # Load ALL assigned workshops from DB
+            workshops = self.db_service.get_all_assigned_workshops_for_project(db, project_id)
+            response_data["all_assigned_workshops"] = [
+                transform_workshop_to_assigned_response(workshop) for workshop in workshops
+            ]
+
             logger.debug(
                 "All assigned assets loaded for project",
                 project_id=str(project_id),
                 sketches_count=len(sketches),
                 images_count=len(images),
+                workshops_count=len(workshops),
             )
 
         except Exception as e:
@@ -298,6 +315,7 @@ class SongProjectOrchestrator:
             # Don't fail the entire request, just log the error
             response_data["all_assigned_sketches"] = []
             response_data["all_assigned_images"] = []
+            response_data["all_assigned_workshops"] = []
 
     def get_project_with_details(self, db: Session, project_id: UUID, domain_id: UUID) -> dict[str, Any] | None:
         """
@@ -1392,6 +1410,77 @@ class SongProjectOrchestrator:
             raise
         except Exception as e:
             logger.error("Clear folder failed", folder_id=str(folder_id), error=str(e), error_type=type(e).__name__)
+            raise
+
+    def generate_template_zip(self, db: Session, project_id: UUID, domain_id: UUID) -> tuple[BytesIO, str] | None:
+        """Generate ZIP with empty folder structure for a project."""
+        try:
+            project = self.db_service.get_project_with_details(db, project_id)
+            if not project or project.domain_id != domain_id:
+                return None
+
+            buffer = BytesIO()
+            project_name = project.project_name
+
+            with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+                for folder in project.folders:
+                    zf.writestr(zipfile.ZipInfo(f"{project_name}/{folder.folder_name}/"), "")
+
+            buffer.seek(0)
+            return buffer, project_name
+
+        except Exception as e:
+            logger.error("Generate template ZIP failed", project_id=str(project_id), error=str(e))
+            raise
+
+    def generate_folder_zip(
+        self, db: Session, project_id: UUID, folder_id: UUID, domain_id: UUID
+    ) -> tuple[BytesIO, str] | None | dict:
+        """Generate ZIP with all files from a specific folder."""
+        try:
+            project = self.db_service.get_project_with_details(db, project_id)
+            if not project or project.domain_id != domain_id:
+                return None
+
+            # Find the folder
+            folder = None
+            for f in project.folders:
+                if f.id == folder_id:
+                    folder = f
+                    break
+
+            if not folder:
+                return None
+
+            if not folder.files:
+                return None
+
+            # Check total size (500MB limit)
+            max_size = 500 * 1024 * 1024
+            total_size = sum(f.file_size_bytes or 0 for f in folder.files)
+            if total_size > max_size:
+                return {"error": "too_large", "size": total_size}
+
+            buffer = BytesIO()
+            folder_name = folder.folder_name
+
+            with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+                for file in folder.files:
+                    if not file.s3_key:
+                        continue
+                    file_data = self.storage.download(file.s3_key)
+                    zf.writestr(file.filename, file_data)
+
+            buffer.seek(0)
+            return buffer, folder_name
+
+        except Exception as e:
+            logger.error(
+                "Generate folder ZIP failed",
+                project_id=str(project_id),
+                folder_id=str(folder_id),
+                error=str(e),
+            )
             raise
 
 

@@ -1,4 +1,4 @@
-@if (isOnPipelinePage$ | async) {
+@if (currentStep$ | async; as currentStep) {
   <nav class="step-bar" aria-label="Production Pipeline">
     <button class="home-button" (click)="goHome()" [matTooltip]="'sideMenu.dashboard' | translate">
       <i class="fas fa-home"></i>
@@ -7,7 +7,7 @@
     <div class="steps-track">
       @for (step of steps; track step.step) {
         <div class="step-item"
-             [class.active]="(currentStep$ | async)?.step === step.step"
+             [class.active]="currentStep.step === step.step"
              [class.enabled]="step.enabled"
              [class.disabled]="!step.enabled">
           <div class="connector" [class.first]="step.step === 1"></div>

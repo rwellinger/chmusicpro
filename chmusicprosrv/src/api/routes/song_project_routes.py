@@ -748,3 +748,85 @@ def download_file(project_id: str, file_id: str):
             error_type=type(e).__name__,
         )
         return jsonify({"error": "Failed to load file from S3"}), 500
+
+
+@api_song_projects_v1.route("/<project_id>/template-zip", methods=["GET"])
+@jwt_required
+def download_template_zip(project_id: str):
+    """Download empty folder structure as ZIP."""
+    domain_id = get_current_domain_id()
+    if not domain_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        from flask import send_file
+
+        from business.song_project_orchestrator import song_project_orchestrator
+
+        project_uuid = UUID(project_id)
+        domain_uuid = UUID(domain_id)
+
+        db: Session = next(get_db())
+        try:
+            result = song_project_orchestrator.generate_template_zip(db, project_uuid, domain_uuid)
+            if not result:
+                return jsonify({"error": "Project not found"}), 404
+
+            buffer, project_name = result
+            return send_file(
+                buffer,
+                mimetype="application/zip",
+                as_attachment=True,
+                download_name=f"{project_name}-template.zip",
+            )
+        finally:
+            db.close()
+
+    except ValueError:
+        return jsonify({"error": "Invalid project ID format"}), 400
+    except Exception as e:
+        logger.error("Error generating template ZIP", project_id=project_id, error=str(e))
+        return jsonify({"error": "Failed to generate template ZIP"}), 500
+
+
+@api_song_projects_v1.route("/<project_id>/folders/<folder_id>/download-zip", methods=["GET"])
+@jwt_required
+def download_folder_zip(project_id: str, folder_id: str):
+    """Download all files from a folder as ZIP."""
+    domain_id = get_current_domain_id()
+    if not domain_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        from flask import send_file
+
+        from business.song_project_orchestrator import song_project_orchestrator
+
+        project_uuid = UUID(project_id)
+        folder_uuid = UUID(folder_id)
+        domain_uuid = UUID(domain_id)
+
+        db: Session = next(get_db())
+        try:
+            result = song_project_orchestrator.generate_folder_zip(db, project_uuid, folder_uuid, domain_uuid)
+            if result is None:
+                return jsonify({"error": "Folder not found"}), 404
+
+            if isinstance(result, dict) and result.get("error") == "too_large":
+                return jsonify({"error": "Folder too large for ZIP download (max 500MB)", "size": result["size"]}), 413
+
+            buffer, folder_name = result
+            return send_file(
+                buffer,
+                mimetype="application/zip",
+                as_attachment=True,
+                download_name=f"{folder_name}.zip",
+            )
+        finally:
+            db.close()
+
+    except ValueError:
+        return jsonify({"error": "Invalid ID format"}), 400
+    except Exception as e:
+        logger.error("Error generating folder ZIP", project_id=project_id, folder_id=folder_id, error=str(e))
+        return jsonify({"error": "Failed to generate folder ZIP"}), 500

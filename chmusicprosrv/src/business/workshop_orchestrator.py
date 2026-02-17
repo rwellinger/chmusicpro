@@ -104,6 +104,122 @@ class WorkshopOrchestrator:
             )
             raise WorkshopOrchestratorError(f"Failed to update workshop: {e}") from e
 
+    def assign_to_project(
+        self,
+        db: Session,
+        domain_id: str,
+        workshop_id: str,
+        project_id: str,
+        folder_id: str | None = None,
+    ) -> dict | None:
+        """
+        Assign workshop to a project (1:1 relationship)
+
+        Args:
+            db: Database session
+            workshop_id: Workshop UUID
+            project_id: Project UUID
+            folder_id: Optional folder UUID
+
+        Returns:
+            dict: Updated workshop data or None if not found
+
+        Raises:
+            ValueError: If project or folder not found
+        """
+        from uuid import UUID
+
+        from db.song_project_service import get_folder_by_id, get_project_by_id
+
+        try:
+            project = get_project_by_id(db, UUID(project_id))
+            if not project:
+                raise ValueError(f"Project not found: {project_id}")
+
+            if folder_id:
+                folder = get_folder_by_id(db, UUID(folder_id))
+                if not folder:
+                    raise ValueError(f"Folder not found: {folder_id}")
+                if folder.project_id != UUID(project_id):
+                    raise ValueError(f"Folder {folder_id} does not belong to project {project_id}")
+
+            updated_workshop = workshop_service.update_workshop(
+                db=db,
+                workshop_id=workshop_id,
+                domain_id=domain_id,
+                project_id=project_id,
+                project_folder_id=folder_id,
+            )
+
+            if not updated_workshop:
+                return None
+
+            logger.info(
+                "Workshop assigned to project",
+                workshop_id=workshop_id,
+                project_id=project_id,
+                folder_id=folder_id,
+            )
+
+            return {
+                "id": str(updated_workshop.id),
+                "title": updated_workshop.title,
+                "project_id": str(updated_workshop.project_id) if updated_workshop.project_id else None,
+                "project_folder_id": str(updated_workshop.project_folder_id)
+                if updated_workshop.project_folder_id
+                else None,
+            }
+
+        except Exception as e:
+            logger.error(
+                "Failed to assign workshop to project",
+                workshop_id=workshop_id,
+                project_id=project_id,
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            raise
+
+    def unassign_from_project(self, db: Session, domain_id: str, workshop_id: str) -> dict | None:
+        """
+        Remove workshop from its assigned project (link only, workshop remains)
+
+        Args:
+            db: Database session
+            workshop_id: Workshop UUID
+
+        Returns:
+            dict: Updated workshop data or None if not found
+        """
+        try:
+            updated_workshop = workshop_service.update_workshop(
+                db=db,
+                workshop_id=workshop_id,
+                domain_id=domain_id,
+                clear_project=True,
+            )
+
+            if not updated_workshop:
+                return None
+
+            logger.info("Workshop unassigned from project", workshop_id=workshop_id)
+
+            return {
+                "id": str(updated_workshop.id),
+                "title": updated_workshop.title,
+                "project_id": None,
+                "project_folder_id": None,
+            }
+
+        except Exception as e:
+            logger.error(
+                "Failed to unassign workshop from project",
+                workshop_id=workshop_id,
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            raise
+
     def export_to_sketch(self, db: Session, user_id: str, domain_id: str, workshop_id: str | UUID) -> Any:
         """
         Export workshop content to a new SongSketch
