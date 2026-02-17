@@ -22,6 +22,8 @@ services:
     volumes:
       - minio-data:/data
     command: server /data --console-address ":9001"
+    ports:
+      - "127.0.0.1:9001:9001"
     networks:
       - chmusicpro-net
     healthcheck:
