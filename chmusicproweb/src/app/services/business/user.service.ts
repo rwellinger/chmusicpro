@@ -4,6 +4,8 @@ import {Observable, throwError} from "rxjs";
 import {catchError, map} from "rxjs/operators";
 import {environment} from "../../../environments/environment";
 import {
+    ApiKeyStatusResponse,
+    ApiKeyUpdateRequest,
     PasswordChangeRequest,
     PasswordChangeResponse,
     User,
@@ -89,6 +91,30 @@ export class UserService {
      */
     public changeCurrentUserPassword(passwordData: PasswordChangeRequest): Observable<PasswordChangeResponse> {
         return this.changePassword(passwordData);
+    }
+
+    /**
+     * Get API key configuration status
+     */
+    public getApiKeyStatus(): Observable<ApiKeyStatusResponse> {
+        return this.http.get<ApiKeyStatusResponse>(`${this.baseUrl}/api/v1/user/api-keys/status`)
+            .pipe(catchError(this.handleError));
+    }
+
+    /**
+     * Update API keys (encrypted on server)
+     */
+    public updateApiKeys(keys: ApiKeyUpdateRequest): Observable<ApiKeyStatusResponse> {
+        return this.http.put<ApiKeyStatusResponse>(`${this.baseUrl}/api/v1/user/api-keys`, keys)
+            .pipe(catchError(this.handleError));
+    }
+
+    /**
+     * Delete all API keys
+     */
+    public deleteApiKeys(): Observable<{success: boolean; message: string}> {
+        return this.http.delete<{success: boolean; message: string}>(`${this.baseUrl}/api/v1/user/api-keys`)
+            .pipe(catchError(this.handleError));
     }
 
     /**

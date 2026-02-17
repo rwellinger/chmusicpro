@@ -7,8 +7,11 @@ from flask_pydantic import validate
 
 from api.auth_middleware import domain_role_required, get_current_user_id, jwt_required
 from api.controllers.user_controller import UserController
+from business.user_api_key_orchestrator import user_api_key_orchestrator
+from db.database import SessionLocal
 from db.models import DomainType
 from schemas.user_schemas import (
+    ApiKeyUpdateRequest,
     LoginRequest,
     PasswordChangeRequest,
     PasswordResetRequest,
@@ -186,6 +189,68 @@ def validate_token_light():
             ), 200
         else:
             return jsonify({"success": False, "valid": False, "error": "Invalid or expired token"}), 401
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@api_user_v1.route("/api-keys", methods=["PUT"])
+@jwt_required
+@validate()
+def update_api_keys(body: ApiKeyUpdateRequest):
+    """Save/update user API keys (encrypted)"""
+    try:
+        user_id = get_current_user_id()
+        if not user_id:
+            return jsonify({"success": False, "error": "User ID not found in token"}), 401
+
+        with SessionLocal() as db:
+            keys = body.model_dump(exclude_none=True)
+            success = user_api_key_orchestrator.save_api_keys(db, str(user_id), keys)
+
+            if not success:
+                return jsonify({"success": False, "error": "Failed to update API keys"}), 500
+
+            status = user_api_key_orchestrator.get_api_key_status(db, str(user_id))
+            return jsonify({"success": True, "message": "API keys updated", **status}), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@api_user_v1.route("/api-keys/status", methods=["GET"])
+@jwt_required
+def get_api_key_status():
+    """Get which API keys are configured (booleans only, never actual keys)"""
+    try:
+        user_id = get_current_user_id()
+        if not user_id:
+            return jsonify({"success": False, "error": "User ID not found in token"}), 401
+
+        with SessionLocal() as db:
+            status = user_api_key_orchestrator.get_api_key_status(db, str(user_id))
+            return jsonify({"success": True, **status}), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@api_user_v1.route("/api-keys", methods=["DELETE"])
+@jwt_required
+def delete_api_keys():
+    """Remove all API keys"""
+    try:
+        user_id = get_current_user_id()
+        if not user_id:
+            return jsonify({"success": False, "error": "User ID not found in token"}), 401
+
+        with SessionLocal() as db:
+            success = user_api_key_orchestrator.clear_all_api_keys(db, str(user_id))
+
+            if not success:
+                return jsonify({"success": False, "error": "Failed to delete API keys"}), 500
+
+            return jsonify({"success": True, "message": "All API keys removed"}), 200
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500

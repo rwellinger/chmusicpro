@@ -5,7 +5,7 @@ User management Pydantic schemas for OpenAPI integration
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
 from schemas.common_schemas import BaseResponse
 
@@ -80,11 +80,26 @@ class UserResponse(BaseModel):
     preferred_language: str = Field("en", description="Preferred language")
     is_active: bool = Field(..., description="User active status")
     is_verified: bool = Field(..., description="User verification status")
+    has_openai_api_key: bool = Field(False, description="Whether user has an OpenAI API key configured")
+    has_openai_admin_api_key: bool = Field(False, description="Whether user has an OpenAI Admin API key configured")
+    has_claude_api_key: bool = Field(False, description="Whether user has a Claude API key configured")
     created_at: datetime = Field(..., description="User creation timestamp")
     updated_at: datetime | None = Field(None, description="Last update timestamp")
     last_login: datetime | None = Field(None, description="Last login timestamp")
 
     model_config = ConfigDict(from_attributes=True)
+
+    @model_validator(mode="wrap")
+    @classmethod
+    def compute_api_key_flags(cls, data, handler):
+        """Compute has_*_api_key booleans from encrypted columns when loading from ORM."""
+        obj = handler(data)
+        # When loaded from SQLAlchemy model (from_attributes), compute flags from encrypted columns
+        if hasattr(data, "openai_api_key_encrypted"):
+            obj.has_openai_api_key = bool(data.openai_api_key_encrypted)
+            obj.has_openai_admin_api_key = bool(data.openai_admin_api_key_encrypted)
+            obj.has_claude_api_key = bool(data.claude_api_key_encrypted)
+        return obj
 
 
 # User Update
@@ -158,6 +173,23 @@ class TokenValidationResponse(BaseModel):
     valid: bool = Field(..., description="Token validity status")
     user_id: UUID | None = Field(None, description="User ID if token is valid")
     email: str | None = Field(None, description="User email if token is valid")
+
+
+# API Key Management
+class ApiKeyUpdateRequest(BaseModel):
+    """Schema for updating user API keys"""
+
+    openai_api_key: str | None = Field(None, description="OpenAI API key")
+    openai_admin_api_key: str | None = Field(None, description="OpenAI Admin API key")
+    claude_api_key: str | None = Field(None, description="Claude API key")
+
+
+class ApiKeyStatusResponse(BaseResponse):
+    """Response with API key configuration status (booleans only, never actual keys)"""
+
+    has_openai_api_key: bool = Field(False, description="Whether user has an OpenAI API key configured")
+    has_openai_admin_api_key: bool = Field(False, description="Whether user has an OpenAI Admin API key configured")
+    has_claude_api_key: bool = Field(False, description="Whether user has a Claude API key configured")
 
 
 # Update forward references

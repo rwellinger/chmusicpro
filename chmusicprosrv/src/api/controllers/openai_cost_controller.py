@@ -9,7 +9,7 @@ from typing import Any
 import requests
 from dateutil.relativedelta import relativedelta
 
-from config.settings import OPENAI_ADMIN_API_KEY, OPENAI_ADMIN_BASE_URL, OPENAI_ADMIN_TIMEOUT
+from config.settings import OPENAI_ADMIN_BASE_URL, OPENAI_ADMIN_TIMEOUT
 from db.api_cost_service import ApiCostService
 from db.database import SessionLocal
 from utils.logger import logger
@@ -21,10 +21,19 @@ class OpenAICostController:
     CACHE_TTL_SECONDS = int(os.getenv("OPENAI_COST_CACHE_TTL", "3600"))  # Default: 1 hour
 
     def __init__(self):
-        self.api_key = OPENAI_ADMIN_API_KEY
         self.base_url = OPENAI_ADMIN_BASE_URL
         self.timeout = OPENAI_ADMIN_TIMEOUT
         self.cost_service = ApiCostService()
+
+    @property
+    def api_key(self) -> str | None:
+        """Resolve API key: per-user admin key from flask.g (no fallback to .env)."""
+        try:
+            from flask import g
+
+            return getattr(g, "user_openai_admin_api_key", None)
+        except RuntimeError:
+            return None
 
     def fetch_month_costs_raw(self, year: int, month: int, project_ids: list[str] | None = None) -> dict[str, Any]:
         """

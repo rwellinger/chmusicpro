@@ -4,7 +4,7 @@ from typing import Any
 
 import requests
 
-from config.settings import CHAT_DEBUG_LOGGING, OPENAI_ADMIN_BASE_URL, OPENAI_API_KEY, OPENAI_TIMEOUT
+from config.settings import CHAT_DEBUG_LOGGING, OPENAI_ADMIN_BASE_URL, OPENAI_TIMEOUT
 from utils.logger import logger
 
 
@@ -12,9 +12,18 @@ class OpenAIAPIClient:
     """HTTP client for OpenAI API."""
 
     def __init__(self):
-        self.api_key = OPENAI_API_KEY
         self.base_url = OPENAI_ADMIN_BASE_URL
         self.timeout = OPENAI_TIMEOUT
+
+    @property
+    def api_key(self) -> str | None:
+        """Resolve API key: per-user key from flask.g (no fallback to .env)."""
+        try:
+            from flask import g
+
+            return getattr(g, "user_openai_api_key", None)
+        except RuntimeError:
+            return None
 
     def chat_completion(self, payload: dict[str, Any]) -> dict[str, Any]:
         """

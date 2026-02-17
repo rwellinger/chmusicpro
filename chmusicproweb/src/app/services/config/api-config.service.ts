@@ -144,7 +144,9 @@ export class ApiConfigService {
         },
         user: {
             profile: `${this.baseUrl}/api/v1/user/profile`,
-            update: `${this.baseUrl}/api/v1/user/profile`
+            update: `${this.baseUrl}/api/v1/user/profile`,
+            apiKeys: `${this.baseUrl}/api/v1/user/api-keys`,
+            apiKeysStatus: `${this.baseUrl}/api/v1/user/api-keys/status`
         },
         costs: {
             openaiCurrent: `${this.baseUrl}/api/v1/openai/costs/current`,

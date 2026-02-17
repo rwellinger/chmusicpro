@@ -1141,6 +1141,27 @@
       "switch": "Switch",
       "switchSuccess": "Domain switched successfully",
       "switchError": "Failed to switch domain"
+    },
+    "apiKeys": {
+      "title": "API Keys",
+      "infoText": "Your keys are stored encrypted. We never see your keys in plaintext. Only enter keys you want to update - empty fields are ignored.",
+      "openaiKey": "OpenAI API Key",
+      "openaiKeyPlaceholder": "sk-...",
+      "openaiAdminKey": "OpenAI Admin API Key",
+      "openaiAdminKeyPlaceholder": "sk-admin-...",
+      "claudeKey": "Claude API Key",
+      "claudeKeyPlaceholder": "sk-ant-...",
+      "configured": "Configured",
+      "notConfigured": "Not configured",
+      "save": "Save Keys",
+      "clearAll": "Clear All",
+      "saveSuccess": "API keys saved successfully",
+      "clearSuccess": "All API keys removed",
+      "errors": {
+        "noKeys": "Please enter at least one API key",
+        "saveFailed": "Failed to save API keys",
+        "clearFailed": "Failed to clear API keys"
+      }
     }
   },
   "lyricParsingRules": {

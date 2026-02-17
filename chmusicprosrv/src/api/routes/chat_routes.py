@@ -5,6 +5,7 @@ Chat Generation Routes - Multi-Provider AI Integration with Pydantic validation
 from flask import Blueprint, jsonify
 from flask_pydantic import validate
 
+from api.api_key_middleware import load_user_api_keys, require_api_key
 from api.auth_middleware import get_current_user_id, jwt_required
 from api.controllers.chat_controller import ChatController
 from config.ai_config import AI_MODE_EXTERNAL, PROVIDER_OLLAMA, AIConfig
@@ -78,6 +79,14 @@ def generate_unified(body: UnifiedChatRequest):
         # Resolve provider and model from template + config
         provider, resolved_model = _resolve_provider_and_model(body.category, body.action, body.model)
         model = resolved_model or body.model
+
+        # Load per-user API keys and check provider key (skip for Ollama)
+        if provider != PROVIDER_OLLAMA:
+            load_user_api_keys()
+            provider_key = "claude" if provider == "claude" else "openai"
+            error = require_api_key(provider_key)
+            if error:
+                return jsonify(error[0]), error[1]
 
         # Validate that required template parameters are provided
         if model is None:

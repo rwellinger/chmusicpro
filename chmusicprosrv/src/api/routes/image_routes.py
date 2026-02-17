@@ -7,6 +7,7 @@ import traceback
 from flask import Blueprint, jsonify, request, send_from_directory
 from flask_pydantic import validate
 
+from api.api_key_middleware import load_user_api_keys, require_api_key
 from api.auth_middleware import get_current_domain_id, get_current_user_id, jwt_required
 from api.controllers.image_controller import ImageController
 from config.settings import IMAGES_DIR
@@ -35,6 +36,11 @@ def generate(body: ImageGenerateRequest):
     domain_id = get_current_domain_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
+
+    load_user_api_keys()
+    error = require_api_key("openai")
+    if error:
+        return jsonify(error[0]), error[1]
 
     try:
         response_data, status_code = image_controller.generate_image(

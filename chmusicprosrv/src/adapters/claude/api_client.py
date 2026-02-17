@@ -4,7 +4,7 @@ from typing import Any
 
 import requests
 
-from config.settings import CHAT_DEBUG_LOGGING, CLAUDE_API_KEY, CLAUDE_API_VERSION, CLAUDE_BASE_URL, CLAUDE_TIMEOUT
+from config.settings import CHAT_DEBUG_LOGGING, CLAUDE_API_VERSION, CLAUDE_BASE_URL, CLAUDE_TIMEOUT
 from utils.logger import logger
 
 
@@ -12,10 +12,19 @@ class ClaudeAPIClient:
     """HTTP client for Claude Messages API."""
 
     def __init__(self):
-        self.api_key = CLAUDE_API_KEY
         self.base_url = CLAUDE_BASE_URL
         self.api_version = CLAUDE_API_VERSION
         self.timeout = CLAUDE_TIMEOUT
+
+    @property
+    def api_key(self) -> str | None:
+        """Resolve API key: per-user key from flask.g (no fallback to .env)."""
+        try:
+            from flask import g
+
+            return getattr(g, "user_claude_api_key", None)
+        except RuntimeError:
+            return None
 
     def messages_create(self, payload: dict[str, Any]) -> dict[str, Any]:
         """

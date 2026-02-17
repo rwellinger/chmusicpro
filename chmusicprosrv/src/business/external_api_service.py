@@ -5,7 +5,6 @@ import requests
 from config.settings import (
     CHAT_DEBUG_LOGGING,
     OPENAI_ADMIN_BASE_URL,
-    OPENAI_API_KEY,
     OPENAI_IMAGE_MODEL,
     OPENAI_TIMEOUT,
 )
@@ -22,9 +21,18 @@ class OpenAIService:
     """Service for OpenAI API integration (Images)"""
 
     def __init__(self):
-        self.api_key = OPENAI_API_KEY
         self.base_url = OPENAI_ADMIN_BASE_URL
         self.model = OPENAI_IMAGE_MODEL
+
+    @property
+    def api_key(self) -> str | None:
+        """Resolve API key: per-user key from flask.g (no fallback to .env)."""
+        try:
+            from flask import g
+
+            return getattr(g, "user_openai_api_key", None)
+        except RuntimeError:
+            return None
 
     def generate_image(self, prompt: str, size: str) -> str:
         """

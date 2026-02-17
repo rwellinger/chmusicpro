@@ -5,6 +5,7 @@ import uuid
 from flask import Blueprint, jsonify, request
 from flask_pydantic import validate
 
+from api.api_key_middleware import load_user_api_keys
 from api.auth_middleware import get_current_domain_id, get_current_user_id, jwt_required
 from api.controllers.compression_controller import CompressionController
 from api.controllers.conversation_controller import ConversationController
@@ -160,6 +161,7 @@ def delete_conversation(conversation_id: str):
 def send_message(conversation_id: str, body: SendMessageRequest):
     """Send a message in a conversation and get AI response."""
     try:
+        load_user_api_keys()
         domain_id = get_current_domain_id()
         db = next(get_db())
 
@@ -188,6 +190,7 @@ def send_message(conversation_id: str, body: SendMessageRequest):
 def compress_conversation(conversation_id: str):
     """Compress conversation by archiving old messages and creating AI summary."""
     try:
+        load_user_api_keys()
         domain_id = get_current_domain_id()
         db = next(get_db())
 

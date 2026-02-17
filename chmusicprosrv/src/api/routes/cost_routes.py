@@ -4,6 +4,7 @@ OpenAI Cost API Routes - OpenAI Admin Cost Tracking
 
 from flask import Blueprint, jsonify
 
+from api.api_key_middleware import load_user_api_keys, require_api_key
 from api.auth_middleware import domain_role_required, get_current_user_id, jwt_required
 from api.controllers.openai_cost_controller import OpenAICostController
 from db.models import DomainType
@@ -24,6 +25,11 @@ def get_openai_current_month():
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
+    load_user_api_keys()
+    error = require_api_key("openai_admin")
+    if error:
+        return jsonify(error[0]), error[1]
+
     response_data, status_code = cost_controller.get_current_month_costs()
     return jsonify(response_data), status_code
 
@@ -37,6 +43,11 @@ def get_openai_all_time():
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
 
+    load_user_api_keys()
+    error = require_api_key("openai_admin")
+    if error:
+        return jsonify(error[0]), error[1]
+
     response_data, status_code = cost_controller.get_all_time_costs()
     return jsonify(response_data), status_code
 
@@ -49,6 +60,11 @@ def get_openai_month(year: int, month: int):
     user_id = get_current_user_id()
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
+
+    load_user_api_keys()
+    error = require_api_key("openai_admin")
+    if error:
+        return jsonify(error[0]), error[1]
 
     # Validate month
     if month < 1 or month > 12:

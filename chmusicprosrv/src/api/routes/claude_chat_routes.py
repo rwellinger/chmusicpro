@@ -2,6 +2,7 @@
 
 from flask import Blueprint, jsonify
 
+from api.api_key_middleware import load_user_api_keys, require_api_key
 from api.auth_middleware import jwt_required
 from api.controllers.claude_chat_controller import ClaudeChatController
 from utils.logger import logger
@@ -18,6 +19,11 @@ claude_chat_controller = ClaudeChatController()
 def get_models():
     """Get list of available Claude Chat models."""
     try:
+        load_user_api_keys()
+        error = require_api_key("claude")
+        if error:
+            return jsonify(error[0]), error[1]
+
         models = claude_chat_controller.get_available_models()
 
         return jsonify({"models": models}), 200

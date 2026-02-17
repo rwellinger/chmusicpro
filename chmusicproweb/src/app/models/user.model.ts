@@ -11,6 +11,9 @@ export interface User {
     preferred_language?: string;
     is_active: boolean;
     is_verified: boolean;
+    has_openai_api_key?: boolean;
+    has_openai_admin_api_key?: boolean;
+    has_claude_api_key?: boolean;
     created_at: string;
     updated_at?: string;
     last_login?: string;
@@ -81,6 +84,19 @@ export interface ApiResponse<T> {
     message?: string;
     data?: T;
     error?: string;
+}
+
+export interface ApiKeyUpdateRequest {
+    openai_api_key?: string;
+    openai_admin_api_key?: string;
+    claude_api_key?: string;
+}
+
+export interface ApiKeyStatusResponse {
+    success: boolean;
+    has_openai_api_key: boolean;
+    has_openai_admin_api_key: boolean;
+    has_claude_api_key: boolean;
 }
 
 export interface AuthState {

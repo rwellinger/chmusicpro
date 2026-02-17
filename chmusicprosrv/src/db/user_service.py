@@ -283,3 +283,69 @@ class UserService:
         users = db.query(User).filter(User.is_active).offset(skip).limit(limit).all()
         logger.debug("Users listed", count=len(users), skip=skip, limit=limit)
         return users
+
+    def update_api_keys(self, db: Session, user_id: str, **encrypted_keys: str | None) -> bool:
+        """
+        Update encrypted API key columns on the user.
+
+        Args:
+            db: Database session
+            user_id: User UUID as string
+            **encrypted_keys: Key-value pairs of column names to encrypted values
+                Valid keys: openai_api_key_encrypted, openai_admin_api_key_encrypted, claude_api_key_encrypted
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            user_uuid = uuid.UUID(user_id)
+            user = db.query(User).filter(User.id == user_uuid, User.is_active).first()
+
+            if not user:
+                logger.warning("API key update failed - user not found", user_id=user_id)
+                return False
+
+            for col_name, encrypted_value in encrypted_keys.items():
+                if hasattr(user, col_name):
+                    setattr(user, col_name, encrypted_value)
+
+            user.updated_at = datetime.utcnow()
+            db.commit()
+            logger.info("User API keys updated", user_id=user_id)
+            return True
+
+        except (ValueError, TypeError) as e:
+            logger.warning("Invalid user ID format", user_id=user_id, error=str(e))
+            return False
+        except Exception as e:
+            db.rollback()
+            logger.error("API key update failed", error=str(e), user_id=user_id)
+            raise e
+
+    def get_user_api_keys(self, db: Session, user_id: str) -> dict[str, str | None] | None:
+        """
+        Get raw encrypted API key columns for a user.
+
+        Args:
+            db: Database session
+            user_id: User UUID as string
+
+        Returns:
+            Dict with encrypted key values, or None if user not found
+        """
+        try:
+            user_uuid = uuid.UUID(user_id)
+            user = db.query(User).filter(User.id == user_uuid, User.is_active).first()
+
+            if not user:
+                return None
+
+            return {
+                "openai_api_key_encrypted": user.openai_api_key_encrypted,
+                "openai_admin_api_key_encrypted": user.openai_admin_api_key_encrypted,
+                "claude_api_key_encrypted": user.claude_api_key_encrypted,
+            }
+
+        except (ValueError, TypeError) as e:
+            logger.warning("Invalid user ID format", user_id=user_id, error=str(e))
+            return None

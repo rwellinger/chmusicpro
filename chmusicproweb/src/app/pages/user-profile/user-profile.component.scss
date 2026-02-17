@@ -481,20 +481,34 @@
       overflow: hidden;
 
       mat-card-content {
-        padding: 1.5rem;
+        padding: 1rem 1.5rem;
       }
     }
 
-    .settings-header {
+    // Shared compact header for right-column cards
+    .card-header-compact {
       display: flex;
       align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+
+      h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: $text-primary;
+      }
+
+      .card-header-subtitle {
+        margin: 0.125rem 0 0;
+        font-size: 0.75rem;
+        color: $text-secondary;
+      }
     }
 
-    .settings-avatar {
-      width: 60px;
-      height: 60px;
+    .card-avatar-compact {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: linear-gradient(135deg, #D32F2F 0%, #880E4F 100%);
       display: flex;
@@ -503,17 +517,8 @@
       flex-shrink: 0;
 
       i {
-        font-size: 1.5rem;
+        font-size: 0.9rem;
         color: white;
-      }
-    }
-
-    .settings-header-text {
-      h3 {
-        margin: 0;
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: $text-primary;
       }
     }
 
@@ -560,69 +565,133 @@
       gap: $spacing-md;
     }
 
+    // API Keys Card
+    .api-keys-card {
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+
+      mat-card-content {
+        padding: 1rem 1.5rem;
+      }
+    }
+
+    .api-key-status-list {
+      display: grid;
+      grid-template-columns: 8px auto auto;
+      justify-content: start;
+      gap: 0.375rem 0.5rem;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .api-key-status-item {
+      display: grid;
+      grid-template-columns: subgrid;
+      grid-column: 1 / -1;
+      align-items: center;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef5350;
+
+      &.configured {
+        background: #66bb6a;
+      }
+    }
+
+    .status-label {
+      font-weight: 500;
+      color: $text-primary;
+      white-space: nowrap;
+    }
+
+    .status-text {
+      color: $text-secondary;
+      font-size: 0.75rem;
+    }
+
+    .api-keys-form {
+      .full-width {
+        width: 100%;
+      }
+
+      mat-form-field {
+        margin-bottom: 0.25rem;
+
+        .mat-mdc-text-field-wrapper {
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+
+        .mat-mdc-form-field-infix {
+          min-height: 40px;
+          padding-top: 8px;
+          padding-bottom: 8px;
+        }
+
+        input {
+          font-size: 0.85rem;
+        }
+      }
+    }
+
+    .api-keys-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0;
+      padding-top: 0.75rem;
+      border-top: 1px solid $border-light;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    }
+
     // API Costs Section
     .api-costs-section {
       // no extra margin/border needed - it's in its own card now
     }
 
-    .api-costs-header {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid $border-light;
+    // Costs card content padding
+    .costs-card mat-card-content {
+      padding: 1rem 1.5rem;
     }
 
-    .api-costs-avatar {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, #D32F2F 0%, #880E4F 100%);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 2.5rem;
-      flex-shrink: 0;
-    }
-
-    .api-costs-header-text {
-      flex-grow: 1;
-
-      h3 {
-        margin: 0 0 0.5rem 0;
-        font-size: 1.5rem;
-        color: $text-primary;
-      }
-
-      p {
-        margin: 0;
-        color: $text-secondary;
-        font-size: 1rem;
-      }
+    .api-costs-subtitle {
+      margin: 0.5rem 0 0.25rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: $text-primary;
     }
 
     .api-costs-list {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0;
     }
 
     .api-costs-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.5rem 0;
-      font-size: 0.95rem;
+      padding: 0.2rem 0;
+      font-size: 0.85rem;
     }
 
     .api-costs-item.api-costs-total {
       border-top: 2px solid $border-light;
-      margin-top: 0.5rem;
-      padding-top: 1rem;
+      margin-top: 0.25rem;
+      padding-top: 0.375rem;
       font-weight: 600;
-      font-size: 1.05rem;
+      font-size: 0.9rem;
     }
 
     .api-costs-total .api-costs-value {

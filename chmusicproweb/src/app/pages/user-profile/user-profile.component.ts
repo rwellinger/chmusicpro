@@ -22,7 +22,7 @@ import {NotificationService} from "../../services/ui/notification.service";
 import {UserSettingsService} from "../../services/user-settings.service";
 import {LanguageService} from "../../services/language.service";
 import {CostService, MonthlyCosts} from "../../services/config/cost.service";
-import {User} from "../../models/user.model";
+import {ApiKeyStatusResponse, User} from "../../models/user.model";
 import {DomainType, DomainTypeLabels, DomainWithRole} from "../../models/domain.model";
 import {Language, UserSettings} from "../../models/user-settings.model";
 
@@ -46,6 +46,7 @@ import {Language, UserSettings} from "../../models/user-settings.model";
 export class UserProfileComponent implements OnInit, OnDestroy {
     userForm: FormGroup;
     settingsForm: FormGroup;
+    apiKeysForm: FormGroup;
     currentUser: User | null = null;
     currentSettings: UserSettings | null = null;
     openaiCosts: MonthlyCosts | null = null;
@@ -61,6 +62,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     isSwitchingDomain = false;
     activeDomainId: string | null = null;
     domainTypeLabels = DomainTypeLabels;
+    apiKeyStatus: ApiKeyStatusResponse | null = null;
+    isSavingApiKeys = false;
+    isLoadingApiKeys = false;
 
     private destroy$ = new Subject<void>();
     private fb = inject(FormBuilder);
@@ -89,6 +93,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
             equipmentListLimit: [7, [Validators.required, Validators.min(5), Validators.max(100)]],
             language: ["en", [Validators.required]]
         });
+
+        this.apiKeysForm = this.fb.group({
+            openai_api_key: [""],
+            openai_admin_api_key: [""],
+            claude_api_key: [""]
+        });
     }
 
     ngOnInit(): void {
@@ -103,6 +113,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
             this.loadOpenAIAllTimeCosts();
         }
         this.loadUserDomains();
+        this.loadApiKeyStatus();
     }
 
     ngOnDestroy(): void {
@@ -501,6 +512,95 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                 },
                 error: (error) => {
                     console.error("Failed to load OpenAI all-time costs:", error);
+                }
+            });
+    }
+
+    /**
+     * Load API key configuration status
+     */
+    private loadApiKeyStatus(): void {
+        this.isLoadingApiKeys = true;
+        this.userService.getApiKeyStatus()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (status) => {
+                    this.apiKeyStatus = status;
+                    this.isLoadingApiKeys = false;
+                },
+                error: (error) => {
+                    console.error("Failed to load API key status:", error);
+                    this.isLoadingApiKeys = false;
+                }
+            });
+    }
+
+    /**
+     * Save API keys
+     */
+    public saveApiKeys(): void {
+        if (this.isSavingApiKeys) return;
+
+        const formValues = this.apiKeysForm.value;
+        const keys: Record<string, string> = {};
+
+        // Only include non-empty values
+        if (formValues.openai_api_key?.trim()) {
+            keys["openai_api_key"] = formValues.openai_api_key.trim();
+        }
+        if (formValues.openai_admin_api_key?.trim()) {
+            keys["openai_admin_api_key"] = formValues.openai_admin_api_key.trim();
+        }
+        if (formValues.claude_api_key?.trim()) {
+            keys["claude_api_key"] = formValues.claude_api_key.trim();
+        }
+
+        if (Object.keys(keys).length === 0) {
+            this.notificationService.error(this.translate.instant("userProfile.apiKeys.errors.noKeys"));
+            return;
+        }
+
+        this.isSavingApiKeys = true;
+        this.userService.updateApiKeys(keys)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (status) => {
+                    this.apiKeyStatus = status;
+                    this.apiKeysForm.reset();
+                    this.isSavingApiKeys = false;
+                    this.notificationService.success(this.translate.instant("userProfile.apiKeys.saveSuccess"));
+                },
+                error: (error) => {
+                    console.error("Failed to save API keys:", error);
+                    this.notificationService.error(error.message || this.translate.instant("userProfile.apiKeys.errors.saveFailed"));
+                    this.isSavingApiKeys = false;
+                }
+            });
+    }
+
+    /**
+     * Clear all API keys
+     */
+    public clearAllApiKeys(): void {
+        this.isSavingApiKeys = true;
+        this.userService.deleteApiKeys()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: () => {
+                    this.apiKeyStatus = {
+                        success: true,
+                        has_openai_api_key: false,
+                        has_openai_admin_api_key: false,
+                        has_claude_api_key: false
+                    };
+                    this.apiKeysForm.reset();
+                    this.isSavingApiKeys = false;
+                    this.notificationService.success(this.translate.instant("userProfile.apiKeys.clearSuccess"));
+                },
+                error: (error) => {
+                    console.error("Failed to clear API keys:", error);
+                    this.notificationService.error(error.message || this.translate.instant("userProfile.apiKeys.errors.clearFailed"));
+                    this.isSavingApiKeys = false;
                 }
             });
     }

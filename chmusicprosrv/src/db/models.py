@@ -303,6 +303,11 @@ class User(Base):
     # User preferences
     preferred_language = Column(String(5), nullable=False, default="en", server_default="en")
 
+    # Per-user API keys (encrypted with Fernet)
+    openai_api_key_encrypted = Column(Text, nullable=True)
+    openai_admin_api_key_encrypted = Column(Text, nullable=True)
+    claude_api_key_encrypted = Column(Text, nullable=True)
+
     # OAuth2 preparation (for future use)
     oauth_provider = Column(String(50), nullable=True)  # 'google', 'github', etc.
     oauth_id = Column(String(255), nullable=True)  # OAuth provider user ID

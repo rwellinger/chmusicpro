@@ -249,13 +249,11 @@
       @if (currentSettings) {
         <mat-card class="settings-card">
           <mat-card-content>
-            <div class="settings-header">
-              <div class="settings-avatar">
+            <div class="card-header-compact">
+              <div class="card-avatar-compact">
                 <i class="fas fa-cog"></i>
               </div>
-              <div class="settings-header-text">
-                <h3>{{ 'userProfile.userSettings' | translate }}</h3>
-              </div>
+              <h3>{{ 'userProfile.userSettings' | translate }}</h3>
             </div>
             <form [formGroup]="settingsForm" class="settings-form">
               <div class="form-row">
@@ -352,6 +350,83 @@
         </mat-card>
       }
 
+      <!-- API Keys Card -->
+      <mat-card class="api-keys-card">
+        <mat-card-content>
+          <div class="card-header-compact">
+            <div class="card-avatar-compact">
+              <i class="fas fa-key"></i>
+            </div>
+            <div>
+              <h3>{{ 'userProfile.apiKeys.title' | translate }}</h3>
+              <p class="card-header-subtitle">{{ 'userProfile.apiKeys.infoText' | translate }}</p>
+            </div>
+          </div>
+
+          <!-- Status indicators -->
+          @if (apiKeyStatus) {
+            <div class="api-key-status-list">
+              <div class="api-key-status-item">
+                <span class="status-dot" [class.configured]="apiKeyStatus.has_openai_api_key"></span>
+                <span class="status-label">{{ 'userProfile.apiKeys.openaiKey' | translate }}</span>
+                <span class="status-text">{{ (apiKeyStatus.has_openai_api_key ? 'userProfile.apiKeys.configured' : 'userProfile.apiKeys.notConfigured') | translate }}</span>
+              </div>
+              <div class="api-key-status-item">
+                <span class="status-dot" [class.configured]="apiKeyStatus.has_openai_admin_api_key"></span>
+                <span class="status-label">{{ 'userProfile.apiKeys.openaiAdminKey' | translate }}</span>
+                <span class="status-text">{{ (apiKeyStatus.has_openai_admin_api_key ? 'userProfile.apiKeys.configured' : 'userProfile.apiKeys.notConfigured') | translate }}</span>
+              </div>
+              <div class="api-key-status-item">
+                <span class="status-dot" [class.configured]="apiKeyStatus.has_claude_api_key"></span>
+                <span class="status-label">{{ 'userProfile.apiKeys.claudeKey' | translate }}</span>
+                <span class="status-text">{{ (apiKeyStatus.has_claude_api_key ? 'userProfile.apiKeys.configured' : 'userProfile.apiKeys.notConfigured') | translate }}</span>
+              </div>
+            </div>
+          }
+
+          <!-- API Key Form -->
+          <form [formGroup]="apiKeysForm" class="api-keys-form">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+              <mat-label>{{ 'userProfile.apiKeys.openaiKey' | translate }}</mat-label>
+              <input matInput type="password" formControlName="openai_api_key"
+                [placeholder]="'userProfile.apiKeys.openaiKeyPlaceholder' | translate">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+              <mat-label>{{ 'userProfile.apiKeys.openaiAdminKey' | translate }}</mat-label>
+              <input matInput type="password" formControlName="openai_admin_api_key"
+                [placeholder]="'userProfile.apiKeys.openaiAdminKeyPlaceholder' | translate">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+              <mat-label>{{ 'userProfile.apiKeys.claudeKey' | translate }}</mat-label>
+              <input matInput type="password" formControlName="claude_api_key"
+                [placeholder]="'userProfile.apiKeys.claudeKeyPlaceholder' | translate">
+            </mat-form-field>
+
+            <div class="api-keys-actions">
+              <button mat-button color="warn" type="button"
+                (click)="clearAllApiKeys()"
+                [disabled]="isSavingApiKeys">
+                <i class="fas fa-trash"></i>
+                {{ 'userProfile.apiKeys.clearAll' | translate }}
+              </button>
+              <button mat-raised-button color="primary" type="button"
+                (click)="saveApiKeys()"
+                [disabled]="isSavingApiKeys">
+                @if (isSavingApiKeys) {
+                  <i class="fas fa-spinner fa-spin"></i>
+                }
+                @if (!isSavingApiKeys) {
+                  <i class="fas fa-save"></i>
+                }
+                {{ 'userProfile.apiKeys.save' | translate }}
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+
       <!-- API Costs Card (System Admin only) -->
       @if (showCosts) {
         <mat-card class="costs-card">
@@ -368,14 +443,14 @@
               <!-- Costs Content -->
               @if (!isLoadingCosts && openaiCosts) {
                 <div>
-                  <div class="api-costs-header">
-                    <div class="api-costs-avatar">
+                  <div class="card-header-compact">
+                    <div class="card-avatar-compact">
                       <i class="fas fa-dollar-sign"></i>
                     </div>
-                    <div class="api-costs-header-text">
+                    <div>
                       <h3>{{ 'userProfile.costs.title' | translate }}</h3>
                       @if (openaiCosts.organization_id) {
-                        <p>{{ openaiCosts.organization_id }}</p>
+                        <p class="card-header-subtitle">{{ openaiCosts.organization_id }}</p>
                       }
                     </div>
                   </div>

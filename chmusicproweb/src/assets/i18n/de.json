@@ -1141,6 +1141,27 @@
       "switch": "Wechseln",
       "switchSuccess": "Domain erfolgreich gewechselt",
       "switchError": "Fehler beim Wechseln der Domain"
+    },
+    "apiKeys": {
+      "title": "API-Schluessel",
+      "infoText": "Deine Schluessel werden verschluesselt gespeichert. Wir sehen deine Schluessel nie im Klartext. Gib nur Schluessel ein, die du aktualisieren willst - leere Felder werden ignoriert.",
+      "openaiKey": "OpenAI API-Schluessel",
+      "openaiKeyPlaceholder": "sk-...",
+      "openaiAdminKey": "OpenAI Admin API-Schluessel",
+      "openaiAdminKeyPlaceholder": "sk-admin-...",
+      "claudeKey": "Claude API-Schluessel",
+      "claudeKeyPlaceholder": "sk-ant-...",
+      "configured": "Konfiguriert",
+      "notConfigured": "Nicht konfiguriert",
+      "save": "Schluessel speichern",
+      "clearAll": "Alle loeschen",
+      "saveSuccess": "API-Schluessel erfolgreich gespeichert",
+      "clearSuccess": "Alle API-Schluessel entfernt",
+      "errors": {
+        "noKeys": "Bitte mindestens einen API-Schluessel eingeben",
+        "saveFailed": "Fehler beim Speichern der API-Schluessel",
+        "clearFailed": "Fehler beim Loeschen der API-Schluessel"
+      }
     }
   },
   "lyricParsingRules": {
