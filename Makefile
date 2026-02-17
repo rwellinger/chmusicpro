@@ -2,17 +2,26 @@
 
 .PHONY: help install-cli install-cli-dev install-cli-prod setup-cli-config-dev setup-cli-config-prod
 
+DEPRECATION_MSG = \
+	"\n\033[93m======================================================================\n\
+WARNING: The CLI tool is DEPRECATED.\n\
+All operations (upload, download, mirror sync, etc.) are now\n\
+available directly in the Web UI. Please use the web interface.\n\
+======================================================================\033[0m\n"
+
 help:
 	@echo "CH Music Pro - Available commands:"
 	@echo ""
-	@echo "  make install-cli           Install CLI tool (no config)"
-	@echo "  make install-cli-dev       Install CLI + DEV config (localhost:5050)"
-	@echo "  make install-cli-prod      Install CLI + PROD config (macstudio)"
-	@echo "  make setup-cli-config-dev  Create DEV config only"
-	@echo "  make setup-cli-config-prod Create PROD config only"
+	@echo "  make install-cli           [DEPRECATED] Install CLI tool (no config)"
+	@echo "  make install-cli-dev       [DEPRECATED] Install CLI + DEV config (localhost:5050)"
+	@echo "  make install-cli-prod      [DEPRECATED] Install CLI + PROD config (macstudio)"
+	@echo "  make setup-cli-config-dev  [DEPRECATED] Create DEV config only"
+	@echo "  make setup-cli-config-prod [DEPRECATED] Create PROD config only"
 	@echo ""
+	@echo $(DEPRECATION_MSG)
 
 install-cli:
+	@echo $(DEPRECATION_MSG)
 	@echo "Installing chmusicpro-cli..."
 	@mkdir -p ~/bin
 	@cp scripts/cli/chmusicpro-cli.py ~/bin/chmusicpro-cli
@@ -25,7 +34,7 @@ install-cli:
 	@echo "✓ Installation complete!"
 	@echo ""
 	@echo "Make sure ~/bin is in your PATH:"
-	@echo "  export PATH=\"\$$HOME/bin:\$$PATH\""
+	@echo "  export PATH=\"$$HOME/bin:$$PATH\""
 	@echo ""
 	@echo "⚠ No config created. Run one of:"
 	@echo "  make setup-cli-config-dev   (for localhost development)"
@@ -37,6 +46,7 @@ install-cli-dev: install-cli setup-cli-config-dev
 install-cli-prod: install-cli setup-cli-config-prod
 
 setup-cli-config-dev:
+	@echo $(DEPRECATION_MSG)
 	@echo "Creating DEV config (~/.chmusicpro/config.json)..."
 	@mkdir -p ~/.chmusicpro
 	@chmod 700 ~/.chmusicpro
@@ -53,6 +63,7 @@ setup-cli-config-dev:
 	@echo "  chmusicpro-cli login --api-url http://localhost:5050"
 
 setup-cli-config-prod:
+	@echo $(DEPRECATION_MSG)
 	@echo "Creating PROD config (~/.chmusicpro/config.json)..."
 	@mkdir -p ~/.chmusicpro
 	@chmod 700 ~/.chmusicpro

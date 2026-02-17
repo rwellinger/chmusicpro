@@ -2,7 +2,9 @@
 """
 CH Music Pro CLI Tool - Song Project Management
 
-Command-line tool for managing Song Projects.
+DEPRECATED: This CLI tool is deprecated and will be removed in a future version.
+All operations (upload, download, mirror sync, etc.) are now available directly
+in the Web UI. Please use the web interface instead.
 """
 
 # ============================================================
@@ -39,6 +41,14 @@ def check_conda_environment():
 
 # Check environment BEFORE importing any third-party packages!
 check_conda_environment()
+
+# Deprecation warning - shown on every invocation
+print("\033[93m" + "=" * 70)
+print("WARNING: This CLI tool is DEPRECATED.")
+print("All operations (upload, download, mirror sync, etc.) are now")
+print("available directly in the Web UI. Please use the web interface.")
+print("=" * 70 + "\033[0m")
+print()
 
 
 # ============================================================
