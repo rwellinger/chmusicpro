@@ -196,7 +196,34 @@
             <input type="checkbox" formControlName="termsAccepted" />
             <span>{{ 'register.step4.acceptTerms' | translate }}</span>
           </label>
-          <div id="recaptcha-container" class="recaptcha-wrapper"></div>
+          <div class="captcha-container">
+            @if (captchaLoading) {
+              <span class="captcha-label">{{ 'common.loading' | translate }}</span>
+            }
+            @if (!captchaLoading && captchaQuestion) {
+              <div class="captcha-question">
+                <span class="captcha-label">{{ 'register.step4.captchaLabel' | translate }}</span>
+                <span class="captcha-math">{{ captchaQuestion }} = ?</span>
+              </div>
+              <div class="captcha-input-row">
+                <input
+                  type="text"
+                  [value]="captchaAnswer"
+                  (input)="onCaptchaInput($event)"
+                  [placeholder]="'register.step4.captchaPlaceholder' | translate"
+                  [class.invalid]="captchaError"
+                  autocomplete="off"
+                  inputmode="numeric"
+                />
+                <button type="button" class="captcha-refresh" (click)="loadCaptcha()" [title]="'register.step4.captchaRefresh' | translate">
+                  &#x21bb;
+                </button>
+              </div>
+              @if (captchaError) {
+                <div class="captcha-error">{{ captchaError }}</div>
+              }
+            }
+          </div>
         </div>
       }
 

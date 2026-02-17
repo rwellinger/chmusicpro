@@ -24,6 +24,16 @@ api_user_v1 = Blueprint("api_user_v1", __name__, url_prefix="/api/v1/user")
 user_controller = UserController()
 
 
+@api_user_v1.route("/captcha", methods=["GET"])
+def get_captcha():
+    """Get a math CAPTCHA challenge (no auth required)"""
+    try:
+        response_data, status_code = user_controller.get_captcha_challenge()
+        return jsonify(response_data), status_code
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @api_user_v1.route("/create", methods=["POST"])
 @validate()
 def create_user(body: UserCreateRequest):

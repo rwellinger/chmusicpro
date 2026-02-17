@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from business.domain_orchestrator import DomainOrchestrator
-from business.recaptcha_service import RecaptchaService
+from business.math_captcha_service import MathCaptchaService
 from business.user_auth_service import UserAuthService
 from config.settings import REGISTRATION_INVITE_CODE
 from db.database import SessionLocal
@@ -42,7 +42,7 @@ class UserController:
     def __init__(self):
         self.user_service = UserService()
         self.auth_service = UserAuthService()
-        self.recaptcha_service = RecaptchaService()
+        self.captcha_service = MathCaptchaService()
         self.registration_log_service = RegistrationLogService()
         self.domain_orchestrator = DomainOrchestrator()
 
@@ -59,6 +59,11 @@ class UserController:
         """Format success response"""
         return response_model.model_dump(), status_code
 
+    def get_captcha_challenge(self) -> tuple[dict[str, Any], int]:
+        """Generate a math CAPTCHA challenge"""
+        question, token = self.captcha_service.generate_challenge()
+        return {"question": question, "token": token}, 200
+
     def create_user(
         self,
         request: UserCreateRequest,
@@ -74,9 +79,11 @@ class UserController:
             ):
                 return self._format_error_response("Invalid or missing invite code", 403)
 
-            # Business logic: Verify reCAPTCHA token (if provided)
-            if request.recaptcha_token:
-                captcha_ok, captcha_error = self.recaptcha_service.verify_token(request.recaptcha_token, remote_ip)
+            # Business logic: Verify math CAPTCHA (if token provided)
+            if request.captcha_token:
+                captcha_ok, captcha_error = self.captcha_service.verify_answer(
+                    request.captcha_token, request.captcha_answer or ""
+                )
                 if not captcha_ok:
                     return self._format_error_response(captcha_error or "CAPTCHA verification failed", 400)
 

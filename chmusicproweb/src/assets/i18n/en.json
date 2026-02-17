@@ -253,7 +253,10 @@
       "termsContent": "By creating an account, you agree to use this platform responsibly. This is a private music production tool. All generated content (lyrics, images, music prompts) remains your intellectual property. The platform is provided as-is without warranty. We reserve the right to suspend accounts that violate these terms.",
       "privacyTitle": "Privacy Policy",
       "privacyContent": "We collect your email address for authentication purposes. Your personal data (name, artist name) is stored securely and used only within this platform. We do not share your data with third parties. AI-generated content may be processed by external services (OpenAI, Ollama). You can request account deletion at any time.",
-      "acceptTerms": "I accept the Terms of Service and Privacy Policy"
+      "acceptTerms": "I accept the Terms of Service and Privacy Policy",
+      "captchaLabel": "Solve this:",
+      "captchaPlaceholder": "Answer",
+      "captchaRefresh": "New question"
     },
     "step5": {
       "title": "Welcome!",

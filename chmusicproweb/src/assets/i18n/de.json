@@ -253,7 +253,10 @@
       "termsContent": "Mit der Erstellung eines Kontos erklaerst du dich einverstanden, diese Plattform verantwortungsvoll zu nutzen. Dies ist ein privates Musikproduktions-Tool. Alle generierten Inhalte (Texte, Bilder, Musik-Prompts) bleiben dein geistiges Eigentum. Die Plattform wird ohne Gewaehrleistung bereitgestellt. Wir behalten uns das Recht vor, Konten zu sperren, die gegen diese Bedingungen verstossen.",
       "privacyTitle": "Datenschutz",
       "privacyContent": "Wir erfassen deine E-Mail-Adresse fuer Authentifizierungszwecke. Deine persoenlichen Daten (Name, Kuenstlername) werden sicher gespeichert und nur innerhalb dieser Plattform verwendet. Wir geben deine Daten nicht an Dritte weiter. KI-generierte Inhalte koennen von externen Diensten (OpenAI, Ollama) verarbeitet werden. Du kannst jederzeit die Loeschung deines Kontos beantragen.",
-      "acceptTerms": "Ich akzeptiere die Nutzungsbedingungen und Datenschutzerklaerung"
+      "acceptTerms": "Ich akzeptiere die Nutzungsbedingungen und Datenschutzerklaerung",
+      "captchaLabel": "Berechne:",
+      "captchaPlaceholder": "Antwort",
+      "captchaRefresh": "Neue Frage"
     },
     "step5": {
       "title": "Willkommen!",

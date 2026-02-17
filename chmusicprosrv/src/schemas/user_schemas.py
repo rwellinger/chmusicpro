@@ -26,7 +26,8 @@ class UserCreateRequest(UserBase):
 
     password: str = Field(..., min_length=4, max_length=128, description="User password")
     preferred_language: str = Field("en", max_length=5, description="Preferred language")
-    recaptcha_token: str | None = Field(None, description="reCAPTCHA v2 token (optional in dev)")
+    captcha_token: str | None = Field(None, description="Math CAPTCHA signed token")
+    captcha_answer: str | None = Field(None, description="User's answer to math CAPTCHA")
     invite_code: str | None = Field(None, description="Invite code for restricted registration")
 
     @field_validator("password")

@@ -36,7 +36,8 @@ export interface UserCreateRequest {
     last_name?: string;
     artist_name?: string;
     preferred_language?: string;
-    recaptcha_token?: string;
+    captcha_token?: string;
+    captcha_answer?: string;
     invite_code?: string;
 }
 

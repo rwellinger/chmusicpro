@@ -1,5 +1,5 @@
 import {Component, inject, OnDestroy, OnInit} from "@angular/core";
-
+import {HttpClient} from "@angular/common/http";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors} from "@angular/forms";
 import {Router, RouterLink} from "@angular/router";
 import {Subject} from "rxjs";
@@ -10,7 +10,10 @@ import {LanguageService} from "../../services/language.service";
 import {UserCreateRequest} from "../../models/user.model";
 import {environment} from "../../../environments/environment";
 
-declare const grecaptcha: any;
+interface CaptchaChallenge {
+    question: string;
+    token: string;
+}
 
 @Component({
     selector: "app-register",
@@ -29,14 +32,19 @@ export class RegisterComponent implements OnInit, OnDestroy {
     public hideConfirmPassword = true;
     public termsAccepted = false;
     public registrationComplete = false;
-    public recaptchaToken: string | null = null;
-    public recaptchaWidgetId: number | null = null;
     public availableLanguages: {code: string; name: string}[] = [];
+
+    public captchaQuestion = "";
+    public captchaToken = "";
+    public captchaAnswer = "";
+    public captchaError: string | null = null;
+    public captchaLoading = false;
 
     private destroy$ = new Subject<void>();
     private formBuilder = inject(FormBuilder);
     private authService = inject(AuthService);
     private router = inject(Router);
+    private http = inject(HttpClient);
     private languageService = inject(LanguageService);
     private translateService = inject(TranslateService);
 
@@ -120,7 +128,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
                     password?.value === confirmPassword?.value);
             }
             case 4:
-                return this.registerForm.get("termsAccepted")?.value === true;
+                return this.registerForm.get("termsAccepted")?.value === true &&
+                    !!this.captchaToken && !!this.captchaAnswer.trim();
             default:
                 return false;
         }
@@ -130,7 +139,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
         if (this.currentStep < this.totalSteps && this.canProceed()) {
             this.currentStep++;
             if (this.currentStep === 4) {
-                setTimeout(() => this.renderRecaptcha(), 300);
+                this.loadCaptcha();
             }
         }
     }
@@ -147,6 +156,31 @@ export class RegisterComponent implements OnInit, OnDestroy {
         }
     }
 
+    public loadCaptcha(): void {
+        this.captchaLoading = true;
+        this.captchaError = null;
+        this.captchaAnswer = "";
+
+        this.http.get<CaptchaChallenge>(`${environment.apiUrl}/api/v1/user/captcha`)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (challenge) => {
+                    this.captchaQuestion = challenge.question;
+                    this.captchaToken = challenge.token;
+                    this.captchaLoading = false;
+                },
+                error: () => {
+                    this.captchaError = "Failed to load CAPTCHA";
+                    this.captchaLoading = false;
+                }
+            });
+    }
+
+    public onCaptchaInput(event: Event): void {
+        this.captchaAnswer = (event.target as HTMLInputElement).value;
+        this.captchaError = null;
+    }
+
     public onSubmit(): void {
         if (!this.canProceed() || this.loading) return;
 
@@ -161,7 +195,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
             last_name: formValue.last_name || undefined,
             artist_name: formValue.artist_name || undefined,
             preferred_language: formValue.preferred_language,
-            recaptcha_token: this.recaptchaToken || undefined,
+            captcha_token: this.captchaToken || undefined,
+            captcha_answer: this.captchaAnswer.trim() || undefined,
             invite_code: formValue.invite_code || undefined
         };
 
@@ -176,10 +211,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
                 error: (err) => {
                     this.loading = false;
                     this.error = err.error?.error || "Registration failed";
-                    if (this.recaptchaWidgetId !== null) {
-                        try { grecaptcha.reset(this.recaptchaWidgetId); } catch (_e) { /* ignore */ }
-                    }
-                    this.recaptchaToken = null;
+                    this.loadCaptcha();
                 }
             });
     }
@@ -220,29 +252,5 @@ export class RegisterComponent implements OnInit, OnDestroy {
             confirmPassword.setErrors(Object.keys(errors).length ? errors : null);
         }
         return null;
-    }
-
-    private renderRecaptcha(): void {
-        const siteKey = environment.recaptchaSiteKey;
-        if (!siteKey) return;
-
-        const container = document.getElementById("recaptcha-container");
-        if (!container) return;
-
-        try {
-            if (typeof grecaptcha !== "undefined" && grecaptcha.render) {
-                this.recaptchaWidgetId = grecaptcha.render("recaptcha-container", {
-                    sitekey: siteKey,
-                    callback: (token: string) => {
-                        this.recaptchaToken = token;
-                    },
-                    "expired-callback": () => {
-                        this.recaptchaToken = null;
-                    }
-                });
-            }
-        } catch (_e) {
-            // reCAPTCHA may already be rendered
-        }
     }
 }
