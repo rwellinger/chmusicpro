@@ -89,6 +89,22 @@
           <h2>{{ 'register.step3.title' | translate }}</h2>
           <p class="step-subtitle">{{ 'register.step3.subtitle' | translate }}</p>
           <div class="form-group">
+            <label for="invite_code">{{ 'register.step3.inviteCode' | translate }} *</label>
+            <input
+              id="invite_code"
+              type="text"
+              formControlName="invite_code"
+              [placeholder]="'register.step3.inviteCodePlaceholder' | translate"
+              [class.invalid]="isFieldInvalid('invite_code')"
+              />
+            @if (isFieldInvalid('invite_code')) {
+              <div class="error-message">
+                {{ 'register.errors.inviteCodeRequired' | translate }}
+              </div>
+            }
+            <span class="field-hint">{{ 'register.step3.inviteCodeHint' | translate }}</span>
+          </div>
+          <div class="form-group">
             <label for="email">{{ 'register.step3.email' | translate }} *</label>
             <input
               id="email"

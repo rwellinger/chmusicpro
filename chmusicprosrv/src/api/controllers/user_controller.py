@@ -13,6 +13,7 @@ from typing import Any
 from business.domain_orchestrator import DomainOrchestrator
 from business.recaptcha_service import RecaptchaService
 from business.user_auth_service import UserAuthService
+from config.settings import REGISTRATION_INVITE_CODE
 from db.database import SessionLocal
 from db.registration_log_service import RegistrationLogService
 from db.user_service import UserService
@@ -67,6 +68,12 @@ class UserController:
         """Create a new user with optional reCAPTCHA verification and auto-login"""
         db = self._get_db()
         try:
+            # Business logic: Verify invite code (if configured)
+            if REGISTRATION_INVITE_CODE and (
+                not request.invite_code or request.invite_code != REGISTRATION_INVITE_CODE
+            ):
+                return self._format_error_response("Invalid or missing invite code", 403)
+
             # Business logic: Verify reCAPTCHA token (if provided)
             if request.recaptcha_token:
                 captcha_ok, captcha_error = self.recaptcha_service.verify_token(request.recaptcha_token, remote_ip)

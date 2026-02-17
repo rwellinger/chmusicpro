@@ -70,6 +70,12 @@ AGENT_EXTERNAL_MODEL_OPENAI=gpt-4.1-mini
 AGENT_EXTERNAL_MODEL_CLAUDE=claude-haiku-4-5-20250929
 
 # ==================================================
+# REGISTRATION
+# ==================================================
+# Leave empty for open registration, set a secret code to restrict
+REGISTRATION_INVITE_CODE=
+
+# ==================================================
 # APPLICATION SETTINGS
 # ==================================================
 DEBUG=false

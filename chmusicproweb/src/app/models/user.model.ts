@@ -37,6 +37,7 @@ export interface UserCreateRequest {
     artist_name?: string;
     preferred_language?: string;
     recaptcha_token?: string;
+    invite_code?: string;
 }
 
 export interface UserCreateResponse {

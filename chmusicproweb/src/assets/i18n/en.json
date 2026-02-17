@@ -238,6 +238,9 @@
       "passwordPlaceholder": "At least 8 characters",
       "confirmPassword": "Confirm Password",
       "confirmPasswordPlaceholder": "Repeat your password",
+      "inviteCode": "Invite Code",
+      "inviteCodePlaceholder": "Enter your invite code",
+      "inviteCodeHint": "You need an invite code to register. Ask the administrator.",
       "strengthWeak": "Weak",
       "strengthMedium": "Fair",
       "strengthGood": "Good",
@@ -269,6 +272,8 @@
       "emailInvalid": "Please enter a valid email address",
       "passwordTooShort": "Password must be at least 8 characters",
       "passwordMismatch": "Passwords do not match",
+      "inviteCodeRequired": "Invite code is required",
+      "invalidInviteCode": "Invalid invite code",
       "emailExists": "An account with this email already exists",
       "captchaFailed": "CAPTCHA verification failed"
     },

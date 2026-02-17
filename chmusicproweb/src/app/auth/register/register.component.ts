@@ -46,6 +46,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
             first_name: ["", [Validators.maxLength(100)]],
             last_name: ["", [Validators.maxLength(100)]],
             artist_name: ["", [Validators.maxLength(100)]],
+            invite_code: ["", [Validators.required]],
             email: ["", [Validators.required, Validators.email]],
             password: ["", [Validators.required, Validators.minLength(8)]],
             confirmPassword: ["", [Validators.required]],
@@ -111,10 +112,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
             case 2:
                 return true; // Personal info is optional
             case 3: {
+                const inviteCode = this.registerForm.get("invite_code");
                 const email = this.registerForm.get("email");
                 const password = this.registerForm.get("password");
                 const confirmPassword = this.registerForm.get("confirmPassword");
-                return !!(email?.valid && password?.valid && confirmPassword?.valid &&
+                return !!(inviteCode?.valid && email?.valid && password?.valid && confirmPassword?.valid &&
                     password?.value === confirmPassword?.value);
             }
             case 4:
@@ -159,7 +161,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
             last_name: formValue.last_name || undefined,
             artist_name: formValue.artist_name || undefined,
             preferred_language: formValue.preferred_language,
-            recaptcha_token: this.recaptchaToken || undefined
+            recaptcha_token: this.recaptchaToken || undefined,
+            invite_code: formValue.invite_code || undefined
         };
 
         this.authService.register(userData)

@@ -60,9 +60,23 @@ def upgrade() -> None:
     op.create_index("ix_song_sketches_project_folder_id", "song_sketches", ["project_folder_id"])
 
     # 4. Remove generated_images.project_id (clean N:M, no backward compatibility)
-    op.drop_constraint("generated_images_project_id_fkey", "generated_images", type_="foreignkey")
-    op.drop_index("idx_images_project", "generated_images")
-    op.drop_column("generated_images", "project_id")
+    op.execute("""
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'generated_images_project_id_fkey') THEN
+                ALTER TABLE generated_images DROP CONSTRAINT generated_images_project_id_fkey;
+            END IF;
+        END $$;
+    """)
+    op.execute("DROP INDEX IF EXISTS idx_images_project")
+    op.execute("""
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'generated_images' AND column_name = 'project_id') THEN
+                ALTER TABLE generated_images DROP COLUMN project_id;
+            END IF;
+        END $$;
+    """)
 
 
 def downgrade() -> None:

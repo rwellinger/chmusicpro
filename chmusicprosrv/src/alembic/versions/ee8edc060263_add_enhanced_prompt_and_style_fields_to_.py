@@ -29,20 +29,23 @@ def upgrade() -> None:
     op.add_column("generated_images", sa.Column("lighting", sa.String(length=50), nullable=True))
     op.add_column("generated_images", sa.Column("color_palette", sa.String(length=50), nullable=True))
     op.add_column("generated_images", sa.Column("detail_level", sa.String(length=50), nullable=True))
-    op.drop_constraint(op.f("uq_lyric_parsing_rule_name"), "lyric_parsing_rules", type_="unique")
-    # Handle both possible constraint names (fresh DB vs existing DB)
     op.execute("""
         DO $$
         BEGIN
+            IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'uq_lyric_parsing_rule_name') THEN
+                ALTER TABLE lyric_parsing_rules DROP CONSTRAINT uq_lyric_parsing_rule_name;
+            END IF;
             IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'uq_prompt_category_action') THEN
                 ALTER TABLE prompt_templates DROP CONSTRAINT uq_prompt_category_action;
             END IF;
             IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'uq_prompt_templates_category_action') THEN
                 ALTER TABLE prompt_templates DROP CONSTRAINT uq_prompt_templates_category_action;
             END IF;
+            IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'songs_task_id_key') THEN
+                ALTER TABLE songs DROP CONSTRAINT songs_task_id_key;
+            END IF;
         END $$;
     """)
-    op.drop_constraint(op.f("songs_task_id_key"), "songs", type_="unique")
     op.create_index(op.f("ix_songs_task_id"), "songs", ["task_id"], unique=True)
     # ### end Alembic commands ###
 

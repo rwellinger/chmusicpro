@@ -55,9 +55,9 @@ def upgrade() -> None:
         existing_nullable=True,
         existing_server_default=sa.text("now()"),
     )
-    op.drop_index(op.f("idx_project_files_project"), table_name="project_files")
-    op.drop_index(op.f("idx_project_files_s3_key"), table_name="project_files")
-    op.drop_index(op.f("ix_project_files_file_hash"), table_name="project_files")
+    op.execute("DROP INDEX IF EXISTS idx_project_files_project")
+    op.execute("DROP INDEX IF EXISTS idx_project_files_s3_key")
+    op.execute("DROP INDEX IF EXISTS ix_project_files_file_hash")
     op.create_index(op.f("ix_project_files_folder_id"), "project_files", ["folder_id"], unique=False)
     op.create_index(op.f("ix_project_files_id"), "project_files", ["id"], unique=False)
     op.create_index(op.f("ix_project_files_project_id"), "project_files", ["project_id"], unique=False)
@@ -70,7 +70,7 @@ def upgrade() -> None:
         existing_nullable=True,
         existing_server_default=sa.text("now()"),
     )
-    op.drop_index(op.f("idx_project_folders_project"), table_name="project_folders")
+    op.execute("DROP INDEX IF EXISTS idx_project_folders_project")
     op.create_index(op.f("ix_project_folders_id"), "project_folders", ["id"], unique=False)
     op.create_index(op.f("ix_project_folders_project_id"), "project_folders", ["project_id"], unique=False)
     op.alter_column(
@@ -125,14 +125,9 @@ def upgrade() -> None:
         existing_nullable=True,
         existing_server_default=sa.text("now()"),
     )
-    op.drop_index(op.f("idx_song_projects_tags"), table_name="song_projects", postgresql_using="gin")
-    op.drop_index(op.f("idx_song_projects_user"), table_name="song_projects")
-    op.drop_index(
-        op.f("ix_song_projects_project_name_gin"),
-        table_name="song_projects",
-        postgresql_ops={"project_name": "gin_trgm_ops"},
-        postgresql_using="gin",
-    )
+    op.execute("DROP INDEX IF EXISTS idx_song_projects_tags")
+    op.execute("DROP INDEX IF EXISTS idx_song_projects_user")
+    op.execute("DROP INDEX IF EXISTS ix_song_projects_project_name_gin")
     op.create_index(op.f("ix_song_projects_id"), "song_projects", ["id"], unique=False)
     op.create_index(op.f("ix_song_projects_user_id"), "song_projects", ["user_id"], unique=False)
     # Fix song_releases.updated_at: Add server_default for INSERT
@@ -151,9 +146,9 @@ def upgrade() -> None:
         existing_server_default=sa.text("now()"),
     )
     op.create_index(op.f("ix_song_releases_id"), "song_releases", ["id"], unique=False)
-    op.drop_index(op.f("idx_sketches_project"), table_name="song_sketches")
+    op.execute("DROP INDEX IF EXISTS idx_sketches_project")
     op.create_index(op.f("ix_song_sketches_project_id"), "song_sketches", ["project_id"], unique=False)
-    op.drop_index(op.f("idx_songs_project"), table_name="songs")
+    op.execute("DROP INDEX IF EXISTS idx_songs_project")
     op.create_index(op.f("ix_songs_project_id"), "songs", ["project_id"], unique=False)
     # ### end Alembic commands ###
 
