@@ -296,10 +296,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         if (!dateString) return this.translate.instant("userProfile.unknown");
 
         const date = new Date(dateString);
-        return date.toLocaleDateString("en-US", {
+        return date.toLocaleDateString("de-DE", {
+            day: "2-digit",
+            month: "2-digit",
             year: "numeric",
-            month: "long",
-            day: "numeric",
             hour: "2-digit",
             minute: "2-digit"
         });

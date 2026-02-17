@@ -18,6 +18,7 @@ from utils.logger import logger
 from .routes.ai_config_routes import api_ai_config_v1
 from .routes.chat_routes import api_chat_v1
 from .routes.claude_chat_routes import api_claude_chat_v1
+from .routes.config_routes import api_config_v1
 from .routes.conversation_routes import api_conversation_v1
 from .routes.cost_routes import api_openai_costs_v1
 from .routes.domain_routes import api_domain_v1
@@ -576,5 +577,6 @@ def create_app():
     app.register_blueprint(api_domain_v1)
     app.register_blueprint(api_ai_config_v1)
     app.register_blueprint(api_system_context_template_v1)
+    app.register_blueprint(api_config_v1)
 
     return app

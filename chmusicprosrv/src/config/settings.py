@@ -4,6 +4,7 @@ Zentrale Konfiguration für alle Module
 
 import os
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -153,3 +154,10 @@ DATABASE_POOL_SIZE = int(os.getenv("DATABASE_POOL_SIZE", "10"))
 DATABASE_MAX_OVERFLOW = int(os.getenv("DATABASE_MAX_OVERFLOW", "20"))
 DATABASE_POOL_PRE_PING = os.getenv("DATABASE_POOL_PRE_PING", "true").lower() == "true"
 DATABASE_POOL_RECYCLE = int(os.getenv("DATABASE_POOL_RECYCLE", "3600"))  # 1 hour default
+
+# --------------------------------------------------
+# Mirror Sync Ignore Patterns
+# --------------------------------------------------
+# Path to .chmusicproignore file (gitignore-like syntax)
+# Default: .chmusicproignore in chmusicprosrv root
+CHMUSICPRO_IGNORE_FILE = os.getenv("CHMUSICPRO_IGNORE_FILE", str(Path(__file__).parents[2] / ".chmusicproignore"))

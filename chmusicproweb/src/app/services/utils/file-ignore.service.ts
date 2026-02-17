@@ -1,37 +1,54 @@
-import {Injectable} from "@angular/core";
+import {inject, Injectable} from "@angular/core";
+import {HttpClient} from "@angular/common/http";
+import {firstValueFrom} from "rxjs";
+import {ApiConfigService} from "../config/api-config.service";
 
 /**
  * FileIgnoreService - Filters files based on .chmusicproignore patterns.
- * Hardcoded default patterns from .chmusicproignore.default.
+ * Loads patterns from backend API, falls back to hardcoded defaults.
  */
 @Injectable({
     providedIn: "root"
 })
 export class FileIgnoreService {
-    private readonly defaultPatterns: string[] = [
-        // macOS system files
+    private readonly http = inject(HttpClient);
+    private readonly apiConfig = inject(ApiConfigService);
+
+    private patterns: string[] | null = null;
+
+    private readonly fallbackPatterns: string[] = [
         ".DS_Store", ".AppleDouble", ".LSOverride", "Icon*", "._*",
-        // Windows
-        "Thumbs.db", "desktop.ini",
-        // Temporary files
-        "*.tmp", "*.temp", "*.swp", "*.swo", "*~", "*.bak",
-        // Version control
-        ".git/", ".svn/", ".hg/", ".gitignore", ".gitattributes",
-        // IDE / Editor
-        ".vscode/", ".idea/", "*.sublime-*", "*.code-workspace",
-        // Build artifacts
-        "node_modules/", "dist/", "build/", "*.pyc", "__pycache__/", ".cache/",
-        // Logs
-        "*.log", "logs/",
-        // Environment files
-        ".env", ".env.local", "*.secret"
+        "Thumbs.db",
+        "*.tmp", "*.temp", "*.swp", "*.swo", "*~",
+        ".git/", ".svn/", ".hg/",
+        ".vscode/", ".idea/", "*.sublime-*",
+        "node_modules/", "dist/", "build/", "*.pyc", "__pycache__/",
+        "Cache/", "*.csh", "autosave/"
     ];
+
+    async loadPatterns(): Promise<void> {
+        if (this.patterns !== null) return;
+
+        try {
+            const response = await firstValueFrom(
+                this.http.get<{ data: { patterns: string[] } }>(this.apiConfig.endpoints.config.ignorePatterns)
+            );
+            const loaded = response?.data?.patterns;
+            this.patterns = loaded && loaded.length > 0 ? loaded : this.fallbackPatterns;
+        } catch {
+            this.patterns = this.fallbackPatterns;
+        }
+    }
+
+    private getPatterns(): string[] {
+        return this.patterns ?? this.fallbackPatterns;
+    }
 
     shouldIgnore(relativePath: string): boolean {
         const segments = relativePath.split("/");
         const filename = segments[segments.length - 1];
 
-        for (const pattern of this.defaultPatterns) {
+        for (const pattern of this.getPatterns()) {
             // Directory pattern (ending with /)
             if (pattern.endsWith("/")) {
                 const dirName = pattern.slice(0, -1);

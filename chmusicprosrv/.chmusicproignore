@@ -1,0 +1,48 @@
+# Music Production - Global Ignore Patterns
+# Syntax like .gitignore (supports wildcards: *, ?, [])
+# This file is served via GET /api/v1/config/ignore-patterns
+# Location configurable via CHMUSICPRO_IGNORE_FILE env var
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon*
+._*
+.localized
+
+# Thumbnails
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Version control
+.git/
+.svn/
+.hg/
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Build artifacts
+node_modules/
+dist/
+build/
+*.pyc
+__pycache__/
+
+# Studio One
+Cache/
+
+# Nuendo
+*.csh
+
+# AceStudio
+autosave/

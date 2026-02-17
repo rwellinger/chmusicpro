@@ -186,6 +186,9 @@ export class ApiConfigService {
             members: (domainId: string) => `${this.baseUrl}/api/v1/domains/${domainId}/members`,
             memberDetail: (domainId: string, userId: string) => `${this.baseUrl}/api/v1/domains/${domainId}/members/${userId}`
         },
+        config: {
+            ignorePatterns: `${this.baseUrl}/api/v1/config/ignore-patterns`
+        },
         songRelease: {
             create: `${this.baseUrl}/api/v1/song-releases`,
             list: (limit?: number, offset?: number, statusFilter?: string, search?: string) => {

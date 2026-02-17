@@ -478,7 +478,7 @@ export class ExternalChatComponent implements OnInit, OnDestroy {
         }
 
         // Older - Show full date
-        return date.toLocaleDateString("en-GB", {
+        return date.toLocaleDateString("de-DE", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",

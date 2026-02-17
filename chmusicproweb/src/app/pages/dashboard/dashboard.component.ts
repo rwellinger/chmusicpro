@@ -104,7 +104,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
         } else if (diffDays < 30) {
             return this.translate.instant("dashboard.recentWork.daysAgo", {days: diffDays});
         }
-        return date.toLocaleDateString();
+        return date.toLocaleDateString("de-DE", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
     }
 
     private loadRecentWork(): void {

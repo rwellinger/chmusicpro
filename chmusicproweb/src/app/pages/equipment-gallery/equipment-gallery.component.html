@@ -274,12 +274,12 @@
             <div class="meta-grid">
               <div class="meta-item">
                 <i class="fas fa-calendar-plus meta-icon"></i>
-                <span class="meta-value">{{ selectedEquipment.created_at | date:'medium' }}</span>
+                <span class="meta-value">{{ selectedEquipment.created_at | date:'dd.MM.yyyy HH:mm' }}</span>
               </div>
               @if (selectedEquipment.updated_at) {
                 <div class="meta-item">
                   <i class="fas fa-calendar-check meta-icon"></i>
-                  <span class="meta-value">{{ selectedEquipment.updated_at | date:'medium' }}</span>
+                  <span class="meta-value">{{ selectedEquipment.updated_at | date:'dd.MM.yyyy HH:mm' }}</span>
                 </div>
               }
             </div>
@@ -534,7 +534,7 @@
                   <span class="field-label">{{ 'equipment.editor.purchaseDate' | translate }}</span>
                   <div class="readonly-field">
                     <i class="fas fa-calendar-alt"></i>
-                    {{ selectedEquipment.purchase_date | date:'mediumDate' }}
+                    {{ selectedEquipment.purchase_date | date:'dd.MM.yyyy' }}
                   </div>
                 </div>
               }

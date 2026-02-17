@@ -767,6 +767,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
         this.isUploadComplete = false;
         this.uploadErrors = [];
 
+        await this.fileIgnoreService.loadPatterns();
         const {accepted, ignored} = this.fileIgnoreService.filterFiles(fileEntries);
 
         if (accepted.length === 0) {
