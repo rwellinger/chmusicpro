@@ -23,14 +23,14 @@ CHAT_DEBUG_LOGGING=false
 LOG_LEVEL=INFO
 
 # ==================================================
-# OLLAMA (not used in external mode, keep defaults)
+# OLLAMA (Docker internal hostname)
 # ==================================================
-OLLAMA_URL=http://localhost:11434
+OLLAMA_URL=http://ollama:11434
 OLLAMA_TIMEOUT=360
-OLLAMA_CHAT_MODELS=
-OLLAMA_DEFAULT_MODEL=
-OLLAMA_ALLOWED_MODELS=
-OLLAMA_SUMMARY_MODEL=
+OLLAMA_CHAT_MODELS=mistral:7b,gemma3:4b,llama3.2:3b
+OLLAMA_DEFAULT_MODEL=mistral:7b
+OLLAMA_ALLOWED_MODELS=mistral:7b,gemma3:4b,llama3.2:3b
+OLLAMA_SUMMARY_MODEL=llama3.2:3b
 
 # ==================================================
 # FLASK SERVER
@@ -64,7 +64,7 @@ CLAUDE_MAX_TOKENS=4096
 # ==================================================
 # AI AGENT CONFIGURATION
 # ==================================================
-USE_AI_AGENT_GENERAL=external
+USE_AI_AGENT_GENERAL=hybrid
 AGENT_EXTERNAL_PROVIDER=openai
 AGENT_EXTERNAL_MODEL_OPENAI=gpt-4.1-mini
 AGENT_EXTERNAL_MODEL_CLAUDE=claude-haiku-4-5-20250929

@@ -141,10 +141,10 @@ class ChatOrchestrator:
             )
         else:
             logger.info(
-                "Ollama chat request",
-                category=category,
-                action=action,
-                model=model,
+                "Ollama chat request [{}/{}] model={}",
+                category,
+                action,
+                model,
                 prompt_length=len(prompt),
             )
 
@@ -187,7 +187,7 @@ class ChatOrchestrator:
         if CHAT_DEBUG_LOGGING:
             logger.debug("Ollama Chat Response", category=category, action=action, model=model, response_data=cleaned)
         else:
-            logger.info("Ollama chat completed", category=category, action=action, model=model)
+            logger.info("Ollama chat completed [{}/{}] model={}", category, action, model)
 
         return cleaned, 200
 
