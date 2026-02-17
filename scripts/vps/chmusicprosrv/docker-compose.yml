@@ -1,0 +1,35 @@
+services:
+  db-migration:
+    container_name: db-migration
+    image: ghcr.io/rwellinger/chmusicprosrv-app:v0.3.2
+    pull_policy: always
+    command: sh -c "alembic upgrade head"
+    restart: "no"
+    env_file: ../.env
+    volumes:
+      - ./alembic.ini:/app/alembic.ini:ro
+    networks:
+      - chmusicpro-net
+
+  chmusicprosrv-app:
+    container_name: chmusicprosrv
+    restart: unless-stopped
+    image: ghcr.io/rwellinger/chmusicprosrv-app:v0.3.2
+    pull_policy: always
+    env_file: ../.env
+    networks:
+      - chmusicpro-net
+    depends_on:
+      db-migration:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5050/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  chmusicpro-net:
+    external: true
+    name: chmusicpro-net

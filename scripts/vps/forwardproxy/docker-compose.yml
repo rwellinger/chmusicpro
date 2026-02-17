@@ -1,0 +1,29 @@
+services:
+  nginx:
+    image: ghcr.io/rwellinger/chmusicproweb-app:v0.3.2
+    container_name: forward-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ./logs:/var/log/nginx
+      - webui-content:/usr/share/nginx/html:ro
+    networks:
+      - chmusicpro-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/nginx_status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  webui-content:
+
+networks:
+  chmusicpro-net:
+    external: true
+    name: chmusicpro-net

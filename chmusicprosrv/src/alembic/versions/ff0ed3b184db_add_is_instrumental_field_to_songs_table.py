@@ -36,7 +36,15 @@ def upgrade() -> None:
         postgresql_ops={"title": "gin_trgm_ops"},
         postgresql_using="gin",
     )
-    op.drop_constraint(op.f("uq_prompt_category_action"), "prompt_templates", type_="unique")
+    # Handle both possible constraint names (fresh DB vs existing DB)
+    op.execute("""
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'uq_prompt_category_action') THEN
+                ALTER TABLE prompt_templates DROP CONSTRAINT uq_prompt_category_action;
+            END IF;
+        END $$;
+    """)
     op.add_column("songs", sa.Column("is_instrumental", sa.Boolean(), nullable=True))
     op.drop_index(op.f("idx_songs_created_search"), table_name="songs")
     op.drop_index(

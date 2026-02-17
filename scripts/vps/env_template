@@ -1,0 +1,106 @@
+# ==================================================
+# JWT AUTHENTICATION
+# ==================================================
+# Generate with: openssl rand -base64 32
+JWT_SECRET_KEY=
+JWT_EXPIRATION_HOURS=240
+
+# ==================================================
+# ENCRYPTION (Fernet symmetric encryption for Equipment)
+# ==================================================
+# Generate with: python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+ENCRYPTION_SECRET_KEY=
+
+# ==================================================
+# Image storage
+# ==================================================
+IMAGES_DIR=/images
+IMAGE_BASE_URL=https://mymusicproduction.thwelly.ch/chmusicprosrv/api/v1/image
+DELETE_PHYSICAL_FILES=true
+
+# Logging
+CHAT_DEBUG_LOGGING=false
+LOG_LEVEL=INFO
+
+# ==================================================
+# OLLAMA (not used in external mode, keep defaults)
+# ==================================================
+OLLAMA_URL=http://localhost:11434
+OLLAMA_TIMEOUT=360
+OLLAMA_CHAT_MODELS=
+OLLAMA_DEFAULT_MODEL=
+OLLAMA_ALLOWED_MODELS=
+OLLAMA_SUMMARY_MODEL=
+
+# ==================================================
+# FLASK SERVER
+# ==================================================
+FLASK_SERVER_PORT=5050
+FLASK_SERVER_HOST=0.0.0.0
+
+# ==================================================
+# OPENAI CONFIGURATION
+# ==================================================
+OPENAI_API_KEY=
+OPENAI_ADMIN_API_KEY=
+OPENAI_ADMIN_BASE_URL=https://api.openai.com/v1
+OPENAI_IMAGE_MODEL=dall-e-3
+OPENAI_CHAT_MODELS=gpt-4o,gpt-4o-mini,gpt-4,gpt-5,gpt-5-mini,gpt-5-nano,gpt-4.1,gpt-4.1-mini
+OPENAI_TIMEOUT=120
+OPENAI_ADMIN_TIMEOUT=30
+OPENAI_MAX_TOKENS=4096
+OPENAI_COST_CACHE_TTL=3600
+
+# ==================================================
+# CLAUDE CONFIGURATION
+# ==================================================
+CLAUDE_API_KEY=
+CLAUDE_BASE_URL=https://api.anthropic.com/v1
+CLAUDE_API_VERSION=2023-06-01
+CLAUDE_CHAT_MODELS=claude-sonnet-4-5-20250929,claude-haiku-4-5-20250929,claude-opus-4-5-20251101
+CLAUDE_TIMEOUT=120
+CLAUDE_MAX_TOKENS=4096
+
+# ==================================================
+# AI AGENT CONFIGURATION
+# ==================================================
+USE_AI_AGENT_GENERAL=external
+AGENT_EXTERNAL_PROVIDER=openai
+AGENT_EXTERNAL_MODEL_OPENAI=gpt-4.1-mini
+AGENT_EXTERNAL_MODEL_CLAUDE=claude-haiku-4-5-20250929
+
+# ==================================================
+# APPLICATION SETTINGS
+# ==================================================
+DEBUG=false
+
+# ==================================================
+# Database PostgreSQL (Docker internal hostnames)
+# ==================================================
+DATABASE_URL=postgresql://aiproxy:CHANGE_ME@postgres:5432/aiproxysrv
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=aiproxysrv
+POSTGRES_USER=aiproxy
+POSTGRES_PASSWORD=CHANGE_ME
+
+# ==================================================
+# S3 Storage (MinIO - Docker internal hostname)
+# ==================================================
+STORAGE_BACKEND=s3
+S3_PROVIDER=minio
+S3_ENDPOINT=http://minio:9000
+S3_ACCESS_KEY=CHANGE_ME
+S3_SECRET_KEY=CHANGE_ME
+S3_REGION=us-east-1
+
+S3_BUCKET=aiproxy-media
+S3_SONG_PROJECTS_BUCKET=song-projects
+S3_SONG_RELEASES_BUCKET=song-releases
+S3_SONGS_BUCKET=songs
+S3_IMAGES_BUCKET=ai-generated-images
+S3_EQUIPMENT_DATA_BUCKET=equipment-data
+
+# MinIO Root Credentials (for MinIO container)
+MINIO_ROOT_USER=CHANGE_ME
+MINIO_ROOT_PASSWORD=CHANGE_ME
