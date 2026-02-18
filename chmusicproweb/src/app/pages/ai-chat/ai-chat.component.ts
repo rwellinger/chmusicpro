@@ -340,7 +340,10 @@ export class AiChatComponent implements OnInit, OnDestroy {
                 },
                 error: (error) => {
                     console.error("Error sending message:", error);
-                    this.notificationService.error(this.translate.instant("aiChat.notifications.sendFailed"));
+                    // Skip generic notification if interceptor already showed API key error
+                    if (error.status !== 403 || error.error?.error_code !== "missing_api_key") {
+                        this.notificationService.error(this.translate.instant("aiChat.notifications.sendFailed"));
+                    }
 
                     // Remove temporary message on error
                     this.messages = this.messages.filter(m => m.id !== tempUserMessage.id);
@@ -579,7 +582,9 @@ export class AiChatComponent implements OnInit, OnDestroy {
                 },
                 error: (error) => {
                     console.error("Error compressing conversation:", error);
-                    this.notificationService.error(this.translate.instant("aiChat.notifications.compressionFailed"));
+                    if (error.status !== 403 || error.error?.error_code !== "missing_api_key") {
+                        this.notificationService.error(this.translate.instant("aiChat.notifications.compressionFailed"));
+                    }
                     this.isCompressing = false;
                 },
                 complete: () => {

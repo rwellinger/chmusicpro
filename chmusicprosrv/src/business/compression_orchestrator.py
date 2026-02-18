@@ -7,6 +7,7 @@ from typing import Any
 import requests
 from sqlalchemy.orm import Session
 
+from api.api_key_middleware import require_api_key
 from business.compression_transformer import (
     build_summary_messages,
     build_summary_prompt,
@@ -83,6 +84,13 @@ class CompressionOrchestrator:
                 old=len(old_messages),
                 recent=len(recent_messages),
             )
+
+            # Check API key before calling external AI for summary
+            if conversation.provider == "external":
+                provider_key = getattr(conversation, "external_provider", "openai") or "openai"
+                error = require_api_key(provider_key)
+                if error:
+                    return error[0], error[1]
 
             # Create AI summary of old messages
             summary_content, summary_token_count = self._create_ai_summary(

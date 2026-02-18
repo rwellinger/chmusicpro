@@ -286,7 +286,13 @@
   "authInterceptor": {
     "sessionExpired": "Session expired. Please log in again.",
     "sessionTimeout": "Session validation timeout. Please log in again.",
-    "forbidden": "You do not have permission for this action."
+    "forbidden": "You do not have permission for this action.",
+    "missingApiKey": {
+      "openai": "Your OpenAI API key is missing. Please add it under Profile > API Keys.",
+      "openai_admin": "Your OpenAI Admin API key is missing. Please add it under Profile > API Keys.",
+      "claude": "Your Claude API key is missing. Please add it under Profile > API Keys."
+    },
+    "missingApiKeyGeneric": "API key missing. Please add your keys under Profile > API Keys."
   },
   "common": {
     "actions": "Actions",

@@ -37,15 +37,31 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
             // Handle 403 Forbidden - show error, do NOT logout
             if (error.status === 403) {
-                snackBar.open(
-                    translate.instant("authInterceptor.forbidden"),
-                    translate.instant("common.close"),
-                    {
-                        duration: 5000,
+                const body = error.error;
+                if (body?.error_code === "missing_api_key") {
+                    const provider = body.provider || "generic";
+                    const key = "authInterceptor.missingApiKey." + provider;
+                    const msg = translate.instant(key);
+                    // If translation key not found, fall back to generic
+                    const displayMsg = msg === key
+                        ? translate.instant("authInterceptor.missingApiKeyGeneric")
+                        : msg;
+                    snackBar.open(displayMsg, translate.instant("common.close"), {
+                        duration: 8000,
                         horizontalPosition: "center",
                         verticalPosition: "top"
-                    }
-                );
+                    });
+                } else {
+                    snackBar.open(
+                        translate.instant("authInterceptor.forbidden"),
+                        translate.instant("common.close"),
+                        {
+                            duration: 5000,
+                            horizontalPosition: "center",
+                            verticalPosition: "top"
+                        }
+                    );
+                }
             }
 
             return throwError(() => error);

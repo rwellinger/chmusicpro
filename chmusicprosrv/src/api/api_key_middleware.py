@@ -60,6 +60,16 @@ def require_api_key(provider: str):
         "openai_admin": getattr(g, "user_openai_admin_api_key", None),
         "claude": getattr(g, "user_claude_api_key", None),
     }
+    provider_labels = {
+        "openai": "OpenAI",
+        "openai_admin": "OpenAI Admin",
+        "claude": "Claude",
+    }
     if not key_map.get(provider):
-        return {"error": f"API key not configured for {provider}. Please add your key in your profile."}, 403
+        label = provider_labels.get(provider, provider)
+        return {
+            "error": f"{label} API key is not configured. Please add it in your profile settings.",
+            "error_code": "missing_api_key",
+            "provider": provider,
+        }, 403
     return None

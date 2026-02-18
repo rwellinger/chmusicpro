@@ -286,7 +286,13 @@
   "authInterceptor": {
     "sessionExpired": "Sitzung abgelaufen. Bitte melde dich erneut an.",
     "sessionTimeout": "Zeitüberschreitung bei der Sitzungsvalidierung. Bitte melde dich erneut an.",
-    "forbidden": "Du hast keine Berechtigung für diese Aktion."
+    "forbidden": "Du hast keine Berechtigung für diese Aktion.",
+    "missingApiKey": {
+      "openai": "Dein OpenAI API Key fehlt. Bitte hinterlege ihn unter Profil > API Keys.",
+      "openai_admin": "Dein OpenAI Admin API Key fehlt. Bitte hinterlege ihn unter Profil > API Keys.",
+      "claude": "Dein Claude API Key fehlt. Bitte hinterlege ihn unter Profil > API Keys."
+    },
+    "missingApiKeyGeneric": "API Key fehlt. Bitte hinterlege deine Keys unter Profil > API Keys."
   },
   "common": {
     "actions": "Aktionen",

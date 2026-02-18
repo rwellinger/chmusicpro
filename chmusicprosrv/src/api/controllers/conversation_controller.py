@@ -9,6 +9,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from adapters.ollama.api_client import OllamaAPIClient, OllamaAPIError
+from api.api_key_middleware import require_api_key
 from api.controllers.claude_chat_controller import ClaudeAPIError as ClaudeError
 from api.controllers.claude_chat_controller import ClaudeChatController
 from api.controllers.openai_chat_controller import OpenAIAPIError as OpenAIError
@@ -526,6 +527,12 @@ class ConversationController:
                         }, 500
 
                     if conversation.external_provider == "claude":
+                        # Check API key before calling external API
+                        error = require_api_key("claude")
+                        if error:
+                            db.rollback()
+                            return error[0], error[1]
+
                         # Enhance system context with model information for Claude
                         enhanced_messages = self._enhance_claude_system_context(chat_messages, conversation.model)
 
@@ -534,6 +541,12 @@ class ConversationController:
                             conversation.model, enhanced_messages
                         )
                     elif conversation.external_provider == "openai":
+                        # Check API key before calling external API
+                        error = require_api_key("openai")
+                        if error:
+                            db.rollback()
+                            return error[0], error[1]
+
                         # Call OpenAI Chat API
                         assistant_content, prompt_eval_count, eval_count = self._call_openai_chat_api(
                             conversation.model, chat_messages
