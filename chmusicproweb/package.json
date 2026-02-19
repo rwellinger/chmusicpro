@@ -1,6 +1,6 @@
 {
   "name": "chmusicproweb",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "scripts": {
     "ng": "ng",
     "prestart": "node scripts/update-version.js",
