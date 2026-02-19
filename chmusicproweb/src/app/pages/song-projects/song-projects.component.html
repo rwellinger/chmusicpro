@@ -112,21 +112,12 @@
               (click)="selectProject(project)"
               >
               <div class="project-item__header">
-                <!-- Cover Image -->
                 <div class="project-cover">
-                  @if (getProjectCoverUrl(project)) {
-                    <img
-                      [src]="getProjectCoverUrl(project)"
-                      [alt]="project.project_name"
-                      class="cover-image">
-                  }
-                  @if (!getProjectCoverUrl(project)) {
-                    <div
-                      class="cover-placeholder"
-                      [style.background-color]="getColorFromString(project.project_name)">
-                      <span class="initials">{{ getInitials(project.project_name) }}</span>
-                    </div>
-                  }
+                  <div
+                    class="cover-placeholder"
+                    [style.background-color]="getColorFromString(project.project_name)">
+                    <span class="initials">{{ getInitials(project.project_name) }}</span>
+                  </div>
                 </div>
                 <div class="title-group">
                   <h4>{{ project.project_name }}</h4>
@@ -197,21 +188,12 @@
           <!-- Detail Header -->
           <div class="detail-header">
             <div class="header-title">
-              <!-- Project Cover (larger for detail view) -->
               <div class="project-cover-detail">
-                @if (getSelectedProjectCoverUrl()) {
-                  <img
-                    [src]="getSelectedProjectCoverUrl()"
-                    [alt]="selectedProject.project_name"
-                    class="cover-image">
-                }
-                @if (!getSelectedProjectCoverUrl()) {
-                  <div
-                    class="cover-placeholder"
-                    [style.background-color]="getColorFromString(selectedProject.project_name)">
-                    <span class="initials">{{ getInitials(selectedProject.project_name) }}</span>
-                  </div>
-                }
+                <div
+                  class="cover-placeholder"
+                  [style.background-color]="getColorFromString(selectedProject.project_name)">
+                  <span class="initials">{{ getInitials(selectedProject.project_name) }}</span>
+                </div>
               </div>
               <div class="title-content">
                 <i class="fas fa-folder-open"></i>
