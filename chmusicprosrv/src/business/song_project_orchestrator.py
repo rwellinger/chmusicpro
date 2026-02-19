@@ -11,6 +11,7 @@ import contextlib
 import os
 import tempfile
 import zipfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from io import BytesIO
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
@@ -1468,12 +1469,28 @@ class SongProjectOrchestrator:
             temp_fd, temp_path = tempfile.mkstemp(suffix=".zip")
             os.close(temp_fd)
 
-            with zipfile.ZipFile(temp_path, "w", zipfile.ZIP_DEFLATED) as zf:
-                for file in folder.files:
-                    if not file.s3_key:
-                        continue
-                    file_data = self.storage.download(file.s3_key)
-                    zf.writestr(file.filename, file_data)
+            # Download all files from S3 in parallel (4 threads)
+            files_to_download = [(f, f.s3_key) for f in folder.files if f.s3_key]
+
+            def _download(item: tuple) -> tuple:
+                file_obj, s3_key = item
+                return file_obj, self.storage.download(s3_key)
+
+            downloaded = []
+            with ThreadPoolExecutor(max_workers=4) as executor:
+                futures = [executor.submit(_download, item) for item in files_to_download]
+                for future in as_completed(futures):
+                    downloaded.append(future.result())
+
+            # Write ZIP sequentially (zipfile is not thread-safe), ZIP_STORED = no compression
+            with zipfile.ZipFile(temp_path, "w", zipfile.ZIP_STORED) as zf:
+                for file_obj, file_data in downloaded:
+                    zip_path = file_obj.relative_path or file_obj.filename
+                    if zip_path.startswith(f"{folder_name}/"):
+                        zip_path = zip_path[len(folder_name) + 1 :]
+                    if not zip_path:
+                        zip_path = file_obj.filename
+                    zf.writestr(zip_path, file_data)
 
             return temp_path, folder_name
 

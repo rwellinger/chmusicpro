@@ -1288,8 +1288,11 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
                 await writable.write(blob);
                 await writable.close();
                 return;
-            } catch {
-                return;
+            } catch (err: any) {
+                if (err?.name === "AbortError") {
+                    return;
+                }
+                // Other errors (Brave SecurityError etc.) → fall through to <a> download
             }
         }
 
