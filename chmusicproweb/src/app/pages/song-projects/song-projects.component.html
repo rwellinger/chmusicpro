@@ -524,11 +524,11 @@
                               type="button"
                               class="download-folder-button"
                               (click)="downloadFolderZip(folder)"
-                              [disabled]="!folder.files.length"
-                              [matTooltip]="'songProjects.download.folderZip' | translate"
+                              [disabled]="!folder.files.length || folderDownloadProgress?.folderId === folder.id"
+                              [matTooltip]="'songProjects.download.downloadFolder' | translate"
                               >
                               <i class="fas fa-download"></i>
-                              <span>{{ 'songProjects.download.folderZip' | translate }}</span>
+                              <span>{{ 'songProjects.download.downloadFolder' | translate }}</span>
                             </button>
                             <button
                               type="button"
@@ -541,6 +541,26 @@
                               <span>{{ 'songProjects.actions.clearFolder' | translate }}</span>
                             </button>
                           </div>
+                          <!-- Folder Download Progress -->
+                          @if (folderDownloadProgress?.folderId === folder.id) {
+                            <div class="folder-download-progress">
+                              @if (folderDownloadProgress!.total > 0) {
+                                <mat-progress-bar
+                                  mode="determinate"
+                                  [value]="(folderDownloadProgress!.current / folderDownloadProgress!.total) * 100">
+                                </mat-progress-bar>
+                                <span class="download-progress-text">
+                                  {{ folderDownloadProgress!.current }}/{{ folderDownloadProgress!.total }}
+                                  — {{ folderDownloadProgress!.filename }}
+                                </span>
+                              } @else {
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                                <span class="download-progress-text">
+                                  {{ 'songProjects.download.downloadToDirectory' | translate }}
+                                </span>
+                              }
+                            </div>
+                          }
                           <!-- Mirror / Upload Progress Section -->
                           @if (uploadingFolderId === folder.id) {
                             <div class="upload-progress-section">

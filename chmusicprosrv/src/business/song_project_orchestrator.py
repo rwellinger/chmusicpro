@@ -8,6 +8,8 @@ This orchestrator is NOT unit-tested (orchestration only).
 from __future__ import annotations
 
 import contextlib
+import os
+import tempfile
 import zipfile
 from io import BytesIO
 from typing import TYPE_CHECKING, Any
@@ -1435,8 +1437,13 @@ class SongProjectOrchestrator:
 
     def generate_folder_zip(
         self, db: Session, project_id: UUID, folder_id: UUID, domain_id: UUID
-    ) -> tuple[BytesIO, str] | None | dict:
-        """Generate ZIP with all files from a specific folder."""
+    ) -> tuple[str, str] | None:
+        """Generate ZIP with all files from a specific folder using a temp file on disk.
+
+        Returns (temp_file_path, folder_name) or None if not found.
+        Caller is responsible for deleting the temp file after use.
+        """
+        temp_path = None
         try:
             project = self.db_service.get_project_with_details(db, project_id)
             if not project or project.domain_id != domain_id:
@@ -1455,31 +1462,30 @@ class SongProjectOrchestrator:
             if not folder.files:
                 return None
 
-            # Check total size (500MB limit)
-            max_size = 500 * 1024 * 1024
-            total_size = sum(f.file_size_bytes or 0 for f in folder.files)
-            if total_size > max_size:
-                return {"error": "too_large", "size": total_size}
-
-            buffer = BytesIO()
             folder_name = folder.folder_name
 
-            with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+            # Write ZIP to temp file on disk (not memory) - no size limit
+            temp_fd, temp_path = tempfile.mkstemp(suffix=".zip")
+            os.close(temp_fd)
+
+            with zipfile.ZipFile(temp_path, "w", zipfile.ZIP_DEFLATED) as zf:
                 for file in folder.files:
                     if not file.s3_key:
                         continue
                     file_data = self.storage.download(file.s3_key)
                     zf.writestr(file.filename, file_data)
 
-            buffer.seek(0)
-            return buffer, folder_name
+            return temp_path, folder_name
 
-        except Exception as e:
+        except Exception:
+            # Clean up temp file on error
+            if temp_path:
+                with contextlib.suppress(OSError):
+                    os.unlink(temp_path)
             logger.error(
                 "Generate folder ZIP failed",
                 project_id=str(project_id),
                 folder_id=str(folder_id),
-                error=str(e),
             )
             raise
 

@@ -792,13 +792,16 @@ def download_template_zip(project_id: str):
 @api_song_projects_v1.route("/<project_id>/folders/<folder_id>/download-zip", methods=["GET"])
 @jwt_required
 def download_folder_zip(project_id: str, folder_id: str):
-    """Download all files from a folder as ZIP."""
+    """Download all files from a folder as streaming ZIP (written to temp file on disk)."""
     domain_id = get_current_domain_id()
     if not domain_id:
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        from flask import send_file
+        import contextlib
+        import os
+
+        from flask import after_this_request, send_file
 
         from business.song_project_orchestrator import song_project_orchestrator
 
@@ -812,12 +815,16 @@ def download_folder_zip(project_id: str, folder_id: str):
             if result is None:
                 return jsonify({"error": "Folder not found"}), 404
 
-            if isinstance(result, dict) and result.get("error") == "too_large":
-                return jsonify({"error": "Folder too large for ZIP download (max 500MB)", "size": result["size"]}), 413
+            temp_path, folder_name = result
 
-            buffer, folder_name = result
+            @after_this_request
+            def cleanup(response):
+                with contextlib.suppress(OSError):
+                    os.unlink(temp_path)
+                return response
+
             return send_file(
-                buffer,
+                temp_path,
                 mimetype="application/zip",
                 as_attachment=True,
                 download_name=f"{folder_name}.zip",

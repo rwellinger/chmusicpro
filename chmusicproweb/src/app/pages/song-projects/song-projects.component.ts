@@ -81,6 +81,9 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     mirrorPhase: "idle" | "filtering" | "hashing" | "comparing" | "uploading" | "moving" | "deleting" = "idle";
     mirrorHashProgress = {current: 0, total: 0};
 
+    // Folder download state
+    folderDownloadProgress: { folderId: string; current: number; total: number; filename: string } | null = null;
+
     // Math for template
     Math = Math;
 
@@ -1188,12 +1191,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
             const blob = await firstValueFrom(
                 this.projectService.downloadTemplateZip(this.selectedProject.id)
             );
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${this.selectedProject.project_name}-template.zip`;
-            a.click();
-            URL.revokeObjectURL(url);
+            await this.saveBlob(blob, `${this.selectedProject.project_name}-template.zip`);
         } catch (error) {
             console.error("Failed to download template ZIP:", error);
             this.notificationService.error(
@@ -1204,28 +1202,102 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
 
     async downloadFolderZip(folder: any): Promise<void> {
         if (!this.selectedProject) return;
+        const projectId = this.selectedProject.id;
+        const files = folder.files || [];
+
+        // Strategy 1: Direct to directory (Chromium) - try first
+        if ("showDirectoryPicker" in window) {
+            try {
+                const dirHandle = await (window as any).showDirectoryPicker({mode: "readwrite"});
+
+                this.folderDownloadProgress = {folderId: folder.id, current: 0, total: files.length, filename: ""};
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    this.folderDownloadProgress = {
+                        folderId: folder.id,
+                        current: i + 1,
+                        total: files.length,
+                        filename: file.filename
+                    };
+
+                    const blob = await firstValueFrom(
+                        this.projectService.downloadFile(projectId, file.id)
+                    );
+
+                    // Recreate subdirectories from relative_path, stripping folder name prefix
+                    let targetDir = dirHandle;
+                    let pathParts = (file.relative_path || file.filename).split("/");
+                    const fileName = pathParts.pop()!;
+                    // Strip folder name if relative_path starts with it (user already picked the folder)
+                    if (pathParts.length > 0 && pathParts[0] === folder.folder_name) {
+                        pathParts = pathParts.slice(1);
+                    }
+                    for (const part of pathParts) {
+                        targetDir = await targetDir.getDirectoryHandle(part, {create: true});
+                    }
+
+                    const fileHandle = await targetDir.getFileHandle(fileName, {create: true});
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                }
+
+                this.folderDownloadProgress = null;
+                this.notificationService.success(
+                    this.translate.instant("songProjects.download.downloadComplete", {count: files.length})
+                );
+                return;
+            } catch (err: any) {
+                this.folderDownloadProgress = null;
+                // User cancelled picker → fall through to ZIP
+                if (err?.name === "AbortError") {
+                    return;
+                }
+                // Other error (e.g. permission denied) → fall through to ZIP
+            }
+        }
+
+        // Strategy 2: ZIP fallback with "Save As" or direct download
+        this.folderDownloadProgress = {folderId: folder.id, current: 0, total: 0, filename: ""};
 
         try {
             const blob = await firstValueFrom(
                 this.projectService.downloadFolderZip(this.selectedProject.id, folder.id)
             );
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${folder.folder_name}.zip`;
-            a.click();
-            URL.revokeObjectURL(url);
-        } catch (error: any) {
-            if (error?.status === 413) {
-                this.notificationService.error(
-                    this.translate.instant("songProjects.download.folderTooLarge")
-                );
-            } else {
-                console.error("Failed to download folder ZIP:", error);
-                this.notificationService.error(
-                    this.translate.instant("songProjects.download.zipDownloadError")
-                );
+
+            await this.saveBlob(blob, `${folder.folder_name}.zip`);
+        } catch (error) {
+            console.error("Failed to download folder ZIP:", error);
+            this.notificationService.error(
+                this.translate.instant("songProjects.download.zipDownloadError")
+            );
+        } finally {
+            this.folderDownloadProgress = null;
+        }
+    }
+
+    private async saveBlob(blob: Blob, filename: string): Promise<void> {
+        if ("showSaveFilePicker" in window) {
+            try {
+                const handle = await (window as any).showSaveFilePicker({
+                    suggestedName: filename,
+                    types: [{description: "ZIP Archive", accept: {"application/zip": [".zip"]}}]
+                });
+                const writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+                return;
+            } catch {
+                return;
             }
         }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
     }
 }

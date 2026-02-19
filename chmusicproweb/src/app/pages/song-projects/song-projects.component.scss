@@ -779,6 +779,21 @@ mat-accordion {
   }
 }
 
+// Folder download progress
+.folder-download-progress {
+  padding: $spacing-xs $spacing-sm;
+
+  .download-progress-text {
+    display: block;
+    font-size: $font-sm;
+    color: $text-secondary;
+    margin-top: $spacing-xs;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 // Mirror sync phase indicator
 .mirror-phase-info {
   display: flex;

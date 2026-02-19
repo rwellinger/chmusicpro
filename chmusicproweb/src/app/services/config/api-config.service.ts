@@ -175,7 +175,8 @@ export class ApiConfigService {
             mirror: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/mirror`,
             batchMove: (projectId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/files/batch-move`,
             templateZip: (projectId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/template-zip`,
-            folderZip: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/download-zip`
+            folderZip: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/download-zip`,
+            fileDownload: (projectId: string, fileId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/files/${fileId}/download`
         },
         aiConfig: `${this.baseUrl}/api/v1/ai-config/`,
         domain: {

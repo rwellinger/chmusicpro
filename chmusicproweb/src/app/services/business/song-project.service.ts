@@ -234,4 +234,8 @@ export class SongProjectService {
     downloadFolderZip(projectId: string, folderId: string): Observable<Blob> {
         return this.http.get(this.apiConfig.endpoints.songProject.folderZip(projectId, folderId), {responseType: 'blob'});
     }
+
+    downloadFile(projectId: string, fileId: string): Observable<Blob> {
+        return this.http.get(this.apiConfig.endpoints.songProject.fileDownload(projectId, fileId), {responseType: 'blob'});
+    }
 }

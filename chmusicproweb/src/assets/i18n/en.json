@@ -2020,9 +2020,9 @@
     },
     "download": {
       "templateZip": "Download Template",
-      "folderZip": "Download ZIP",
+      "downloadFolder": "Download Folder",
       "zipDownloadError": "Download failed",
-      "folderTooLarge": "Folder too large for ZIP (max 500MB)"
+      "downloadComplete": "Downloaded {{count}} files"
     },
     "mirror": {
       "dropToSync": "Drop to sync",
