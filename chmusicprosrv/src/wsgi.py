@@ -29,7 +29,7 @@ if __name__ == "__main__":
     flask_logger.handlers = [LoguruHandler()]
     flask_logger.setLevel(LOG_LEVEL)
 
-    logger.info("*** CH MUSIC PRODUCTION SERVER STARTED ***")
+    logger.info("*** SWISS MUSIC PRODUCTION SERVER STARTED ***")
     logger.info(f"*** Version: {version} ***")
 
     app.run(host=FLASK_SERVER_HOST, port=FLASK_SERVER_PORT, debug=DEBUG)

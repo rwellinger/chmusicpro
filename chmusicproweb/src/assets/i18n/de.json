@@ -207,7 +207,7 @@
   },
   "register": {
     "title": "Konto erstellen",
-    "subtitle": "Meine Music Production beitreten",
+    "subtitle": "Swiss Music Production beitreten",
     "steps": {
       "step1": "Sprache",
       "step2": "Person",
@@ -972,7 +972,7 @@
   },
   "sideMenu": {
     "aiChat": "KI Chat",
-    "brandName": "Meine Music Production",
+    "brandName": "Swiss Music Production",
     "dashboard": "Dashboard",
     "createImage": "Erstellen",
     "equipment": "Equipment",

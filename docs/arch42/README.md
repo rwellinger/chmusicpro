@@ -1,4 +1,4 @@
-# ARC42 Architecture Documentation - My Music Production
+# ARC42 Architecture Documentation - Swiss Music Production
 
 ## Table of Contents
 
@@ -86,9 +86,9 @@
 ## 1. Introduction and Goals
 
 ### 1.1 Requirements Overview
-My Music Production is a personal AI-based multimedia generation platform offering the following main features:
+Swiss Music Production is a personal AI-based multimedia generation platform offering the following main features:
 - **AI Chat Conversations** - Interactive conversational AI via Ollama with persistent conversation history
-  - Integrated chat UI as part of My Music Production (replaced Open WebUI dependency)
+  - Integrated chat UI as part of Swiss Music Production (replaced Open WebUI dependency)
   - Direct Ollama integration with full conversation management
 - **Lyric Creation Editor** - Professional songwriting tool with AI-powered assistance
   - Section-based editing (Intro, Verse, Pre-Chorus, Chorus, Bridge, Outro)
@@ -1526,7 +1526,7 @@ Only deployment configuration: docker-compose.yml, .env, runtime scripts
 1. **DEV (aiproxy):** Code changes → Commit → GitHub Actions builds images → Push to GHCR
 2. **PROD:** Update docker-compose.yml image versions → `docker compose pull` → `docker compose up -d`
 
-**Note:** Chat functionality previously provided by Open WebUI is now integrated directly into the My Music Production Angular frontend.
+**Note:** Chat functionality previously provided by Open WebUI is now integrated directly into the Swiss Music Production Angular frontend.
 
 ### 7.3 Network Architecture
 

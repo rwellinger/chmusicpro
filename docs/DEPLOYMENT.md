@@ -1,6 +1,6 @@
 # Production Deployment Guide
 
-This guide covers deploying My Music Production in a production environment using Docker containers across multiple hosts.
+This guide covers deploying Swiss Music Production in a production environment using Docker containers across multiple hosts.
 
 > **Note:** This documentation uses anonymized placeholder values. All IP addresses (e.g., `192.168.1.10`, `192.168.1.20`), container registry paths (`ghcr.io/<your-username>/`), and credentials are examples only. Replace them with your actual infrastructure values before deployment.
 

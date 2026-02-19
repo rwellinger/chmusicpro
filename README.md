@@ -1,4 +1,4 @@
-# My Music Production
+# Swiss Music Production
 
 **Your AI-powered music production workflow** — from first idea to finished release.
 
