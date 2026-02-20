@@ -36,6 +36,11 @@ class StorageInterface(ABC):
         pass
 
     @abstractmethod
+    def download_to_fileobj(self, key: str, fileobj: BinaryIO) -> None:
+        """Stream file from storage directly into a file-like object."""
+        pass
+
+    @abstractmethod
     def delete(self, key: str) -> bool:
         """
         Delete file from storage

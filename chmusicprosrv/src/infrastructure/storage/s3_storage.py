@@ -85,6 +85,15 @@ class S3Storage(StorageInterface):
             logger.error("S3 download failed", key=key, error=str(e))
             raise
 
+    def download_to_fileobj(self, key: str, fileobj) -> None:
+        """Stream file from S3 directly into a file-like object (no intermediate buffer)."""
+        try:
+            self.s3_client.download_fileobj(self.bucket, key, fileobj)
+            logger.debug("File streamed from S3", key=key)
+        except ClientError as e:
+            logger.error("S3 stream download failed", key=key, error=str(e))
+            raise
+
     def delete(self, key: str) -> bool:
         """Delete file from S3"""
         try:
