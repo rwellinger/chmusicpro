@@ -887,6 +887,25 @@ class SystemContextTemplate(Base):
         return f"<SystemContextTemplate(id={self.id}, name='{self.name}', active={self.active})>"
 
 
+class ModelContextWindow(Base):
+    """Model for configurable AI model context window sizes"""
+
+    __tablename__ = "model_context_windows"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    model_name = Column(String(100), nullable=False, unique=True)
+    context_window = Column(Integer, nullable=False)
+    provider = Column(String(50), nullable=False, server_default="ollama")
+    description = Column(String(255), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    def __repr__(self):
+        return (
+            f"<ModelContextWindow(id={self.id}, model_name='{self.model_name}', context_window={self.context_window})>"
+        )
+
+
 class ReleaseProjectReference(Base):
     """Model for N:M relationship between releases and song projects"""
 

@@ -1002,7 +1002,8 @@
     "coverArt": "Cover Art",
     "distribution": "Distribution",
     "manageProjects": "Manage Projects",
-    "systemContextTemplates": "System Context Templates"
+    "systemContextTemplates": "System Context Templates",
+    "aiModels": "AI Models"
   },
   "musicStylePrompt": {
     "title": "Music Style Prompt",
@@ -2168,5 +2169,24 @@
       "inspirationsRequired": "Please add inspirations or a title first.",
       "materialRequired": "Please collect some material first."
     }
+  },
+  "modelContext": {
+    "title": "Model Context Windows",
+    "modelName": "Model Name",
+    "contextWindow": "Context Window (Tokens)",
+    "provider": "Provider",
+    "description": "Description",
+    "addModel": "Add Model",
+    "editModel": "Edit Model",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this model configuration?",
+    "saved": "Model saved",
+    "deleted": "Model deleted",
+    "loadError": "Failed to load model configurations",
+    "saveError": "Failed to save model",
+    "deleteError": "Failed to delete model",
+    "noEntries": "No model configurations found",
+    "filterAll": "All"
   }
 }

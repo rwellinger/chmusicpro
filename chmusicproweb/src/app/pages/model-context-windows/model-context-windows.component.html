@@ -1,0 +1,152 @@
+<div class="model-context-windows-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="title-group">
+      <i class="fas fa-microchip"></i>
+      <h2>{{ 'modelContext.title' | translate }}</h2>
+      <span class="count-badge">{{ filteredEntries.length }}</span>
+    </div>
+    <button mat-flat-button color="primary" (click)="openAddDialog()">
+      <i class="fas fa-plus"></i>
+      {{ 'modelContext.addModel' | translate }}
+    </button>
+  </div>
+
+  <!-- Provider Filter -->
+  <div class="filter-bar">
+    <button mat-stroked-button
+            [class.active]="activeFilter === 'all'"
+            (click)="onFilterChange('all')">
+      {{ 'modelContext.filterAll' | translate }}
+    </button>
+    @for (provider of providers; track provider) {
+      <button mat-stroked-button
+              [class.active]="activeFilter === provider"
+              (click)="onFilterChange(provider)">
+        {{ provider | titlecase }}
+      </button>
+    }
+  </div>
+
+  <!-- Table -->
+  <mat-card class="table-card">
+    @if (isLoading) {
+      <div class="loading-overlay">
+        <i class="fas fa-spinner fa-spin"></i>
+      </div>
+    }
+
+    @if (!isLoading && filteredEntries.length === 0) {
+      <div class="empty-state">
+        <i class="fas fa-database"></i>
+        <p>{{ 'modelContext.noEntries' | translate }}</p>
+      </div>
+    }
+
+    @if (filteredEntries.length > 0) {
+      <table mat-table [dataSource]="filteredEntries">
+        <!-- Model Name Column -->
+        <ng-container matColumnDef="model_name">
+          <th mat-header-cell *matHeaderCellDef>{{ 'modelContext.modelName' | translate }}</th>
+          <td mat-cell *matCellDef="let entry">
+            <code>{{ entry.model_name }}</code>
+          </td>
+        </ng-container>
+
+        <!-- Provider Column -->
+        <ng-container matColumnDef="provider">
+          <th mat-header-cell *matHeaderCellDef>{{ 'modelContext.provider' | translate }}</th>
+          <td mat-cell *matCellDef="let entry">
+            <span class="provider-badge" [attr.data-provider]="entry.provider">
+              {{ entry.provider }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Context Window Column -->
+        <ng-container matColumnDef="context_window">
+          <th mat-header-cell *matHeaderCellDef>{{ 'modelContext.contextWindow' | translate }}</th>
+          <td mat-cell *matCellDef="let entry">
+            <span class="token-value">{{ formatTokens(entry.context_window) }}</span>
+            <span class="token-raw">{{ entry.context_window | number }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Description Column -->
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>{{ 'modelContext.description' | translate }}</th>
+          <td mat-cell *matCellDef="let entry">{{ entry.description || '-' }}</td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let entry">
+            <button mat-icon-button
+                    [matTooltip]="'modelContext.edit' | translate"
+                    (click)="openEditDialog(entry)">
+              <i class="fas fa-pen"></i>
+            </button>
+            <button mat-icon-button
+                    [matTooltip]="'modelContext.delete' | translate"
+                    (click)="deleteEntry(entry)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    }
+  </mat-card>
+
+  <!-- Add/Edit Dialog -->
+  @if (showDialog) {
+    <div class="dialog-overlay" (click)="onDialogBackdropClick($event)">
+      <mat-card class="dialog-card">
+        <div class="dialog-header">
+          <h3>{{ (isEditing ? 'modelContext.editModel' : 'modelContext.addModel') | translate }}</h3>
+          <button mat-icon-button (click)="closeDialog()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <form [formGroup]="entryForm" (ngSubmit)="saveEntry()" class="dialog-form">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'modelContext.modelName' | translate }}</mat-label>
+            <input matInput formControlName="model_name" placeholder="e.g. qwen3:30b">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'modelContext.contextWindow' | translate }}</mat-label>
+            <input matInput type="number" formControlName="context_window" placeholder="e.g. 32768">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'modelContext.provider' | translate }}</mat-label>
+            <mat-select formControlName="provider">
+              @for (p of providers; track p) {
+                <mat-option [value]="p">{{ p | titlecase }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'modelContext.description' | translate }}</mat-label>
+            <input matInput formControlName="description" placeholder="Optional description">
+          </mat-form-field>
+
+          <div class="dialog-actions">
+            <button mat-stroked-button type="button" (click)="closeDialog()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button mat-flat-button color="primary" type="submit" [disabled]="entryForm.invalid">
+              {{ 'common.save' | translate }}
+            </button>
+          </div>
+        </form>
+      </mat-card>
+    </div>
+  }
+</div>

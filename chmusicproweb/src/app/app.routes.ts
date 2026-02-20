@@ -93,6 +93,12 @@ export const routes: Routes = [
         loadComponent: () => import("./pages/system-context-templates/system-context-templates.component").then(m => m.SystemContextTemplatesComponent)
     },
     {
+        path: "model-context-windows",
+        canActivate: [AuthGuard, domainRoleGuard],
+        data: {requiredDomainRoles: ["owner", "admin"]},
+        loadComponent: () => import("./pages/model-context-windows/model-context-windows.component").then(m => m.ModelContextWindowsComponent)
+    },
+    {
         path: "domain-management",
         canActivate: [AuthGuard, domainRoleGuard],
         data: {requiredDomainRoles: ["owner", "admin"]},

@@ -1002,7 +1002,8 @@
     "coverArt": "Cover Art",
     "distribution": "Distribution",
     "manageProjects": "Projekte verwalten",
-    "systemContextTemplates": "System-Kontext-Vorlagen"
+    "systemContextTemplates": "System-Kontext-Vorlagen",
+    "aiModels": "KI Modelle"
   },
   "musicStylePrompt": {
     "title": "Music Style Prompt",
@@ -2168,5 +2169,24 @@
       "inspirationsRequired": "Bitte zuerst Inspirationen oder einen Titel eingeben.",
       "materialRequired": "Bitte zuerst Material sammeln."
     }
+  },
+  "modelContext": {
+    "title": "Modell-Kontextfenster",
+    "modelName": "Modellname",
+    "contextWindow": "Kontextfenster (Tokens)",
+    "provider": "Anbieter",
+    "description": "Beschreibung",
+    "addModel": "Modell hinzufuegen",
+    "editModel": "Modell bearbeiten",
+    "edit": "Bearbeiten",
+    "delete": "Loeschen",
+    "deleteConfirm": "Diese Modellkonfiguration loeschen?",
+    "saved": "Modell gespeichert",
+    "deleted": "Modell geloescht",
+    "loadError": "Fehler beim Laden der Modellkonfigurationen",
+    "saveError": "Fehler beim Speichern des Modells",
+    "deleteError": "Fehler beim Loeschen des Modells",
+    "noEntries": "Keine Modellkonfigurationen gefunden",
+    "filterAll": "Alle"
   }
 }

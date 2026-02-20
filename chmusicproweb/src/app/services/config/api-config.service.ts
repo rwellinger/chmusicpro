@@ -178,6 +178,12 @@ export class ApiConfigService {
             folderZip: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/download-zip`,
             fileDownload: (projectId: string, fileId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/files/${fileId}/download`
         },
+        modelContextWindow: {
+            list: `${this.baseUrl}/api/v1/model-context-windows`,
+            create: `${this.baseUrl}/api/v1/model-context-windows`,
+            update: (id: number) => `${this.baseUrl}/api/v1/model-context-windows/${id}`,
+            delete: (id: number) => `${this.baseUrl}/api/v1/model-context-windows/${id}`
+        },
         aiConfig: `${this.baseUrl}/api/v1/ai-config/`,
         domain: {
             list: `${this.baseUrl}/api/v1/domains`,

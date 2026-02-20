@@ -174,7 +174,7 @@
   
   .accordion-content {
     padding: $spacing-xs $spacing-sm;
-    background: $background-light;
+    background: $background-white;
     animation: accordion-slide-down 0.2s ease;
   }
   
@@ -193,6 +193,41 @@
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
+
+    .tag-button {
+      padding: 3px 10px;
+      border: 1px solid rgba($border-light, 0.8);
+      background: transparent;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: $font-weight-medium;
+      color: $text-secondary;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      height: 22px;
+      line-height: 1;
+      box-shadow: none;
+      min-height: 22px;
+      text-transform: capitalize;
+      font-family: $font-family-base;
+
+      &:hover:not(.selected):not(:disabled) {
+        border-color: rgba($primary-color, 0.5);
+        background: rgba($primary-color, 0.05);
+        color: $text-primary;
+      }
+
+      &.selected {
+        background: rgba($primary-color, 0.15);
+        color: $primary-color;
+        border-color: rgba($primary-color, 0.4);
+        font-weight: $font-weight-semibold;
+      }
+    }
   }
 
   .chooser-actions {

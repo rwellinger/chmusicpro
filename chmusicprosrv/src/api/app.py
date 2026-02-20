@@ -26,6 +26,7 @@ from .routes.equipment_routes import api_equipment_v1
 from .routes.health_routes import api_health_v1
 from .routes.image_routes import api_image_v1
 from .routes.lyric_parsing_rule_routes import api_lyric_parsing_rule_v1
+from .routes.model_context_window_routes import api_model_context_v1
 from .routes.ollama_routes import api_ollama_v1
 from .routes.openai_chat_routes import api_openai_chat_v1
 from .routes.prompt_routes import api_prompt_v1
@@ -319,6 +320,7 @@ def create_app():
                     "api_ai_config_v1": "AI Config",
                     "api_system_context_template_v1": "System Context Templates",
                     "api_ollama_v1": "Ollama",
+                    "api_model_context_v1": "Model Context Windows",
                     "api_v1": "System",
                 }
 
@@ -345,6 +347,7 @@ def create_app():
                             "api_ai_config_v1",
                             "api_system_context_template_v1",
                             "api_ollama_v1",
+                            "api_model_context_v1",
                             "api_v1",
                         )
                     ):
@@ -578,5 +581,6 @@ def create_app():
     app.register_blueprint(api_ai_config_v1)
     app.register_blueprint(api_system_context_template_v1)
     app.register_blueprint(api_config_v1)
+    app.register_blueprint(api_model_context_v1)
 
     return app

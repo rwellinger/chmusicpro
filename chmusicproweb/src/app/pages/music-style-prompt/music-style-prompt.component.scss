@@ -3,7 +3,7 @@
 @use '../../../scss/mixins' as *;
 
 .music-style-prompt-container {
-  height: 100vh;
+  height: calc(100vh - $step-bar-height);
   overflow: hidden;
   padding: $spacing-md;
   background: $background-white;
@@ -14,7 +14,7 @@
 .music-style-prompt-card {
   max-width: 1600px;
   width: 100%;
-  height: calc(100vh - 2rem);
+  height: calc(100vh - $step-bar-height - 2rem);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   display: flex;

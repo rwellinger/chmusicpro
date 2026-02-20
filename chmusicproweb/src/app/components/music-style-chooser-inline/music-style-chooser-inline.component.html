@@ -46,15 +46,16 @@
           </div>
           @if (isCategoryExpanded('styles')) {
             <div class="accordion-content">
-              <mat-chip-listbox multiple class="tag-grid">
+              <div class="tag-grid">
                 @for (style of availableStyles; track style) {
-                  <mat-chip-option
-                    [selected]="isStyleSelected(style)"
+                  <button type="button"
+                    class="tag-button"
+                    [class.selected]="isStyleSelected(style)"
                     (click)="toggleStyle(style)">
                     {{ style }}
-                  </mat-chip-option>
+                  </button>
                 }
-              </mat-chip-listbox>
+              </div>
             </div>
           }
         </div>
@@ -74,15 +75,16 @@
           </div>
           @if (isCategoryExpanded('instruments')) {
             <div class="accordion-content">
-              <mat-chip-listbox multiple class="tag-grid">
+              <div class="tag-grid">
                 @for (instrument of availableInstruments; track instrument) {
-                  <mat-chip-option
-                    [selected]="isInstrumentSelected(instrument)"
+                  <button type="button"
+                    class="tag-button"
+                    [class.selected]="isInstrumentSelected(instrument)"
                     (click)="toggleInstrument(instrument)">
                     {{ instrument }}
-                  </mat-chip-option>
+                  </button>
                 }
-              </mat-chip-listbox>
+              </div>
             </div>
           }
         </div>
@@ -102,15 +104,16 @@
           </div>
           @if (isCategoryExpanded('themes')) {
             <div class="accordion-content">
-              <mat-chip-listbox multiple class="tag-grid">
+              <div class="tag-grid">
                 @for (theme of availableThemes; track theme) {
-                  <mat-chip-option
-                    [selected]="isThemeSelected(theme)"
+                  <button type="button"
+                    class="tag-button"
+                    [class.selected]="isThemeSelected(theme)"
                     (click)="toggleTheme(theme)">
                     {{ theme }}
-                  </mat-chip-option>
+                  </button>
                 }
-              </mat-chip-listbox>
+              </div>
             </div>
           }
         </div>

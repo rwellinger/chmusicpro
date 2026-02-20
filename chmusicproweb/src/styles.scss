@@ -366,8 +366,11 @@ form button[type="submit"]:not([mat-button]):not([mat-flat-button]):not([mat-rai
   @include button-primary('lg');
 }
 
-/* Form buttons - neutral by default, AI/Material components excluded */
-form button[type="button"]:not(.magic-icon-button):not(.dropdown-item):not(.mdc-switch__icon):not([mat-button]):not([mat-flat-button]):not([mat-raised-button]):not([mat-stroked-button]):not([mat-icon-button]) {
+/* Form buttons - neutral by default. Only targets buttons without ANY custom class.
+   Buttons with component-specific classes (tag-button, magic-icon-button, etc.)
+   are styled by their own component SCSS. */
+form button[type="button"]:not([class]):not([mat-button]):not([mat-flat-button]):not([mat-raised-button]):not([mat-stroked-button]):not([mat-icon-button]),
+form button[type="button"][class=""]:not([mat-button]):not([mat-flat-button]):not([mat-raised-button]):not([mat-stroked-button]):not([mat-icon-button]) {
   @include button-secondary('lg');
 }
 
@@ -454,6 +457,7 @@ form button[type="button"].btn-danger {
   
   --mdc-switch-selected-icon-color: #4caf50 !important;
 }
+
 
 // Audio & Media Komponenten werden durch _components.scss abgedeckt
 
