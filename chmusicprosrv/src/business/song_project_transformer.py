@@ -6,6 +6,7 @@ NO database operations, NO file system operations, NO external dependencies.
 
 import hashlib
 import re
+from datetime import date
 from typing import Any
 
 
@@ -526,7 +527,7 @@ def get_display_cover_info(releases: list[Any]) -> dict[str, Any]:
         ...     id = "abc-123"
         ...     name = "Summer EP"
         ...     status = "released"
-        ...     release_date = "2024-06-01"
+        ...     release_date = date(2024, 6, 1)
         >>> get_display_cover_info([MockRelease()])
         {'source': 'release', 'release_id': 'abc-123', 'release_name': 'Summer EP'}
 
@@ -535,21 +536,21 @@ def get_display_cover_info(releases: list[Any]) -> dict[str, Any]:
         ...     id = "old-123"
         ...     name = "Old Release"
         ...     status = "released"
-        ...     release_date = "2023-01-01"
+        ...     release_date = date(2023, 1, 1)
         >>> class Release2:
         ...     id = "new-456"
         ...     name = "New Release"
         ...     status = "uploaded"
-        ...     release_date = "2024-12-01"
+        ...     release_date = date(2024, 12, 1)
         >>> get_display_cover_info([Release1(), Release2()])
         {'source': 'release', 'release_id': 'new-456', 'release_name': 'New Release'}
 
-        >>> # Only invalid status → placeholder
+        >>> # Only invalid status -> placeholder
         >>> class RejectedRelease:
         ...     id = "rejected-123"
         ...     name = "Rejected EP"
         ...     status = "rejected"
-        ...     release_date = "2024-01-01"
+        ...     release_date = date(2024, 1, 1)
         >>> get_display_cover_info([RejectedRelease()])
         {'source': 'placeholder', 'release_id': None, 'release_name': None}
     """
@@ -569,7 +570,7 @@ def get_display_cover_info(releases: list[Any]) -> dict[str, Any]:
     # Handle None release_date (treat as very old)
     sorted_releases = sorted(
         valid_releases,
-        key=lambda r: r.release_date if r.release_date else "1900-01-01",  # type: ignore
+        key=lambda r: r.release_date if r.release_date else date(1900, 1, 1),
         reverse=True,
     )
 

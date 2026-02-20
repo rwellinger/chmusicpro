@@ -1,5 +1,6 @@
 """Tests for SongProjectTransformer - Business logic unit tests (100% coverage)"""
 
+from datetime import date
 from unittest.mock import Mock
 
 from business.song_project_transformer import (
@@ -576,7 +577,7 @@ class TestGetDisplayCoverInfo:
         release.id = "abc-123"
         release.name = "Summer EP"
         release.status = "released"
-        release.release_date = "2024-06-01"
+        release.release_date = date(2024, 6, 1)
 
         result = get_display_cover_info([release])
 
@@ -588,13 +589,13 @@ class TestGetDisplayCoverInfo:
         old_release.id = "old-123"
         old_release.name = "Old Release"
         old_release.status = "released"
-        old_release.release_date = "2023-01-01"
+        old_release.release_date = date(2023, 1, 1)
 
         new_release = Mock()
         new_release.id = "new-456"
         new_release.name = "New Release"
         new_release.status = "uploaded"
-        new_release.release_date = "2024-12-01"
+        new_release.release_date = date(2024, 12, 1)
 
         result = get_display_cover_info([old_release, new_release])
 
@@ -606,7 +607,7 @@ class TestGetDisplayCoverInfo:
         rejected.id = "rejected-123"
         rejected.name = "Rejected EP"
         rejected.status = "rejected"
-        rejected.release_date = "2024-01-01"
+        rejected.release_date = date(2024, 1, 1)
 
         result = get_display_cover_info([rejected])
 
@@ -618,7 +619,7 @@ class TestGetDisplayCoverInfo:
         downtaken.id = "downtaken-123"
         downtaken.name = "Downtaken Album"
         downtaken.status = "downtaken"
-        downtaken.release_date = "2024-03-01"
+        downtaken.release_date = date(2024, 3, 1)
 
         result = get_display_cover_info([downtaken])
 
@@ -630,7 +631,7 @@ class TestGetDisplayCoverInfo:
         archived.id = "archived-123"
         archived.name = "Archived Release"
         archived.status = "archived"
-        archived.release_date = "2024-02-01"
+        archived.release_date = date(2024, 2, 1)
 
         result = get_display_cover_info([archived])
 
@@ -642,13 +643,13 @@ class TestGetDisplayCoverInfo:
         rejected.id = "rejected-123"
         rejected.name = "Rejected EP"
         rejected.status = "rejected"
-        rejected.release_date = "2024-05-01"
+        rejected.release_date = date(2024, 5, 1)
 
         valid = Mock()
         valid.id = "valid-456"
         valid.name = "Valid Album"
         valid.status = "released"
-        valid.release_date = "2024-03-01"
+        valid.release_date = date(2024, 3, 1)
 
         result = get_display_cover_info([rejected, valid])
 
@@ -666,7 +667,7 @@ class TestGetDisplayCoverInfo:
         with_date.id = "with-date-456"
         with_date.name = "Scheduled Release"
         with_date.status = "uploaded"
-        with_date.release_date = "2024-12-01"
+        with_date.release_date = date(2024, 12, 1)
 
         result = get_display_cover_info([no_date, with_date])
 
@@ -699,19 +700,19 @@ class TestGetDisplayCoverInfo:
         release1.id = "2023-release"
         release1.name = "2023 Album"
         release1.status = "released"
-        release1.release_date = "2023-06-15"
+        release1.release_date = date(2023, 6, 15)
 
         release2 = Mock()
         release2.id = "2024-release"
         release2.name = "2024 Single"
         release2.status = "uploaded"
-        release2.release_date = "2024-01-10"
+        release2.release_date = date(2024, 1, 10)
 
         release3 = Mock()
         release3.id = "2024-latest"
         release3.name = "2024 Latest"
         release3.status = "mastering"
-        release3.release_date = "2024-11-20"
+        release3.release_date = date(2024, 11, 20)
 
         result = get_display_cover_info([release1, release2, release3])
 
@@ -727,7 +728,7 @@ class TestGetDisplayCoverInfo:
             release.id = f"{status}-id"
             release.name = f"{status} Release"
             release.status = status
-            release.release_date = "2024-01-01"
+            release.release_date = date(2024, 1, 1)
 
             result = get_display_cover_info([release])
 
