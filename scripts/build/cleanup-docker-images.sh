@@ -31,7 +31,6 @@ CLEANUP_DANGLING=false
 # Images to clean up (both local and registry-tagged)
 IMAGES=(
     "chmusicprosrv-app"
-    "celery-worker-app"
     "chmusicproweb-app"
 )
 

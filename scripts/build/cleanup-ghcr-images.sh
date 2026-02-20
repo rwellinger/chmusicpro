@@ -36,9 +36,8 @@ DRY_RUN=false
 
 # Images to clean up
 IMAGES=(
-    "chmusicproweb-app"
     "chmusicprosrv-app"
-    "celery-worker-app"
+    "chmusicproweb-app"
 )
 
 # Print functions
