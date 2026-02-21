@@ -687,7 +687,7 @@
   },
   "lyricCreation": {
     "title": "Lyric Creation",
-    "backToSketch": "Back to Sketch",
+    "backToComposition": "Back to Composition",
     "lyricsLabel": "Lyrics:",
     "lyricsPlaceholder": "Write your song lyrics here...",
     "charactersCount": "characters",
@@ -696,7 +696,7 @@
     "translateToEnglish": "Translate to English",
     "lyricArchitecture": "Lyric Architecture",
     "resetButton": "Clear",
-    "autoSaved": "Auto-saved to song generator",
+    "autoSaved": "Auto-saved to composition",
     "changesApplied": "Changes applied successfully",
     "changesCancelled": "Changes discarded",
     "edit": "Edit",
@@ -717,7 +717,8 @@
     "cleanupComplete": "Lyrics cleaned up successfully",
     "optimizing": "Optimizing Phrasing...",
     "optimizingHint": "AI is reformatting lyrics into short musical phrases",
-    "optimizingSuccess": "Lyrics optimized for music generation",
+    "architectureUpdated": "Lyric architecture updated",
+    "optimizingSuccess": "Lyrics optimized successfully",
     "finalizeComplete": "Lyrics finalized successfully (Cleanup + Structure applied)",
     "undoApplied": "Change reverted successfully",
     "rebuildSuccess": "Architecture rebuilt: {{count}} sections detected",
@@ -740,6 +741,12 @@
       "lyricsRequired": "Please enter lyrics first",
       "noArchitecture": "No lyric architecture defined. Please configure architecture first.",
       "copyFailed": "Failed to copy to clipboard"
+    },
+    "progress": {
+      "generatingLyrics": "Generating Lyrics...",
+      "generatingLyricsHint": "AI is creating lyrics from your input",
+      "translatingLyrics": "Translating Lyrics...",
+      "translatingLyricsHint": "AI is translating your lyrics to English"
     },
     "copyToClipboard": "Copy to Clipboard",
     "copiedToClipboard": "Copied to clipboard",
@@ -1007,10 +1014,10 @@
   },
   "musicStylePrompt": {
     "title": "Music Style Prompt",
-    "backToSketch": "Back to Sketch",
+    "backToComposition": "Back to Composition",
     "placeholder": "Describe the music style (e.g., 'energetic pop with synth, 120 BPM')...",
     "charactersCount": "characters",
-    "autoSaved": "Changes are automatically saved to song generator",
+    "autoSaved": "Changes are automatically saved to composition",
     "cleared": "Prompt and style selection cleared",
     "changesApplied": "Changes applied successfully",
     "changesCancelled": "Changes discarded",
@@ -1421,7 +1428,7 @@
         "edit": "Edit",
         "editDisabled": "Edit disabled (only available for drafts)",
         "delete": "Delete",
-        "generate": "Generate Song",
+
         "archive": "Archive",
         "copyTitle": "Title copied to clipboard",
         "copyLyrics": "Lyrics copied to clipboard",

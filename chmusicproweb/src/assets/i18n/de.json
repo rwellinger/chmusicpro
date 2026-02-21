@@ -687,7 +687,7 @@
   },
   "lyricCreation": {
     "title": "Songtext Editor",
-    "backToSketch": "Zurück zur Skizze",
+    "backToComposition": "Zurück zur Komposition",
     "lyricsLabel": "Songtext:",
     "lyricsPlaceholder": "Schreibe deinen Songtext hier...",
     "charactersCount": "Zeichen",
@@ -696,7 +696,7 @@
     "translateToEnglish": "Ins Englische übersetzen",
     "lyricArchitecture": "Text-Struktur",
     "resetButton": "Löschen",
-    "autoSaved": "Automatisch zum Song Generator gespeichert",
+    "autoSaved": "Automatisch zur Komposition gespeichert",
     "changesApplied": "Änderungen übernommen",
     "changesCancelled": "Änderungen verworfen",
     "edit": "Bearbeiten",
@@ -717,7 +717,8 @@
     "cleanupComplete": "Text erfolgreich bereinigt",
     "optimizing": "Optimiere Phrasierung...",
     "optimizingHint": "KI formatiert Text in kurze musikalische Phrasen",
-    "optimizingSuccess": "Songtext für Musikgenerierung optimiert",
+    "architectureUpdated": "Text-Architektur aktualisiert",
+    "optimizingSuccess": "Songtext erfolgreich optimiert",
     "finalizeComplete": "Text erfolgreich finalisiert (Bereinigung + Struktur angewendet)",
     "undoApplied": "Änderung erfolgreich rückgängig gemacht",
     "rebuildSuccess": "Architektur rekonstruiert: {{count}} Abschnitte erkannt",
@@ -740,6 +741,12 @@
       "lyricsRequired": "Bitte gib zuerst einen Songtext ein",
       "noArchitecture": "Keine Text-Architektur definiert. Bitte konfiguriere zuerst die Architektur.",
       "copyFailed": "Kopieren in Zwischenablage fehlgeschlagen"
+    },
+    "progress": {
+      "generatingLyrics": "Generiere Songtext...",
+      "generatingLyricsHint": "KI erstellt Songtext aus deiner Eingabe",
+      "translatingLyrics": "Übersetze Songtext...",
+      "translatingLyricsHint": "KI übersetzt deinen Songtext ins Englische"
     },
     "copyToClipboard": "In Zwischenablage kopieren",
     "copiedToClipboard": "In Zwischenablage kopiert",
@@ -1007,10 +1014,10 @@
   },
   "musicStylePrompt": {
     "title": "Music Style Prompt",
-    "backToSketch": "Zurück zur Skizze",
+    "backToComposition": "Zurück zur Komposition",
     "placeholder": "Musikstil beschreiben (z.B. 'energetischer Pop mit Synth, 120 BPM')...",
     "charactersCount": "Zeichen",
-    "autoSaved": "Änderungen werden automatisch im Song Generator gespeichert",
+    "autoSaved": "Änderungen werden automatisch zur Komposition gespeichert",
     "cleared": "Prompt und Stil-Auswahl gelöscht",
     "changesApplied": "Änderungen übernommen",
     "changesCancelled": "Änderungen verworfen",
@@ -1421,7 +1428,7 @@
         "edit": "Bearbeiten",
         "editDisabled": "Bearbeiten deaktiviert (nur für Entwürfe verfügbar)",
         "delete": "Löschen",
-        "generate": "Song generieren",
+
         "archive": "Archivieren",
         "copyTitle": "Titel in Zwischenablage kopiert",
         "copyLyrics": "Songtext in Zwischenablage kopiert",

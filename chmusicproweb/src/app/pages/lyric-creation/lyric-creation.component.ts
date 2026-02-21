@@ -238,8 +238,8 @@ export class LyricCreationComponent implements OnInit {
         try {
             const generatedLyrics = await this.progressService.executeWithProgress(
                 () => this.chatService.generateLyrics(currentText),
-                this.translate.instant("songGenerator.progress.generatingLyrics"),
-                this.translate.instant("songGenerator.progress.generatingLyricsHint")
+                this.translate.instant("lyricCreation.progress.generatingLyrics"),
+                this.translate.instant("lyricCreation.progress.generatingLyricsHint")
             );
             this.lyricForm.patchValue({lyrics: this.removeQuotes(generatedLyrics)});
         } catch (error: any) {
@@ -262,8 +262,8 @@ export class LyricCreationComponent implements OnInit {
         try {
             const translatedLyrics = await this.progressService.executeWithProgress(
                 () => this.chatService.translateLyric(currentLyrics),
-                this.translate.instant("songGenerator.progress.translatingLyrics"),
-                this.translate.instant("songGenerator.progress.translatingLyricsHint")
+                this.translate.instant("lyricCreation.progress.translatingLyrics"),
+                this.translate.instant("lyricCreation.progress.translatingLyricsHint")
             );
             this.lyricForm.patchValue({lyrics: this.removeQuotes(translatedLyrics)});
         } catch (error: any) {
@@ -285,7 +285,7 @@ export class LyricCreationComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result && result.architectureString) {
-                this.notificationService.success(this.translate.instant("songGenerator.success.architectureUpdated"));
+                this.notificationService.success(this.translate.instant("lyricCreation.architectureUpdated"));
             }
         });
     }

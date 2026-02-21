@@ -25,7 +25,7 @@ Controller → Orchestrator → Transformer/Normalizer + Repository
 - ❌ NO business logic in DB services (CRUD only)
 - ❌ NO database queries in controllers (use orchestrator)
 
-**Reference:** `sketch_controller.py` → `sketch_orchestrator.py` → `sketch_transformer.py` + `sketch_service.py`
+**Reference:** `sketch_controller.py` → `sketch_orchestrator.py` → `sketch_normalizer.py` + `sketch_service.py`
 
 ---
 
@@ -136,7 +136,7 @@ grep -r "serve.*s3\|proxy.*resource" src/
 | Pattern | Reference File | Purpose |
 |---------|---------------|---------|
 | **S3 Proxy** | `song_release_routes.py:123` → `s3_proxy_service.py` | Serve S3 resources via backend |
-| **3-Layer** | `sketch_controller.py` → `sketch_orchestrator.py` → `sketch_transformer.py` | Testable business logic |
+| **3-Layer** | `sketch_controller.py` → `sketch_orchestrator.py` → `sketch_normalizer.py` | Testable business logic |
 | **AI Integration** | Backend: `chat_controller.py`, Frontend: `chat.service.ts` | Template-driven Ollama |
 | **DB Migration** | `chmusicprosrv/src/alembic/versions/` | Schema changes |
 
@@ -270,7 +270,7 @@ cat scripts/db/seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U ch
 # 🎯 Tech Stack Summary
 
 **Frontend:** Angular 21, Material, SCSS, TypeScript, RxJS, ngx-translate
-**Backend:** FastAPI, Python 3.12.12, SQLAlchemy, Alembic
+**Backend:** Flask, Python 3.12, SQLAlchemy, Alembic
 **Database:** PostgreSQL
 **Deployment:** Docker (Colima), Nginx
 **Hardware:** Apple Silicon (M-Series), Python 3.12 via Conda
@@ -285,4 +285,24 @@ cat scripts/db/seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U ch
 
 ---
 
-**Last Review:** 2026-02-17
+---
+
+# Terminology Mapping (Code vs. UI)
+
+Internal code names (filenames, routes, DB tables) differ from what the user sees in the UI:
+
+| Code / Filenames | UI Label | Notes |
+|---|---|---|
+| `sketch_*`, `song-sketch-*`, `songSketch.*` | **Composition** | Backend files + i18n keys still use "sketch" |
+| `image_*`, `image-view`, `image-generator` | **Picture** | Backend files + routes still use "image" |
+| `sketchLibrary` (menu key) | **Compositions** | Menu entry |
+| `imageView` (page) | **Picture Gallery** | Page title |
+| `imageGenerator` (page) | **Create Picture** | Page title |
+| `coverArt` (pipeline step) | **Cover Art** | Pipeline + menu |
+| `workshop`, `text-workshop` | **Text Workshop** / **Lyric Creation** | Pipeline step 1 |
+
+**Important:** There is NO song generation feature (Mureka/Celery were removed). The app generates **text** (lyrics, descriptions, prompts) and **images** (DALL-E), not audio.
+
+---
+
+**Last Review:** 2026-02-21

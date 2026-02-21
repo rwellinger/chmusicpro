@@ -12,7 +12,7 @@ export interface HealthCheckResponse {
 /**
  * Health Service - System health monitoring
  *
- * CRITICAL: Pre-flight checks for expensive operations (Song/Image generation)
+ * CRITICAL: Pre-flight checks for expensive operations (Picture generation, file uploads)
  * Prevents:
  * - Lost API credits when storage is unavailable
  * - User frustration (content generated but not saved)
@@ -29,8 +29,7 @@ export class HealthService {
      * Check if S3 storage backend (MinIO) is reachable
      *
      * Use BEFORE expensive operations:
-     * - Song management
-     * - Image generation (OpenAI/DALL-E credits)
+     * - Picture generation (OpenAI/DALL-E credits)
      * - Large file uploads
      *
      * @param timeoutMs Request timeout in milliseconds (default: 5000ms)
@@ -45,7 +44,7 @@ export class HealthService {
      *       return;
      *     }
      *     // Proceed with generation
-     *     this.generateSong();
+     *     this.generatePicture();
      *   }
      * });
      * ```

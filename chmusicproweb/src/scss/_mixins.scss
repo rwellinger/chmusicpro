@@ -126,7 +126,7 @@
   }
 }
 
-// 4a. Generator Layout - Standardized for image-generator & song-generator
+// 4a. Generator Layout - Standardized for image-generator & composition creator
 @mixin generator-layout() {
   @include master-detail-layout($spacing-20, 40%, calc(100vh - 320px));
   

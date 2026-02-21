@@ -459,7 +459,7 @@ class SketchService:
         self, db: Session, sketch_id: str | UUID, domain_id: str | None = None
     ) -> SongSketch | None:
         """
-        Mark sketch as used (after song generation)
+        Mark composition as used
 
         Args:
             db: Database session

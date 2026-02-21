@@ -200,7 +200,7 @@ export class SongReleaseEditorComponent implements OnInit, OnDestroy {
 
     /**
      * Update form validators based on current status
-     * PATTERN from song-generator.component.ts Lines 462-477
+     * Dynamically update validators based on release status
      */
     private updateStatusValidators(): void {
         const status = this.releaseForm.get("status")?.value;

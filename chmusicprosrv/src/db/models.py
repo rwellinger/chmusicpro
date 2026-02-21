@@ -93,7 +93,7 @@ class DomainMembership(Base):
 
 
 class SongSketch(Base):
-    """Model for storing song concepts/drafts before generation"""
+    """Model for storing song compositions (lyrics, prompts, metadata)"""
 
     __tablename__ = "song_sketches"
 
