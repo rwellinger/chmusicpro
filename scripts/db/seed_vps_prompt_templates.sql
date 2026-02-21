@@ -1,13 +1,13 @@
 -- ============================================================
--- VPS Prompt Templates - Complete Seed Script
+-- VPS Prompt Templates - Complete Seed Script (OpenAI)
 -- ============================================================
 -- Self-contained script that seeds ALL prompt templates with
--- VPS-optimized Ollama models. Uses UPSERT (ON CONFLICT) to
--- create or overwrite existing entries.
+-- OpenAI models. Uses UPSERT (ON CONFLICT) to create or
+-- overwrite existing entries.
 --
--- Available VPS models:
---   llama3.2:3b    (2.0 GB)  - fast, titles & simple tasks
---   mistral:7b     (4.4 GB)  - quality tasks (lyrics, descriptions, images, creative writing)
+-- Available OpenAI models:
+--   gpt-4o-mini   - fast & cheap, translations, titles, tags, enhancements
+--   gpt-4o        - quality tasks (full lyrics, rewrites, song drafts, lyric interpretation)
 --
 -- Usage (VPS):
 --   docker exec -i postgres psql -U aiproxy -d aiproxysrv < seed_vps_prompt_templates.sql
@@ -72,7 +72,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ============================================================
--- DESCRIPTION TEMPLATES (mistral:7b)
+-- DESCRIPTION TEMPLATES (gpt-4o-mini)
 -- ============================================================
 
 -- description/generate-long (v1.1)
@@ -111,8 +111,8 @@ Input: "[Verse 1] Walking through the empty streets at dawn..."
 Output: A reflective journey through solitude and self-discovery. This song paints vivid imagery of urban landscapes at dawn, exploring themes of loneliness, hope, and renewal. The lyrics balance melancholic introspection with optimistic undertones.',
     'Generates long release descriptions from song lyrics (max 1000 chars)',
     '1.1',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.7,
     null,
     true
@@ -151,8 +151,8 @@ Input (English): "A reflective journey through solitude and self-discovery. This
 Output: Dawn-lit reflections on solitude, hope, and urban renewal.',
     'Generates short release descriptions from long descriptions (max 150 chars)',
     '1.1',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.6,
     null,
     true
@@ -197,15 +197,15 @@ Input (English): "A reflective journey through solitude and self-discovery. This
 Output: Reflective, Solitude, Urban, Dawn, Self-Discovery, Melancholic, Hopeful, Introspective, Atmospheric, Cinematic',
     'Generates 10 searchable release tags from song description',
     '1.1',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.6,
     null,
     true
 );
 
 -- ============================================================
--- IMAGE TEMPLATES (mistral:7b + llama3.2:3b for fast)
+-- IMAGE TEMPLATES (gpt-4o-mini + gpt-4o for interpret-lyric)
 -- ============================================================
 
 -- image/enhance (v7.6)
@@ -252,8 +252,8 @@ Input: "futuristic city"
 Output: "Futuristic metropolis with glass skyscrapers, neon lights, flying vehicles, cyberpunk aesthetic, moody blue lighting, cinematic wide shot, highly detailed digital art"',
     'Enhances image generation prompts for DALL-E 3 with minimal hallucination - stays true to input',
     '7.6',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.7,
     null,
     true
@@ -310,8 +310,8 @@ Input: "Abstract geometric shapes"
 Output: "Bold abstract geometric shapes, vibrant color palette, clean minimalist composition, sharp edges, modern digital art, balanced symmetrical layout, high contrast"',
     'Enhances prompts for album cover artwork without text - optimized for Text Overlay integration',
     '2.1',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.7,
     null,
     true
@@ -350,16 +350,16 @@ RULES:
 Example:
 Input: "a clown"
 Output: "A clown character, vibrant costume, expressive face paint, centered portrait, soft studio lighting, digital art"',
-    'Fast image prompt enhancement using small Ollama model - for manual style mode',
+    'Fast image prompt enhancement for manual style mode',
     '1.0',
-    'ollama',
-    'llama3.2:3b',
+    'openai',
+    'gpt-4o-mini',
     0.5,
     400,
     true
 );
 
--- image/interpret-lyric (v1.1)
+-- image/interpret-lyric (v1.1) -- gpt-4o: complex abstract->visual interpretation
 SELECT upsert_prompt_template(
     'image',
     'interpret-lyric',
@@ -402,8 +402,8 @@ Input (English lyrics): "They lower their gazes, listening to the trees'' soft m
 Output: "An enchanted forest clearing where ethereal translucent figures appear among towering ancient trees, gentle wind curling around a lone person in reverent pose, soft luminous light filtering through dense canopy, mystical atmosphere of wonder and mindfulness, nature as living storyteller, dreamy surreal composition"',
     'Interprets song lyrics and transforms them into focused visual scene descriptions for DALL-E 3',
     '1.1',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o',
     0.8,
     null,
     true
@@ -434,15 +434,15 @@ Input (German): "Futuristische Stadt bei Nacht mit vielen Lichtern"
 Output: "Futuristic city at night with bright lights"',
     'Translates image prompts to natural, idiomatic English for DALL-E 3',
     '3.1',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.5,
     null,
     true
 );
 
 -- ============================================================
--- LYRICS TEMPLATES (mistral:7b)
+-- LYRICS TEMPLATES (gpt-4o-mini + gpt-4o for creative tasks)
 -- ============================================================
 
 -- lyrics/condense-section (v1.1)
@@ -474,14 +474,14 @@ STRICT RULES:
 - No labels or meta-commentary',
     'Condenses verbose text into concise, singable lyrics with section-appropriate length',
     '1.1',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.6,
     null,
     true
 );
 
--- lyrics/generate (v2.8)
+-- lyrics/generate (v2.8) -- gpt-4o: full creative lyric writing
 SELECT upsert_prompt_template(
     'lyrics',
     'generate',
@@ -519,14 +519,14 @@ FORMAT REQUIREMENT: Start each section with its label in square bracket format [
 Do not include any other explanations, comments, or metadata in your output.',
     'Generates song lyrics from input text',
     '3.0',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o',
     0.7,
     null,
     true
 );
 
--- lyrics/improve-section (v1.6)
+-- lyrics/improve-section (v1.6) -- gpt-4o: nuanced lyric improvement
 SELECT upsert_prompt_template(
     'lyrics',
     'improve-section',
@@ -554,8 +554,8 @@ STRICT LENGTH RULE: Your output MUST have the same number of lines (+-1) as the 
 Do not include labels, explanations, comments, or the section name in your output.',
     'Improves a specific lyric section while maintaining context, style, and LENGTH',
     '1.6',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o',
     0.7,
     null,
     true
@@ -574,14 +574,14 @@ SELECT upsert_prompt_template(
     'Return ONLY the reformatted lyrics. Keep the same language as input. Preserve section labels in [Section] format if present. No explanations or comments.',
     'Optimizes lyric phrasing for music generation (4-8 words per line)',
     '1.1',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.5,
     null,
     true
 );
 
--- lyrics/rewrite-section (v1.9)
+-- lyrics/rewrite-section (v1.9) -- gpt-4o: creative rewriting
 SELECT upsert_prompt_template(
     'lyrics',
     'rewrite-section',
@@ -608,8 +608,8 @@ STRICT LENGTH RULE: Your output MUST have the same number of lines (+-1) as the 
 Do not include labels, explanations, comments, or the section name in your output.',
     'Completely rewrites a lyric section with fresh perspectives while maintaining LENGTH',
     '1.9',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o',
     0.8,
     null,
     true
@@ -662,15 +662,15 @@ You made me smile
 You made things right',
     'Translates lyrics to natural English with optimized phrasing for singability (4-8 words/line, breathing points)',
     '3.2',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.5,
     null,
     true
 );
 
 -- ============================================================
--- MUSIC TEMPLATES (mistral:7b)
+-- MUSIC TEMPLATES (gpt-4o-mini)
 -- ============================================================
 
 -- music/enhance (v4.0)
@@ -705,8 +705,8 @@ Examples:
     - Input: "traurige Ballade" -> Output: "Melancholische Pop-Ballade mit Klavier, sanften Streichern, subtilen Drums. Emotionale, intime Stimmung."',
     'Enhances music style prompts for AI music generation (optimized for genre, mood, instruments, production)',
     '4.0',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.9,
     null,
     true
@@ -785,8 +785,8 @@ Input (German): "traurige Ballade"
 Output (German): "Melancholische Pop-Ballade mit Klavier, sanften Streichern, subtilen Drums. Emotionale, intime Stimmung, trockene Vocals, gleichmaessiges Tempo, kein Hall, kein Echo."',
     'Enhances music style prompts specifically for Suno AI with focus on post-processing optimization (dry vocals, stable tempo, minimal effects)',
     '1.0',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.9,
     null,
     true
@@ -818,15 +818,15 @@ Input (German): "Elektronische Tanzmusik mit treibenden Synths, moderne Produkti
 Output: "Electronic dance music with driving synths, modern production"',
     'Translates music style descriptions to natural English with accurate terminology',
     '2.0',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.5,
     null,
     true
 );
 
 -- ============================================================
--- TITEL TEMPLATES (llama3.2:3b - fast)
+-- TITEL TEMPLATES (gpt-4o-mini)
 -- ============================================================
 
 -- titel/generate (v4.0)
@@ -845,8 +845,8 @@ SELECT upsert_prompt_template(
     'Respond only with the title, maximum 35 characters. Absolutely NO punctuation marks (no apostrophes, no quotes, no hyphens, no special characters). Do not include any explanations, notes, or introductions.',
     'Generates short song titles optimized for cover image text generation (2-5 words, max 35 chars, no punctuation)',
     '4.0',
-    'ollama',
-    'llama3.2:3b',
+    'openai',
+    'gpt-4o-mini',
     0.7,
     300,
     true
@@ -858,17 +858,17 @@ SELECT upsert_prompt_template(
     'generate-fast',
     'Generate a short title (2-4 words) in the same language as the input. Keep it simple and descriptive. No punctuation marks.',
     'Output only the title (max 35 characters). No punctuation, no explanations.',
-    'Fast title generation optimized for speed with llama3.2:3b (auto-generation fallback)',
+    'Fast title generation (auto-generation fallback)',
     '1.1',
-    'ollama',
-    'llama3.2:3b',
+    'openai',
+    'gpt-4o-mini',
     0.5,
     100,
     true
 );
 
 -- ============================================================
--- WORKSHOP TEMPLATES (mistral:7b + llama3.2:3b)
+-- WORKSHOP TEMPLATES (gpt-4o-mini + gpt-4o for draft)
 -- ============================================================
 
 -- workshop/connect-inspire (v1.0)
@@ -885,8 +885,8 @@ Write in the same language as the input.
 Do NOT add follow-up questions, conversation, or offers for further help. Just deliver the content.',
     'Generate songwriting inspirations from a topic/theme',
     '1.0',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.9,
     NULL,
     true
@@ -913,8 +913,8 @@ Write in the same language as the input.
 Do NOT add follow-up questions, conversation, or offers for further help. Just deliver the content.',
     'Generate association mindmap for songwriting',
     '1.0',
-    'ollama',
-    'llama3.2:3b',
+    'openai',
+    'gpt-4o-mini',
     0.9,
     2048,
     true
@@ -934,8 +934,8 @@ Write in the same language as the input.
 Do NOT add follow-up questions, conversation, or offers for further help. Just deliver the content.',
     'Generate story ideas for songwriting',
     '1.0',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.7,
     2048,
     true
@@ -956,8 +956,8 @@ Write in the same language as the input.
 Do NOT add follow-up questions, conversation, or offers for further help. Just deliver the content.',
     'Generate word library for songwriting',
     '1.0',
-    'ollama',
-    'llama3.2:3b',
+    'openai',
+    'gpt-4o-mini',
     0.7,
     2048,
     true
@@ -978,14 +978,14 @@ Write in the same language as the input.
 Do NOT add follow-up questions, conversation, or offers for further help. Just deliver the content.',
     'Find rhymes and syllable matches for songwriting',
     '1.0',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o-mini',
     0.5,
     2048,
     true
 );
 
--- workshop/shape-draft (v1.2)
+-- workshop/shape-draft (v1.2) -- gpt-4o: full song draft composition
 SELECT upsert_prompt_template(
     'workshop',
     'shape-draft',
@@ -1004,15 +1004,15 @@ Write in the same language as the input material.
 Do NOT add follow-up questions, conversation, or offers for further help. Just deliver the content.',
     'Generate song draft from collected workshop material',
     '1.2',
-    'ollama',
-    'mistral:7b',
+    'openai',
+    'gpt-4o',
     0.7,
     NULL,
     true
 );
 
 -- ============================================================
--- PROMPT ENGINEERING TEMPLATES (llama3.2:3b - fast)
+-- PROMPT ENGINEERING TEMPLATES (gpt-4o-mini)
 -- ============================================================
 
 -- prompt_engineering/improve_condition (v1.0)
@@ -1054,8 +1054,8 @@ RULES:
 - Output ONLY the improved prompt itself',
     'AI-powered prompt condition improvement using prompt engineering best practices',
     '1.0',
-    'ollama',
-    'llama3.2:3b',
+    'openai',
+    'gpt-4o-mini',
     0.7,
     2048,
     true

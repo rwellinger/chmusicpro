@@ -4,7 +4,7 @@ MinIO Console is **not publicly exposed** on the VPS. Access is only possible vi
 
 ## Prerequisites
 
-- SSH access to the VPS: `root@138.199.207.251`
+- SSH access to the VPS: `rob@x.x.x.x`
 - MinIO port `9001` is bound to `127.0.0.1` on the VPS (not reachable from the internet)
 
 ## Open SSH Tunnel
@@ -12,7 +12,7 @@ MinIO Console is **not publicly exposed** on the VPS. Access is only possible vi
 **Option A: Visible in terminal (recommended)**
 
 ```bash
-ssh -L 19001:127.0.0.1:9001 -N root@138.199.207.251
+ssh -L 19001:127.0.0.1:9001 -N rob@songprod.thwelly.ch
 ```
 
 Terminal stays open with no prompt. Close with `Ctrl+C`.
@@ -20,7 +20,7 @@ Terminal stays open with no prompt. Close with `Ctrl+C`.
 **Option B: Background process**
 
 ```bash
-ssh -L 19001:127.0.0.1:9001 -N -f root@138.199.207.251
+ssh -L 19001:127.0.0.1:9001 -N -f rob@songprod.thwelly.ch
 ```
 
 Runs silently in background.
