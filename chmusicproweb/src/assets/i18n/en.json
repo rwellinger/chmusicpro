@@ -81,14 +81,6 @@
         "title": "Cover Art",
         "description": "Generate album artwork with AI"
       },
-      "mixing": {
-        "title": "Mixing Session",
-        "description": "Mix and balance your tracks"
-      },
-      "mastering": {
-        "title": "Mastering Session",
-        "description": "Finalize your master audio"
-      },
       "distribute": {
         "title": "Distribution",
         "description": "Prepare release for DistroKid, Ditto Music etc."

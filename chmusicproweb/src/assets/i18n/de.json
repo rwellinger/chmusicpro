@@ -81,14 +81,6 @@
         "title": "Cover Art",
         "description": "Album-Artwork mit KI generieren"
       },
-      "mixing": {
-        "title": "Mixing Session",
-        "description": "Tracks mischen und abmischen"
-      },
-      "mastering": {
-        "title": "Mastering Session",
-        "description": "Master-Audio finalisieren"
-      },
       "distribute": {
         "title": "Distribution",
         "description": "Release für DistroKid, Ditto Music etc. vorbereiten"

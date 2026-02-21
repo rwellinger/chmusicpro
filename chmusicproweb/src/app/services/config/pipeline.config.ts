@@ -42,26 +42,6 @@ export const PIPELINE_STEPS: PipelineStep[] = [
     },
     {
         step: 4,
-        titleKey: "dashboard.tiles.mixing.title",
-        descriptionKey: "dashboard.tiles.mixing.description",
-        icon: "fa-headphones",
-        iconColor: "#6c757d",
-        enabled: false,
-        routes: [],
-        primaryRoute: ""
-    },
-    {
-        step: 5,
-        titleKey: "dashboard.tiles.mastering.title",
-        descriptionKey: "dashboard.tiles.mastering.description",
-        icon: "fa-compact-disc",
-        iconColor: "#6c757d",
-        enabled: false,
-        routes: [],
-        primaryRoute: ""
-    },
-    {
-        step: 6,
         titleKey: "dashboard.tiles.distribute.title",
         descriptionKey: "dashboard.tiles.distribute.description",
         icon: "fa-share-alt",
@@ -71,7 +51,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
         primaryRoute: "/song-releases"
     },
     {
-        step: 7,
+        step: 5,
         titleKey: "dashboard.tiles.promote.title",
         descriptionKey: "dashboard.tiles.promote.description",
         icon: "fa-bullhorn",
@@ -81,7 +61,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
         primaryRoute: ""
     },
     {
-        step: 8,
+        step: 6,
         titleKey: "dashboard.tiles.project.title",
         descriptionKey: "dashboard.tiles.project.description",
         icon: "fa-folder-open",
