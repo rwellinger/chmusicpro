@@ -11,6 +11,8 @@ from schemas.common_schemas import PaginationMeta
 from schemas.song_project_schemas import (
     BatchDeleteRequest,
     BatchDeleteResponse,
+    ChunkedUploadCompleteRequest,
+    ChunkedUploadInitRequest,
     MirrorRequest,
     MirrorResponse,
     ProjectCompleteDownloadResponse,
@@ -795,6 +797,128 @@ class SongProjectController:
                 error_type=type(e).__name__,
             )
             return {"error": f"Failed to clear folder: {str(e)}"}, 500
+
+    # ── Chunked Upload Controller Methods ────────────────────────────────
+
+    @staticmethod
+    def init_chunked_upload(
+        db: Session, domain_id: UUID, project_id: str, folder_id: str, init_data: ChunkedUploadInitRequest
+    ) -> tuple[dict[str, Any], int]:
+        """Initiate a chunked upload session."""
+        try:
+            try:
+                project_uuid = UUID(project_id)
+                folder_uuid = UUID(folder_id)
+            except ValueError:
+                return {"error": "Invalid ID format"}, 400
+
+            result = song_project_orchestrator.init_chunked_upload(
+                db=db,
+                project_id=project_uuid,
+                domain_id=domain_id,
+                folder_id=folder_uuid,
+                filename=init_data.filename,
+                file_size_bytes=init_data.file_size_bytes,
+                file_hash=init_data.file_hash,
+                mime_type=init_data.mime_type,
+                chunk_size_bytes=init_data.chunk_size_bytes,
+                total_chunks=init_data.total_chunks,
+            )
+
+            if not result:
+                return {"error": "Failed to initiate chunked upload"}, 500
+
+            return {"data": result}, 200
+
+        except Exception as e:
+            logger.error("Chunked upload init error", error=str(e), error_type=type(e).__name__)
+            return {"error": f"Failed to initiate chunked upload: {str(e)}"}, 500
+
+    @staticmethod
+    def upload_chunk(upload_id: str, part_number: int, s3_key: str, body: bytes) -> tuple[dict[str, Any], int]:
+        """Upload a single chunk."""
+        try:
+            result = song_project_orchestrator.upload_chunk(
+                s3_key=s3_key,
+                upload_id=upload_id,
+                part_number=part_number,
+                body=body,
+            )
+
+            if not result:
+                return {"error": "Failed to upload chunk"}, 500
+
+            return {"data": result}, 200
+
+        except Exception as e:
+            logger.error("Chunk upload error", upload_id=upload_id, part_number=part_number, error=str(e))
+            return {"error": f"Failed to upload chunk: {str(e)}"}, 500
+
+    @staticmethod
+    def complete_chunked_upload(
+        db: Session, domain_id: UUID, project_id: str, upload_id: str, complete_data: ChunkedUploadCompleteRequest
+    ) -> tuple[dict[str, Any], int]:
+        """Complete a chunked upload."""
+        try:
+            try:
+                project_uuid = UUID(project_id)
+                folder_uuid = UUID(complete_data.folder_id)
+            except ValueError:
+                return {"error": "Invalid ID format"}, 400
+
+            parts = [{"part_number": p.part_number, "etag": p.etag} for p in complete_data.parts]
+
+            result = song_project_orchestrator.complete_chunked_upload(
+                db=db,
+                project_id=project_uuid,
+                domain_id=domain_id,
+                upload_id=upload_id,
+                s3_key=complete_data.s3_key,
+                filename=complete_data.filename,
+                folder_id=folder_uuid,
+                file_size_bytes=complete_data.file_size_bytes,
+                file_hash=complete_data.file_hash,
+                parts=parts,
+            )
+
+            if not result:
+                return {"error": "Failed to complete chunked upload"}, 500
+
+            return {"data": result, "message": "Chunked upload completed successfully"}, 201
+
+        except Exception as e:
+            logger.error("Chunked upload complete error", upload_id=upload_id, error=str(e))
+            return {"error": f"Failed to complete chunked upload: {str(e)}"}, 500
+
+    @staticmethod
+    def get_chunked_upload_status(upload_id: str, s3_key: str) -> tuple[dict[str, Any], int]:
+        """Get status of a chunked upload."""
+        try:
+            result = song_project_orchestrator.get_chunked_upload_status(s3_key, upload_id)
+
+            if not result:
+                return {"error": "Upload not found or failed"}, 404
+
+            return {"data": result}, 200
+
+        except Exception as e:
+            logger.error("Chunked upload status error", upload_id=upload_id, error=str(e))
+            return {"error": f"Failed to get upload status: {str(e)}"}, 500
+
+    @staticmethod
+    def abort_chunked_upload(upload_id: str, s3_key: str) -> tuple[dict[str, Any], int]:
+        """Abort a chunked upload."""
+        try:
+            success = song_project_orchestrator.abort_chunked_upload(s3_key, upload_id)
+
+            if not success:
+                return {"error": "Failed to abort upload"}, 500
+
+            return {"data": {"message": "Upload aborted"}}, 200
+
+        except Exception as e:
+            logger.error("Chunked upload abort error", upload_id=upload_id, error=str(e))
+            return {"error": f"Failed to abort upload: {str(e)}"}, 500
 
 
 # Global controller instance

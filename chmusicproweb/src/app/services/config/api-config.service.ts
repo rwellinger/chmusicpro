@@ -176,7 +176,12 @@ export class ApiConfigService {
             batchMove: (projectId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/files/batch-move`,
             templateZip: (projectId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/template-zip`,
             folderZip: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/download-zip`,
-            fileDownload: (projectId: string, fileId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/files/${fileId}/download`
+            fileDownload: (projectId: string, fileId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/files/${fileId}/download`,
+            chunkedUploadInit: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/chunked-upload/init`,
+            chunkedUploadPart: (uploadId: string, partNumber: number, s3Key: string) => `${this.baseUrl}/api/v1/song-projects/chunked-upload/${uploadId}/part/${partNumber}?s3_key=${encodeURIComponent(s3Key)}`,
+            chunkedUploadComplete: (projectId: string, uploadId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/chunked-upload/${uploadId}/complete`,
+            chunkedUploadStatus: (uploadId: string, s3Key: string) => `${this.baseUrl}/api/v1/song-projects/chunked-upload/${uploadId}/status?s3_key=${encodeURIComponent(s3Key)}`,
+            chunkedUploadAbort: (uploadId: string, s3Key: string) => `${this.baseUrl}/api/v1/song-projects/chunked-upload/${uploadId}/abort?s3_key=${encodeURIComponent(s3Key)}`
         },
         modelContextWindow: {
             list: `${this.baseUrl}/api/v1/model-context-windows`,

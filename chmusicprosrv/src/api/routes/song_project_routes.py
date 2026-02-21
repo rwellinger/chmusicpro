@@ -25,7 +25,14 @@ from sqlalchemy.orm import Session
 from api.auth_middleware import get_current_domain_id, get_current_user_id, jwt_required
 from api.controllers.song_project_controller import song_project_controller
 from db.database import get_db
-from schemas.song_project_schemas import BatchDeleteRequest, MirrorRequest, ProjectCreateRequest, ProjectUpdateRequest
+from schemas.song_project_schemas import (
+    BatchDeleteRequest,
+    ChunkedUploadCompleteRequest,
+    ChunkedUploadInitRequest,
+    MirrorRequest,
+    ProjectCreateRequest,
+    ProjectUpdateRequest,
+)
 from utils.logger import logger
 
 
@@ -837,3 +844,147 @@ def download_folder_zip(project_id: str, folder_id: str):
     except Exception as e:
         logger.error("Error generating folder ZIP", project_id=project_id, folder_id=folder_id, error=str(e))
         return jsonify({"error": "Failed to generate folder ZIP"}), 500
+
+
+# ── Chunked Upload Routes ─────────────────────────────────────────────
+
+
+@api_song_projects_v1.route("/<project_id>/folders/<folder_id>/chunked-upload/init", methods=["POST"])
+@jwt_required
+def init_chunked_upload(project_id: str, folder_id: str):
+    """
+    Initiate a chunked upload session.
+
+    Request Body:
+        ChunkedUploadInitRequest (JSON)
+
+    Response:
+        200: {'data': {'upload_id': '...', 's3_key': '...', 'chunk_size_bytes': ..., 'total_chunks': ...}}
+    """
+    domain_id = get_current_domain_id()
+    if not domain_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        init_data = ChunkedUploadInitRequest.model_validate(request.json)
+    except ValidationError as e:
+        return jsonify({"error": f"Validation error: {e}"}), 400
+
+    db: Session = next(get_db())
+    try:
+        result, status_code = song_project_controller.init_chunked_upload(
+            db, UUID(domain_id), project_id, folder_id, init_data
+        )
+        return jsonify(result), status_code
+    finally:
+        db.close()
+
+
+@api_song_projects_v1.route("/chunked-upload/<upload_id>/part/<int:part_number>", methods=["PUT"])
+@jwt_required
+def upload_chunk(upload_id: str, part_number: int):
+    """
+    Upload a single chunk (part) of a chunked upload.
+
+    Query Parameters:
+        - s3_key: S3 key from init response
+
+    Request Body:
+        Raw binary data (application/octet-stream)
+
+    Response:
+        200: {'data': {'part_number': 1, 'etag': '...'}}
+    """
+    domain_id = get_current_domain_id()
+    if not domain_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    s3_key = request.args.get("s3_key")
+    if not s3_key:
+        return jsonify({"error": "Missing s3_key query parameter"}), 400
+
+    body = request.get_data()
+    if not body:
+        return jsonify({"error": "Empty request body"}), 400
+
+    result, status_code = song_project_controller.upload_chunk(upload_id, part_number, s3_key, body)
+    return jsonify(result), status_code
+
+
+@api_song_projects_v1.route("/<project_id>/chunked-upload/<upload_id>/complete", methods=["POST"])
+@jwt_required
+def complete_chunked_upload(project_id: str, upload_id: str):
+    """
+    Complete a chunked upload (assemble parts and create DB record).
+
+    Request Body:
+        ChunkedUploadCompleteRequest (JSON)
+
+    Response:
+        201: {'data': {'file_id': '...', 'filename': '...', 'relative_path': '...', 'file_size_bytes': ...}}
+    """
+    domain_id = get_current_domain_id()
+    if not domain_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        complete_data = ChunkedUploadCompleteRequest.model_validate(request.json)
+    except ValidationError as e:
+        return jsonify({"error": f"Validation error: {e}"}), 400
+
+    db: Session = next(get_db())
+    try:
+        result, status_code = song_project_controller.complete_chunked_upload(
+            db, UUID(domain_id), project_id, upload_id, complete_data
+        )
+        return jsonify(result), status_code
+    finally:
+        db.close()
+
+
+@api_song_projects_v1.route("/chunked-upload/<upload_id>/status", methods=["GET"])
+@jwt_required
+def get_chunked_upload_status(upload_id: str):
+    """
+    Get status of a chunked upload (which parts are uploaded).
+
+    Query Parameters:
+        - s3_key: S3 key from init response
+
+    Response:
+        200: {'data': {'upload_id': '...', 'uploaded_parts': [1, 2, 3, 5, 6]}}
+    """
+    domain_id = get_current_domain_id()
+    if not domain_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    s3_key = request.args.get("s3_key")
+    if not s3_key:
+        return jsonify({"error": "Missing s3_key query parameter"}), 400
+
+    result, status_code = song_project_controller.get_chunked_upload_status(upload_id, s3_key)
+    return jsonify(result), status_code
+
+
+@api_song_projects_v1.route("/chunked-upload/<upload_id>/abort", methods=["POST"])
+@jwt_required
+def abort_chunked_upload(upload_id: str):
+    """
+    Abort a chunked upload and clean up uploaded parts.
+
+    Query Parameters:
+        - s3_key: S3 key from init response
+
+    Response:
+        200: {'data': {'message': 'Upload aborted'}}
+    """
+    domain_id = get_current_domain_id()
+    if not domain_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    s3_key = request.args.get("s3_key")
+    if not s3_key:
+        return jsonify({"error": "Missing s3_key query parameter"}), 400
+
+    result, status_code = song_project_controller.abort_chunked_upload(upload_id, s3_key)
+    return jsonify(result), status_code

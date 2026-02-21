@@ -275,6 +275,44 @@ class BatchDeleteResponse(BaseModel):
         from_attributes = True
 
 
+class ChunkedUploadInitRequest(BaseModel):
+    """Request schema for initiating a chunked upload"""
+
+    filename: str = Field(..., min_length=1, max_length=500, description="Original filename")
+    file_size_bytes: int = Field(..., gt=0, description="Total file size in bytes")
+    file_hash: str = Field(..., min_length=64, max_length=64, description="SHA256 hash (64 hex chars)")
+    mime_type: str | None = Field(default=None, description="MIME type (e.g., 'audio/wav')")
+    chunk_size_bytes: int = Field(..., ge=1_048_576, le=104_857_600, description="Chunk size (1MB-100MB)")
+    total_chunks: int = Field(..., ge=1, description="Total number of chunks")
+
+    class Config:
+        from_attributes = True
+
+
+class ChunkedUploadPartInfo(BaseModel):
+    """Schema for a single part in complete request"""
+
+    part_number: int = Field(..., ge=1)
+    etag: str = Field(..., min_length=1)
+
+    class Config:
+        from_attributes = True
+
+
+class ChunkedUploadCompleteRequest(BaseModel):
+    """Request schema for completing a chunked upload"""
+
+    s3_key: str = Field(..., min_length=1, description="S3 key from init response")
+    filename: str = Field(..., min_length=1, max_length=500, description="Original filename")
+    folder_id: str = Field(..., description="Target folder UUID")
+    file_size_bytes: int = Field(..., gt=0, description="Total file size in bytes")
+    file_hash: str = Field(..., min_length=64, max_length=64, description="SHA256 hash (64 hex chars)")
+    parts: list[ChunkedUploadPartInfo] = Field(..., min_length=1, description="List of uploaded parts")
+
+    class Config:
+        from_attributes = True
+
+
 class CompleteDownloadFileResponse(BaseModel):
     """Response schema for a single file in complete project download"""
 

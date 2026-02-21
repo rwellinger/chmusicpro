@@ -607,6 +607,11 @@
                                     <span>{{ uploadProgress }}%</span>
                                   </div>
                                   <mat-progress-bar mode="determinate" [value]="uploadProgress"></mat-progress-bar>
+                                  @if (currentChunkedFile && chunkedProgress) {
+                                    <div class="chunked-progress-info">
+                                      <span>{{ currentChunkedFile }} - {{ 'songProjects.upload.chunkedProgress' | translate: {current: chunkedProgress.chunksUploaded, total: chunkedProgress.totalChunks} }}</span>
+                                    </div>
+                                  }
                                 }
                               }
                               @if (isUploadComplete) {

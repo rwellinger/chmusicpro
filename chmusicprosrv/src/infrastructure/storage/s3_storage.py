@@ -1,6 +1,7 @@
 """S3 Storage - S3-compatible storage implementation (MinIO, AWS, Backblaze, Wasabi)"""
 
 from io import BytesIO
+from typing import Any, BinaryIO
 
 import boto3
 from botocore.exceptions import ClientError
@@ -157,6 +158,102 @@ class S3Storage(StorageInterface):
 
         except ClientError as e:
             logger.error("S3 move failed", source=source_key, dest=dest_key, error=str(e))
+            return False
+
+    def create_multipart_upload(self, key: str, content_type: str | None = None) -> str:
+        """Initiate a multipart upload on S3."""
+        try:
+            params: dict[str, Any] = {"Bucket": self.bucket, "Key": key}
+            if content_type:
+                params["ContentType"] = content_type
+
+            response = self.s3_client.create_multipart_upload(**params)
+            upload_id = response["UploadId"]
+            logger.info("Multipart upload initiated", key=key, upload_id=upload_id)
+            return upload_id
+
+        except ClientError as e:
+            logger.error("S3 create_multipart_upload failed", key=key, error=str(e))
+            raise
+
+    def upload_part(self, key: str, upload_id: str, part_number: int, body: bytes | BinaryIO) -> str:
+        """Upload a single part of a multipart upload."""
+        try:
+            response = self.s3_client.upload_part(
+                Bucket=self.bucket,
+                Key=key,
+                UploadId=upload_id,
+                PartNumber=part_number,
+                Body=body,
+            )
+            etag = response["ETag"]
+            logger.debug("Part uploaded", key=key, upload_id=upload_id, part_number=part_number, etag=etag)
+            return etag
+
+        except ClientError as e:
+            logger.error("S3 upload_part failed", key=key, part_number=part_number, error=str(e))
+            raise
+
+    def complete_multipart_upload(self, key: str, upload_id: str, parts: list[dict[str, Any]]) -> dict[str, Any]:
+        """Complete a multipart upload by assembling all parts."""
+        try:
+            response = self.s3_client.complete_multipart_upload(
+                Bucket=self.bucket,
+                Key=key,
+                UploadId=upload_id,
+                MultipartUpload={"Parts": parts},
+            )
+            logger.info("Multipart upload completed", key=key, upload_id=upload_id, parts_count=len(parts))
+            return response
+
+        except ClientError as e:
+            logger.error("S3 complete_multipart_upload failed", key=key, upload_id=upload_id, error=str(e))
+            raise
+
+    def list_parts(self, key: str, upload_id: str) -> list[dict[str, Any]]:
+        """List uploaded parts for a multipart upload (with pagination)."""
+        try:
+            parts_info = []
+            part_marker = 0
+
+            while True:
+                params: dict[str, Any] = {
+                    "Bucket": self.bucket,
+                    "Key": key,
+                    "UploadId": upload_id,
+                }
+                if part_marker > 0:
+                    params["PartNumberMarker"] = part_marker
+
+                response = self.s3_client.list_parts(**params)
+
+                for part in response.get("Parts", []):
+                    parts_info.append({"part_number": part["PartNumber"], "etag": part["ETag"]})
+
+                if not response.get("IsTruncated", False):
+                    break
+                part_marker = response.get("NextPartNumberMarker", 0)
+
+            logger.debug("Listed parts", key=key, upload_id=upload_id, parts_count=len(parts_info))
+            return parts_info
+
+        except ClientError as e:
+            logger.error("S3 list_parts failed", key=key, upload_id=upload_id, error=str(e))
+            raise
+
+    def abort_multipart_upload(self, key: str, upload_id: str) -> bool:
+        """Abort a multipart upload and clean up parts."""
+        try:
+            self.s3_client.abort_multipart_upload(
+                Bucket=self.bucket,
+                Key=key,
+                UploadId=upload_id,
+            )
+            logger.info("Multipart upload aborted", key=key, upload_id=upload_id)
+            return True
+
+        except ClientError as e:
+            logger.error("S3 abort_multipart_upload failed", key=key, upload_id=upload_id, error=str(e))
             return False
 
     def health_check(self, timeout: int = 2) -> tuple[bool, str]:

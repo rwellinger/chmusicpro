@@ -10,6 +10,42 @@ from datetime import date
 from typing import Any
 
 
+def calculate_chunk_plan(file_size_bytes: int, chunk_size_bytes: int) -> dict[str, int]:
+    """
+    Calculate chunked upload plan from file size and chunk size.
+
+    Args:
+        file_size_bytes: Total file size in bytes
+        chunk_size_bytes: Size of each chunk in bytes
+
+    Returns:
+        Dictionary with chunk_size_bytes, total_chunks, last_chunk_size
+
+    Examples:
+        >>> calculate_chunk_plan(100, 30)
+        {'chunk_size_bytes': 30, 'total_chunks': 4, 'last_chunk_size': 10}
+        >>> calculate_chunk_plan(90, 30)
+        {'chunk_size_bytes': 30, 'total_chunks': 3, 'last_chunk_size': 30}
+        >>> calculate_chunk_plan(10, 30)
+        {'chunk_size_bytes': 30, 'total_chunks': 1, 'last_chunk_size': 10}
+        >>> calculate_chunk_plan(0, 30)
+        {'chunk_size_bytes': 30, 'total_chunks': 0, 'last_chunk_size': 0}
+    """
+    if file_size_bytes <= 0:
+        return {"chunk_size_bytes": chunk_size_bytes, "total_chunks": 0, "last_chunk_size": 0}
+
+    total_chunks = (file_size_bytes + chunk_size_bytes - 1) // chunk_size_bytes
+    last_chunk_size = file_size_bytes % chunk_size_bytes
+    if last_chunk_size == 0:
+        last_chunk_size = chunk_size_bytes
+
+    return {
+        "chunk_size_bytes": chunk_size_bytes,
+        "total_chunks": total_chunks,
+        "last_chunk_size": last_chunk_size,
+    }
+
+
 def generate_s3_prefix(project_name: str, user_id: str) -> str:
     """
     Generate S3 prefix from user_id and project name (slug-like)

@@ -2018,7 +2018,10 @@
       "dismiss": "Schließen",
       "batchUploadSuccess": "{{count}} Dateien erfolgreich hochgeladen",
       "batchUploadPartial": "{{uploaded}} Dateien hochgeladen, {{failed}} fehlgeschlagen",
-      "batchUploadError": "Upload fehlgeschlagen"
+      "batchUploadError": "Upload fehlgeschlagen",
+      "chunkedProgress": "Teil {{current}}/{{total}}",
+      "chunkedResuming": "Upload wird fortgesetzt...",
+      "chunkedComplete": "Grosse Datei hochgeladen"
     },
     "download": {
       "templateZip": "Vorlage herunterladen",

@@ -23,7 +23,8 @@ import {FileIgnoreService} from "../../services/utils/file-ignore.service";
 import {FileHashService} from "../../services/utils/file-hash.service";
 import {CreateProjectDialogComponent} from "../../dialogs/create-project-dialog/create-project-dialog.component";
 import {MirrorPreviewDialogComponent} from "../../dialogs/mirror-preview-dialog/mirror-preview-dialog.component";
-import {AssignedSketch, AssignedWorkshop, BatchUploadResponse, MirrorFileEntry, SongProjectDetail, SongProjectListItem} from "../../models/song-project.model";
+import {AssignedSketch, AssignedWorkshop, BatchUploadResponse, ChunkedUploadProgress, MirrorFileEntry, SongProjectDetail, SongProjectListItem} from "../../models/song-project.model";
+import {ChunkedUploadService} from "../../services/business/chunked-upload.service";
 import {getColorFromString, getInitials} from "../../services/utils/cover-utils";
 
 @Component({
@@ -77,6 +78,10 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     isUploadComplete = false;
     isDragOver: string | null = null;
 
+    // Chunked upload state
+    currentChunkedFile: string | null = null;
+    chunkedProgress: ChunkedUploadProgress | null = null;
+
     // Mirror sync state
     mirrorPhase: "idle" | "filtering" | "hashing" | "comparing" | "uploading" | "moving" | "deleting" = "idle";
     mirrorHashProgress = {current: 0, total: 0};
@@ -100,6 +105,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     private route = inject(ActivatedRoute);
     private fileIgnoreService = inject(FileIgnoreService);
     private fileHashService = inject(FileHashService);
+    private chunkedUploadService = inject(ChunkedUploadService);
 
     // Navigation state (must be captured in constructor)
     private navigationState: any = null;
@@ -469,7 +475,8 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Core batch upload engine. Splits files into batches of 3 and uploads sequentially.
+     * Core batch upload engine. Splits files into small (<20MB, batch upload)
+     * and large (>=20MB, chunked upload) groups.
      */
     async processBatchUpload(folder: any, files: File[]): Promise<void> {
         const maxSizeBytes = 500 * 1024 * 1024; // 500MB
@@ -495,6 +502,10 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
             return;
         }
 
+        // Split into small files (batch) and large files (chunked)
+        const smallFiles = validFiles.filter(f => !this.chunkedUploadService.shouldUseChunkedUpload(f));
+        const largeFiles = validFiles.filter(f => this.chunkedUploadService.shouldUseChunkedUpload(f));
+
         // Initialize upload state
         this.uploadingFolderId = folder.id;
         this.uploadProgress = 0;
@@ -502,66 +513,112 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
         this.uploadTotalFileCount = validFiles.length;
         this.uploadErrors = [...sizeErrors];
         this.isUploadComplete = false;
-
-        // Split into batches of 3
-        const batchSize = 3;
-        const batches: File[][] = [];
-        for (let i = 0; i < validFiles.length; i += batchSize) {
-            batches.push(validFiles.slice(i, i + batchSize));
-        }
+        this.currentChunkedFile = null;
+        this.chunkedProgress = null;
 
         let totalUploaded = 0;
         let totalFailed = 0;
 
-        for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-            const batch = batches[batchIndex];
-            const formData = new FormData();
+        // Calculate weight for progress: small files as one group, each large file as individual
+        const totalWeight = (smallFiles.length > 0 ? 1 : 0) + largeFiles.length;
+        let completedWeight = 0;
 
-            for (const file of batch) {
-                const filename = (file as any).webkitRelativePath || file.name;
-                formData.append("files", file, filename);
+        // Upload small files via batch upload (existing logic)
+        if (smallFiles.length > 0) {
+            const batchSize = 3;
+            const batches: File[][] = [];
+            for (let i = 0; i < smallFiles.length; i += batchSize) {
+                batches.push(smallFiles.slice(i, i + batchSize));
             }
+
+            for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+                const batch = batches[batchIndex];
+                const formData = new FormData();
+
+                for (const file of batch) {
+                    const filename = (file as any).webkitRelativePath || file.name;
+                    formData.append("files", file, filename);
+                }
+
+                try {
+                    const result = await new Promise<BatchUploadResponse>((resolve, reject) => {
+                        this.projectService.batchUploadFiles(
+                            this.selectedProject!.id,
+                            folder.id,
+                            formData
+                        ).subscribe({
+                            next: (event) => {
+                                if (event.type === HttpEventType.UploadProgress && event.total) {
+                                    const batchProgress = event.loaded / event.total;
+                                    const smallProgress = (batchIndex + batchProgress) / batches.length;
+                                    this.uploadProgress = Math.round(((completedWeight + smallProgress) / totalWeight) * 100);
+                                } else if (event.type === HttpEventType.Response) {
+                                    resolve(event.body!);
+                                }
+                            },
+                            error: (error) => reject(error)
+                        });
+                    });
+
+                    totalUploaded += result.data.uploaded;
+                    totalFailed += result.data.failed;
+                    this.uploadedFileCount = totalUploaded;
+
+                    if (result.data.errors?.length) {
+                        this.uploadErrors.push(...result.data.errors);
+                    }
+                } catch (error: any) {
+                    console.error(`Batch ${batchIndex + 1} failed:`, error);
+                    totalFailed += batch.length;
+                    this.uploadErrors.push({
+                        error: `Batch ${batchIndex + 1} failed: ${error?.message || "Unknown error"}`
+                    });
+                }
+            }
+            completedWeight += 1;
+        }
+
+        // Upload large files via chunked upload (one at a time)
+        for (const largeFile of largeFiles) {
+            const filename = (largeFile as any).webkitRelativePath || largeFile.name;
+            this.currentChunkedFile = filename;
 
             try {
-                const result = await new Promise<BatchUploadResponse>((resolve, reject) => {
-                    this.projectService.batchUploadFiles(
-                        this.selectedProject!.id,
-                        folder.id,
-                        formData
-                    ).subscribe({
-                        next: (event) => {
-                            if (event.type === HttpEventType.UploadProgress && event.total) {
-                                // Calculate overall progress across all batches
-                                const batchProgress = event.loaded / event.total;
-                                const overallProgress = ((batchIndex + batchProgress) / batches.length) * 100;
-                                this.uploadProgress = Math.round(overallProgress);
-                            } else if (event.type === HttpEventType.Response) {
-                                resolve(event.body!);
-                            }
-                        },
-                        error: (error) => reject(error)
-                    });
-                });
+                // Hash the file first
+                const fileHash = await this.fileHashService.hashFile(largeFile);
 
-                totalUploaded += result.data.uploaded;
-                totalFailed += result.data.failed;
+                await this.chunkedUploadService.uploadFileChunked(
+                    this.selectedProject!.id,
+                    folder.id,
+                    largeFile,
+                    filename,
+                    fileHash,
+                    (progress) => {
+                        this.chunkedProgress = progress;
+                        const chunkedFraction = progress.percentComplete / 100;
+                        this.uploadProgress = Math.round(((completedWeight + chunkedFraction) / totalWeight) * 100);
+                    }
+                );
+
+                totalUploaded += 1;
                 this.uploadedFileCount = totalUploaded;
-
-                if (result.data.errors?.length) {
-                    this.uploadErrors.push(...result.data.errors);
-                }
             } catch (error: any) {
-                console.error(`Batch ${batchIndex + 1} failed:`, error);
-                totalFailed += batch.length;
+                console.error(`Chunked upload failed for ${filename}:`, error);
+                totalFailed += 1;
                 this.uploadErrors.push({
-                    error: `Batch ${batchIndex + 1} failed: ${error?.message || "Unknown error"}`
+                    filename,
+                    error: error?.message || "Chunked upload failed"
                 });
             }
+
+            completedWeight += 1;
         }
 
         // Complete
         this.uploadProgress = 100;
         this.isUploadComplete = true;
+        this.currentChunkedFile = null;
+        this.chunkedProgress = null;
 
         if (totalFailed === 0) {
             this.notificationService.success(

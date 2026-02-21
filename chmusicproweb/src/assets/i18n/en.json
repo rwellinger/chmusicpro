@@ -2018,7 +2018,10 @@
       "dismiss": "Dismiss",
       "batchUploadSuccess": "{{count}} files uploaded successfully",
       "batchUploadPartial": "{{uploaded}} files uploaded, {{failed}} failed",
-      "batchUploadError": "Upload failed"
+      "batchUploadError": "Upload failed",
+      "chunkedProgress": "Chunk {{current}}/{{total}}",
+      "chunkedResuming": "Resuming upload...",
+      "chunkedComplete": "Large file uploaded"
     },
     "download": {
       "templateZip": "Download Template",

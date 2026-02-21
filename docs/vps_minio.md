@@ -27,7 +27,7 @@ Runs silently in background.
 
 ## Access MinIO Console
 
-Open in browser: http://localhost:19001
+    Open in browser: http://localhost:19001
 
 Credentials are in `/opt/chmusicpro/.env` on the VPS (`MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD`).
 

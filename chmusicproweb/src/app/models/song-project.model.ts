@@ -195,3 +195,25 @@ export interface MirrorCompareResult {
 export interface BatchMoveResponse {
     data: { moved: number; failed: number; errors: { file_id: string; error: string }[] };
 }
+
+export interface ChunkedUploadInit {
+    upload_id: string;
+    s3_key: string;
+    chunk_size_bytes: number;
+    total_chunks: number;
+}
+
+export interface ChunkedUploadProgress {
+    chunksUploaded: number;
+    totalChunks: number;
+    bytesUploaded: number;
+    totalBytes: number;
+    percentComplete: number;
+}
+
+export interface ChunkedUploadResult {
+    file_id: string;
+    filename: string;
+    relative_path: string;
+    file_size_bytes: number;
+}

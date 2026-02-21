@@ -31,6 +31,7 @@ from business.song_project_transformer import (
     get_display_cover_info,
     get_mime_type,
     normalize_project_name,
+    transform_file_to_response,
     transform_image_to_assigned_response,
     transform_project_detail_to_response,
     transform_project_to_response,
@@ -733,8 +734,6 @@ class SongProjectOrchestrator:
             download_url = self.storage.get_url(s3_key, expires_in=3600)
 
             # Transform to response (business logic in transformer)
-            from business.song_project_transformer import transform_file_to_response
-
             return transform_file_to_response(file_record, download_url=download_url)
 
         except Exception as e:
@@ -1495,6 +1494,238 @@ class SongProjectOrchestrator:
                 folder_id=str(folder_id),
             )
             raise
+
+    # ── Chunked Upload Methods ──────────────────────────────────────────
+
+    def init_chunked_upload(
+        self,
+        db: Session,
+        project_id: UUID,
+        domain_id: UUID,
+        folder_id: UUID,
+        filename: str,
+        file_size_bytes: int,
+        file_hash: str,
+        mime_type: str | None,
+        chunk_size_bytes: int,
+        total_chunks: int,
+    ) -> dict[str, Any] | None:
+        """
+        Initiate a chunked upload session.
+
+        Checks project ownership, generates S3 key, calls create_multipart_upload.
+        """
+        try:
+            project = self.db_service.get_project_by_id(db, project_id)
+            if not project or project.domain_id != domain_id:
+                logger.warning("Unauthorized chunked upload init", project_id=str(project_id))
+                return None
+
+            if project.project_status == "archived":
+                logger.warning("Cannot upload to archived project", project_id=str(project_id))
+                return None
+
+            folder = self.db_service.get_folder_by_id(db, folder_id)
+            if not folder or folder.project_id != project_id:
+                logger.warning("Folder not found or mismatch", folder_id=str(folder_id))
+                return None
+
+            # Generate S3 key (reuse pattern from upload_file_to_project)
+            from pathlib import Path as PathLib
+
+            file_path_obj = PathLib(filename)
+            actual_filename = file_path_obj.name
+            subdir = str(file_path_obj.parent) if file_path_obj.parent != PathLib(".") else ""
+
+            if subdir:
+                subdir_normalized = subdir.replace("\\", "/")
+                if not subdir_normalized.endswith("/"):
+                    subdir_normalized += "/"
+                s3_key = f"{folder.s3_prefix}{subdir_normalized}{actual_filename}"
+            else:
+                s3_key = f"{folder.s3_prefix}{actual_filename}"
+
+            # Detect content type
+            content_type = mime_type or get_mime_type(actual_filename)
+
+            upload_id = self.storage.create_multipart_upload(s3_key, content_type=content_type)
+
+            logger.info(
+                "Chunked upload initiated",
+                project_id=str(project_id),
+                filename=filename,
+                s3_key=s3_key,
+                upload_id=upload_id,
+                total_chunks=total_chunks,
+                file_size_bytes=file_size_bytes,
+            )
+
+            return {
+                "upload_id": upload_id,
+                "s3_key": s3_key,
+                "chunk_size_bytes": chunk_size_bytes,
+                "total_chunks": total_chunks,
+            }
+
+        except Exception as e:
+            logger.error("Chunked upload init failed", project_id=str(project_id), error=str(e))
+            return None
+
+    def upload_chunk(
+        self,
+        s3_key: str,
+        upload_id: str,
+        part_number: int,
+        body: bytes,
+    ) -> dict[str, Any] | None:
+        """Upload a single chunk (part) to S3."""
+        try:
+            etag = self.storage.upload_part(s3_key, upload_id, part_number, body)
+            return {"part_number": part_number, "etag": etag}
+        except Exception as e:
+            logger.error(
+                "Chunk upload failed",
+                upload_id=upload_id,
+                part_number=part_number,
+                error=str(e),
+            )
+            return None
+
+    def complete_chunked_upload(
+        self,
+        db: Session,
+        project_id: UUID,
+        domain_id: UUID,
+        upload_id: str,
+        s3_key: str,
+        filename: str,
+        folder_id: UUID,
+        file_size_bytes: int,
+        file_hash: str,
+        parts: list[dict[str, Any]],
+    ) -> dict[str, Any] | None:
+        """
+        Complete a chunked upload: assemble S3 parts, create/update DB record.
+
+        Reuses the duplicate-check and auto-status-update logic from upload_file_to_project.
+        """
+        try:
+            project = self.db_service.get_project_by_id(db, project_id)
+            if not project or project.domain_id != domain_id:
+                logger.warning("Unauthorized chunked upload complete", project_id=str(project_id))
+                return None
+
+            folder = self.db_service.get_folder_by_id(db, folder_id)
+            if not folder or folder.project_id != project_id:
+                logger.warning("Folder not found", folder_id=str(folder_id))
+                return None
+
+            # Complete the S3 multipart upload
+            s3_parts = [{"PartNumber": p["part_number"], "ETag": p["etag"]} for p in parts]
+            self.storage.complete_multipart_upload(s3_key, upload_id, s3_parts)
+
+            # Build relative_path and detect file type (reuse from upload_file_to_project)
+            from pathlib import Path as PathLib
+
+            file_path_obj = PathLib(filename)
+            actual_filename = file_path_obj.name
+            subdir = str(file_path_obj.parent) if file_path_obj.parent != PathLib(".") else ""
+
+            if subdir:
+                subdir_normalized = subdir.replace("\\", "/")
+                if not subdir_normalized.endswith("/"):
+                    subdir_normalized += "/"
+                relative_path = f"{folder.folder_name}/{subdir_normalized}{actual_filename}"
+            else:
+                relative_path = f"{folder.folder_name}/{actual_filename}"
+
+            file_type = detect_file_type(actual_filename)
+            mime_type = get_mime_type(actual_filename)
+
+            # Check for existing file (duplicate/update scenario)
+            existing_file = self.db_service.get_file_by_path(db, project_id, relative_path)
+
+            if existing_file:
+                file_record = self.db_service.update_file(
+                    db=db,
+                    file_id=existing_file.id,
+                    s3_key=s3_key,
+                    file_size_bytes=file_size_bytes,
+                    file_hash=file_hash,
+                    mime_type=mime_type,
+                )
+            else:
+                file_record = self.db_service.create_file(
+                    db=db,
+                    project_id=project_id,
+                    folder_id=folder_id,
+                    filename=actual_filename,
+                    relative_path=relative_path,
+                    s3_key=s3_key,
+                    file_type=file_type,
+                    mime_type=mime_type,
+                    file_size_bytes=file_size_bytes,
+                    file_hash=file_hash,
+                    storage_backend="s3",
+                )
+
+            if not file_record:
+                logger.error("Failed to create/update file record after chunked upload")
+                return None
+
+            # Auto-update project status: 'new' -> 'progress'
+            if project.project_status == "new":
+                self.db_service.update_project(
+                    db=db,
+                    project_id=project_id,
+                    domain_id=domain_id,
+                    update_data={"project_status": "progress"},
+                )
+
+            logger.info(
+                "Chunked upload completed",
+                project_id=str(project_id),
+                filename=actual_filename,
+                relative_path=relative_path,
+                file_size_bytes=file_size_bytes,
+            )
+
+            return {
+                "file_id": str(file_record.id),
+                "filename": file_record.filename,
+                "relative_path": file_record.relative_path,
+                "file_size_bytes": file_record.file_size_bytes,
+            }
+
+        except Exception as e:
+            logger.error(
+                "Chunked upload complete failed",
+                project_id=str(project_id),
+                upload_id=upload_id,
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            return None
+
+    def get_chunked_upload_status(self, s3_key: str, upload_id: str) -> dict[str, Any] | None:
+        """Get status of a chunked upload (which parts are already uploaded, with etags for resume)."""
+        try:
+            parts = self.storage.list_parts(s3_key, upload_id)
+            return {
+                "upload_id": upload_id,
+                "uploaded_parts": parts,
+            }
+        except Exception as e:
+            logger.error("Get chunked upload status failed", upload_id=upload_id, error=str(e))
+            return None
+
+    def abort_chunked_upload(self, s3_key: str, upload_id: str) -> bool:
+        """Abort a chunked upload and clean up S3 parts."""
+        try:
+            return self.storage.abort_multipart_upload(s3_key, upload_id)
+        except Exception as e:
+            logger.error("Abort chunked upload failed", upload_id=upload_id, error=str(e))
+            return False
 
 
 # Global orchestrator instance
