@@ -44,6 +44,10 @@
               </div>
             }
           </div>
+          <div class="info-notice">
+            <h4>{{ 'register.step1.noticeTitle' | translate }}</h4>
+            <p>{{ 'register.step1.noticeText' | translate }}</p>
+          </div>
         </div>
       }
 
@@ -102,7 +106,7 @@
                 {{ 'register.errors.inviteCodeRequired' | translate }}
               </div>
             }
-            <span class="field-hint">{{ 'register.step3.inviteCodeHint' | translate }}</span>
+            <span class="field-hint" [innerHTML]="'register.step3.inviteCodeHint' | translate"></span>
           </div>
           <div class="form-group">
             <label for="email">{{ 'register.step3.email' | translate }} *</label>

@@ -208,7 +208,9 @@
     },
     "step1": {
       "title": "Choose Your Language",
-      "subtitle": "Select your preferred language for the application."
+      "subtitle": "Select your preferred language for the application.",
+      "noticeTitle": "Important Information",
+      "noticeText": "This application relies on the OpenAI API for AI-powered features such as text and image generation. A local AI is not available on this platform, as processing times would be impractical. You are required to provide your own OpenAI API key. Your key is stored in encrypted form in the database and is neither visible nor accessible to third parties. It cannot be reconstructed without the server-side encryption key. By using these features, your input data will be transmitted to OpenAI for processing purposes only."
     },
     "step2": {
       "title": "Personal Information",
@@ -232,7 +234,7 @@
       "confirmPasswordPlaceholder": "Repeat your password",
       "inviteCode": "Invite Code",
       "inviteCodePlaceholder": "Enter your invite code",
-      "inviteCodeHint": "You need an invite code to register. Ask the administrator.",
+      "inviteCodeHint": "You need an invite code to register. <a href=\"https://thwelly.ch/contact/\" target=\"_blank\" rel=\"noopener noreferrer\">Request one here</a>.",
       "strengthWeak": "Weak",
       "strengthMedium": "Fair",
       "strengthGood": "Good",
@@ -242,9 +244,9 @@
       "title": "Terms & Conditions",
       "subtitle": "Please review and accept our terms.",
       "termsTitle": "Terms of Service",
-      "termsContent": "By creating an account, you agree to use this platform responsibly. This is a private music production tool. All generated content (lyrics, images, music prompts) remains your intellectual property. The platform is provided as-is without warranty. We reserve the right to suspend accounts that violate these terms.",
+      "termsContent": "By creating an account, you agree to use this platform responsibly. This is a private music production tool. All generated content (lyrics, images, music prompts) remains your intellectual property. The platform is provided as-is without warranty. We reserve the right to suspend accounts that violate these terms. This application uses the OpenAI API for AI-powered features. By using these features, your input data is transmitted to OpenAI solely for the purpose of processing your request.",
       "privacyTitle": "Privacy Policy",
-      "privacyContent": "We collect your email address for authentication purposes. Your personal data (name, artist name) is stored securely and used only within this platform. We do not share your data with third parties. AI-generated content may be processed by external services (OpenAI, Ollama). You can request account deletion at any time.",
+      "privacyContent": "We collect your email address for authentication purposes. Your personal data (name, artist name) is stored securely and used only within this platform. All data is hosted and stored in Europe (Germany). We do not sell or share your personal data with third parties. When you use AI-powered features, your input data is transmitted to OpenAI for processing. OpenAI's data processing policies apply to this data. You can request account deletion at any time.",
       "acceptTerms": "I accept the Terms of Service and Privacy Policy",
       "captchaLabel": "Solve this:",
       "captchaPlaceholder": "Answer",

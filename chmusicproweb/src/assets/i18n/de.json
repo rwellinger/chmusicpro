@@ -208,7 +208,9 @@
     },
     "step1": {
       "title": "Sprache waehlen",
-      "subtitle": "Waehle deine bevorzugte Sprache fuer die Anwendung."
+      "subtitle": "Waehle deine bevorzugte Sprache fuer die Anwendung.",
+      "noticeTitle": "Wichtiger Hinweis",
+      "noticeText": "Diese Anwendung nutzt die OpenAI-Schnittstelle fuer KI-gestuetzte Funktionen wie Text- und Bildgenerierung. Eine lokale KI steht auf dieser Plattform nicht zur Verfuegung, da die Verarbeitungszeiten nicht praktikabel waeren. Du musst deinen eigenen OpenAI API Key bereitstellen. Dein Key wird verschluesselt in der Datenbank gespeichert und ist fuer Dritte weder einsehbar noch zugaenglich. Ohne den serverseitigen Verschluesselungsschluessel kann er nicht reproduziert werden. Bei Nutzung dieser Funktionen werden deine Eingabedaten ausschliesslich zum Zweck der Verarbeitung an OpenAI uebermittelt."
     },
     "step2": {
       "title": "Persoenliche Informationen",
@@ -232,7 +234,7 @@
       "confirmPasswordPlaceholder": "Passwort wiederholen",
       "inviteCode": "Einladungscode",
       "inviteCodePlaceholder": "Gib deinen Einladungscode ein",
-      "inviteCodeHint": "Du benoetigst einen Einladungscode zur Registrierung. Frage den Administrator.",
+      "inviteCodeHint": "Du benoetigst einen Einladungscode zur Registrierung. <a href=\"https://thwelly.ch/contact/\" target=\"_blank\" rel=\"noopener noreferrer\">Hier anfragen</a>.",
       "strengthWeak": "Schwach",
       "strengthMedium": "Mittel",
       "strengthGood": "Gut",
@@ -242,9 +244,9 @@
       "title": "Nutzungsbedingungen",
       "subtitle": "Bitte lese und akzeptiere unsere Bedingungen.",
       "termsTitle": "Nutzungsbedingungen",
-      "termsContent": "Mit der Erstellung eines Kontos erklaerst du dich einverstanden, diese Plattform verantwortungsvoll zu nutzen. Dies ist ein privates Musikproduktions-Tool. Alle generierten Inhalte (Texte, Bilder, Musik-Prompts) bleiben dein geistiges Eigentum. Die Plattform wird ohne Gewaehrleistung bereitgestellt. Wir behalten uns das Recht vor, Konten zu sperren, die gegen diese Bedingungen verstossen.",
+      "termsContent": "Mit der Erstellung eines Kontos erklaerst du dich einverstanden, diese Plattform verantwortungsvoll zu nutzen. Dies ist ein privates Musikproduktions-Tool. Alle generierten Inhalte (Texte, Bilder, Musik-Prompts) bleiben dein geistiges Eigentum. Die Plattform wird ohne Gewaehrleistung bereitgestellt. Wir behalten uns das Recht vor, Konten zu sperren, die gegen diese Bedingungen verstossen. Diese Anwendung nutzt die OpenAI-Schnittstelle fuer KI-gestuetzte Funktionen. Bei Nutzung dieser Funktionen werden deine Eingabedaten ausschliesslich zum Zweck der Verarbeitung an OpenAI uebermittelt.",
       "privacyTitle": "Datenschutz",
-      "privacyContent": "Wir erfassen deine E-Mail-Adresse fuer Authentifizierungszwecke. Deine persoenlichen Daten (Name, Kuenstlername) werden sicher gespeichert und nur innerhalb dieser Plattform verwendet. Wir geben deine Daten nicht an Dritte weiter. KI-generierte Inhalte koennen von externen Diensten (OpenAI, Ollama) verarbeitet werden. Du kannst jederzeit die Loeschung deines Kontos beantragen.",
+      "privacyContent": "Wir erfassen deine E-Mail-Adresse fuer Authentifizierungszwecke. Deine persoenlichen Daten (Name, Kuenstlername) werden sicher gespeichert und nur innerhalb dieser Plattform verwendet. Saemtliche Daten werden in Europa (Deutschland) gehostet und gespeichert. Wir verkaufen oder teilen deine persoenlichen Daten nicht mit Dritten. Bei Nutzung von KI-Funktionen werden deine Eingabedaten zur Verarbeitung an OpenAI uebermittelt. Es gelten die Datenverarbeitungsrichtlinien von OpenAI. Du kannst jederzeit die Loeschung deines Kontos beantragen.",
       "acceptTerms": "Ich akzeptiere die Nutzungsbedingungen und Datenschutzerklaerung",
       "captchaLabel": "Berechne:",
       "captchaPlaceholder": "Antwort",

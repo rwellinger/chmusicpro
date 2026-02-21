@@ -1,4 +1,11 @@
 # ==================================================
+# APPLICATION SETTINGS
+# ==================================================
+# Debug Mode (true/false)
+DEBUG=false
+APP_VERSION=v0.4.0
+
+# ==================================================
 # JWT AUTHENTICATION
 # ==================================================
 # JWT Secret Key (IMPORTANT: Change in production! Use 32+ random characters)
@@ -65,13 +72,6 @@ FLASK_SERVER_HOST=0.0.0.0
 # ==================================================
 # OPENAI CONFIGURATION (Images + Chat + Admin API)
 # ==================================================
-# OpenAI API Key (for images and chat)
-OPENAI_API_KEY=
-
-# OpenAI Admin API Key (for organization cost tracking)
-# Get from: https://platform.openai.com/settings/organization/admin-keys
-OPENAI_ADMIN_API_KEY=
-
 # OpenAI Base URL (used for ALL OpenAI API calls: images, chat, and admin)
 OPENAI_ADMIN_BASE_URL=https://api.openai.com/v1
 
@@ -102,10 +102,6 @@ OPENAI_COST_CACHE_TTL=3600
 # ==================================================
 # CLAUDE CONFIGURATION (Anthropic Claude API)
 # ==================================================
-# Claude API Key (for chat)
-# Get from: https://console.anthropic.com/settings/keys
-CLAUDE_API_KEY=
-
 # Claude Base URL (Messages API)
 CLAUDE_BASE_URL=https://api.anthropic.com/v1
 
@@ -136,12 +132,6 @@ AGENT_EXTERNAL_PROVIDER=openai
 # Default external models per provider (used for template override in external-only mode)
 AGENT_EXTERNAL_MODEL_OPENAI=gpt-4.1-mini
 AGENT_EXTERNAL_MODEL_CLAUDE=claude-haiku-4-5-20250929
-
-# ==================================================
-# APPLICATION SETTINGS
-# ==================================================
-# Debug Mode (true/false)
-DEBUG=true
 
 # ==================================================
 # Database PostgreSQL

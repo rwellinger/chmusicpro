@@ -177,6 +177,29 @@
   }
 }
 
+// Info Notice (Step 1)
+.info-notice {
+  margin-top: $spacing-xl;
+  padding: $spacing-md;
+  border: 1px solid $warning-color;
+  border-radius: $border-radius-lg;
+  background: rgba($warning-color, 0.08);
+
+  h4 {
+    font-size: $font-sm;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    margin: 0 0 $spacing-xs;
+  }
+
+  p {
+    font-size: $font-xs;
+    color: $text-secondary;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
 // Form Groups
 .form-group {
   margin-bottom: $spacing-lg;
