@@ -1,11 +1,10 @@
 # Claude Code Configuration
 
-**Language:** English
-**Last Updated:** 2026-02-17
+**Last Updated:** 2026-02-21
 
 ---
 
-# 🎯 Critical Rules (Guardrails)
+# Critical Rules (Guardrails)
 
 ## 1. 3-Layer Architecture (MANDATORY - Enforced by import-linter)
 
@@ -129,13 +128,13 @@ grep -r "serve.*s3\|proxy.*resource" src/
 
 ---
 
-# 📚 Reference Implementations (Copy These!)
+# Reference Implementations (Copy These!)
 
 ## Backend Patterns
 
 | Pattern | Reference File | Purpose |
 |---------|---------------|---------|
-| **S3 Proxy** | `song_release_routes.py:123` → `s3_proxy_service.py` | Serve S3 resources via backend |
+| **S3 Proxy** | `song_release_routes.py` → `serve_cover()` → `s3_proxy_service.py` | Serve S3 resources via backend |
 | **3-Layer** | `sketch_controller.py` → `sketch_orchestrator.py` → `sketch_normalizer.py` | Testable business logic |
 | **AI Integration** | Backend: `chat_controller.py`, Frontend: `chat.service.ts` | Template-driven Ollama |
 | **DB Migration** | `chmusicprosrv/src/alembic/versions/` | Schema changes |
@@ -153,58 +152,7 @@ grep -r "serve.*s3\|proxy.*resource" src/
 
 ---
 
-# 🛠️ Quick Commands
-
-## Frontend (chmusicproweb)
-
-```bash
-# Code Quality & Build (ALWAYS run before commit!)
-make build-prod                # Production build (linters + tests + compilation)
-make lint-all                  # TypeScript + SCSS + Architecture only
-make lint-fix                  # Auto-fix issues
-
-# Build
-make build-dev                 # Development build
-
-# Development
-make dev                       # Dev server
-make test                      # Unit tests
-make test-watch               # Tests in watch mode
-```
-
-## Backend (chmusicprosrv)
-
-```bash
-# Activate conda environment first!
-conda activate chmusicpro_py312
-
-# Development
-python src/server.py           # Dev server
-
-# Database
-make db-current                # Show current version
-make db-upgrade                # Apply migrations
-make db-revision               # Create new migration
-
-# Code Quality
-make lint-all                  # Ruff + import-linter
-make format                    # Auto-fix and format
-make test                      # pytest
-```
-
-## Database Seeding
-
-```bash
-# From project root (chmusicpro/)
-cat scripts/db/seed_prompts.sql | docker exec -i postgres psql -U chmusicpro -d chmusicpro
-cat scripts/db/seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U chmusicpro -d chmusicpro
-```
-
-**DB Credentials:** See `.env` file (not committed to repository)
-
----
-
-# ❌ Critical DON'Ts
+# Critical DON'Ts
 
 ## Backend
 - ❌ NO business logic in DB layer (`src/db/*_service.py` = CRUD only)
@@ -225,65 +173,6 @@ cat scripts/db/seed_lyric_parsing_rules.sql | docker exec -i postgres psql -U ch
 - ❌ NO `.env` files in commits
 - ❌ NO emojis in code/docs (unless requested)
 - ❌ NO unnecessary documentation files
-
----
-
-# 📖 Full Documentation
-
-**When you need details:**
-- **Project Overview:** `README.md` (Build, Features, Commands)
-- **Architecture Deep-Dive:** `docs/arch42/README.md` (2000+ lines - arc42, ADRs, Workflows)
-- **UI Patterns:** `docs/UI_PATTERNS.md` (CRITICAL - Read before new UI!)
-- **Code Patterns:** `docs/CODE_PATTERNS.md`
-- **Troubleshooting:** `docs/TROUBLESHOOTING.md`
-- **CI/CD:** `docs/CI_CD.md`
-
-**External API Docs:**
-- **Ollama:** https://github.com/ollama/ollama/blob/main/docs/api.md
-- **OpenAI:** https://platform.openai.com/docs/api-reference/introduction
-
----
-
-# 🤖 How I (Claude) Use This File
-
-**When you give me a task:**
-
-1. **Check:** Does pattern exist? → Look at reference implementations
-2. **Check:** S3 involved? → Use backend proxy pattern
-3. **Check:** New UI page? → Read `docs/UI_PATTERNS.md` first
-4. **Implement** → Code changes
-5. **Validate:**
-   - Frontend: `make build-prod` (linters + tests + compilation)
-   - Backend: `make lint-all` (Ruff + import-linter)
-6. **Done** → Ready for manual testing & commit
-
-**When I need business context:**
-→ I'll ask you! (Just-in-time explanation)
-
-**What I DON'T need in this file:**
-- Business logic details (you explain when needed)
-- Complete feature specs (README.md has that)
-- Detailed workflows (arc42/ has that)
-
----
-
-# 🎯 Tech Stack Summary
-
-**Frontend:** Angular 21, Material, SCSS, TypeScript, RxJS, ngx-translate
-**Backend:** Flask, Python 3.12, SQLAlchemy, Alembic
-**Database:** PostgreSQL
-**Deployment:** Docker (Colima), Nginx
-**Hardware:** Apple Silicon (M-Series), Python 3.12 via Conda
-
----
-
-# 💬 Communication Style
-
-- Code/Comments/Docs: English only
-- Be factual and direct
-- Present analysis, plan & effort estimation first
-
----
 
 ---
 
