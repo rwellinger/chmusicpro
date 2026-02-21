@@ -90,7 +90,7 @@ def create_app():
 
     # OpenAPI/Swagger Configuration
     spec = APISpec(
-        title="Swiss Music Production API",
+        title="thWelly's Song Production API",
         version=get_version(),
         openapi_version="3.0.2",
         info={

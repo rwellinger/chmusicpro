@@ -1,4 +1,4 @@
-# Swiss Music Production
+# thWelly's Song Production
 
 **Your AI-powered music production workflow** — from first idea to finished release.
 

@@ -28,7 +28,7 @@
   flex-shrink: 0;
 }
 
-.logo-swiss {
+.logo-icon {
   position: relative;
   display: inline-block;
   margin-bottom: $spacing-sm;
@@ -41,35 +41,23 @@
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
 }
 
-.swiss-badge {
+.music-badge {
   position: absolute;
   bottom: -2px;
   right: -6px;
   width: 20px;
   height: 20px;
   background: white;
-  border-radius: 4px;
-  border: 2px solid #D32F2F;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-}
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 
-.cross-v,
-.cross-h {
-  position: absolute;
-  background: #D32F2F;
-  border-radius: 0.5px;
-}
-
-.cross-v {
-  width: 4px;
-  height: 12px;
-}
-
-.cross-h {
-  width: 12px;
-  height: 4px;
+  i {
+    font-size: 10px;
+    color: #D32F2F;
+  }
 }
 
 .brand {

@@ -1,6 +1,6 @@
 # Documentation Overview
 
-This directory contains technical documentation for the Swiss Music Production project.
+This directory contains technical documentation for the thWelly's Song Production project.
 
 ## Architecture Documentation
 

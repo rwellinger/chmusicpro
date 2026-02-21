@@ -207,7 +207,7 @@
   },
   "register": {
     "title": "Create Account",
-    "subtitle": "Join Swiss Music Production",
+    "subtitle": "Join thWelly's Song Production",
     "steps": {
       "step1": "Language",
       "step2": "Personal",
@@ -972,7 +972,7 @@
   },
   "sideMenu": {
     "aiChat": "AI Chat",
-    "brandName": "Swiss Music Production",
+    "brandName": "thWelly's Song Production",
     "dashboard": "Dashboard",
     "createImage": "Create",
     "equipment": "Equipment",
