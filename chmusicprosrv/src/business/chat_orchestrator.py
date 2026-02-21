@@ -266,7 +266,7 @@ class ChatOrchestrator:
                 response_data=response_data,
             )
         else:
-            logger.info(f"{provider.title()} chat completed", category=category, action=action, model=model)
+            logger.info("{} chat completed [{}/{}] model={}", provider.title(), category, action, model)
 
         return response_data, 200
 

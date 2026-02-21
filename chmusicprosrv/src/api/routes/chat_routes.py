@@ -8,7 +8,7 @@ from flask_pydantic import validate
 from api.api_key_middleware import load_user_api_keys, require_api_key
 from api.auth_middleware import get_current_user_id, jwt_required
 from api.controllers.chat_controller import ChatController
-from config.ai_config import AI_MODE_EXTERNAL, PROVIDER_OLLAMA, AIConfig
+from config.ai_config import AI_MODE_EXTERNAL, AI_MODE_INTERNAL, PROVIDER_OLLAMA, AIConfig
 from config.settings import CHAT_DEBUG_LOGGING
 from schemas.chat_schemas import ChatErrorResponse, UnifiedChatRequest
 from utils.logger import logger
@@ -25,8 +25,9 @@ def _resolve_provider_and_model(category: str | None, action: str | None, reques
 
     Priority:
     1. Load template from DB -> use template.provider and template.model
-    2. If external-only mode and template says ollama -> override with external config
-    3. Fallback (no template): external mode -> external provider, else ollama
+    2. Internal mode + non-ollama provider -> force Ollama
+    3. External mode + provider != configured external provider -> override with external config
+    4. Fallback (no template): use mode to decide provider
     """
     provider = PROVIDER_OLLAMA
     model = request_model
@@ -50,22 +51,37 @@ def _resolve_provider_and_model(category: str | None, action: str | None, reques
         except Exception as e:
             logger.warning("Failed to load template for provider resolution", error=str(e))
 
-    # External-only mode override: if provider is ollama but mode is external-only
     mode = AIConfig.get_mode()
-    if mode == AI_MODE_EXTERNAL and provider == PROVIDER_OLLAMA:
+
+    if mode == AI_MODE_INTERNAL and provider != PROVIDER_OLLAMA:
+        # Internal-only: force all templates to Ollama
+        logger.info(
+            "Internal-only mode: overriding external template to Ollama",
+            original_provider=provider,
+            original_model=model,
+        )
+        provider = PROVIDER_OLLAMA
+        model = None  # Let Ollama use its default model
+
+    elif mode == AI_MODE_EXTERNAL and provider != AIConfig.get_external_provider():
+        # External-only: override non-matching templates to configured external provider
+        logger.info(
+            "External-only mode: overriding non-matching provider template",
+            original_provider=provider,
+            new_provider=AIConfig.get_external_provider(),
+            new_model=AIConfig.get_external_model(),
+        )
         provider = AIConfig.get_external_provider()
         model = AIConfig.get_external_model()
-        logger.info(
-            "External-only mode: overriding ollama template",
-            new_provider=provider,
-            new_model=model,
-        )
+
     elif not category and not action:
         # No template context - use mode to decide
         if mode == AI_MODE_EXTERNAL:
             provider = AIConfig.get_external_provider()
             if not model:
                 model = AIConfig.get_external_model()
+        elif mode == AI_MODE_INTERNAL:
+            provider = PROVIDER_OLLAMA
 
     return provider, model
 
