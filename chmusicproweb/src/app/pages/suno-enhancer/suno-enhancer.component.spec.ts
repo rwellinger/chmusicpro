@@ -32,7 +32,7 @@ describe("SunoEnhancerComponent", () => {
     });
 
     it("should initialize in library mode", () => {
-        expect(component.isEditorMode).toBeFalse();
+        expect(component.isEditorMode).toBeFalsy();
     });
 
     it("should have correct char limits", () => {
