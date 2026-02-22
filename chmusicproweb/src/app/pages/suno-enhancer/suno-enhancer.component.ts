@@ -382,13 +382,15 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
         const current = this.templateForm.get('enhanced_lyrics')?.value || '';
 
         const newValue = current.substring(0, start) + tagText + current.substring(end);
+        const scrollTop = textarea.scrollTop;
         this.templateForm.patchValue({enhanced_lyrics: newValue});
 
-        // Set cursor after inserted tag
+        // Restore cursor position and scroll position after Angular re-render
         setTimeout(() => {
-            textarea.focus();
             const newPos = start + tagText.length;
+            textarea.focus();
             textarea.setSelectionRange(newPos, newPos);
+            textarea.scrollTop = scrollTop;
         });
 
         if (tag.supportsModifiers) {

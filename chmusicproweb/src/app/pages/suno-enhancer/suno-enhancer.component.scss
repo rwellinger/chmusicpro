@@ -267,13 +267,21 @@
   flex: 1;
 }
 
-.back-button {
-  @include button-secondary('base');
-  white-space: nowrap;
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  background: none;
+  border: none;
+  color: $text-muted;
+  font-size: $font-sm;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
 
-  i {
-    margin-right: $spacing-xs;
-  }
+  &:hover { color: $primary-color; }
+
+  i { font-size: 0.75rem; }
 }
 
 .title-field {
@@ -313,7 +321,7 @@
 // Editor Body (Split Pane)
 .editor-body {
   display: grid;
-  grid-template-columns: 1fr 420px;
+  grid-template-columns: 3fr 2fr;
   gap: $spacing-md;
   flex: 1;
   overflow: hidden;
