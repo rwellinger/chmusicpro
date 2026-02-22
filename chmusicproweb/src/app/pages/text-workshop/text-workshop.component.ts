@@ -81,9 +81,13 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
     workshops: Workshop[] = [];
     totalWorkshops = 0;
     currentPage = 0;
-    pageSize = 20;
+    pageSize = 10;
     searchTerm = "";
     isLoading = false;
+
+    // Detail panel
+    selectedWorkshop: Workshop | null = null;
+    isLoadingDetail = false;
 
     private destroy$ = new Subject<void>();
     private fb = inject(FormBuilder);
@@ -142,6 +146,9 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
                     this.workshops = response.data;
                     this.totalWorkshops = response.pagination.total;
                     this.isLoading = false;
+                    if (!this.selectedWorkshop && this.workshops.length > 0) {
+                        this.selectWorkshop(this.workshops[0]);
+                    }
                 },
                 error: () => {
                     this.notificationService.error(this.translate.instant("workshop.errors.loadFailed"));
@@ -153,11 +160,13 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
     onSearch(event: Event): void {
         this.searchTerm = (event.target as HTMLInputElement).value;
         this.currentPage = 0;
+        this.selectedWorkshop = null;
         this.loadWorkshops();
     }
 
     onPageChange(direction: number): void {
         this.currentPage += direction;
+        this.selectedWorkshop = null;
         this.loadWorkshops();
     }
 
@@ -170,7 +179,7 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
     }
 
     openWorkshop(workshop: Workshop): void {
-        this.router.navigate(["/text-workshop", workshop.id]);
+        this.selectWorkshop(workshop);
     }
 
     async createNewWorkshop(): Promise<void> {
@@ -184,16 +193,92 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
         }
     }
 
-    async deleteWorkshop(event: Event, workshop: Workshop): Promise<void> {
-        event.stopPropagation();
+    selectWorkshop(workshop: Workshop): void {
+        this.isLoadingDetail = true;
+        this.workshopService.getWorkshopById(String(workshop.id))
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (response) => {
+                    this.selectedWorkshop = response.data;
+                    this.isLoadingDetail = false;
+                },
+                error: () => {
+                    this.notificationService.error(this.translate.instant("workshop.errors.loadFailed"));
+                    this.isLoadingDetail = false;
+                }
+            });
+    }
+
+    editSelectedWorkshop(): void {
+        if (!this.selectedWorkshop) return;
+        this.router.navigate(["/text-workshop", this.selectedWorkshop.id]);
+    }
+
+    async deleteSelectedWorkshop(): Promise<void> {
+        if (!this.selectedWorkshop) return;
         const confirmed = confirm(this.translate.instant("workshop.confirmDelete"));
         if (!confirmed) return;
 
         try {
-            await firstValueFrom(this.workshopService.deleteWorkshop(workshop.id));
+            await firstValueFrom(this.workshopService.deleteWorkshop(this.selectedWorkshop.id));
+            this.selectedWorkshop = null;
             this.loadWorkshops();
         } catch {
             this.notificationService.error(this.translate.instant("workshop.errors.deleteFailed"));
+        }
+    }
+
+    formatDate(dateString: string | undefined): string {
+        if (!dateString) return "-";
+        return new Date(dateString).toLocaleDateString();
+    }
+
+    truncateText(text: string | undefined, maxLength = 200): string {
+        if (!text) return "";
+        return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+    }
+
+    getPhaseIcon(phase: WorkshopPhase): string {
+        const icons: Record<string, string> = {
+            connect: "fa-link",
+            collect: "fa-layer-group",
+            shape: "fa-pen-nib",
+            completed: "fa-check-circle"
+        };
+        return icons[phase] || "fa-circle";
+    }
+
+    isPhaseCompleted(phase: WorkshopPhase, currentPhase: WorkshopPhase): boolean {
+        const order: WorkshopPhase[] = ["connect", "collect", "shape", "completed"];
+        return order.indexOf(phase) < order.indexOf(currentPhase);
+    }
+
+    openAssignToProjectDialogForSelected(): void {
+        if (!this.selectedWorkshop) return;
+        const dialogRef = this.dialog.open(AssignToProjectDialogComponent, {
+            width: "500px",
+            data: {
+                assetType: "workshop",
+                assetId: this.selectedWorkshop.id
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result?.success) {
+                this.selectedWorkshop = null;
+                this.loadWorkshops();
+            }
+        });
+    }
+
+    async unassignFromProjectForSelected(): Promise<void> {
+        if (!this.selectedWorkshop) return;
+        try {
+            await this.workshopService.unassignFromProject(this.selectedWorkshop.id);
+            this.selectedWorkshop = null;
+            this.loadWorkshops();
+        } catch {
+            this.notificationService.error(this.translate.instant("textWorkshop.errors.unassignFailed"));
         }
     }
 

@@ -2090,7 +2090,17 @@
       "unassignFromProject": "Vom Projekt entfernen",
       "assignSuccess": "Workshop dem Projekt zugewiesen",
       "unassignSuccess": "Workshop vom Projekt entfernt",
-      "unassignFailed": "Fehler beim Entfernen des Workshops vom Projekt"
+      "unassignFailed": "Fehler beim Entfernen des Workshops vom Projekt",
+      "selectPrompt": "Waehle einen Workshop, um Details anzuzeigen"
+    },
+    "detail": {
+      "progress": "Fortschritt",
+      "contentPreview": "Inhaltsvorschau",
+      "noContent": "Noch kein Inhalt. Oeffne den Editor, um mit dem Schreiben zu beginnen.",
+      "project": "Projekt",
+      "dates": "Datum",
+      "created": "Erstellt",
+      "updated": "Zuletzt aktualisiert"
     },
     "newWorkshopTitle": "Neuer Workshop",
     "confirmDelete": "Diesen Workshop loeschen? Das kann nicht rueckgaengig gemacht werden.",
@@ -2202,6 +2212,7 @@
     "newInstrumental": "Neues Instrumental",
     "searchPlaceholder": "Templates durchsuchen...",
     "empty": "Noch keine Templates vorhanden. Erstelle dein erstes Suno Template!",
+    "selectPrompt": "Waehle ein Template, um Details anzuzeigen",
     "confirmDelete": "Dieses Template loeschen?",
     "deleted": "Template geloescht",
     "backToLibrary": "Zurueck zur Bibliothek",
@@ -2219,6 +2230,17 @@
     "instrumental": "Instrumental",
     "supportsModifiers": "Unterstuetzt Pipe-Modifier",
     "modifierFor": "Modifier fuer",
+    "detail": {
+      "styleInfo": "Stil-Informationen",
+      "genre": "Genre",
+      "vocalType": "Gesangstyp",
+      "instruments": "Instrumente",
+      "mood": "Stimmung",
+      "project": "Projekt",
+      "dates": "Datum",
+      "created": "Erstellt",
+      "updated": "Zuletzt aktualisiert"
+    },
     "filter": {
       "all": "Alle",
       "song": "Song",

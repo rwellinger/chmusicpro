@@ -2090,7 +2090,17 @@
       "unassignFromProject": "Remove from Project",
       "assignSuccess": "Workshop assigned to project",
       "unassignSuccess": "Workshop removed from project",
-      "unassignFailed": "Failed to remove workshop from project"
+      "unassignFailed": "Failed to remove workshop from project",
+      "selectPrompt": "Select a workshop to view details"
+    },
+    "detail": {
+      "progress": "Progress",
+      "contentPreview": "Content Preview",
+      "noContent": "No content yet. Open the editor to start writing.",
+      "project": "Project",
+      "dates": "Dates",
+      "created": "Created",
+      "updated": "Last Updated"
     },
     "newWorkshopTitle": "New Workshop",
     "confirmDelete": "Delete this workshop? This cannot be undone.",
@@ -2202,6 +2212,7 @@
     "newInstrumental": "New Instrumental",
     "searchPlaceholder": "Search templates...",
     "empty": "No templates yet. Create your first Suno template!",
+    "selectPrompt": "Select a template to view details",
     "confirmDelete": "Delete this template?",
     "deleted": "Template deleted",
     "backToLibrary": "Back to Library",
@@ -2219,6 +2230,17 @@
     "instrumental": "Instrumental",
     "supportsModifiers": "Supports pipe modifiers",
     "modifierFor": "Modifier for",
+    "detail": {
+      "styleInfo": "Style Information",
+      "genre": "Genre",
+      "vocalType": "Vocal Type",
+      "instruments": "Instruments",
+      "mood": "Mood",
+      "project": "Project",
+      "dates": "Dates",
+      "created": "Created",
+      "updated": "Last Updated"
+    },
     "filter": {
       "all": "All",
       "song": "Song",

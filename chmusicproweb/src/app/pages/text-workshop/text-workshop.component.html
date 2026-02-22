@@ -1,155 +1,284 @@
 <div class="text-workshop-container">
 
   <!-- ============================================ -->
-  <!-- LIBRARY MODE -->
+  <!-- LIBRARY MODE (Master-Detail) -->
   <!-- ============================================ -->
   @if (!isEditorMode) {
-    <div class="library-mode">
-      <mat-card class="list-card">
-        <!-- Header -->
-        <div class="list-header">
-          <div class="header-title">
-            <div class="header-title-group">
-              <h2>
-                <i class="fas fa-pen-fancy"></i>
-                {{ 'workshop.library.title' | translate }}
-              </h2>
-              @if (totalWorkshops > 0) {
-                <div class="count-badge">
-                  {{ totalWorkshops }}
-                </div>
+    <div class="master-detail-layout">
+      <!-- Left: List Section -->
+      <div class="list-section">
+        <mat-card class="list-card">
+          <!-- Header -->
+          <div class="list-header">
+            <div class="header-title">
+              <div class="header-title-group">
+                <h2>
+                  <i class="fas fa-pen-fancy"></i>
+                  {{ 'workshop.library.title' | translate }}
+                </h2>
+                @if (totalWorkshops > 0) {
+                  <div class="count-badge">
+                    {{ totalWorkshops }}
+                  </div>
+                }
+              </div>
+              <p class="subtitle">{{ 'workshop.library.subtitle' | translate }}</p>
+            </div>
+            <button
+              type="button"
+              class="action-button new-button"
+              (click)="createNewWorkshop()"
+              [title]="'workshop.library.newWorkshop' | translate">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+          <!-- Search -->
+          <div class="filters-section">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                class="search-input"
+                [placeholder]="'workshop.library.searchPlaceholder' | translate"
+                [value]="searchTerm"
+                (input)="onSearch($event)"
+                />
+              @if (searchTerm) {
+                <button
+                  type="button"
+                  class="clear-search-button"
+                  (click)="searchTerm = ''; selectedWorkshop = null; loadWorkshops()">
+                  <i class="fas fa-times"></i>
+                </button>
               }
             </div>
-            <p class="subtitle">{{ 'workshop.library.subtitle' | translate }}</p>
           </div>
-          <button
-            type="button"
-            class="action-button new-button"
-            (click)="createNewWorkshop()"
-            [title]="'workshop.library.newWorkshop' | translate">
-            <i class="fas fa-plus"></i>
-          </button>
-        </div>
-        <!-- Search -->
-        <div class="filters-section">
-          <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input
-              type="text"
-              class="search-input"
-              [placeholder]="'workshop.library.searchPlaceholder' | translate"
-              [value]="searchTerm"
-              (input)="onSearch($event)"
-              />
-            @if (searchTerm) {
-              <button
-                type="button"
-                class="clear-search-button"
-                (click)="searchTerm = ''; loadWorkshops()">
-                <i class="fas fa-times"></i>
-              </button>
+          <!-- Workshop List -->
+          <div class="items-list">
+            @if (isLoading) {
+              <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>{{ 'common.loading' | translate }}</p>
+              </div>
+            }
+            @if (!isLoading && workshops.length === 0) {
+              <div class="empty-state">
+                <i class="fas fa-pen-fancy"></i>
+                <p>{{ 'workshop.library.empty' | translate }}</p>
+                <button type="button" class="action-button new-button" (click)="createNewWorkshop()">
+                  <i class="fas fa-plus"></i>
+                  <span>{{ 'workshop.library.newWorkshop' | translate }}</span>
+                </button>
+              </div>
+            }
+            @for (workshop of workshops; track workshop) {
+              <div
+                class="workshop-item"
+                [class.selected]="selectedWorkshop?.id === workshop.id"
+                (click)="openWorkshop(workshop)">
+                <div class="item-content">
+                  <div class="item-header">
+                    <h4 class="item-title">{{ workshop.title }}</h4>
+                    <div class="item-badges">
+                      <span class="phase-badge" [class]="'phase-' + workshop.current_phase">
+                        {{ getPhaseLabel(workshop.current_phase) }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="item-meta">
+                    @if (workshop.project_name) {
+                      <span class="meta-project">
+                        <i class="fas fa-folder-open"></i>
+                        {{ workshop.project_name }}
+                      </span>
+                    }
+                    <span class="meta-date">
+                      <i class="fas fa-clock"></i>
+                      {{ workshop.created_at | date:'dd.MM.yyyy' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
             }
           </div>
-        </div>
-        <!-- Workshop List -->
-        <div class="items-list">
-          <!-- Loading State -->
-          @if (isLoading) {
+          <!-- Pagination -->
+          @if (totalWorkshops > pageSize) {
+            <div class="pagination">
+              <button
+                class="pagination-btn"
+                [disabled]="!hasPreviousPage"
+                (click)="onPageChange(-1)">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <span class="pagination-info">{{ currentPage + 1 }}</span>
+              <button
+                class="pagination-btn"
+                [disabled]="!hasNextPage"
+                (click)="onPageChange(1)">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          }
+        </mat-card>
+      </div>
+
+      <!-- Right: Detail Section -->
+      <div class="detail-section">
+        <mat-card class="detail-card">
+          @if (isLoadingDetail) {
             <div class="loading-state">
               <i class="fas fa-spinner fa-spin"></i>
               <p>{{ 'common.loading' | translate }}</p>
             </div>
-          }
-          <!-- Empty State -->
-          @if (!isLoading && workshops.length === 0) {
-            <div class="empty-state">
+          } @else if (!selectedWorkshop) {
+            <div class="empty-detail">
               <i class="fas fa-pen-fancy"></i>
-              <p>{{ 'workshop.library.empty' | translate }}</p>
-              <button type="button" class="action-button new-button" (click)="createNewWorkshop()">
-                <i class="fas fa-plus"></i>
-                <span>{{ 'workshop.library.newWorkshop' | translate }}</span>
+              <p>{{ 'workshop.library.selectPrompt' | translate }}</p>
+            </div>
+          } @else {
+            <div class="detail-content">
+              <!-- Header -->
+              <div class="detail-header">
+                <div class="detail-title-group">
+                  <h2>{{ selectedWorkshop.title }}</h2>
+                  <div class="detail-badges">
+                    <span class="phase-badge" [class]="'phase-' + selectedWorkshop.current_phase">
+                      {{ getPhaseLabel(selectedWorkshop.current_phase) }}
+                    </span>
+                    @if (selectedWorkshop.draft_language) {
+                      <span class="language-badge">{{ selectedWorkshop.draft_language }}</span>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Phase Progress -->
+              <div class="detail-section-block">
+                <h3 class="section-title">
+                  <i class="fas fa-tasks"></i>
+                  {{ 'workshop.detail.progress' | translate }}
+                </h3>
+                <div class="phase-progress">
+                  <div class="phase-step" [class.completed]="isPhaseCompleted('connect', selectedWorkshop.current_phase)" [class.active]="selectedWorkshop.current_phase === 'connect'">
+                    <div class="step-icon"><i class="fas fa-link"></i></div>
+                    <span class="step-label">{{ 'workshop.phases.connect' | translate }}</span>
+                  </div>
+                  <div class="phase-connector" [class.completed]="isPhaseCompleted('collect', selectedWorkshop.current_phase)"></div>
+                  <div class="phase-step" [class.completed]="isPhaseCompleted('collect', selectedWorkshop.current_phase)" [class.active]="selectedWorkshop.current_phase === 'collect'">
+                    <div class="step-icon"><i class="fas fa-layer-group"></i></div>
+                    <span class="step-label">{{ 'workshop.phases.collect' | translate }}</span>
+                  </div>
+                  <div class="phase-connector" [class.completed]="isPhaseCompleted('shape', selectedWorkshop.current_phase)"></div>
+                  <div class="phase-step" [class.completed]="isPhaseCompleted('shape', selectedWorkshop.current_phase)" [class.active]="selectedWorkshop.current_phase === 'shape'">
+                    <div class="step-icon"><i class="fas fa-pen-nib"></i></div>
+                    <span class="step-label">{{ 'workshop.phases.shape' | translate }}</span>
+                  </div>
+                  <div class="phase-connector" [class.completed]="selectedWorkshop.current_phase === 'completed'"></div>
+                  <div class="phase-step" [class.completed]="selectedWorkshop.current_phase === 'completed'" [class.active]="selectedWorkshop.current_phase === 'completed'">
+                    <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                    <span class="step-label">{{ 'workshop.phases.completed' | translate }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Topic -->
+              @if (selectedWorkshop.connect_topic) {
+                <div class="detail-section-block">
+                  <h3 class="section-title">
+                    <i class="fas fa-comment"></i>
+                    {{ 'workshop.connect.topicLabel' | translate }}
+                  </h3>
+                  <div class="readonly-field preview-text">{{ truncateText(selectedWorkshop.connect_topic, 300) }}</div>
+                </div>
+              }
+
+              <!-- Content Preview -->
+              <div class="detail-section-block">
+                <h3 class="section-title">
+                  <i class="fas fa-file-alt"></i>
+                  {{ 'workshop.detail.contentPreview' | translate }}
+                </h3>
+                @if (selectedWorkshop.shape_draft) {
+                  <div class="detail-field">
+                    <span class="field-label">{{ 'workshop.shape.draftLabel' | translate }}</span>
+                    <div class="readonly-field preview-text">{{ truncateText(selectedWorkshop.shape_draft, 400) }}</div>
+                  </div>
+                } @else if (selectedWorkshop.connect_inspirations || selectedWorkshop.collect_mindmap) {
+                  @if (selectedWorkshop.connect_inspirations) {
+                    <div class="detail-field">
+                      <span class="field-label">{{ 'workshop.connect.inspirationsLabel' | translate }}</span>
+                      <div class="readonly-field preview-text">{{ truncateText(selectedWorkshop.connect_inspirations, 300) }}</div>
+                    </div>
+                  }
+                  @if (selectedWorkshop.collect_mindmap) {
+                    <div class="detail-field">
+                      <span class="field-label">{{ 'workshop.collect.mindmapLabel' | translate }}</span>
+                      <div class="readonly-field preview-text">{{ truncateText(selectedWorkshop.collect_mindmap, 300) }}</div>
+                    </div>
+                  }
+                } @else {
+                  <p class="no-content-hint">{{ 'workshop.detail.noContent' | translate }}</p>
+                }
+              </div>
+
+              <!-- Project Assignment -->
+              @if (selectedWorkshop.project_name) {
+                <div class="detail-section-block">
+                  <h3 class="section-title">
+                    <i class="fas fa-folder-open"></i>
+                    {{ 'workshop.detail.project' | translate }}
+                  </h3>
+                  <div class="readonly-field">
+                    <i class="fas fa-folder-open"></i>
+                    {{ selectedWorkshop.project_name }}
+                  </div>
+                </div>
+              }
+
+              <!-- Dates -->
+              <div class="detail-section-block">
+                <h3 class="section-title">
+                  <i class="fas fa-calendar"></i>
+                  {{ 'workshop.detail.dates' | translate }}
+                </h3>
+                <div class="detail-field-row">
+                  <div class="detail-field">
+                    <span class="field-label">{{ 'workshop.detail.created' | translate }}</span>
+                    <div class="readonly-field">{{ formatDate(selectedWorkshop.created_at) }}</div>
+                  </div>
+                  <div class="detail-field">
+                    <span class="field-label">{{ 'workshop.detail.updated' | translate }}</span>
+                    <div class="readonly-field">{{ formatDate(selectedWorkshop.updated_at) }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="detail-actions">
+              @if (selectedWorkshop.project_id) {
+                <button mat-stroked-button type="button" (click)="unassignFromProjectForSelected()">
+                  <i class="fas fa-link-slash"></i>
+                  <span>{{ 'workshop.library.unassignFromProject' | translate }}</span>
+                </button>
+              } @else {
+                <button mat-stroked-button type="button" (click)="openAssignToProjectDialogForSelected()">
+                  <i class="fas fa-link"></i>
+                  <span>{{ 'workshop.library.assignToProject' | translate }}</span>
+                </button>
+              }
+              <button mat-stroked-button type="button" color="warn" (click)="deleteSelectedWorkshop()">
+                <i class="fas fa-trash"></i>
+                <span>{{ 'common.delete' | translate }}</span>
+              </button>
+              <button mat-flat-button type="button" color="primary" (click)="editSelectedWorkshop()">
+                <i class="fas fa-edit"></i>
+                <span>{{ 'common.edit' | translate }}</span>
               </button>
             </div>
           }
-          <!-- Items -->
-          @for (workshop of workshops; track workshop) {
-            <div
-              class="workshop-item"
-              (click)="openWorkshop(workshop)"
-              >
-              <div class="item-content">
-                <div class="item-header">
-                  <h4 class="item-title">{{ workshop.title }}</h4>
-                  <div class="item-badges">
-                    <span class="phase-badge" [class]="'phase-' + workshop.current_phase">
-                      {{ getPhaseLabel(workshop.current_phase) }}
-                    </span>
-                  </div>
-                </div>
-                <div class="item-meta">
-                  @if (workshop.project_name) {
-                    <span class="meta-project">
-                      <i class="fas fa-folder-open"></i>
-                      {{ workshop.project_name }}
-                    </span>
-                  }
-                  @if (workshop.connect_topic) {
-                    <span class="meta-date">
-                      <i class="fas fa-comment"></i>
-                      {{ workshop.connect_topic }}
-                    </span>
-                  }
-                  <span class="meta-date">
-                    <i class="fas fa-clock"></i>
-                    {{ workshop.created_at | date:'dd.MM.yyyy' }}
-                  </span>
-                </div>
-              </div>
-              <div class="item-actions">
-                @if (workshop.project_id) {
-                  <button
-                    class="action-icon-btn"
-                    (click)="unassignFromProject($event, workshop)"
-                    [title]="'textWorkshop.unassignFromProject' | translate">
-                    <i class="fas fa-link-slash"></i>
-                  </button>
-                } @else {
-                  <button
-                    class="action-icon-btn"
-                    (click)="openAssignToProjectDialog($event, workshop)"
-                    [title]="'textWorkshop.assignToProject' | translate">
-                    <i class="fas fa-link"></i>
-                  </button>
-                }
-                <button
-                  class="delete-item-btn"
-                  (click)="deleteWorkshop($event, workshop)"
-                  [title]="'common.delete' | translate">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </div>
-          }
-        </div>
-        <!-- Pagination -->
-        @if (totalWorkshops > pageSize) {
-          <div class="pagination">
-            <button
-              class="pagination-btn"
-              [disabled]="!hasPreviousPage"
-              (click)="onPageChange(-1)">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <span class="pagination-info">{{ currentPage + 1 }}</span>
-            <button
-              class="pagination-btn"
-              [disabled]="!hasNextPage"
-              (click)="onPageChange(1)">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
-        }
-      </mat-card>
+        </mat-card>
+      </div>
     </div>
   }
 

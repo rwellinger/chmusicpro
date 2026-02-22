@@ -1,120 +1,275 @@
-<!-- Library Mode -->
+<!-- Library Mode (Master-Detail) -->
 @if (!isEditorMode) {
-  <div class="suno-enhancer-container library-mode">
-    <mat-card class="library-card">
-      <div class="library-header">
-        <h2>
-          <i class="fas fa-wand-sparkles"></i>
-          {{ 'sunoEnhancer.title' | translate }}
-        </h2>
-        <div class="library-actions">
-          <button type="button" class="action-button create-song-button" (click)="createNewTemplate('song')">
-            <i class="fas fa-music"></i>
-            <span>{{ 'sunoEnhancer.newSong' | translate }}</span>
-          </button>
-          <button type="button" class="action-button create-instrumental-button" (click)="createNewTemplate('instrumental')">
-            <i class="fas fa-drum"></i>
-            <span>{{ 'sunoEnhancer.newInstrumental' | translate }}</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Search & Filter -->
-      <div class="filters-section">
-        <div class="search-box">
-          <i class="fas fa-search"></i>
-          <input
-            type="text"
-            [(ngModel)]="searchTerm"
-            (keyup.enter)="onSearch()"
-            [placeholder]="'sunoEnhancer.searchPlaceholder' | translate"
-          />
-        </div>
-        <div class="filter-chips">
-          <button type="button"
-                  class="filter-chip"
-                  [class.active]="filterType === null"
-                  (click)="onFilterChange(null)">
-            {{ 'sunoEnhancer.filter.all' | translate }}
-          </button>
-          <button type="button"
-                  class="filter-chip"
-                  [class.active]="filterType === 'song'"
-                  (click)="onFilterChange('song')">
-            <i class="fas fa-music"></i>
-            {{ 'sunoEnhancer.filter.song' | translate }}
-          </button>
-          <button type="button"
-                  class="filter-chip"
-                  [class.active]="filterType === 'instrumental'"
-                  (click)="onFilterChange('instrumental')">
-            <i class="fas fa-drum"></i>
-            {{ 'sunoEnhancer.filter.instrumental' | translate }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Template List -->
-      @if (isLoading) {
-        <div class="loading-state">
-          <i class="fas fa-spinner fa-spin"></i>
-          {{ 'common.loading' | translate }}
-        </div>
-      } @else if (templates.length === 0) {
-        <div class="empty-state">
-          <i class="fas fa-wand-sparkles"></i>
-          <p>{{ 'sunoEnhancer.empty' | translate }}</p>
-        </div>
-      } @else {
-        <div class="template-list">
-          @for (template of templates; track template.id) {
-            <div class="template-item" (click)="openTemplate(template)">
-              <div class="template-item-header">
-                <div class="template-icon">
-                  <i [class]="template.template_type === 'song' ? 'fas fa-music' : 'fas fa-drum'"></i>
+  <div class="suno-enhancer-container master-detail-layout">
+    <!-- Left: List Section -->
+    <div class="list-section">
+      <mat-card class="list-card">
+        <!-- Header -->
+        <div class="list-header">
+          <div class="header-title">
+            <div class="header-title-group">
+              <h2>
+                <i class="fas fa-wand-sparkles"></i>
+                {{ 'sunoEnhancer.title' | translate }}
+              </h2>
+              @if (totalTemplates > 0) {
+                <div class="count-badge">
+                  {{ totalTemplates }}
                 </div>
-                <div class="template-info">
-                  <h4>{{ template.title }}</h4>
-                  <div class="template-meta">
-                    <span class="type-badge" [class.song]="template.template_type === 'song'" [class.instrumental]="template.template_type === 'instrumental'">
-                      {{ template.template_type === 'song' ? ('sunoEnhancer.filter.song' | translate) : ('sunoEnhancer.filter.instrumental' | translate) }}
-                    </span>
-                    @if (template.genre) {
-                      <span class="genre-tag">{{ template.genre }}</span>
-                    }
+              }
+            </div>
+          </div>
+          <div class="header-actions">
+            <button type="button" class="action-button create-song-button" (click)="createNewTemplate('song')" [title]="'sunoEnhancer.newSong' | translate">
+              <i class="fas fa-music"></i>
+            </button>
+            <button type="button" class="action-button create-instrumental-button" (click)="createNewTemplate('instrumental')" [title]="'sunoEnhancer.newInstrumental' | translate">
+              <i class="fas fa-drum"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="filters-section">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              (keyup.enter)="onSearch()"
+              [placeholder]="'sunoEnhancer.searchPlaceholder' | translate"
+            />
+          </div>
+          <div class="filter-chips">
+            <button type="button"
+                    class="filter-chip"
+                    [class.active]="filterType === null"
+                    (click)="onFilterChange(null)">
+              {{ 'sunoEnhancer.filter.all' | translate }}
+            </button>
+            <button type="button"
+                    class="filter-chip"
+                    [class.active]="filterType === 'song'"
+                    (click)="onFilterChange('song')">
+              <i class="fas fa-music"></i>
+              {{ 'sunoEnhancer.filter.song' | translate }}
+            </button>
+            <button type="button"
+                    class="filter-chip"
+                    [class.active]="filterType === 'instrumental'"
+                    (click)="onFilterChange('instrumental')">
+              <i class="fas fa-drum"></i>
+              {{ 'sunoEnhancer.filter.instrumental' | translate }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Template List -->
+        <div class="items-list">
+          @if (isLoading) {
+            <div class="loading-state">
+              <i class="fas fa-spinner fa-spin"></i>
+              {{ 'common.loading' | translate }}
+            </div>
+          } @else if (templates.length === 0) {
+            <div class="empty-state">
+              <i class="fas fa-wand-sparkles"></i>
+              <p>{{ 'sunoEnhancer.empty' | translate }}</p>
+            </div>
+          } @else {
+            @for (template of templates; track template.id) {
+              <div class="template-item"
+                   [class.selected]="selectedTemplate?.id === template.id"
+                   (click)="openTemplate(template)">
+                <div class="template-item-header">
+                  <div class="template-icon">
+                    <i [class]="template.template_type === 'song' ? 'fas fa-music' : 'fas fa-drum'"></i>
+                  </div>
+                  <div class="template-info">
+                    <h4>{{ template.title }}</h4>
+                    <div class="template-meta">
+                      <span class="type-badge" [class.song]="template.template_type === 'song'" [class.instrumental]="template.template_type === 'instrumental'">
+                        {{ template.template_type === 'song' ? ('sunoEnhancer.filter.song' | translate) : ('sunoEnhancer.filter.instrumental' | translate) }}
+                      </span>
+                      @if (template.genre) {
+                        <span class="genre-tag">{{ template.genre }}</span>
+                      }
+                    </div>
                   </div>
                 </div>
-                <button type="button" class="delete-icon-btn" (click)="deleteTemplate(template, $event)" [title]="'common.delete' | translate">
-                  <i class="fas fa-trash"></i>
-                </button>
+                <div class="template-item-footer">
+                  <span class="date">{{ template.created_at | date:'short' }}</span>
+                  @if (template.project_name) {
+                    <span class="project-tag">
+                      <i class="fas fa-folder"></i>
+                      {{ template.project_name }}
+                    </span>
+                  }
+                </div>
               </div>
-              <div class="template-item-footer">
-                <span class="date">{{ template.created_at | date:'short' }}</span>
-                @if (template.project_name) {
-                  <span class="project-tag">
-                    <i class="fas fa-folder"></i>
-                    {{ template.project_name }}
-                  </span>
-                }
-              </div>
-            </div>
+            }
           }
         </div>
 
         <!-- Pagination -->
         @if (totalTemplates > pageSize) {
-          <div class="pagination-section">
-            <button type="button" mat-button [disabled]="currentPage === 0" (click)="onPageChange(-1)">
+          <div class="pagination">
+            <button class="pagination-btn" [disabled]="currentPage === 0" (click)="onPageChange(-1)">
               <i class="fas fa-chevron-left"></i>
             </button>
-            <span class="page-info">{{ currentPage + 1 }} / {{ (totalTemplates / pageSize | number:'1.0-0') }}</span>
-            <button type="button" mat-button [disabled]="(currentPage + 1) * pageSize >= totalTemplates" (click)="onPageChange(1)">
+            <span class="pagination-info">{{ currentPage + 1 }}</span>
+            <button class="pagination-btn" [disabled]="(currentPage + 1) * pageSize >= totalTemplates" (click)="onPageChange(1)">
               <i class="fas fa-chevron-right"></i>
             </button>
           </div>
         }
-      }
-    </mat-card>
+      </mat-card>
+    </div>
+
+    <!-- Right: Detail Section -->
+    <div class="detail-section">
+      <mat-card class="detail-card">
+        @if (isLoadingDetail) {
+          <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            {{ 'common.loading' | translate }}
+          </div>
+        } @else if (!selectedTemplate) {
+          <div class="empty-detail">
+            <i class="fas fa-wand-sparkles"></i>
+            <p>{{ 'sunoEnhancer.selectPrompt' | translate }}</p>
+          </div>
+        } @else {
+          <div class="detail-content">
+            <!-- Header -->
+            <div class="detail-header">
+              <div class="detail-title-group">
+                <h2>{{ selectedTemplate.title }}</h2>
+                <div class="detail-badges">
+                  <span class="type-badge" [class.song]="selectedTemplate.template_type === 'song'" [class.instrumental]="selectedTemplate.template_type === 'instrumental'">
+                    {{ selectedTemplate.template_type === 'song' ? ('sunoEnhancer.filter.song' | translate) : ('sunoEnhancer.filter.instrumental' | translate) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Style Info -->
+            <div class="detail-section-block">
+              <h3 class="section-title">
+                <i class="fas fa-palette"></i>
+                {{ 'sunoEnhancer.detail.styleInfo' | translate }}
+              </h3>
+              <div class="detail-field-row">
+                @if (selectedTemplate.genre) {
+                  <div class="detail-field">
+                    <span class="field-label">{{ 'sunoEnhancer.detail.genre' | translate }}</span>
+                    <div class="readonly-field">{{ selectedTemplate.genre }}</div>
+                  </div>
+                }
+                @if (selectedTemplate.bpm) {
+                  <div class="detail-field">
+                    <span class="field-label">{{ 'sunoEnhancer.fields.bpm' | translate }}</span>
+                    <div class="readonly-field">{{ selectedTemplate.bpm }}</div>
+                  </div>
+                }
+              </div>
+              <div class="detail-field-row">
+                @if (selectedTemplate.vocal_type) {
+                  <div class="detail-field">
+                    <span class="field-label">{{ 'sunoEnhancer.detail.vocalType' | translate }}</span>
+                    <div class="readonly-field">{{ selectedTemplate.vocal_type }}</div>
+                  </div>
+                }
+                @if (selectedTemplate.instruments) {
+                  <div class="detail-field">
+                    <span class="field-label">{{ 'sunoEnhancer.detail.instruments' | translate }}</span>
+                    <div class="readonly-field">{{ selectedTemplate.instruments }}</div>
+                  </div>
+                }
+              </div>
+              @if (selectedTemplate.mood) {
+                <div class="detail-field">
+                  <span class="field-label">{{ 'sunoEnhancer.detail.mood' | translate }}</span>
+                  <div class="readonly-field">{{ selectedTemplate.mood }}</div>
+                </div>
+              }
+              @if (selectedTemplate.mix_character) {
+                <div class="detail-field">
+                  <span class="field-label">{{ 'sunoEnhancer.fields.mixCharacter' | translate }}</span>
+                  <div class="readonly-field">{{ selectedTemplate.mix_character }}</div>
+                </div>
+              }
+            </div>
+
+            <!-- Lyrics Preview -->
+            @if (selectedTemplate.enhanced_lyrics) {
+              <div class="detail-section-block">
+                <h3 class="section-title">
+                  <i class="fas fa-file-alt"></i>
+                  {{ 'sunoEnhancer.enhancedLyrics' | translate }}
+                </h3>
+                <div class="readonly-field lyrics-preview-field">{{ truncateText(selectedTemplate.enhanced_lyrics, 300) }}</div>
+              </div>
+            }
+
+            <!-- Style Prompt Preview -->
+            @if (selectedTemplate.style_prompt) {
+              <div class="detail-section-block">
+                <h3 class="section-title">
+                  <i class="fas fa-magic"></i>
+                  {{ 'sunoEnhancer.generatedPrompt' | translate }}
+                </h3>
+                <div class="readonly-field style-prompt-preview">{{ truncateText(selectedTemplate.style_prompt, 300) }}</div>
+              </div>
+            }
+
+            <!-- Project Assignment -->
+            @if (selectedTemplate.project_name) {
+              <div class="detail-section-block">
+                <h3 class="section-title">
+                  <i class="fas fa-folder-open"></i>
+                  {{ 'sunoEnhancer.detail.project' | translate }}
+                </h3>
+                <div class="readonly-field">
+                  <i class="fas fa-folder-open"></i>
+                  {{ selectedTemplate.project_name }}
+                </div>
+              </div>
+            }
+
+            <!-- Dates -->
+            <div class="detail-section-block">
+              <h3 class="section-title">
+                <i class="fas fa-calendar"></i>
+                {{ 'sunoEnhancer.detail.dates' | translate }}
+              </h3>
+              <div class="detail-field-row">
+                <div class="detail-field">
+                  <span class="field-label">{{ 'sunoEnhancer.detail.created' | translate }}</span>
+                  <div class="readonly-field">{{ formatDate(selectedTemplate.created_at) }}</div>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">{{ 'sunoEnhancer.detail.updated' | translate }}</span>
+                  <div class="readonly-field">{{ formatDate(selectedTemplate.updated_at) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="detail-actions">
+            <button mat-stroked-button type="button" color="warn" (click)="deleteSelectedTemplate()">
+              <i class="fas fa-trash"></i>
+              <span>{{ 'common.delete' | translate }}</span>
+            </button>
+            <button mat-flat-button type="button" color="primary" (click)="editSelectedTemplate()">
+              <i class="fas fa-edit"></i>
+              <span>{{ 'common.edit' | translate }}</span>
+            </button>
+          </div>
+        }
+      </mat-card>
+    </div>
   </div>
 }
 

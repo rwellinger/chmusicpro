@@ -83,10 +83,14 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
     templates: SunoTemplate[] = [];
     totalTemplates = 0;
     currentPage = 0;
-    pageSize = 20;
+    pageSize = 10;
     searchTerm = "";
     filterType: string | null = null;
     isLoading = false;
+
+    // Detail panel
+    selectedTemplate: SunoTemplate | null = null;
+    isLoadingDetail = false;
 
     // Char limits
     readonly LYRICS_LIMIT = SUNO_LYRICS_CHAR_LIMIT;
@@ -208,6 +212,9 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
                 this.templates = response.data;
                 this.totalTemplates = response.pagination.total;
                 this.isLoading = false;
+                if (!this.selectedTemplate && this.templates.length > 0) {
+                    this.selectTemplate(this.templates[0]);
+                }
             },
             error: () => {
                 this.notificationService.error(this.translate.instant('sunoEnhancer.errors.loadFailed'));
@@ -218,17 +225,20 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
 
     onSearch(): void {
         this.currentPage = 0;
+        this.selectedTemplate = null;
         this.loadTemplates();
     }
 
     onFilterChange(type: string | null): void {
         this.filterType = type;
         this.currentPage = 0;
+        this.selectedTemplate = null;
         this.loadTemplates();
     }
 
     onPageChange(direction: number): void {
         this.currentPage += direction;
+        this.selectedTemplate = null;
         this.loadTemplates();
     }
 
@@ -252,21 +262,53 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
     }
 
     openTemplate(template: SunoTemplate): void {
-        this.router.navigate(['/suno-enhancer', template.id]);
+        this.selectTemplate(template);
     }
 
-    deleteTemplate(template: SunoTemplate, event: Event): void {
-        event.stopPropagation();
+    selectTemplate(template: SunoTemplate): void {
+        this.isLoadingDetail = true;
+        this.templateService.getTemplateById(String(template.id))
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (response) => {
+                    this.selectedTemplate = response.data;
+                    this.isLoadingDetail = false;
+                },
+                error: () => {
+                    this.notificationService.error(this.translate.instant('sunoEnhancer.errors.loadFailed'));
+                    this.isLoadingDetail = false;
+                },
+            });
+    }
+
+    editSelectedTemplate(): void {
+        if (!this.selectedTemplate) return;
+        this.router.navigate(['/suno-enhancer', this.selectedTemplate.id]);
+    }
+
+    deleteSelectedTemplate(): void {
+        if (!this.selectedTemplate) return;
         if (!confirm(this.translate.instant('sunoEnhancer.confirmDelete'))) return;
 
-        this.templateService.deleteTemplate(template.id).pipe(takeUntil(this.destroy$)).subscribe({
+        this.templateService.deleteTemplate(this.selectedTemplate.id).pipe(takeUntil(this.destroy$)).subscribe({
             next: () => {
+                this.selectedTemplate = null;
                 this.loadTemplates();
             },
             error: () => {
                 this.notificationService.error(this.translate.instant('sunoEnhancer.errors.deleteFailed'));
             },
         });
+    }
+
+    formatDate(dateString: string | undefined): string {
+        if (!dateString) return "-";
+        return new Date(dateString).toLocaleDateString();
+    }
+
+    truncateText(text: string | undefined, maxLength = 200): string {
+        if (!text) return "";
+        return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
     }
 
     // ===== Editor Mode =====
