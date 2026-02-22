@@ -138,42 +138,6 @@
           </div>
         </div>
 
-        <!-- Music Style Prompt Field -->
-        <div class="form-group">
-          <label for="prompt">
-            {{ 'songSketch.creator.fields.prompt' | translate }}
-            <span class="required">*</span>
-          </label>
-          <div class="prompt-input-group">
-            <textarea
-              id="prompt"
-              formControlName="prompt"
-              [placeholder]="'songSketch.creator.fields.promptPlaceholder' | translate"
-              required
-              [disabled]="isSaving"
-              rows="2"
-              maxlength="1024"
-              class="form-textarea prompt-textarea">
-            </textarea>
-            <button
-              type="button"
-              (click)="navigateToMusicStylePrompt()"
-              [disabled]="isSaving"
-              class="edit-icon-button"
-              [title]="'songSketch.creator.buttons.editMusicStyle' | translate">
-              <i class="fas fa-pen-to-square"></i>
-            </button>
-          </div>
-          <div class="char-counter">
-            {{
-            'songSketch.creator.fields.promptCharCounter' | translate: {
-            count: charCountPrompt,
-            max: 1024
-          }
-          }}
-        </div>
-      </div>
-
       <!-- Workflow Field -->
       <div class="form-group">
         <label for="workflow">{{ 'songSketch.creator.fields.workflow' | translate }}</label>

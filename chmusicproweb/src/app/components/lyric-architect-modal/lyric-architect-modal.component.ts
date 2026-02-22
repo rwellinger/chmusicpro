@@ -117,7 +117,6 @@ export class LyricArchitectModalComponent implements OnInit, OnDestroy {
 
     reset(): void {
         this.config = this.architectureService.resetToDefault();
-        this.notificationService.success(this.translateService.instant("lyricArchitect.messages.resetSuccess"));
     }
 
     save(): void {

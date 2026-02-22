@@ -162,9 +162,6 @@ export class CreateProjectDialogComponent implements OnInit {
             await this.sketchService.unassignFromProject(sketch.id);
             this.assignedSketches = this.assignedSketches.filter(s => s.id !== sketch.id);
             this.unassignedItems.push({type: "sketch", id: sketch.id});
-            this.notificationService.success(
-                this.translate.instant("createProjectDialog.advanced.unassignSuccess")
-            );
         } catch (error: any) {
             this.notificationService.error(
                 this.translate.instant("createProjectDialog.advanced.unassignError") + ": " + error.message
@@ -191,9 +188,6 @@ export class CreateProjectDialogComponent implements OnInit {
             await this.imageService.unassignFromProject(image.id, this.data.project_id);
             this.assignedImages = this.assignedImages.filter(i => i.id !== image.id);
             this.unassignedItems.push({type: "image", id: image.id});
-            this.notificationService.success(
-                this.translate.instant("createProjectDialog.advanced.unassignSuccess")
-            );
         } catch (error: any) {
             this.notificationService.error(
                 this.translate.instant("createProjectDialog.advanced.unassignError") + ": " + error.message

@@ -289,10 +289,9 @@ export class SongReleaseGalleryComponent implements OnInit, OnDestroy {
     /**
      * Copy text to clipboard
      */
-    async copyToClipboard(text: string, messageKey: string): Promise<void> {
+    async copyToClipboard(text: string, _messageKey: string): Promise<void> {
         try {
             await navigator.clipboard.writeText(text);
-            this.notificationService.success(this.translate.instant(messageKey));
         } catch (error) {
             this.notificationService.error(this.translate.instant("songRelease.messages.copyError"));
         }
@@ -336,7 +335,6 @@ export class SongReleaseGalleryComponent implements OnInit, OnDestroy {
 
         try {
             await this.releaseService.deleteRelease(this.selectedRelease.id).toPromise();
-            this.notificationService.success(this.translate.instant("songRelease.messages.deleteSuccess"));
             this.selectedRelease = null;
             this.loadReleases(this.currentPage);
         } catch (error) {

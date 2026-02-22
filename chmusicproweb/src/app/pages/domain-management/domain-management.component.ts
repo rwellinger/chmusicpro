@@ -142,7 +142,6 @@ export class DomainManagementComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: () => {
-                    this.notificationService.success(this.translate.instant("domainManagement.memberAdded"));
                     this.newMemberEmail = "";
                     this.newMemberRole = "member";
                     this.loadMembers(this.selectedDomain!.domain.id);
@@ -165,7 +164,6 @@ export class DomainManagementComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: () => {
-                    this.notificationService.success(this.translate.instant("domainManagement.roleUpdated"));
                     this.loadMembers(this.selectedDomain!.domain.id);
                 },
                 error: (error) => {
@@ -190,7 +188,6 @@ export class DomainManagementComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: () => {
-                    this.notificationService.success(this.translate.instant("domainManagement.memberRemoved"));
                     this.loadMembers(this.selectedDomain!.domain.id);
                 },
                 error: (error) => {
@@ -214,7 +211,6 @@ export class DomainManagementComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: () => {
-                    this.notificationService.success(this.translate.instant("domainManagement.domainCreated"));
                     this.showCreateForm = false;
                     this.newDomainName = "";
                     this.newDomainDescription = "";
@@ -241,7 +237,6 @@ export class DomainManagementComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: () => {
-                    this.notificationService.success(this.translate.instant("domainManagement.domainDeactivated"));
                     this.selectedDomain = null;
                     this.members = [];
                     this.loadDomains();

@@ -659,9 +659,6 @@ export class ImageViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(async (result) => {
             if (result?.success) {
-                this.notificationService.success(
-                    this.translate.instant("assignToProject.success")
-                );
                 // Reload images to reflect updated project assignment
                 const currentPage = Math.floor(this.pagination.offset / this.pagination.limit);
                 await this.loadImages(currentPage);
@@ -774,10 +771,6 @@ export class ImageViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
             this.isLoading = true;
             await this.imageService.unassignFromProject(this.selectedImage.id, targetProjectId);
-
-            this.notificationService.success(
-                this.translate.instant("imageView.messages.unassignedFromProject")
-            );
 
             // Reload images to reflect updated project assignment
             await this.loadImages(this.currentPage);

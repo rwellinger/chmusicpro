@@ -380,7 +380,7 @@ export class ImageDetailPanelComponent implements OnInit, OnChanges {
         if (!text) return;
 
         navigator.clipboard.writeText(text).then(() => {
-            this.notificationService.success(this.translate.instant("imageDetailPanel.prompts.final.copied"));
+            // clipboard copy succeeded
         }).catch(err => {
             console.error("Failed to copy to clipboard:", err);
             this.notificationService.error(this.translate.instant("imageDetailPanel.errors.copyFailed"));

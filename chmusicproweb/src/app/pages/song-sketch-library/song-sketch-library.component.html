@@ -234,21 +234,23 @@
                       </div>
                     }
                   </div>
-                  <!-- Music Style Prompt -->
-                  <div class="detail-section-block">
-                    <div class="section-header">
-                      <h3>{{ 'songSketch.library.detail.musicStyle' | translate }}</h3>
-                      <button type="button"
-                        class="copy-icon-btn"
-                        (click)="copyToClipboard(selectedSketch.prompt, 'Prompt')"
-                        [title]="'songSketch.library.actions.copyPrompt' | translate">
-                        <i class="fas fa-copy"></i>
-                      </button>
+                  <!-- Music Style Prompt (legacy, only shown if data exists) -->
+                  @if (selectedSketch.prompt) {
+                    <div class="detail-section-block">
+                      <div class="section-header">
+                        <h3>{{ 'songSketch.library.detail.musicStyle' | translate }}</h3>
+                        <button type="button"
+                          class="copy-icon-btn"
+                          (click)="copyToClipboard(selectedSketch.prompt, 'Prompt')"
+                          [title]="'songSketch.library.actions.copyPrompt' | translate">
+                          <i class="fas fa-copy"></i>
+                        </button>
+                      </div>
+                      <div class="prompt-display">
+                        {{ selectedSketch.prompt }}
+                      </div>
                     </div>
-                    <div class="prompt-display">
-                      {{ selectedSketch.prompt }}
-                    </div>
-                  </div>
+                  }
                   <!-- Lyrics -->
                   @if (selectedSketch.lyrics) {
                     <div class="detail-section-block">
@@ -429,6 +431,12 @@
               <button mat-button type="button"
                 (click)="duplicateSketch(selectedSketch)">
                 <i class="fas fa-copy"></i> {{ 'songSketch.library.actions.duplicate' | translate }}
+              </button>
+            }
+            @if (selectedSketch.lyrics) {
+              <button mat-button type="button"
+                (click)="openSunoEnhancer(selectedSketch)">
+                <i class="fas fa-wand-sparkles"></i> {{ 'songSketch.library.actions.sunoEnhancer' | translate }}
               </button>
             }
             @if (selectedSketch.workflow !== 'used' && !selectedSketch.project_id) {

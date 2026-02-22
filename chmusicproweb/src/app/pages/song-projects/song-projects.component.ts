@@ -265,9 +265,6 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
         try {
             this.isLoadingDetail = true;
             await this.selectProject(this.selectedProject);
-            this.notificationService.success(
-                this.translate.instant("common.refreshSuccess")
-            );
         } catch (error) {
             console.error("Failed to refresh project:", error);
             this.notificationService.error(
@@ -291,10 +288,6 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
         try {
             await firstValueFrom(
                 this.projectService.deleteProject(this.selectedProject.id)
-            );
-
-            this.notificationService.success(
-                this.translate.instant("songProjects.messages.deleteSuccess")
             );
 
             // Reset selection and reload list
@@ -408,10 +401,6 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
         try {
             await firstValueFrom(
                 this.projectService.deleteFiles(this.selectedProject.id, [file.id])
-            );
-
-            this.notificationService.success(
-                this.translate.instant("songProjects.messages.fileDeleted", {filename})
             );
 
             // Refresh project to show updated file list
@@ -621,9 +610,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
         this.chunkedProgress = null;
 
         if (totalFailed === 0) {
-            this.notificationService.success(
-                this.translate.instant("songProjects.upload.batchUploadSuccess", {count: totalUploaded})
-            );
+            // Upload successful
         } else if (totalUploaded > 0) {
             this.notificationService.info(
                 this.translate.instant("songProjects.upload.batchUploadPartial", {
@@ -835,9 +822,6 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
         if (totalChanges === 0) {
             this.mirrorPhase = "idle";
             this.uploadingFolderId = null;
-            this.notificationService.success(
-                this.translate.instant("songProjects.mirror.alreadyUpToDate")
-            );
             return;
         }
 
@@ -919,9 +903,6 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
 
         // Phase 6: Complete
         this.mirrorPhase = "idle";
-        this.notificationService.success(
-            this.translate.instant("songProjects.mirror.syncComplete")
-        );
 
         // Refresh project
         if (this.selectedProject) {
@@ -947,10 +928,6 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
             try {
                 await firstValueFrom(
                     this.projectService.createProject(result)
-                );
-
-                this.notificationService.success(
-                    this.translate.instant("songProjects.messages.createSuccess")
                 );
 
                 // Reload projects list
@@ -1094,9 +1071,6 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
                     await this.selectProject(projectInList);
                 }
 
-                this.notificationService.success(
-                    this.translate.instant("songProjects.messages.projectUpdated")
-                );
             } catch (error) {
                 console.error("Failed to update project:", error);
                 this.notificationService.error(
@@ -1129,10 +1103,6 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
                 projectInList.project_status = newStatus;
             }
             await this.loadProjects();
-
-            this.notificationService.success(
-                this.translate.instant("songProjects.messages.statusUpdated")
-            );
         } catch (error) {
             console.error("Failed to update project status:", error);
             this.notificationService.error(
@@ -1157,16 +1127,12 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
         if (!confirmed) return;
 
         try {
-            const response = await firstValueFrom(
+            await firstValueFrom(
                 this.projectService.clearFolder(this.selectedProject.id, folderId)
             );
 
             // Refresh project to show updated file list
             await this.selectProject(this.selectedProject);
-
-            this.notificationService.success(
-                this.translate.instant("songProjects.messages.filesDeleted", {count: response.data.deleted})
-            );
         } catch (error) {
             console.error("Failed to clear folder:", error);
             this.notificationService.error(
@@ -1230,9 +1196,6 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     async copyToClipboard(text: string): Promise<void> {
         try {
             await navigator.clipboard.writeText(text);
-            this.notificationService.success(
-                this.translate.instant("common.copiedToClipboard")
-            );
         } catch (error) {
             console.error("Failed to copy to clipboard:", error);
             this.notificationService.error(
@@ -1301,9 +1264,6 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
                 }
 
                 this.folderDownloadProgress = null;
-                this.notificationService.success(
-                    this.translate.instant("songProjects.download.downloadComplete", {count: files.length})
-                );
                 return;
             } catch (err: any) {
                 this.folderDownloadProgress = null;

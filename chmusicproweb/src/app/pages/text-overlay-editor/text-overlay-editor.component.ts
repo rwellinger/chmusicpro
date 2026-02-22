@@ -817,7 +817,6 @@ export class TextOverlayEditorComponent implements OnInit {
                 next: (response) => {
                     this.isProcessing = false;
                     this.resultImageFilePath = response.image_url;
-                    this.notificationService.success(this.translate.instant("textOverlayEditor.success.applied"));
                     this.loadImages(); // Reload image list
                 },
                 error: (error) => {

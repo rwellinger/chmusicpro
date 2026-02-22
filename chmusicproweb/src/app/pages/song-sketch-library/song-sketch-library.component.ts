@@ -231,10 +231,6 @@ export class SongSketchLibraryComponent implements OnInit, OnDestroy {
                 this.sketchService.deleteSketch(this.deleteSketchId)
             );
 
-            this.notificationService.success(
-                this.translate.instant("songSketch.library.messages.deleted")
-            );
-
             // Clear selection if deleted sketch was selected
             if (this.selectedSketch?.id === this.deleteSketchId) {
                 this.selectedSketch = null;
@@ -257,10 +253,6 @@ export class SongSketchLibraryComponent implements OnInit, OnDestroy {
                 this.sketchService.updateSketch(sketch.id, {
                     workflow: "archived"
                 })
-            );
-
-            this.notificationService.success(
-                this.translate.instant("songSketch.library.messages.archived")
             );
 
             // Reload list
@@ -288,10 +280,6 @@ export class SongSketchLibraryComponent implements OnInit, OnDestroy {
                 })
             );
 
-            this.notificationService.success(
-                this.translate.instant("songSketch.library.messages.markedAsUsed")
-            );
-
             // Reload list
             await this.loadSketches(this.currentPage);
 
@@ -315,10 +303,6 @@ export class SongSketchLibraryComponent implements OnInit, OnDestroy {
                 this.sketchService.updateSketch(sketch.id, {
                     workflow: "draft"
                 })
-            );
-
-            this.notificationService.success(
-                this.translate.instant("songSketch.library.messages.markedAsDraft")
             );
 
             // Reload list
@@ -350,10 +334,6 @@ export class SongSketchLibraryComponent implements OnInit, OnDestroy {
         try {
             const response = await firstValueFrom(
                 this.sketchService.duplicateSketch(sketch.id)
-            );
-
-            this.notificationService.success(
-                this.translate.instant("songSketch.library.messages.duplicated")
             );
 
             // Reload list and select new sketch
@@ -410,16 +390,13 @@ export class SongSketchLibraryComponent implements OnInit, OnDestroy {
         return classMap[workflow] || "badge-draft";
     }
 
-    async copyToClipboard(text: string, fieldName: string): Promise<void> {
+    async copyToClipboard(text: string, _fieldName: string): Promise<void> {
         if (!text || !text.trim()) {
             return;
         }
 
         try {
             await navigator.clipboard.writeText(text);
-            this.notificationService.success(
-                this.translate.instant(`songSketch.library.actions.copy${fieldName}`)
-            );
         } catch (error) {
             console.error("Failed to copy to clipboard:", error);
             this.notificationService.error(
@@ -447,9 +424,6 @@ export class SongSketchLibraryComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(async (result) => {
             if (result?.success) {
-                this.notificationService.success(
-                    this.translate.instant("assignToProject.success")
-                );
                 // Reload sketches to reflect updated project assignment
                 const currentPage = Math.floor(this.pagination.offset / this.pagination.limit);
                 await this.loadSketches(currentPage);
@@ -464,6 +438,15 @@ export class SongSketchLibraryComponent implements OnInit, OnDestroy {
         event.stopPropagation();
         this.router.navigate(["/song-projects"], {
             state: {selectedProjectId: projectId}
+        });
+    }
+
+    /**
+     * Open Suno Enhancer with sketch lyrics
+     */
+    openSunoEnhancer(sketch: Sketch): void {
+        this.router.navigate(["/suno-enhancer"], {
+            state: {fromSketch: true, sketchId: sketch.id}
         });
     }
 
@@ -489,10 +472,6 @@ export class SongSketchLibraryComponent implements OnInit, OnDestroy {
         this.isLoading = true;
         try {
             await this.sketchService.unassignFromProject(this.selectedSketch.id);
-
-            this.notificationService.success(
-                this.translate.instant("songSketch.library.messages.unassignedFromProject")
-            );
 
             // Reload sketches to reflect updated project assignment
             await this.loadSketches(this.currentPage);

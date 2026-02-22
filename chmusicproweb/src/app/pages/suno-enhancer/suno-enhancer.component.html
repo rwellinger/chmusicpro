@@ -1,0 +1,372 @@
+<!-- Library Mode -->
+@if (!isEditorMode) {
+  <div class="suno-enhancer-container library-mode">
+    <mat-card class="library-card">
+      <div class="library-header">
+        <h2>
+          <i class="fas fa-wand-sparkles"></i>
+          {{ 'sunoEnhancer.title' | translate }}
+        </h2>
+        <div class="library-actions">
+          <button type="button" class="action-button create-song-button" (click)="createNewTemplate('song')">
+            <i class="fas fa-music"></i>
+            <span>{{ 'sunoEnhancer.newSong' | translate }}</span>
+          </button>
+          <button type="button" class="action-button create-instrumental-button" (click)="createNewTemplate('instrumental')">
+            <i class="fas fa-drum"></i>
+            <span>{{ 'sunoEnhancer.newInstrumental' | translate }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search & Filter -->
+      <div class="filters-section">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="onSearch()"
+            [placeholder]="'sunoEnhancer.searchPlaceholder' | translate"
+          />
+        </div>
+        <div class="filter-chips">
+          <button type="button"
+                  class="filter-chip"
+                  [class.active]="filterType === null"
+                  (click)="onFilterChange(null)">
+            {{ 'sunoEnhancer.filter.all' | translate }}
+          </button>
+          <button type="button"
+                  class="filter-chip"
+                  [class.active]="filterType === 'song'"
+                  (click)="onFilterChange('song')">
+            <i class="fas fa-music"></i>
+            {{ 'sunoEnhancer.filter.song' | translate }}
+          </button>
+          <button type="button"
+                  class="filter-chip"
+                  [class.active]="filterType === 'instrumental'"
+                  (click)="onFilterChange('instrumental')">
+            <i class="fas fa-drum"></i>
+            {{ 'sunoEnhancer.filter.instrumental' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Template List -->
+      @if (isLoading) {
+        <div class="loading-state">
+          <i class="fas fa-spinner fa-spin"></i>
+          {{ 'common.loading' | translate }}
+        </div>
+      } @else if (templates.length === 0) {
+        <div class="empty-state">
+          <i class="fas fa-wand-sparkles"></i>
+          <p>{{ 'sunoEnhancer.empty' | translate }}</p>
+        </div>
+      } @else {
+        <div class="template-list">
+          @for (template of templates; track template.id) {
+            <div class="template-item" (click)="openTemplate(template)">
+              <div class="template-item-header">
+                <div class="template-icon">
+                  <i [class]="template.template_type === 'song' ? 'fas fa-music' : 'fas fa-drum'"></i>
+                </div>
+                <div class="template-info">
+                  <h4>{{ template.title }}</h4>
+                  <div class="template-meta">
+                    <span class="type-badge" [class.song]="template.template_type === 'song'" [class.instrumental]="template.template_type === 'instrumental'">
+                      {{ template.template_type === 'song' ? ('sunoEnhancer.filter.song' | translate) : ('sunoEnhancer.filter.instrumental' | translate) }}
+                    </span>
+                    @if (template.genre) {
+                      <span class="genre-tag">{{ template.genre }}</span>
+                    }
+                  </div>
+                </div>
+                <button type="button" class="delete-icon-btn" (click)="deleteTemplate(template, $event)" [title]="'common.delete' | translate">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+              <div class="template-item-footer">
+                <span class="date">{{ template.created_at | date:'short' }}</span>
+                @if (template.project_name) {
+                  <span class="project-tag">
+                    <i class="fas fa-folder"></i>
+                    {{ template.project_name }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Pagination -->
+        @if (totalTemplates > pageSize) {
+          <div class="pagination-section">
+            <button type="button" mat-button [disabled]="currentPage === 0" (click)="onPageChange(-1)">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="page-info">{{ currentPage + 1 }} / {{ (totalTemplates / pageSize | number:'1.0-0') }}</span>
+            <button type="button" mat-button [disabled]="(currentPage + 1) * pageSize >= totalTemplates" (click)="onPageChange(1)">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        }
+      }
+    </mat-card>
+  </div>
+}
+
+<!-- Editor Mode -->
+@if (isEditorMode) {
+  <div class="suno-enhancer-container editor-mode">
+    <!-- Editor Header -->
+    <div class="editor-header">
+      <div class="header-left">
+        <button type="button" class="back-button" (click)="backToLibrary()">
+          <i class="fas fa-arrow-left"></i>
+          {{ 'sunoEnhancer.backToLibrary' | translate }}
+        </button>
+        <div class="title-input" [formGroup]="templateForm">
+          <input
+            type="text"
+            formControlName="title"
+            [placeholder]="'sunoEnhancer.titlePlaceholder' | translate"
+            class="title-field"
+          />
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="type-selector" [formGroup]="templateForm">
+          <mat-select formControlName="template_type" class="type-select">
+            <mat-option value="song">{{ 'sunoEnhancer.filter.song' | translate }}</mat-option>
+            <mat-option value="instrumental">{{ 'sunoEnhancer.filter.instrumental' | translate }}</mat-option>
+          </mat-select>
+        </div>
+        <div class="save-status">
+          @if (saveStatus === 'saving') {
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>{{ 'sunoEnhancer.saving' | translate }}</span>
+          }
+          @if (saveStatus === 'saved') {
+            <i class="fas fa-check"></i>
+            <span>{{ 'sunoEnhancer.saved' | translate }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor Body (Split Pane) -->
+    <div class="editor-body">
+      <!-- Left Side: Tag Palette + Lyrics -->
+      <div class="editor-left">
+        <!-- Tag Categories -->
+        <div class="tag-palette">
+          <div class="category-tabs">
+            @for (cat of filteredCategories; track cat.key) {
+              <button
+                type="button"
+                class="category-tab"
+                [class.active]="activeCategory === cat.key"
+                (click)="toggleCategory(cat.key)"
+                [title]="cat.labelKey | translate"
+              >
+                <i [class]="'fas ' + cat.icon"></i>
+                <span>{{ cat.labelKey | translate }}</span>
+              </button>
+            }
+          </div>
+
+          <!-- Active Category Tags -->
+          @if (activeCategory) {
+            <div class="tag-chips">
+              @for (cat of filteredCategories; track cat.key) {
+                @if (cat.key === activeCategory) {
+                  @for (tag of cat.tags; track tag.tag) {
+                    <button
+                      type="button"
+                      class="tag-chip"
+                      (click)="insertTag(tag)"
+                      [title]="tag.supportsModifiers ? ('sunoEnhancer.supportsModifiers' | translate) : ''"
+                    >
+                      {{ tag.label }}
+                      @if (tag.supportsModifiers) {
+                        <i class="fas fa-sliders-h modifier-hint"></i>
+                      }
+                    </button>
+                  }
+                }
+              }
+            </div>
+          }
+
+          <!-- Modifier Bar -->
+          @if (showModifiers && lastInsertedTag) {
+            <div class="modifier-bar">
+              <span class="modifier-label">
+                <i class="fas fa-sliders-h"></i>
+                {{ 'sunoEnhancer.modifierFor' | translate }} [{{ lastInsertedTag.label }}]:
+              </span>
+              <div class="modifier-chips">
+                @for (mod of modifiers; track mod) {
+                  <button type="button" class="modifier-chip" (click)="applyModifier(mod)">
+                    {{ mod }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Lyrics Editor -->
+        <div class="lyrics-section" [formGroup]="templateForm">
+          <div class="section-header">
+            <h3>
+              <i class="fas fa-file-alt"></i>
+              {{ 'sunoEnhancer.enhancedLyrics' | translate }}
+            </h3>
+            <div class="section-actions">
+              <button type="button" class="toggle-btn" (click)="togglePreview()">
+                <i [class]="isPreviewMode ? 'fas fa-edit' : 'fas fa-eye'"></i>
+                {{ (isPreviewMode ? 'sunoEnhancer.edit' : 'sunoEnhancer.preview') | translate }}
+              </button>
+              <span class="char-counter" [class.warning]="lyricsStatus === 'warning'" [class.danger]="lyricsStatus === 'danger'">
+                {{ lyricsLength }} / {{ LYRICS_LIMIT }}
+              </span>
+            </div>
+          </div>
+
+          @if (!isPreviewMode) {
+            <textarea
+              #lyricsTextarea
+              formControlName="enhanced_lyrics"
+              class="lyrics-textarea"
+              [placeholder]="'sunoEnhancer.lyricsPlaceholder' | translate"
+            ></textarea>
+          } @else {
+            <div class="lyrics-preview" [innerHTML]="previewHtml"></div>
+          }
+        </div>
+      </div>
+
+      <!-- Right Side: Style Prompt Builder -->
+      <div class="editor-right">
+        <mat-card class="style-card">
+          <div class="style-card-header">
+            <h3>
+              <i class="fas fa-palette"></i>
+              {{ 'sunoEnhancer.stylePromptBuilder' | translate }}
+            </h3>
+            <div class="mode-badge" [class.auto-mode]="currentMode === 'auto'"
+              [class.manual-mode]="currentMode === 'manual'">
+              <i class="fas" [class.fa-sync-alt]="currentMode === 'auto'"
+                [class.fa-edit]="currentMode === 'manual'"></i>
+              <span>{{ 'sunoEnhancer.mode.' + currentMode | translate }}</span>
+            </div>
+          </div>
+
+          <!-- Style Chooser (always visible) -->
+          <div class="style-chooser-section">
+            <app-music-style-chooser-inline
+              [mode]="currentMode"
+              [isInstrumental]="templateForm.get('is_instrumental')?.value || false"
+              (styleChanged)="onStyleChooserChanged()"
+              (applyStyles)="onApplyStyles()"
+            ></app-music-style-chooser-inline>
+          </div>
+
+          <div class="style-fields" [formGroup]="styleForm">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'sunoEnhancer.fields.bpm' | translate }}</mat-label>
+              <input matInput type="number" formControlName="bpm" min="40" max="300" placeholder="120" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'sunoEnhancer.fields.mixCharacter' | translate }}</mat-label>
+              <input matInput formControlName="mix_character" [placeholder]="'sunoEnhancer.placeholders.mixCharacter' | translate" />
+            </mat-form-field>
+          </div>
+
+          <!-- Instrumental Toggle -->
+          <div class="instrumental-toggle" [formGroup]="templateForm">
+            <mat-slide-toggle formControlName="is_instrumental" color="primary">
+              {{ 'sunoEnhancer.instrumental' | translate }}
+            </mat-slide-toggle>
+          </div>
+
+          <!-- Generated Style Prompt -->
+          <div class="style-prompt-section">
+            <div class="prompt-header">
+              <h4>
+                <i class="fas fa-magic"></i>
+                {{ 'sunoEnhancer.generatedPrompt' | translate }}
+              </h4>
+              <div class="prompt-actions">
+                <button type="button" class="toggle-btn" (click)="toggleMode()">
+                  <i [class]="currentMode === 'manual' ? 'fas fa-sync' : 'fas fa-pen'"></i>
+                  {{ (currentMode === 'manual' ? 'sunoEnhancer.autoGenerate' : 'sunoEnhancer.manualEdit') | translate }}
+                </button>
+                <span class="char-counter" [class.warning]="stylePromptStatus === 'warning'" [class.danger]="stylePromptStatus === 'danger'">
+                  {{ stylePromptLength }} / {{ STYLE_LIMIT }}
+                </span>
+              </div>
+            </div>
+            <div [formGroup]="styleForm">
+              <textarea
+                formControlName="style_prompt"
+                class="style-prompt-textarea"
+                [readonly]="currentMode === 'auto'"
+                rows="4"
+              ></textarea>
+            </div>
+
+            <!-- AI Actions (only in manual mode) -->
+            @if (currentMode === 'manual') {
+              <div class="ai-actions">
+                <button mat-stroked-button type="button" class="ai-accent"
+                  (click)="enhanceSunoPrompt()"
+                  [disabled]="isAnyAiOperationInProgress || !styleForm.get('style_prompt')?.value?.trim()">
+                  @if (!isEnhancingPrompt) {
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                  }
+                  @if (isEnhancingPrompt) {
+                    <i class="fas fa-spinner fa-spin"></i>
+                  }
+                  <span>{{ 'sunoEnhancer.enhanceSuno' | translate }}</span>
+                </button>
+                <button mat-stroked-button type="button" class="ai-accent"
+                  (click)="translatePrompt()"
+                  [disabled]="isAnyAiOperationInProgress || !styleForm.get('style_prompt')?.value?.trim()">
+                  @if (!isTranslatingPrompt) {
+                    <i class="fas fa-language"></i>
+                  }
+                  @if (isTranslatingPrompt) {
+                    <i class="fas fa-spinner fa-spin"></i>
+                  }
+                  <span>{{ 'sunoEnhancer.translateToEnglish' | translate }}</span>
+                </button>
+              </div>
+            }
+          </div>
+        </mat-card>
+
+        <!-- Copy Actions -->
+        <div class="copy-actions">
+          <button type="button" class="action-button copy-button" (click)="copyLyrics()">
+            <i class="fas fa-copy"></i>
+            <span>{{ 'sunoEnhancer.copy.lyrics' | translate }}</span>
+          </button>
+          <button type="button" class="action-button copy-button" (click)="copyStylePrompt()">
+            <i class="fas fa-copy"></i>
+            <span>{{ 'sunoEnhancer.copy.stylePrompt' | translate }}</span>
+          </button>
+          <button type="button" class="action-button copy-all-button" (click)="copyAll()">
+            <i class="fas fa-clipboard"></i>
+            <span>{{ 'sunoEnhancer.copy.all' | translate }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

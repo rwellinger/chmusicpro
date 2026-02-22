@@ -140,7 +140,6 @@ export class PasswordChangeModalComponent {
             this.userService.changeCurrentUserPassword(passwordChangeData)
                 .subscribe({
                     next: () => {
-                        this.notificationService.success(this.translate.instant("passwordChangeModal.notifications.success"));
                         this.dialogRef.close(true);
                     },
                     error: (error) => {

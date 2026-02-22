@@ -698,6 +698,7 @@
     "searchReplace": "Suchen & Ersetzen",
     "finalizeLyrics": "Text finalisieren",
     "textTools": "Text-Werkzeuge",
+    "uppercaseTags": "Tags in Grossbuchstaben",
     "cleanupLyrics": "Text bereinigen",
     "optimizePhrasing": "KI-Optimierte Formatierung",
     "applyStructure": "Struktur anwenden",
@@ -1004,7 +1005,8 @@
     "distribution": "Distribution",
     "manageProjects": "Projekte verwalten",
     "systemContextTemplates": "System-Kontext-Vorlagen",
-    "aiModels": "KI Modelle"
+    "aiModels": "KI Modelle",
+    "sunoEnhancer": "Suno Enhancer"
   },
   "musicStylePrompt": {
     "title": "Music Style Prompt",
@@ -1437,7 +1439,8 @@
         "duplicate": "Duplizieren",
         "duplicateDisabled": "Duplizieren deaktiviert (nur für Inspirationen verfügbar)",
         "deleteDisabled": "Löschen deaktiviert (verwendete Sketches können nicht gelöscht werden)",
-        "deleteDisabledProject": "Löschen deaktiviert (zugewiesen an Projekt '{{project}}')"
+        "deleteDisabledProject": "Löschen deaktiviert (zugewiesen an Projekt '{{project}}')",
+        "sunoEnhancer": "Suno Enhancer"
       },
       "detail": {
         "tabs": {
@@ -2192,5 +2195,81 @@
     "deleteError": "Fehler beim Loeschen des Modells",
     "noEntries": "Keine Modellkonfigurationen gefunden",
     "filterAll": "Alle"
+  },
+  "sunoEnhancer": {
+    "title": "Suno Enhancer",
+    "newSong": "Neuer Song",
+    "newInstrumental": "Neues Instrumental",
+    "searchPlaceholder": "Templates durchsuchen...",
+    "empty": "Noch keine Templates vorhanden. Erstelle dein erstes Suno Template!",
+    "confirmDelete": "Dieses Template loeschen?",
+    "deleted": "Template geloescht",
+    "backToLibrary": "Zurueck zur Bibliothek",
+    "titlePlaceholder": "Template-Titel...",
+    "saving": "Speichert...",
+    "saved": "Gespeichert",
+    "enhancedLyrics": "Erweiterte Lyrics",
+    "lyricsPlaceholder": "Fuege hier deine Lyrics ein und ergaenze sie mit Suno-Tags aus der Palette oben...",
+    "edit": "Bearbeiten",
+    "preview": "Vorschau",
+    "stylePromptBuilder": "Style Prompt Builder",
+    "generatedPrompt": "Generierter Style Prompt",
+    "autoGenerate": "Auto-Generieren",
+    "manualEdit": "Manuell bearbeiten",
+    "instrumental": "Instrumental",
+    "supportsModifiers": "Unterstuetzt Pipe-Modifier",
+    "modifierFor": "Modifier fuer",
+    "filter": {
+      "all": "Alle",
+      "song": "Song",
+      "instrumental": "Instrumental"
+    },
+    "mode": {
+      "auto": "Auto",
+      "manual": "Manuell"
+    },
+    "fields": {
+      "bpm": "BPM",
+      "mixCharacter": "Mix-Charakter"
+    },
+    "placeholders": {
+      "mixCharacter": "z.B. cleaner Mix, Lo-Fi, viel Reverb"
+    },
+    "copy": {
+      "lyrics": "Lyrics kopieren",
+      "stylePrompt": "Style Prompt kopieren",
+      "all": "Alles kopieren"
+    },
+    "copied": {
+      "lyrics": "Lyrics in die Zwischenablage kopiert",
+      "stylePrompt": "Style Prompt in die Zwischenablage kopiert",
+      "all": "Komplettes Template in die Zwischenablage kopiert"
+    },
+    "defaults": {
+      "songTitle": "Neues Song-Template",
+      "instrumentalTitle": "Neues Instrumental-Template"
+    },
+    "errors": {
+      "loadFailed": "Fehler beim Laden der Templates",
+      "createFailed": "Fehler beim Erstellen des Templates",
+      "createFromSketchFailed": "Fehler beim Erstellen des Templates aus Komposition",
+      "deleteFailed": "Fehler beim Loeschen des Templates"
+    },
+    "enhanceSuno": "Fuer Suno optimieren",
+    "translateToEnglish": "Ins Englische uebersetzen",
+    "progress": {
+      "enhancing": "Style Prompt wird optimiert...",
+      "enhancingHint": "KI optimiert deinen Style Prompt fuer Suno",
+      "translating": "Style Prompt wird uebersetzt...",
+      "translatingHint": "KI uebersetzt deinen Style Prompt ins Englische"
+    },
+    "categories": {
+      "structureSong": "Struktur",
+      "structureEDM": "EDM Struktur",
+      "instrumentSolos": "Instrument Solos",
+      "breaks": "Breaks",
+      "endings": "Endings",
+      "effects": "Effekte"
+    }
   }
 }

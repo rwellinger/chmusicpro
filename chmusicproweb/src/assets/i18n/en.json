@@ -698,6 +698,7 @@
     "searchReplace": "Search & Replace",
     "finalizeLyrics": "Finalize Lyrics",
     "textTools": "Text Tools",
+    "uppercaseTags": "Uppercase Tags",
     "cleanupLyrics": "Cleanup Lyrics",
     "optimizePhrasing": "AI-Optimized Formatting",
     "applyStructure": "Apply Structure",
@@ -1004,7 +1005,8 @@
     "distribution": "Distribution",
     "manageProjects": "Manage Projects",
     "systemContextTemplates": "System Context Templates",
-    "aiModels": "AI Models"
+    "aiModels": "AI Models",
+    "sunoEnhancer": "Suno Enhancer"
   },
   "musicStylePrompt": {
     "title": "Music Style Prompt",
@@ -1437,7 +1439,8 @@
         "duplicate": "Duplicate",
         "duplicateDisabled": "Duplicate disabled (only available for inspirations)",
         "deleteDisabled": "Delete disabled (used sketches cannot be deleted)",
-        "deleteDisabledProject": "Delete disabled (assigned to project '{{project}}')"
+        "deleteDisabledProject": "Delete disabled (assigned to project '{{project}}')",
+        "sunoEnhancer": "Suno Enhancer"
       },
       "detail": {
         "tabs": {
@@ -2192,5 +2195,81 @@
     "deleteError": "Failed to delete model",
     "noEntries": "No model configurations found",
     "filterAll": "All"
+  },
+  "sunoEnhancer": {
+    "title": "Suno Enhancer",
+    "newSong": "New Song",
+    "newInstrumental": "New Instrumental",
+    "searchPlaceholder": "Search templates...",
+    "empty": "No templates yet. Create your first Suno template!",
+    "confirmDelete": "Delete this template?",
+    "deleted": "Template deleted",
+    "backToLibrary": "Back to Library",
+    "titlePlaceholder": "Template title...",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "enhancedLyrics": "Enhanced Lyrics",
+    "lyricsPlaceholder": "Paste or type your lyrics here, then add Suno tags from the palette above...",
+    "edit": "Edit",
+    "preview": "Preview",
+    "stylePromptBuilder": "Style Prompt Builder",
+    "generatedPrompt": "Generated Style Prompt",
+    "autoGenerate": "Auto Generate",
+    "manualEdit": "Manual Edit",
+    "instrumental": "Instrumental",
+    "supportsModifiers": "Supports pipe modifiers",
+    "modifierFor": "Modifier for",
+    "filter": {
+      "all": "All",
+      "song": "Song",
+      "instrumental": "Instrumental"
+    },
+    "mode": {
+      "auto": "Auto",
+      "manual": "Manual"
+    },
+    "fields": {
+      "bpm": "BPM",
+      "mixCharacter": "Mix Character"
+    },
+    "placeholders": {
+      "mixCharacter": "e.g. clean mix, lo-fi, heavy reverb"
+    },
+    "copy": {
+      "lyrics": "Copy Lyrics",
+      "stylePrompt": "Copy Style Prompt",
+      "all": "Copy All"
+    },
+    "copied": {
+      "lyrics": "Lyrics copied to clipboard",
+      "stylePrompt": "Style prompt copied to clipboard",
+      "all": "Complete template copied to clipboard"
+    },
+    "defaults": {
+      "songTitle": "New Song Template",
+      "instrumentalTitle": "New Instrumental Template"
+    },
+    "errors": {
+      "loadFailed": "Failed to load templates",
+      "createFailed": "Failed to create template",
+      "createFromSketchFailed": "Failed to create template from composition",
+      "deleteFailed": "Failed to delete template"
+    },
+    "enhanceSuno": "Enhance for Suno",
+    "translateToEnglish": "Translate to English",
+    "progress": {
+      "enhancing": "Enhancing style prompt...",
+      "enhancingHint": "AI is optimizing your style prompt for Suno",
+      "translating": "Translating style prompt...",
+      "translatingHint": "AI is translating your style prompt to English"
+    },
+    "categories": {
+      "structureSong": "Structure",
+      "structureEDM": "EDM Structure",
+      "instrumentSolos": "Instrument Solos",
+      "breaks": "Breaks",
+      "endings": "Endings",
+      "effects": "Effects"
+    }
   }
 }

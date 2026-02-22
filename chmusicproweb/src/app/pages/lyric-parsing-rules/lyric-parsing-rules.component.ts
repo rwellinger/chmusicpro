@@ -165,9 +165,6 @@ export class LyricParsingRulesComponent implements OnInit, OnDestroy {
                 .pipe(takeUntil(this.destroy$))
                 .subscribe({
                     next: () => {
-                        this.notificationService.success(
-                            this.translate.instant("lyricParsingRules.notifications.updated")
-                        );
                         this.loadRules();
                         this.closeDialog();
                         this.isLoading = false;
@@ -194,9 +191,6 @@ export class LyricParsingRulesComponent implements OnInit, OnDestroy {
                 .pipe(takeUntil(this.destroy$))
                 .subscribe({
                     next: () => {
-                        this.notificationService.success(
-                            this.translate.instant("lyricParsingRules.notifications.created")
-                        );
                         this.loadRules();
                         this.closeDialog();
                         this.isLoading = false;
@@ -223,9 +217,6 @@ export class LyricParsingRulesComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: () => {
-                    this.notificationService.success(
-                        this.translate.instant("lyricParsingRules.notifications.deleted")
-                    );
                     this.loadRules();
                     this.isLoading = false;
                 },
@@ -248,9 +239,6 @@ export class LyricParsingRulesComponent implements OnInit, OnDestroy {
             .subscribe({
                 next: () => {
                     rule.active = !rule.active;
-                    this.notificationService.success(
-                        this.translate.instant("lyricParsingRules.notifications.updated")
-                    );
                 },
                 error: (error) => {
                     this.notificationService.error(
@@ -280,9 +268,6 @@ export class LyricParsingRulesComponent implements OnInit, OnDestroy {
             .subscribe({
                 next: (reorderedRules) => {
                     this.rules = reorderedRules.sort((a, b) => a.order - b.order);
-                    this.notificationService.success(
-                        this.translate.instant("lyricParsingRules.notifications.reordered")
-                    );
                 },
                 error: (error) => {
                     // Rollback to original order on error

@@ -79,7 +79,7 @@ export class SongSketchCreatorComponent implements OnInit, OnDestroy {
         this.sketchForm = this.fb.group({
             title: ["", [Validators.required, Validators.maxLength(500)]],
             lyrics: ["", [Validators.required, Validators.maxLength(10000)]],
-            prompt: ["", [Validators.required, Validators.maxLength(1024)]],
+            prompt: ["", Validators.maxLength(1024)],
             sketch_type: ["song", Validators.required],
             workflow: ["draft"],
             // Release description fields (optional)
@@ -218,7 +218,7 @@ export class SongSketchCreatorComponent implements OnInit, OnDestroy {
             const sketchData = {
                 title: formValue.title?.trim() || undefined,
                 lyrics: formValue.lyrics?.trim() || undefined,
-                prompt: formValue.prompt.trim(),
+                prompt: formValue.prompt?.trim() || null,
                 tags: tagsString,
                 sketch_type: formValue.sketch_type || "song",
                 workflow: formValue.workflow || "draft",
@@ -236,20 +236,12 @@ export class SongSketchCreatorComponent implements OnInit, OnDestroy {
                     this.sketchService.updateSketch(this.currentSketchId, sketchData)
                 );
                 savedSketchId = response.data.id;
-
-                this.notificationService.success(
-                    this.translate.instant("songSketch.creator.messages.updated")
-                );
             } else {
                 // CREATE new sketch
                 const response = await firstValueFrom(
                     this.sketchService.createSketch(sketchData)
                 );
                 savedSketchId = response.data.id;
-
-                this.notificationService.success(
-                    this.translate.instant("songSketch.creator.messages.saved")
-                );
             }
 
             // Reset form and tags
@@ -275,9 +267,6 @@ export class SongSketchCreatorComponent implements OnInit, OnDestroy {
     resetForm(): void {
         this.sketchForm.reset({workflow: "draft"});
         this.selectedTags = [];
-        this.notificationService.success(
-            this.translate.instant("songSketch.creator.messages.resetSuccess")
-        );
     }
 
     cancelEdit(): void {
@@ -310,27 +299,6 @@ export class SongSketchCreatorComponent implements OnInit, OnDestroy {
 
         // Navigate with form data in state
         this.router.navigate(["/lyriccreation"], {
-            state: {
-                context: "sketch",
-                editMode: this.isEditMode,
-                sketchId: this.currentSketchId,
-                formData: formData
-            }
-        });
-    }
-
-    navigateToMusicStylePrompt(): void {
-        // Prepare current form data
-        const formData: any = {
-            title: this.sketchForm.get("title")?.value || "",
-            lyrics: this.sketchForm.get("lyrics")?.value || "",
-            prompt: this.sketchForm.get("prompt")?.value || "",
-            tags: this.selectedTags.join(", "),
-            workflow: this.sketchForm.get("workflow")?.value || "draft"
-        };
-
-        // Navigate with form data in state
-        this.router.navigate(["/music-style-prompt"], {
             state: {
                 context: "sketch",
                 editMode: this.isEditMode,
@@ -437,9 +405,6 @@ export class SongSketchCreatorComponent implements OnInit, OnDestroy {
             );
 
             this.sketchForm.patchValue({description_long: descriptionLong});
-            this.notificationService.success(
-                this.translate.instant("songSketch.creator.messages.descriptionLongGenerated")
-            );
         } catch (error: any) {
             this.notificationService.error(
                 this.translate.instant("songSketch.creator.messages.descriptionLongError") + ": " + error.message
@@ -467,9 +432,6 @@ export class SongSketchCreatorComponent implements OnInit, OnDestroy {
             );
 
             this.sketchForm.patchValue({description_short: descriptionShort});
-            this.notificationService.success(
-                this.translate.instant("songSketch.creator.messages.descriptionShortGenerated")
-            );
         } catch (error: any) {
             this.notificationService.error(
                 this.translate.instant("songSketch.creator.messages.descriptionShortError") + ": " + error.message
@@ -497,9 +459,6 @@ export class SongSketchCreatorComponent implements OnInit, OnDestroy {
             );
 
             this.sketchForm.patchValue({description_tags: tags});
-            this.notificationService.success(
-                this.translate.instant("songSketch.creator.messages.tagsGenerated")
-            );
         } catch (error: any) {
             this.notificationService.error(
                 this.translate.instant("songSketch.creator.messages.tagsError") + ": " + error.message
@@ -521,9 +480,6 @@ ${timeSignature}
 ${totalBars}
 ${songLength}`;
         this.sketchForm.patchValue({info: template});
-        this.notificationService.success(
-            this.translate.instant("songSketch.creator.messages.templateInserted")
-        );
     }
 
     // Tag management methods

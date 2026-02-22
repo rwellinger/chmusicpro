@@ -84,10 +84,6 @@ export class MusicStylePromptComponent implements OnInit {
         };
 
         this.navigateBackToSketchCreator(updatedFormData);
-
-        this.notificationService.success(
-            this.translate.instant("musicStylePrompt.changesApplied")
-        );
     }
 
     cancelChanges(): void {
@@ -199,7 +195,6 @@ export class MusicStylePromptComponent implements OnInit {
         }
         // Switch back to auto-mode
         this.switchToAutoMode();
-        this.notificationService.success(this.translate.instant("musicStylePrompt.cleared"));
     }
 
     async enhancePrompt() {
@@ -219,7 +214,6 @@ export class MusicStylePromptComponent implements OnInit {
                 this.translate.instant("musicStylePrompt.progress.enhancingHint")
             );
             this.promptForm.patchValue({prompt: this.removeQuotes(enhancedPrompt)});
-            this.notificationService.success(this.translate.instant("musicStylePrompt.success.promptEnhanced"));
         } catch (error: any) {
             this.notificationService.error(`Error enhancing prompt: ${error.message}`);
         } finally {
@@ -253,7 +247,6 @@ export class MusicStylePromptComponent implements OnInit {
                 this.translate.instant("musicStylePrompt.progress.enhancingSunoHint")
             );
             this.promptForm.patchValue({prompt: this.removeQuotes(enhancedPrompt)});
-            this.notificationService.success(this.translate.instant("musicStylePrompt.success.promptEnhancedSuno"));
         } catch (error: any) {
             this.notificationService.error(`Error enhancing prompt for Suno: ${error.message}`);
         } finally {
@@ -279,7 +272,6 @@ export class MusicStylePromptComponent implements OnInit {
                 this.translate.instant("musicStylePrompt.progress.translatingHint")
             );
             this.promptForm.patchValue({prompt: this.removeQuotes(translatedPrompt)});
-            this.notificationService.success(this.translate.instant("musicStylePrompt.success.promptTranslated"));
         } catch (error: any) {
             this.notificationService.error(`Error translating prompt: ${error.message}`);
         } finally {
@@ -358,16 +350,9 @@ export class MusicStylePromptComponent implements OnInit {
         // Perform replacement
         const updatedPrompt = currentPrompt.replaceAll(searchText, replaceText);
 
-        // Calculate number of replacements
-        const occurrences = (currentPrompt.match(new RegExp(this.escapeRegExp(searchText), "g")) || []).length;
-
         // Update form
         this.promptForm.patchValue({prompt: updatedPrompt});
 
-        // Show success notification
-        this.notificationService.success(
-            this.translate.instant("musicStylePrompt.searchReplaceDialog.applied", {count: occurrences})
-        );
     }
 
     private escapeRegExp(text: string): string {
@@ -378,7 +363,6 @@ export class MusicStylePromptComponent implements OnInit {
         if (this.lastSearchReplaceState !== null) {
             this.promptForm.patchValue({prompt: this.lastSearchReplaceState});
             this.lastSearchReplaceState = null;
-            this.notificationService.success(this.translate.instant("musicStylePrompt.undoApplied"));
         }
     }
 
@@ -390,7 +374,6 @@ export class MusicStylePromptComponent implements OnInit {
 
         try {
             await navigator.clipboard.writeText(prompt);
-            this.notificationService.success(this.translate.instant("musicStylePrompt.copiedToClipboard"));
         } catch (error) {
             console.error("Failed to copy to clipboard:", error);
             this.notificationService.error(this.translate.instant("musicStylePrompt.errors.copyFailed"));
@@ -417,7 +400,6 @@ export class MusicStylePromptComponent implements OnInit {
 
         this.promptForm.patchValue({prompt: stylePrompt});
         this.switchToAutoMode();
-        this.notificationService.success(this.translate.instant("musicStylePrompt.mode.stylesApplied"));
     }
 
     switchToManualMode(): void {

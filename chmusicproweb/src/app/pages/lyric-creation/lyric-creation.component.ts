@@ -116,10 +116,6 @@ export class LyricCreationComponent implements OnInit {
         };
 
         this.navigateBackToSketchCreator(updatedFormData);
-
-        this.notificationService.success(
-            this.translate.instant("lyricCreation.changesApplied")
-        );
     }
 
     cancelChanges(): void {
@@ -223,7 +219,6 @@ export class LyricCreationComponent implements OnInit {
 
     clearLyrics(): void {
         this.lyricForm.patchValue({lyrics: ""});
-        this.notificationService.success(this.translate.instant("lyricCreation.autoSaved"));
     }
 
     async generateLyrics() {
@@ -283,11 +278,7 @@ export class LyricCreationComponent implements OnInit {
             autoFocus: true
         });
 
-        dialogRef.afterClosed().subscribe(result => {
-            if (result && result.architectureString) {
-                this.notificationService.success(this.translate.instant("lyricCreation.architectureUpdated"));
-            }
-        });
+        dialogRef.afterClosed().subscribe(() => {});
     }
 
     private removeQuotes(text: string): string {
@@ -300,14 +291,11 @@ export class LyricCreationComponent implements OnInit {
     }
 
     private capitalizeLabel(label: string): string {
-        // Capitalize first letter and letters after hyphens
-        // Examples: PRE-CHORUS -> Pre-Chorus, VERSE1 -> Verse 1, POST_CHORUS -> Post-Chorus
-        const normalized = label.replace(/_/g, "-").toLowerCase();
-        let result = normalized.replace(/(^|-)(\w)/g, (match, separator, letter) =>
-            separator + letter.toUpperCase()
-        );
-        // Suno format: Add space before number (Verse1 -> Verse 1)
-        result = result.replace(/([a-zA-Z])(\d)/g, "$1 $2");
+        // UPPERCASE for Suno compatibility
+        // Examples: pre-chorus -> PRE-CHORUS, verse1 -> VERSE 1, post_chorus -> POST-CHORUS
+        let result = label.replace(/_/g, "-").toUpperCase();
+        // Suno format: Add space before number (VERSE1 -> VERSE 1)
+        result = result.replace(/([A-Z])(\d)/g, "$1 $2");
         return result;
     }
 
@@ -361,13 +349,15 @@ export class LyricCreationComponent implements OnInit {
         }
     }
 
-    selectToolsAction(action: "sectionEditor" | "structure" | "cleanup" | "optimize-phrasing" | "finalize" | "rebuild") {
+    selectToolsAction(action: "sectionEditor" | "structure" | "cleanup" | "uppercase-tags" | "optimize-phrasing" | "finalize" | "rebuild") {
         this.closeToolsDropdown();
 
         if (action === "sectionEditor") {
             this.toggleSectionEditor();
         } else if (action === "structure") {
             this.applyStructure();
+        } else if (action === "uppercase-tags") {
+            this.uppercaseTags();
         } else if (action === "cleanup") {
             this.cleanupLyrics();
         } else if (action === "optimize-phrasing") {
@@ -377,6 +367,18 @@ export class LyricCreationComponent implements OnInit {
         } else if (action === "rebuild") {
             this.rebuildFromLyricText();
         }
+    }
+
+    uppercaseTags(): void {
+        const lyrics = this.lyricForm.get("lyrics")?.value || "";
+        if (!lyrics.trim()) {
+            return;
+        }
+
+        this.lastCleanupState = lyrics;
+
+        const updated = lyrics.replace(/\[([^\]]+)\]/g, (_match: string, content: string) => `[${content.toUpperCase()}]`);
+        this.lyricForm.patchValue({lyrics: updated});
     }
 
     cleanupLyrics(): void {
@@ -402,7 +404,6 @@ export class LyricCreationComponent implements OnInit {
                 });
 
                 this.lyricForm.patchValue({lyrics: lyrics.trim()});
-                this.notificationService.success(this.translate.instant("lyricCreation.cleanupComplete"));
             },
             error: (error) => {
                 console.error("Failed to load lyric parsing rules:", error);
@@ -450,8 +451,6 @@ export class LyricCreationComponent implements OnInit {
 
             // Step 3: Apply Structure (normalize section markers)
             this.applyStructure();
-
-            this.notificationService.success(this.translate.instant("lyricCreation.optimizingSuccess"));
         } catch (error: any) {
             this.notificationService.error(
                 this.translate.instant("lyricCreation.errors.optimizingPhrasing", {error: error.message})
@@ -530,7 +529,6 @@ export class LyricCreationComponent implements OnInit {
         }).join("\n\n");
 
         this.lyricForm.patchValue({lyrics: structured});
-        this.notificationService.success(this.translate.instant("lyricCreation.structureApplied"));
     }
 
     undoLastChange(): void {
@@ -539,17 +537,14 @@ export class LyricCreationComponent implements OnInit {
             // Undo search/replace change (highest priority)
             this.lyricForm.patchValue({lyrics: this.lastSearchReplaceState});
             this.lastSearchReplaceState = null;
-            this.notificationService.success(this.translate.instant("lyricCreation.undoApplied"));
         } else if (this.lastStructureState !== null) {
             // Undo structure change
             this.lyricForm.patchValue({lyrics: this.lastStructureState});
             this.lastStructureState = null;
-            this.notificationService.success(this.translate.instant("lyricCreation.undoApplied"));
         } else if (this.lastCleanupState !== null) {
             // Undo cleanup change
             this.lyricForm.patchValue({lyrics: this.lastCleanupState});
             this.lastCleanupState = null;
-            this.notificationService.success(this.translate.instant("lyricCreation.undoApplied"));
         }
     }
 
@@ -671,10 +666,6 @@ export class LyricCreationComponent implements OnInit {
 
         this.sectionEditorMode = false;
         this.activeSection = null;
-
-        this.notificationService.success(
-            this.translate.instant("lyricCreation.sectionEditor.applied")
-        );
     }
 
     cancelSectionEditor(): void {
@@ -830,7 +821,6 @@ export class LyricCreationComponent implements OnInit {
                 });
 
                 this.activeSection!.content = content.trim();
-                this.notificationService.success(this.translate.instant("lyricCreation.cleanupComplete"));
             },
             error: (error) => {
                 console.error("Failed to load lyric parsing rules:", error);
@@ -862,13 +852,11 @@ export class LyricCreationComponent implements OnInit {
 
         // Map parsed sections to SongSection enum
         const architectureSections: SongSectionItem[] = [];
-        let hasWarnings = false;
 
         for (const section of sections) {
             // Skip non-structural Suno tags (Guitar Solo, 8 beats break, etc.)
             if (this.isNonStructuralTag(section.label)) {
                 console.info(`Skipping non-structural tag: ${section.label}`);
-                hasWarnings = true;
                 continue;
             }
 
@@ -877,7 +865,6 @@ export class LyricCreationComponent implements OnInit {
             if (!mapped) {
                 // Unknown section type - log warning but continue
                 console.warn(`Unknown section label: ${section.label} - skipping`);
-                hasWarnings = true;
                 continue;
             }
 
@@ -895,16 +882,6 @@ export class LyricCreationComponent implements OnInit {
             lastModified: new Date()
         });
 
-        // Show success notification
-        if (hasWarnings) {
-            this.notificationService.success(
-                this.translate.instant("lyricCreation.rebuildSuccessWithWarnings", {count: architectureSections.length})
-            );
-        } else {
-            this.notificationService.success(
-                this.translate.instant("lyricCreation.rebuildSuccess", {count: architectureSections.length})
-            );
-        }
     }
 
     private mapLabelToSongSection(label: string): SongSectionItem | null {
@@ -1012,16 +989,9 @@ export class LyricCreationComponent implements OnInit {
         // Perform replacement
         const updatedLyrics = currentLyrics.replaceAll(searchText, replaceText);
 
-        // Calculate number of replacements
-        const occurrences = (currentLyrics.match(new RegExp(this.escapeRegExp(searchText), "g")) || []).length;
-
         // Update form
         this.lyricForm.patchValue({lyrics: updatedLyrics});
 
-        // Show success notification
-        this.notificationService.success(
-            this.translate.instant("lyricCreation.searchReplaceDialog.applied", {count: occurrences})
-        );
     }
 
     private escapeRegExp(text: string): string {
@@ -1059,9 +1029,6 @@ export class LyricCreationComponent implements OnInit {
 
             // Step 2: Apply Structure
             this.applyStructure();
-
-            // Success notification
-            this.notificationService.success(this.translate.instant("lyricCreation.finalizeComplete"));
         } catch (error) {
             console.error("Failed to finalize lyrics:", error);
             this.notificationService.error("Failed to finalize lyrics");
@@ -1082,7 +1049,6 @@ export class LyricCreationComponent implements OnInit {
 
         try {
             await navigator.clipboard.writeText(lyrics);
-            this.notificationService.success(this.translate.instant("lyricCreation.copiedToClipboard"));
         } catch (error) {
             console.error("Failed to copy to clipboard:", error);
             this.notificationService.error(this.translate.instant("lyricCreation.errors.copyFailed"));

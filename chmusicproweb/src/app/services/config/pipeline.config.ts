@@ -27,7 +27,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
         icon: "fa-sliders-h",
         iconColor: "#7B1FA2",
         enabled: true,
-        routes: ["/song-sketch-library", "/song-sketch-creator", "/music-style-prompt"],
+        routes: ["/song-sketch-library", "/song-sketch-creator", "/music-style-prompt", "/suno-enhancer"],
         primaryRoute: "/song-sketch-library"
     },
     {

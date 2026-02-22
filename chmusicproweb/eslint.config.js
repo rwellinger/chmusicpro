@@ -51,8 +51,8 @@ module.exports = tseslint.config(
       "@typescript-eslint/no-inferrable-types": "off",
       // Erlaubt leere Funktionen
       "@typescript-eslint/no-empty-function": "off",
-      // Erlaubt unbenutzte Variablen in catch blocks
-      "@typescript-eslint/no-unused-vars": ["error", { "caughtErrors": "none" }],
+      // Erlaubt unbenutzte Variablen in catch blocks und _prefix Parameter
+      "@typescript-eslint/no-unused-vars": ["error", { "caughtErrors": "none", "argsIgnorePattern": "^_" }],
       // Weniger streng bei generic constructors
       "@typescript-eslint/consistent-generic-constructors": "warn",
     },

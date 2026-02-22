@@ -240,10 +240,6 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
                 update
             );
 
-            this.notificationService.success(
-                this.translate.instant("promptTemplateEditor.notifications.saved")
-            );
-
             // Navigate back with updated template
             this.navigateBackToPromptTemplates(updatedTemplate);
         } catch (error: any) {
@@ -311,10 +307,6 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
             this.editorForm.patchValue({
                 pre_condition: improved
             });
-
-            this.notificationService.success(
-                this.translate.instant("promptTemplateEditor.notifications.improved")
-            );
         } catch (error: any) {
             this.notificationService.error(
                 this.translate.instant("promptTemplateEditor.notifications.improveError", {message: error.message})
@@ -344,10 +336,6 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
             this.editorForm.patchValue({
                 post_condition: improved
             });
-
-            this.notificationService.success(
-                this.translate.instant("promptTemplateEditor.notifications.improved")
-            );
         } catch (error: any) {
             this.notificationService.error(
                 this.translate.instant("promptTemplateEditor.notifications.improveError", {message: error.message})

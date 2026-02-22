@@ -337,10 +337,6 @@ export class EquipmentGalleryComponent implements OnInit, OnDestroy {
                 this.equipmentService.deleteEquipment(this.deleteEquipmentId)
             );
 
-            this.notificationService.success(
-                this.translate.instant("equipment.messages.deleteSuccess")
-            );
-
             // Reload list
             await this.loadEquipment();
 
@@ -448,16 +444,13 @@ export class EquipmentGalleryComponent implements OnInit, OnDestroy {
     /**
      * Copy text to clipboard.
      */
-    async copyToClipboard(text: string | undefined, fieldName: string): Promise<void> {
+    async copyToClipboard(text: string | undefined, _fieldName: string): Promise<void> {
         if (!text || !text.trim()) {
             return;
         }
 
         try {
             await navigator.clipboard.writeText(text);
-            this.notificationService.success(
-                this.translate.instant(`equipment.gallery.actions.copy${fieldName}`)
-            );
         } catch (error) {
             console.error("Failed to copy to clipboard:", error);
             this.notificationService.error(

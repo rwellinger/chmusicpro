@@ -191,7 +191,6 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
 
         try {
             await firstValueFrom(this.workshopService.deleteWorkshop(workshop.id));
-            this.notificationService.success(this.translate.instant("workshop.deleteSuccess"));
             this.loadWorkshops();
         } catch {
             this.notificationService.error(this.translate.instant("workshop.errors.deleteFailed"));
@@ -281,7 +280,6 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
             const result = await this.chatService.generateTitle(input);
             this.workshopForm.patchValue({title: result.trim()});
             await this.autoSave();
-            this.notificationService.success(this.translate.instant("workshop.aiSuccess"));
         } catch {
             this.notificationService.error(this.translate.instant("workshop.errors.aiFailed"));
         } finally {
@@ -308,7 +306,6 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
                 this.currentPhase = "connect";
                 await this.autoSave();
             }
-            this.notificationService.success(this.translate.instant("workshop.aiSuccess"));
         } catch {
             this.notificationService.error(this.translate.instant("workshop.errors.aiFailed"));
         } finally {
@@ -330,7 +327,6 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
             this.workshopForm.patchValue({collect_mindmap: result});
             this.currentPhase = "collect";
             await this.autoSave();
-            this.notificationService.success(this.translate.instant("workshop.aiSuccess"));
         } catch {
             this.notificationService.error(this.translate.instant("workshop.errors.aiFailed"));
         } finally {
@@ -361,7 +357,6 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
                 this.currentPhase = "collect";
                 await this.autoSave();
             }
-            this.notificationService.success(this.translate.instant("workshop.aiSuccess"));
         } catch {
             this.notificationService.error(this.translate.instant("workshop.errors.aiFailed"));
         } finally {
@@ -382,7 +377,6 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
             this.workshopForm.patchValue({collect_words: result});
             this.currentPhase = "collect";
             await this.autoSave();
-            this.notificationService.success(this.translate.instant("workshop.aiSuccess"));
         } catch {
             this.notificationService.error(this.translate.instant("workshop.errors.aiFailed"));
         } finally {
@@ -403,7 +397,6 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
             this.workshopForm.patchValue({shape_rhymes: result});
             this.currentPhase = "shape";
             await this.autoSave();
-            this.notificationService.success(this.translate.instant("workshop.aiSuccess"));
         } catch {
             this.notificationService.error(this.translate.instant("workshop.errors.aiFailed"));
         } finally {
@@ -439,7 +432,6 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
             this.workshopForm.patchValue({shape_draft: result});
             this.currentPhase = "shape";
             await this.autoSave();
-            this.notificationService.success(this.translate.instant("workshop.aiSuccess"));
         } catch {
             this.notificationService.error(this.translate.instant("workshop.errors.aiFailed"));
         } finally {
@@ -482,7 +474,6 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
         try {
             await firstValueFrom(this.workshopService.exportToSketch(this.currentWorkshopId));
             this.currentPhase = "completed";
-            this.notificationService.success(this.translate.instant("workshop.exportSuccess"));
         } catch {
             this.notificationService.error(this.translate.instant("workshop.errors.exportFailed"));
         } finally {
@@ -504,7 +495,6 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result?.success) {
-                this.notificationService.success(this.translate.instant("textWorkshop.assignSuccess"));
                 this.loadWorkshops();
             }
         });
@@ -514,7 +504,6 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
         event.stopPropagation();
         try {
             await this.workshopService.unassignFromProject(workshop.id);
-            this.notificationService.success(this.translate.instant("textWorkshop.unassignSuccess"));
             this.loadWorkshops();
         } catch {
             this.notificationService.error(this.translate.instant("textWorkshop.errors.unassignFailed"));

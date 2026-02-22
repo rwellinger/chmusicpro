@@ -626,10 +626,7 @@ export class ExternalChatComponent implements OnInit, OnDestroy {
             .compressConversation(this.currentConversation.id)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: (response) => {
-                    this.notificationService.success(
-                        this.translate.instant("aiChat.notifications.compressed", {count: response.archived_messages})
-                    );
+                next: () => {
                     // Reload conversation to see updated token count
                     if (this.currentConversation) {
                         this.selectConversation(this.currentConversation);
@@ -731,7 +728,6 @@ export class ExternalChatComponent implements OnInit, OnDestroy {
 
         navigator.clipboard.writeText(plainText)
             .then(() => {
-                this.notificationService.success(this.translate.instant("aiChat.notifications.copiedPlainText"));
             })
             .catch((error) => {
                 console.error("Error copying to clipboard:", error);
@@ -747,7 +743,6 @@ export class ExternalChatComponent implements OnInit, OnDestroy {
 
         navigator.clipboard.writeText(content)
             .then(() => {
-                this.notificationService.success(this.translate.instant("aiChat.notifications.copiedMarkdown"));
             })
             .catch((error) => {
                 console.error("Error copying to clipboard:", error);
@@ -763,7 +758,6 @@ export class ExternalChatComponent implements OnInit, OnDestroy {
 
         try {
             this.chatExportService.exportToMarkdown(this.currentConversation, this.messages);
-            this.notificationService.success(this.translate.instant("aiChat.notifications.exported"));
         } catch (error) {
             console.error("Error exporting to Markdown:", error);
             this.notificationService.error(this.translate.instant("aiChat.notifications.exportFailed"));
@@ -782,7 +776,6 @@ export class ExternalChatComponent implements OnInit, OnDestroy {
                 this.currentConversation.id,
                 this.currentConversation.title
             );
-            this.notificationService.success(this.translate.instant("aiChat.notifications.exportedFull"));
         } catch (error) {
             console.error("Error exporting full chat history:", error);
             this.notificationService.error(this.translate.instant("aiChat.notifications.exportFullFailed"));
@@ -824,8 +817,6 @@ export class ExternalChatComponent implements OnInit, OnDestroy {
                         this.selectConversation(this.conversations[0]);
                     }
 
-                    const successKey = newArchivedState ? "aiChat.notifications.archived" : "aiChat.notifications.unarchived";
-                    this.notificationService.success(this.translate.instant(successKey));
                 },
                 error: (error) => {
                     console.error(`Error ${newArchivedState ? "archiving" : "unarchiving"}:`, error);

@@ -93,6 +93,46 @@ export class MusicStyleChooserService {
         return config;
     }
 
+    generateSunoStylePrompt(config?: MusicStyleChooserConfig, isInstrumental?: boolean): string {
+        const currentConfig = config || this.getConfig();
+
+        const styles = currentConfig.selectedStyles || [];
+        const themes = currentConfig.selectedThemes || [];
+        let instruments = currentConfig.selectedInstruments || [];
+
+        if (isInstrumental) {
+            instruments = instruments.filter(i => i !== "male-voice" && i !== "female-voice" && i !== "vocals");
+        }
+
+        if (styles.length === 0 && themes.length === 0 && instruments.length === 0) {
+            return "";
+        }
+
+        const parts: string[] = [];
+
+        // Styles as-is (Suno understands English style names)
+        parts.push(...styles);
+
+        // Voice instruments → "male vocals" / "female vocals"
+        const voiceInstruments = instruments.filter(i => i === "male-voice" || i === "female-voice");
+        const otherInstruments = instruments.filter(i => i !== "male-voice" && i !== "female-voice");
+
+        for (const voice of voiceInstruments) {
+            const voiceType = voice.replace("-voice", "");
+            parts.push(`${voiceType} vocals`);
+        }
+
+        // Other instruments (replace hyphens with spaces for readability)
+        for (const inst of otherInstruments) {
+            parts.push(inst.replace(/-/g, " "));
+        }
+
+        // Themes
+        parts.push(...themes);
+
+        return parts.join(", ");
+    }
+
     generateStylePrompt(config?: MusicStyleChooserConfig, isInstrumental?: boolean): string {
         const currentConfig = config || this.getConfig();
 

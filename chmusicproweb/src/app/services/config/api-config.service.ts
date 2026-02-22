@@ -203,6 +203,24 @@ export class ApiConfigService {
         config: {
             ignorePatterns: `${this.baseUrl}/api/v1/config/ignore-patterns`
         },
+        sunoTemplate: {
+            create: () => `${this.baseUrl}/api/v1/suno-templates`,
+            list: (limit?: number, offset?: number, search?: string, templateType?: string) => {
+                const params = new URLSearchParams();
+                if (limit !== undefined) params.append("limit", limit.toString());
+                if (offset !== undefined) params.append("offset", offset.toString());
+                if (search) params.append("search", search);
+                if (templateType) params.append("template_type", templateType);
+                const query = params.toString();
+                return `${this.baseUrl}/api/v1/suno-templates${query ? "?" + query : ""}`;
+            },
+            detail: (id: string) => `${this.baseUrl}/api/v1/suno-templates/${id}`,
+            update: (id: string) => `${this.baseUrl}/api/v1/suno-templates/${id}`,
+            delete: (id: string) => `${this.baseUrl}/api/v1/suno-templates/${id}`,
+            createFromSketch: (sketchId: string) => `${this.baseUrl}/api/v1/suno-templates/from-sketch/${sketchId}`,
+            assignToProject: (id: string) => `${this.baseUrl}/api/v1/suno-templates/${id}/assign-to-project`,
+            unassignFromProject: (id: string) => `${this.baseUrl}/api/v1/suno-templates/${id}/unassign-from-project`
+        },
         songRelease: {
             create: `${this.baseUrl}/api/v1/song-releases`,
             list: (limit?: number, offset?: number, statusFilter?: string, search?: string) => {

@@ -142,9 +142,6 @@ export class SystemContextTemplatesComponent implements OnInit, OnDestroy {
                 .pipe(takeUntil(this.destroy$))
                 .subscribe({
                     next: () => {
-                        this.notificationService.success(
-                            this.translate.instant("systemContextTemplates.notifications.updated")
-                        );
                         this.loadTemplates();
                         this.closeDialog();
                         this.isLoading = false;
@@ -169,9 +166,6 @@ export class SystemContextTemplatesComponent implements OnInit, OnDestroy {
                 .pipe(takeUntil(this.destroy$))
                 .subscribe({
                     next: () => {
-                        this.notificationService.success(
-                            this.translate.instant("systemContextTemplates.notifications.created")
-                        );
                         this.loadTemplates();
                         this.closeDialog();
                         this.isLoading = false;
@@ -198,9 +192,6 @@ export class SystemContextTemplatesComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: () => {
-                    this.notificationService.success(
-                        this.translate.instant("systemContextTemplates.notifications.deleted")
-                    );
                     this.loadTemplates();
                     this.isLoading = false;
                 },
@@ -223,9 +214,6 @@ export class SystemContextTemplatesComponent implements OnInit, OnDestroy {
             .subscribe({
                 next: () => {
                     template.active = !template.active;
-                    this.notificationService.success(
-                        this.translate.instant("systemContextTemplates.notifications.updated")
-                    );
                 },
                 error: (error) => {
                     this.notificationService.error(

@@ -153,5 +153,15 @@ export const routes: Routes = [
         path: "text-workshop/:id",
         canActivate: [AuthGuard],
         loadComponent: () => import("./pages/text-workshop/text-workshop.component").then(m => m.TextWorkshopComponent)
+    },
+    {
+        path: "suno-enhancer",
+        canActivate: [AuthGuard],
+        loadComponent: () => import("./pages/suno-enhancer/suno-enhancer.component").then(m => m.SunoEnhancerComponent)
+    },
+    {
+        path: "suno-enhancer/:id",
+        canActivate: [AuthGuard],
+        loadComponent: () => import("./pages/suno-enhancer/suno-enhancer.component").then(m => m.SunoEnhancerComponent)
     }
 ];

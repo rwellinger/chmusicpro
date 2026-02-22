@@ -333,10 +333,6 @@ export class SongReleaseEditorComponent implements OnInit, OnDestroy {
             if (releaseType === ReleaseType.SINGLE && this.assignedProjectNames.length === 1) {
                 this.offerProjectNameForSingle();
             }
-
-            this.notificationService.success(
-                this.translate.instant("songRelease.messages.projectsAssigned")
-            );
         }
     }
 
@@ -535,18 +531,10 @@ export class SongReleaseEditorComponent implements OnInit, OnDestroy {
                 await firstValueFrom(
                     this.releaseService.updateRelease(this.releaseId, releaseData, this.selectedCoverFile || undefined)
                 );
-
-                this.notificationService.success(
-                    this.translate.instant("songRelease.messages.updateSuccess")
-                );
             } else {
                 // Create new release
                 await firstValueFrom(
                     this.releaseService.createRelease(releaseData, this.selectedCoverFile || undefined)
-                );
-
-                this.notificationService.success(
-                    this.translate.instant("songRelease.messages.createSuccess")
                 );
             }
 

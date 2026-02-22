@@ -348,10 +348,6 @@ export class EquipmentEditorComponent implements OnInit, OnDestroy {
     private async createEquipment(data: EquipmentCreateRequest): Promise<void> {
         const response = await firstValueFrom(this.equipmentService.createEquipment(data));
 
-        this.notificationService.success(
-            this.translate.instant("equipment.messages.createSuccess")
-        );
-
         this.router.navigate(["/equipment-gallery"], {
             state: {
                 selectedId: response.data.id,
@@ -371,10 +367,6 @@ export class EquipmentEditorComponent implements OnInit, OnDestroy {
 
         await firstValueFrom(
             this.equipmentService.updateEquipment(this.equipmentId, data)
-        );
-
-        this.notificationService.success(
-            this.translate.instant("equipment.messages.updateSuccess")
         );
 
         this.router.navigate(["/equipment-gallery"], {
@@ -466,9 +458,6 @@ export class EquipmentEditorComponent implements OnInit, OnDestroy {
 
         this.equipmentService.uploadAttachment(this.equipmentId, file).subscribe({
             next: () => {
-                this.notificationService.success(
-                    this.translate.instant("equipment.attachments.uploadSuccess")
-                );
                 this.loadAttachments();
                 this.isUploadingFile = false;
             },
@@ -494,9 +483,6 @@ export class EquipmentEditorComponent implements OnInit, OnDestroy {
 
         this.equipmentService.deleteAttachment(this.equipmentId, attachment.id).subscribe({
             next: () => {
-                this.notificationService.success(
-                    this.translate.instant("equipment.attachments.deleteSuccess")
-                );
                 this.loadAttachments();
             },
             error: (error) => {

@@ -138,7 +138,6 @@ export class MusicStyleChooserModalComponent implements OnInit, OnDestroy {
 
     reset(): void {
         this.config = this.styleChooserService.resetToDefault();
-        this.notificationService.success(this.translateService.instant("musicStyleChooser.messages.resetSuccess"));
     }
 
     save(): void {

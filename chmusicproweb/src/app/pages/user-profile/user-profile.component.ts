@@ -335,7 +335,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         const value = this.settingsForm.get("songListLimit")?.value;
         if (value && value >= 5 && value <= 100) {
             this.settingsService.updateSongListLimit(value);
-            this.notificationService.success(this.translate.instant("userProfile.notifications.songListLimitUpdated"));
         }
     }
 
@@ -346,7 +345,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         const value = this.settingsForm.get("imageListLimit")?.value;
         if (value && value >= 5 && value <= 100) {
             this.settingsService.updateImageListLimit(value);
-            this.notificationService.success(this.translate.instant("userProfile.notifications.imageListLimitUpdated"));
         }
     }
 
@@ -357,7 +355,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         const value = this.settingsForm.get("promptListLimit")?.value;
         if (value && value >= 5 && value <= 100) {
             this.settingsService.updatePromptListLimit(value);
-            this.notificationService.success(this.translate.instant("userProfile.notifications.promptListLimitUpdated"));
         }
     }
 
@@ -368,7 +365,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         const value = this.settingsForm.get("sketchListLimit")?.value;
         if (value && value >= 5 && value <= 100) {
             this.settingsService.updateSketchListLimit(value);
-            this.notificationService.success(this.translate.instant("userProfile.notifications.sketchListLimitUpdated"));
         }
     }
 
@@ -379,7 +375,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         const value = this.settingsForm.get("equipmentListLimit")?.value;
         if (value && value >= 5 && value <= 100) {
             this.settingsService.updateEquipmentListLimit(value);
-            this.notificationService.success(this.translate.instant("userProfile.notifications.equipmentListLimitUpdated"));
         }
     }
 
@@ -388,7 +383,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
      */
     public resetSettingsToDefaults(): void {
         this.settingsService.resetToDefaults();
-        this.notificationService.success(this.translate.instant("userProfile.notifications.settingsReset"));
     }
 
     /**
@@ -398,7 +392,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         const value = this.settingsForm.get("language")?.value as Language;
         if (value) {
             this.languageService.changeLanguage(value);
-            this.notificationService.success(this.translate.instant("userProfile.notifications.languageUpdated"));
         }
     }
 
@@ -470,7 +463,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                     this.activeDomainId = response.domain.domain.id;
                     this.loadUserDomains();
                     this.isSwitchingDomain = false;
-                    this.notificationService.success(this.translate.instant("userProfile.domains.switchSuccess"));
                 },
                 error: (error) => {
                     console.error("Error switching domain:", error);
@@ -568,7 +560,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                     this.apiKeyStatus = status;
                     this.apiKeysForm.reset();
                     this.isSavingApiKeys = false;
-                    this.notificationService.success(this.translate.instant("userProfile.apiKeys.saveSuccess"));
                 },
                 error: (error) => {
                     console.error("Failed to save API keys:", error);
@@ -595,7 +586,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
                     };
                     this.apiKeysForm.reset();
                     this.isSavingApiKeys = false;
-                    this.notificationService.success(this.translate.instant("userProfile.apiKeys.clearSuccess"));
                 },
                 error: (error) => {
                     console.error("Failed to clear API keys:", error);

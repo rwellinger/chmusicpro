@@ -309,6 +309,14 @@
                     type="button"
                     class="dropdown-item"
                     [disabled]="isAnyLyricOperationInProgress"
+                    (click)="selectToolsAction('uppercase-tags')">
+                    <i class="fas fa-font"></i>
+                    <span>{{ 'lyricCreation.uppercaseTags' | translate }}</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="dropdown-item"
+                    [disabled]="isAnyLyricOperationInProgress"
                     (click)="selectToolsAction('cleanup')">
                     <i class="fas fa-broom"></i>
                     <span>{{ 'lyricCreation.cleanupLyrics' | translate }}</span>

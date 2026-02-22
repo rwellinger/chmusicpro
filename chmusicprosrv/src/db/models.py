@@ -203,6 +203,64 @@ class LyricWorkshop(Base):
         return f"<LyricWorkshop(id={self.id}, title='{self.title}', phase='{self.current_phase}')>"
 
 
+class SunoTemplate(Base):
+    """Model for storing Suno song templates (enhanced lyrics + style prompt)"""
+
+    __tablename__ = "suno_templates"
+
+    # Primary identifier
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+
+    # Domain ownership (multi-tenancy)
+    domain_id = Column(UUID(as_uuid=True), ForeignKey("domains.id"), nullable=False, index=True)
+
+    # User reference (created_by / audit trail)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+
+    # Template metadata
+    title = Column(String(500), nullable=False)
+    template_type = Column(String(20), nullable=False, default="song", server_default="song", index=True)
+
+    # Source sketch (Song-Modus only)
+    source_sketch_id = Column(UUID(as_uuid=True), ForeignKey("song_sketches.id", ondelete="SET NULL"), nullable=True)
+
+    # Lyrics
+    original_lyrics = Column(Text, nullable=True)
+    enhanced_lyrics = Column(Text, nullable=True)
+
+    # Style fields
+    genre = Column(String(200), nullable=True)
+    bpm = Column(Integer, nullable=True)
+    vocal_type = Column(String(100), nullable=True)
+    instruments = Column(Text, nullable=True)
+    mood = Column(String(500), nullable=True)
+    mix_character = Column(String(200), nullable=True)
+    style_prompt = Column(Text, nullable=True)
+    is_instrumental = Column(Boolean, nullable=False, default=False, server_default="false")
+
+    # Project relationship (optional)
+    project_id = Column(
+        UUID(as_uuid=True), ForeignKey("song_projects.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    project_folder_id = Column(
+        UUID(as_uuid=True), ForeignKey("project_folders.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+
+    # Timestamps
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    # Relationships
+    domain = relationship("Domain")
+    user = relationship("User", back_populates="suno_templates")
+    source_sketch = relationship("SongSketch", foreign_keys=[source_sketch_id])
+    project = relationship("SongProject", back_populates="suno_templates")
+    project_folder = relationship("ProjectFolder", foreign_keys=[project_folder_id])
+
+    def __repr__(self):
+        return f"<SunoTemplate(id={self.id}, title='{self.title}', type='{self.template_type}')>"
+
+
 class GeneratedImage(Base):
     """Model for storing generated image metadata"""
 
@@ -329,6 +387,7 @@ class User(Base):
     song_releases = relationship("SongRelease", back_populates="user", cascade="all, delete-orphan")
     sketches = relationship("SongSketch", back_populates="user", cascade="all, delete-orphan")
     workshops = relationship("LyricWorkshop", back_populates="user", cascade="all, delete-orphan")
+    suno_templates = relationship("SunoTemplate", back_populates="user", cascade="all, delete-orphan")
     generated_images = relationship("GeneratedImage", back_populates="user", cascade="all, delete-orphan")
     usage_logs = relationship("UsageLog", back_populates="user", cascade="all, delete-orphan")
 
@@ -706,6 +765,7 @@ class SongProject(Base):
     files = relationship("ProjectFile", back_populates="project", cascade="all, delete-orphan")
     sketches = relationship("SongSketch", back_populates="project")
     workshops = relationship("LyricWorkshop", back_populates="project")
+    suno_templates = relationship("SunoTemplate", back_populates="project")
     image_references = relationship("ProjectImageReference", back_populates="project", cascade="all, delete-orphan")
     release_references = relationship("ReleaseProjectReference", back_populates="project", cascade="all, delete-orphan")
 
