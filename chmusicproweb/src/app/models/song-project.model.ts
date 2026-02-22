@@ -86,6 +86,14 @@ export interface AssignedWorkshop {
     created_at: string | null;
 }
 
+export interface AssignedSunoTemplate {
+    id: string;
+    title: string | null;
+    template_type: string;
+    style_prompt: string | null;
+    created_at: string | null;
+}
+
 export interface ProjectFolderWithFiles extends ProjectFolder {
     files: ProjectFile[];
 }
@@ -94,6 +102,7 @@ export interface ProjectFolderWithAssets extends ProjectFolderWithFiles {
     assigned_sketches?: AssignedSketch[];
     assigned_images?: AssignedImage[];
     assigned_workshops?: AssignedWorkshop[];
+    assigned_suno_templates?: AssignedSunoTemplate[];
 }
 
 export interface SongProjectDetail extends SongProject {
@@ -105,6 +114,7 @@ export interface SongProjectDetail extends SongProject {
     all_assigned_sketches?: AssignedSketch[];
     all_assigned_images?: AssignedImage[];
     all_assigned_workshops?: AssignedWorkshop[];
+    all_assigned_suno_templates?: AssignedSunoTemplate[];
 }
 
 export interface SongProjectListItem {

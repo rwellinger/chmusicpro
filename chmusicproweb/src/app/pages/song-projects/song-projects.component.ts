@@ -23,7 +23,7 @@ import {FileIgnoreService} from "../../services/utils/file-ignore.service";
 import {FileHashService} from "../../services/utils/file-hash.service";
 import {CreateProjectDialogComponent} from "../../dialogs/create-project-dialog/create-project-dialog.component";
 import {MirrorPreviewDialogComponent} from "../../dialogs/mirror-preview-dialog/mirror-preview-dialog.component";
-import {AssignedSketch, AssignedWorkshop, BatchUploadResponse, ChunkedUploadProgress, MirrorFileEntry, SongProjectDetail, SongProjectListItem} from "../../models/song-project.model";
+import {AssignedSketch, AssignedSunoTemplate, AssignedWorkshop, BatchUploadResponse, ChunkedUploadProgress, MirrorFileEntry, SongProjectDetail, SongProjectListItem} from "../../models/song-project.model";
 import {ChunkedUploadService} from "../../services/business/chunked-upload.service";
 import {getColorFromString, getInitials} from "../../services/utils/cover-utils";
 
@@ -964,6 +964,13 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Navigate to Suno Enhancer with template ID.
+     */
+    openSunoTemplate(template: AssignedSunoTemplate): void {
+        this.router.navigate(["/suno-enhancer", template.id]);
+    }
+
+    /**
      * Navigate to Image View with image ID in state.
      */
     openImage(imageId: string): void {
@@ -980,7 +987,8 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
         const sketchCount = folder.assigned_sketches?.length || 0;
         const imageCount = folder.assigned_images?.length || 0;
         const workshopCount = folder.assigned_workshops?.length || 0;
-        const totalAssets = sketchCount + imageCount + workshopCount;
+        const sunoCount = folder.assigned_suno_templates?.length || 0;
+        const totalAssets = sketchCount + imageCount + workshopCount + sunoCount;
 
         // Only images (specific type)
         if (totalAssets > 0 && fileCount === 0 && sketchCount === 0 && imageCount > 0) {
@@ -1031,7 +1039,8 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
                 // Pass assigned elements for Advanced section
                 all_assigned_sketches: this.selectedProject.all_assigned_sketches,
                 all_assigned_images: this.selectedProject.all_assigned_images,
-                all_assigned_workshops: this.selectedProject.all_assigned_workshops
+                all_assigned_workshops: this.selectedProject.all_assigned_workshops,
+                all_assigned_suno_templates: this.selectedProject.all_assigned_suno_templates
             }
         });
 

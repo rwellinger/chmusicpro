@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build:prod -- --output-path dist/chmusicproweb
 
 # Production stage - Nginx with built Angular app
-FROM nginx:1.23.3 AS production
+FROM nginx:1.26-alpine AS production
 
 # Copy built Angular app
 COPY --from=builder /app/dist/chmusicproweb/browser /usr/share/nginx/html/chmusicproweb/browser
@@ -26,6 +26,6 @@ EXPOSE 80 443
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 --start-period=10s \
-  CMD curl -f http://localhost/nginx_status || exit 1
+  CMD wget -q --spider http://localhost/nginx_status || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]

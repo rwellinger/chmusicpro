@@ -438,6 +438,27 @@ def transform_workshop_to_assigned_response(workshop: Any) -> dict[str, Any]:  #
     }
 
 
+def transform_suno_template_to_assigned_response(template: Any) -> dict[str, Any]:  # pragma: no cover
+    """
+    Transform SunoTemplate DB model to assigned suno template API response format (pure function)
+
+    NOTE: No unit tests - Simple attribute mapper without business logic.
+
+    Args:
+        template: SunoTemplate DB model instance
+
+    Returns:
+        Dictionary with suno template data for API response
+    """
+    return {
+        "id": str(template.id),
+        "title": template.title if hasattr(template, "title") else None,
+        "template_type": template.template_type if hasattr(template, "template_type") else "song",
+        "style_prompt": template.style_prompt if hasattr(template, "style_prompt") else None,
+        "created_at": template.created_at.isoformat() if template.created_at else None,
+    }
+
+
 def transform_image_to_assigned_response(image: Any) -> dict[str, Any]:  # pragma: no cover
     """
     Transform GeneratedImage DB model to assigned image API response format (pure function)

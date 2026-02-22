@@ -258,6 +258,17 @@
 
           <!-- Action Buttons -->
           <div class="detail-actions">
+            @if (selectedTemplate.project_id) {
+              <button mat-stroked-button type="button" (click)="unassignFromProjectForSelected()">
+                <i class="fas fa-link-slash"></i>
+                <span>{{ 'sunoEnhancer.unassignFromProject' | translate }}</span>
+              </button>
+            } @else {
+              <button mat-stroked-button type="button" (click)="openAssignToProjectDialogForSelected()">
+                <i class="fas fa-link"></i>
+                <span>{{ 'sunoEnhancer.assignToProject' | translate }}</span>
+              </button>
+            }
             <button mat-stroked-button type="button" color="warn" (click)="deleteSelectedTemplate()">
               <i class="fas fa-trash"></i>
               <span>{{ 'common.delete' | translate }}</span>

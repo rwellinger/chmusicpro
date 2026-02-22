@@ -37,6 +37,7 @@ from business.song_project_transformer import (
     transform_project_to_response,
     transform_release_to_assigned_response,
     transform_sketch_to_assigned_response,
+    transform_suno_template_to_assigned_response,
     transform_workshop_to_assigned_response,
 )
 from db.song_project_service import song_project_service
@@ -220,12 +221,19 @@ class SongProjectOrchestrator:
                     transform_workshop_to_assigned_response(workshop) for workshop in workshops
                 ]
 
+                # Load assigned suno templates from DB
+                suno_templates = self.db_service.get_assigned_suno_templates_for_folder(db, project_id, folder_id)
+                folder_data["assigned_suno_templates"] = [
+                    transform_suno_template_to_assigned_response(t) for t in suno_templates
+                ]
+
                 logger.debug(
                     "Assigned assets loaded for folder",
                     folder_id=str(folder_id),
                     sketches_count=len(sketches),
                     images_count=len(images),
                     workshops_count=len(workshops),
+                    suno_templates_count=len(suno_templates),
                 )
 
         except Exception as e:
@@ -300,12 +308,19 @@ class SongProjectOrchestrator:
                 transform_workshop_to_assigned_response(workshop) for workshop in workshops
             ]
 
+            # Load ALL assigned suno templates from DB
+            suno_templates = self.db_service.get_all_assigned_suno_templates_for_project(db, project_id)
+            response_data["all_assigned_suno_templates"] = [
+                transform_suno_template_to_assigned_response(t) for t in suno_templates
+            ]
+
             logger.debug(
                 "All assigned assets loaded for project",
                 project_id=str(project_id),
                 sketches_count=len(sketches),
                 images_count=len(images),
                 workshops_count=len(workshops),
+                suno_templates_count=len(suno_templates),
             )
 
         except Exception as e:
@@ -319,6 +334,7 @@ class SongProjectOrchestrator:
             response_data["all_assigned_sketches"] = []
             response_data["all_assigned_images"] = []
             response_data["all_assigned_workshops"] = []
+            response_data["all_assigned_suno_templates"] = []
 
     def get_project_with_details(self, db: Session, project_id: UUID, domain_id: UUID) -> dict[str, Any] | None:
         """

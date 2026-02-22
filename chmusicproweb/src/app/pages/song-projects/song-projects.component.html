@@ -323,6 +323,28 @@
                     }
                   </div>
                 }
+                <!-- All Assigned Suno Templates -->
+                @if (selectedProject.all_assigned_suno_templates?.length) {
+                  <div class="assigned-assets-section">
+                    <h3 class="section-title">
+                      <i class="fas fa-wand-sparkles"></i>
+                      {{ 'songProjects.detail.allAssignedSunoTemplates' | translate }}
+                    </h3>
+                    @for (template of selectedProject.all_assigned_suno_templates; track template) {
+                      <div class="asset-item">
+                        <div class="asset-info">
+                          <i class="fas fa-wand-sparkles"></i>
+                          <span class="asset-title">{{ template.title }}</span>
+                          <span class="asset-badge">{{ template.template_type }}</span>
+                        </div>
+                        <button type="button" class="asset-action-button" (click)="openSunoTemplate(template)"
+                          [matTooltip]="'songProjects.detail.actions.openSunoTemplate' | translate">
+                          <i class="fas fa-external-link-alt"></i>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
                 <div class="detail-field-row">
                   <div class="detail-field">
                     <span class="field-label">{{ 'songProjects.detail.stats.created' | translate }}</span>
@@ -479,6 +501,29 @@
                                   <button type="button" class="asset-action-button"
                                     (click)="openWorkshop(workshop)"
                                     [matTooltip]="'songProjects.detail.actions.openWorkshop' | translate">
+                                    <i class="fas fa-external-link-alt"></i>
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          }
+                          <!-- Assigned Suno Templates -->
+                          @if (folder.assigned_suno_templates && folder.assigned_suno_templates.length > 0) {
+                            <div class="assigned-assets-section">
+                              <h4 class="assets-section-title">
+                                <i class="fas fa-wand-sparkles"></i>
+                                {{ 'songProjects.detail.assignedSunoTemplates' | translate }}
+                              </h4>
+                              @for (template of folder.assigned_suno_templates; track template) {
+                                <div class="asset-item">
+                                  <div class="asset-info">
+                                    <i class="fas fa-wand-sparkles"></i>
+                                    <span class="asset-title">{{ template.title }}</span>
+                                    <span class="asset-badge">{{ template.template_type }}</span>
+                                  </div>
+                                  <button type="button" class="asset-action-button"
+                                    (click)="openSunoTemplate(template)"
+                                    [matTooltip]="'songProjects.detail.actions.openSunoTemplate' | translate">
                                     <i class="fas fa-external-link-alt"></i>
                                   </button>
                                 </div>

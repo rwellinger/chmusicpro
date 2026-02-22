@@ -1879,6 +1879,8 @@
       "allAssignedSketches": "Assigned Compositions",
       "allAssignedImages": "Assigned Pictures",
       "allAssignedWorkshops": "Assigned Workshops",
+      "assignedSunoTemplates": "Assigned Suno Templates",
+      "allAssignedSunoTemplates": "Assigned Suno Templates",
       "noAssignedAssets": "No assigned assets in this folder",
       "folderContent": {
         "images": "{{count}} pictures",
@@ -1906,6 +1908,7 @@
         "openSketch": "Open Composition",
         "openImage": "Open Picture",
         "openWorkshop": "Open Workshop",
+        "openSunoTemplate": "Open Suno Template",
         "viewRelease": "View Release"
       },
       "sections": {
@@ -2275,8 +2278,11 @@
       "loadFailed": "Failed to load templates",
       "createFailed": "Failed to create template",
       "createFromSketchFailed": "Failed to create template from composition",
-      "deleteFailed": "Failed to delete template"
+      "deleteFailed": "Failed to delete template",
+      "unassignFailed": "Failed to unassign from project"
     },
+    "assignToProject": "Assign to Project",
+    "unassignFromProject": "Unassign from Project",
     "enhanceSuno": "Enhance for Suno",
     "translateToEnglish": "Translate to English",
     "progress": {

@@ -13,8 +13,10 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {debounceTime, Subject, takeUntil} from "rxjs";
 
+import {MatDialog, MatDialogModule} from "@angular/material/dialog";
 import {SunoTemplateService} from "../../services/business/suno-template.service";
 import {NotificationService} from "../../services/ui/notification.service";
+import {AssignToProjectDialogComponent} from "../../dialogs/assign-to-project-dialog/assign-to-project-dialog.component";
 import {ChatService} from "../../services/config/chat.service";
 import {ProgressService} from "../../services/ui/progress.service";
 import {SunoTemplate} from "../../models/suno-template.model";
@@ -45,6 +47,7 @@ import {
         MatInputModule,
         MatSelectModule,
         MatSlideToggleModule,
+        MatDialogModule,
         TranslateModule,
         MusicStyleChooserInlineComponent,
     ],
@@ -110,6 +113,7 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
     private styleChooserService = inject(MusicStyleChooserService);
     private chatService = inject(ChatService);
     private progressService = inject(ProgressService);
+    private dialog = inject(MatDialog);
 
     isEnhancingPrompt = false;
     isTranslatingPrompt = false;
@@ -309,6 +313,37 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
     truncateText(text: string | undefined, maxLength = 200): string {
         if (!text) return "";
         return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+    }
+
+    // ===== Project Assignment =====
+
+    openAssignToProjectDialogForSelected(): void {
+        if (!this.selectedTemplate) return;
+        const dialogRef = this.dialog.open(AssignToProjectDialogComponent, {
+            width: "500px",
+            data: {
+                assetType: "suno_template",
+                assetId: this.selectedTemplate.id
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result?.success) {
+                this.selectedTemplate = null;
+                this.loadTemplates();
+            }
+        });
+    }
+
+    async unassignFromProjectForSelected(): Promise<void> {
+        if (!this.selectedTemplate) return;
+        try {
+            await this.templateService.unassignFromProject(this.selectedTemplate.id);
+            this.selectedTemplate = null;
+            this.loadTemplates();
+        } catch {
+            this.notificationService.error(this.translate.instant("sunoEnhancer.errors.unassignFailed"));
+        }
     }
 
     // ===== Editor Mode =====

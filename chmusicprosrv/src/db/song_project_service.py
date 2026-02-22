@@ -961,6 +961,75 @@ class SongProjectService:
             )
             return []
 
+    def get_assigned_suno_templates_for_folder(self, db: Session, project_id: UUID, folder_id: UUID) -> list[Any]:
+        """
+        Get all assigned suno templates for a project folder (CRUD only)
+
+        Args:
+            db: Database session
+            project_id: Project UUID
+            folder_id: Folder UUID
+
+        Returns:
+            List of SunoTemplate instances
+        """
+        try:
+            from db.models import SunoTemplate
+
+            templates = (
+                db.query(SunoTemplate)
+                .filter(SunoTemplate.project_id == project_id, SunoTemplate.project_folder_id == folder_id)
+                .order_by(SunoTemplate.created_at.desc())
+                .all()
+            )
+            logger.debug(
+                "Assigned suno templates retrieved for folder",
+                project_id=str(project_id),
+                folder_id=str(folder_id),
+                count=len(templates),
+            )
+            return templates
+        except SQLAlchemyError as e:
+            logger.error(
+                "Failed to get assigned suno templates for folder",
+                error=str(e),
+                error_type=type(e).__name__,
+                project_id=str(project_id),
+                folder_id=str(folder_id),
+            )
+            return []
+
+    def get_all_assigned_suno_templates_for_project(self, db: Session, project_id: UUID) -> list[Any]:
+        """
+        Get ALL assigned suno templates for a project (regardless of folder assignment)
+
+        Args:
+            db: Database session
+            project_id: Project UUID
+
+        Returns:
+            List of SunoTemplate instances
+        """
+        try:
+            from db.models import SunoTemplate
+
+            templates = (
+                db.query(SunoTemplate)
+                .filter(SunoTemplate.project_id == project_id)
+                .order_by(SunoTemplate.created_at.desc())
+                .all()
+            )
+            logger.debug("All assigned suno templates retrieved", project_id=str(project_id), count=len(templates))
+            return templates
+        except SQLAlchemyError as e:
+            logger.error(
+                "Failed to get all assigned suno templates",
+                error=str(e),
+                error_type=type(e).__name__,
+                project_id=str(project_id),
+            )
+            return []
+
 
 # Global service instance
 song_project_service = SongProjectService()
