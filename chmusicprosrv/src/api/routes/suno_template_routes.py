@@ -178,7 +178,6 @@ def assign_to_project(template_id: str):
             str(domain_id),
             template_id,
             str(assign_data.project_id),
-            str(assign_data.folder_id) if assign_data.folder_id else None,
         )
         return jsonify(result), status_code
     finally:

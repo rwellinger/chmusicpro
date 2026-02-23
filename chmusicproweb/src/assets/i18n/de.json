@@ -347,13 +347,9 @@
     "selectProject": "Projekt auswählen",
     "selectProjects": "Projekte auswählen",
     "albumMultiSelectHint": "Alben können mehreren Projekten zugewiesen werden",
-    "selectFolder": "Ordner auswählen (Optional)",
-    "noFolder": "Kein Ordner",
-    "noFoldersAvailable": "Keine Ordner in diesem Projekt verfügbar",
     "success": "Erfolgreich zu Projekt zugewiesen",
     "errors": {
       "loadProjectsFailed": "Projekte konnten nicht geladen werden",
-      "loadFoldersFailed": "Ordner konnten nicht geladen werden",
       "assignFailed": "Zuweisung zum Projekt fehlgeschlagen",
       "noProjectSelected": "Bitte wähle mindestens ein Projekt aus",
       "singleOneProject": "Singles können nur einem Projekt zugewiesen werden"

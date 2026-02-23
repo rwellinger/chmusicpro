@@ -55,10 +55,9 @@ export class WorkshopService {
         );
     }
 
-    async assignToProject(workshopId: string, projectId: string, projectFolderId?: string): Promise<any> {
+    async assignToProject(workshopId: string, projectId: string): Promise<any> {
         const body: any = {
-            project_id: projectId,
-            folder_id: projectFolderId || null
+            project_id: projectId
         };
         return firstValueFrom(
             this.http.post(this.apiConfig.endpoints.workshop.assignToProject(workshopId), body)

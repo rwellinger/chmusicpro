@@ -186,65 +186,6 @@ class SongProjectOrchestrator:
             )
             return None
 
-    def _load_assigned_assets_for_folders(
-        self, db: Session, project_id: UUID, folders_data: list[dict[str, Any]]
-    ) -> None:
-        """
-        Load assigned assets (sketches, images) for all folders (coordination only)
-
-        Args:
-            db: Database session
-            project_id: Project UUID
-            folders_data: List of folder dictionaries (will be modified in-place)
-
-        Note:
-            This method modifies folders_data in-place by adding
-            assigned_sketches and assigned_images lists to each folder.
-        """
-        try:
-            for folder_data in folders_data:
-                folder_id = UUID(folder_data["id"])
-
-                # Load assigned sketches from DB
-                sketches = self.db_service.get_assigned_sketches_for_folder(db, project_id, folder_id)
-                folder_data["assigned_sketches"] = [
-                    transform_sketch_to_assigned_response(sketch) for sketch in sketches
-                ]
-
-                # Load assigned images from DB
-                images = self.db_service.get_assigned_images_for_folder(db, project_id, folder_id)
-                folder_data["assigned_images"] = [transform_image_to_assigned_response(image) for image in images]
-
-                # Load assigned workshops from DB
-                workshops = self.db_service.get_assigned_workshops_for_folder(db, project_id, folder_id)
-                folder_data["assigned_workshops"] = [
-                    transform_workshop_to_assigned_response(workshop) for workshop in workshops
-                ]
-
-                # Load assigned suno templates from DB
-                suno_templates = self.db_service.get_assigned_suno_templates_for_folder(db, project_id, folder_id)
-                folder_data["assigned_suno_templates"] = [
-                    transform_suno_template_to_assigned_response(t) for t in suno_templates
-                ]
-
-                logger.debug(
-                    "Assigned assets loaded for folder",
-                    folder_id=str(folder_id),
-                    sketches_count=len(sketches),
-                    images_count=len(images),
-                    workshops_count=len(workshops),
-                    suno_templates_count=len(suno_templates),
-                )
-
-        except Exception as e:
-            logger.error(
-                "Failed to load assigned assets",
-                project_id=str(project_id),
-                error=str(e),
-                error_type=type(e).__name__,
-            )
-            # Don't fail the entire request, just log the error
-
     def _load_assigned_releases(self, db: Session, project_id: UUID, response_data: dict[str, Any]) -> None:
         """
         Load assigned releases for project (coordination only)
@@ -363,9 +304,6 @@ class SongProjectOrchestrator:
 
             # Transform to response (includes folders and files)
             response = transform_project_detail_to_response(project)
-
-            # Load assigned assets for all folders (coordination)
-            self._load_assigned_assets_for_folders(db, project_id, response["folders"])
 
             # Load assigned releases for project (coordination)
             self._load_assigned_releases(db, project_id, response)

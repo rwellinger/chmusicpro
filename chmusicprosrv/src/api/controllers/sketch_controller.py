@@ -295,7 +295,6 @@ class SketchController:
         domain_id: str,
         sketch_id: str,
         project_id: str,
-        folder_id: str | None = None,
     ) -> tuple[dict[str, Any], int]:
         """
         Assign sketch to a project (1:1 relationship)
@@ -304,7 +303,6 @@ class SketchController:
             db: Database session
             sketch_id: Sketch UUID
             project_id: Project UUID
-            folder_id: Optional folder UUID
 
         Returns:
             Tuple of (response_data, status_code)
@@ -314,8 +312,6 @@ class SketchController:
             try:
                 UUID(sketch_id)
                 UUID(project_id)
-                if folder_id:
-                    UUID(folder_id)
             except ValueError as e:
                 return {"error": f"Invalid UUID format: {str(e)}"}, 400
 
@@ -325,7 +321,6 @@ class SketchController:
                 domain_id=domain_id,
                 sketch_id=sketch_id,
                 project_id=project_id,
-                folder_id=folder_id,
             )
 
             if not result:
@@ -335,7 +330,6 @@ class SketchController:
                 "Sketch assigned to project",
                 sketch_id=sketch_id,
                 project_id=project_id,
-                folder_id=folder_id,
             )
 
             return {"success": True, "data": result}, 200

@@ -186,31 +186,23 @@ class SunoTemplateOrchestrator:
         domain_id: str,
         template_id: str,
         project_id: str,
-        folder_id: str | None = None,
     ) -> dict | None:
         """Assign suno template to a project"""
         from uuid import UUID
 
-        from db.song_project_service import get_folder_by_id, get_project_by_id
+        from db.song_project_service import get_project_by_id
 
         try:
             project = get_project_by_id(db, UUID(project_id))
             if not project:
                 raise ValueError(f"Project not found: {project_id}")
 
-            if folder_id:
-                folder = get_folder_by_id(db, UUID(folder_id))
-                if not folder:
-                    raise ValueError(f"Folder not found: {folder_id}")
-                if folder.project_id != UUID(project_id):
-                    raise ValueError(f"Folder {folder_id} does not belong to project {project_id}")
-
             updated_template = suno_template_service.update_template(
                 db=db,
                 template_id=template_id,
                 domain_id=domain_id,
                 project_id=project_id,
-                project_folder_id=folder_id,
+                project_folder_id=None,
             )
 
             if not updated_template:
@@ -220,7 +212,6 @@ class SunoTemplateOrchestrator:
                 "Suno template assigned to project",
                 template_id=template_id,
                 project_id=project_id,
-                folder_id=folder_id,
             )
 
             return {

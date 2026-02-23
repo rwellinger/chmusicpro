@@ -67,10 +67,9 @@ export class ImageService {
     /**
      * Assign an image to a project (with optional folder)
      */
-    async assignToProject(imageId: string, projectId: string, projectFolderId?: string): Promise<any> {
+    async assignToProject(imageId: string, projectId: string): Promise<any> {
         const body: any = {
-            project_id: projectId,
-            folder_id: projectFolderId || null
+            project_id: projectId
         };
         return firstValueFrom(
             this.http.post(this.apiConfig.endpoints.image.assignToProject(imageId), body)

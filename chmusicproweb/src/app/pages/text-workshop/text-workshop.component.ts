@@ -538,8 +538,8 @@ export class TextWorkshopComponent implements OnInit, OnDestroy {
     openStructureModal(): void {
         const dialogRef = this.dialog.open(LyricArchitectModalComponent, {
             width: "800px",
-            maxWidth: "90vw",
-            maxHeight: "90vh"
+            maxWidth: "90dvw",
+            maxHeight: "90dvh"
         });
 
         dialogRef.afterClosed().subscribe(result => {

@@ -347,13 +347,9 @@
     "selectProject": "Select Project",
     "selectProjects": "Select Projects",
     "albumMultiSelectHint": "Albums can be assigned to multiple projects",
-    "selectFolder": "Select Folder (Optional)",
-    "noFolder": "No Folder",
-    "noFoldersAvailable": "No folders available in this project",
     "success": "Successfully assigned to project",
     "errors": {
       "loadProjectsFailed": "Failed to load projects",
-      "loadFoldersFailed": "Failed to load folders",
       "assignFailed": "Failed to assign to project",
       "noProjectSelected": "Please select at least one project",
       "singleOneProject": "Single releases can only be assigned to one project"

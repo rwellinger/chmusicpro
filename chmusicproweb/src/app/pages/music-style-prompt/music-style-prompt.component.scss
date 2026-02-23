@@ -3,7 +3,7 @@
 @use '../../../scss/mixins' as *;
 
 .music-style-prompt-container {
-  height: calc(100vh - $step-bar-height);
+  height: calc(100dvh - $step-bar-height);
   overflow: hidden;
   padding: $spacing-md;
   background: $background-white;
@@ -14,7 +14,7 @@
 .music-style-prompt-card {
   max-width: 1600px;
   width: 100%;
-  height: calc(100vh - $step-bar-height - 2rem);
+  height: calc(100dvh - $step-bar-height - 2rem);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   display: flex;
@@ -317,7 +317,7 @@
   
   .music-style-prompt-card {
     max-width: 100%;
-    height: calc(100vh - 1rem);
+    height: calc(100dvh - 1rem);
   }
   
   // Larger textarea for comfortable editing
@@ -373,7 +373,7 @@
   }
   
   .music-style-prompt-card {
-    height: calc(100vh - 1rem);
+    height: calc(100dvh - 1rem);
   }
   
   .prompt-header {

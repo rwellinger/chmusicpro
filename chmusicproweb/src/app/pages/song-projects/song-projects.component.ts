@@ -836,7 +836,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
 
         const dialogRef = this.dialog.open(MirrorPreviewDialogComponent, {
             width: "700px",
-            maxHeight: "80vh",
+            maxHeight: "80dvh",
             data: {
                 folderName: folder.folder_name,
                 toUpload: compareResult.to_upload,
@@ -984,41 +984,11 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
      */
     getFolderContentLabel(folder: any): string {
         const fileCount = folder.files?.length || 0;
-        const sketchCount = folder.assigned_sketches?.length || 0;
-        const imageCount = folder.assigned_images?.length || 0;
-        const workshopCount = folder.assigned_workshops?.length || 0;
-        const sunoCount = folder.assigned_suno_templates?.length || 0;
-        const totalAssets = sketchCount + imageCount + workshopCount + sunoCount;
 
-        // Only images (specific type)
-        if (totalAssets > 0 && fileCount === 0 && sketchCount === 0 && imageCount > 0) {
-            return this.translate.instant("songProjects.detail.folderContent.images", {count: imageCount});
-        }
-
-        // Only sketches (specific type)
-        if (totalAssets > 0 && fileCount === 0 && sketchCount > 0 && imageCount === 0) {
-            return this.translate.instant("songProjects.detail.folderContent.sketches", {count: sketchCount});
-        }
-
-        // Mixed assets only
-        if (totalAssets > 0 && fileCount === 0) {
-            return this.translate.instant("songProjects.detail.folderContent.assets", {count: totalAssets});
-        }
-
-        // Assets + files
-        if (totalAssets > 0 && fileCount > 0) {
-            return this.translate.instant("songProjects.detail.folderContent.assetsAndFiles", {
-                assetCount: totalAssets,
-                fileCount: fileCount
-            });
-        }
-
-        // Only files
         if (fileCount > 0) {
             return this.translate.instant("songProjects.detail.folderContent.files", {count: fileCount});
         }
 
-        // Empty
         return this.translate.instant("songProjects.detail.folderContent.empty");
     }
 
@@ -1030,7 +1000,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
 
         const dialogRef = this.dialog.open(CreateProjectDialogComponent, {
             width: "600px",
-            maxHeight: "90vh",
+            maxHeight: "90dvh",
             data: {
                 project_id: this.selectedProject.id,
                 project_name: this.selectedProject.project_name,

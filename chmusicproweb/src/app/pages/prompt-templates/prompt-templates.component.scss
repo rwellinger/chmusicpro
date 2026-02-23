@@ -2,7 +2,7 @@
 @use '../../../scss/mixins' as *;
 
 .prompt-templates-container {
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   
   &.master-detail-layout {
@@ -14,7 +14,7 @@
 
 // Left Side: List Section
 .list-section {
-  height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
   overflow-x: hidden;
   padding: $spacing-md;
@@ -23,7 +23,7 @@
 }
 
 .list-card {
-  height: calc(100vh - 2rem);
+  height: calc(100dvh - 2rem);
   display: flex;
   flex-direction: column;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -342,7 +342,7 @@
   background-color: $background-white;
   
   &.empty-detail {
-    height: calc(100vh - 2rem);
+    height: calc(100dvh - 2rem);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -655,7 +655,7 @@
   
   .list-section {
     height: auto;
-    max-height: 50vh;
+    max-height: 50dvh;
     border-right: none;
     border-bottom: 1px solid $border-light;
     padding: $spacing-sm;
@@ -663,7 +663,7 @@
   
   .detail-section {
     height: auto;
-    max-height: 50vh;
+    max-height: 50dvh;
     padding: $spacing-sm;
   }
   

@@ -415,7 +415,7 @@ export class SongSketchLibraryComponent implements OnInit, OnDestroy {
 
         const dialogRef = this.dialog.open(AssignToProjectDialogComponent, {
             width: "600px",
-            maxHeight: "90vh",
+            maxHeight: "90dvh",
             data: {
                 assetType: "sketch",
                 assetId: this.selectedSketch.id

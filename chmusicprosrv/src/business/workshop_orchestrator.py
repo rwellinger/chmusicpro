@@ -110,7 +110,6 @@ class WorkshopOrchestrator:
         domain_id: str,
         workshop_id: str,
         project_id: str,
-        folder_id: str | None = None,
     ) -> dict | None:
         """
         Assign workshop to a project (1:1 relationship)
@@ -119,36 +118,28 @@ class WorkshopOrchestrator:
             db: Database session
             workshop_id: Workshop UUID
             project_id: Project UUID
-            folder_id: Optional folder UUID
 
         Returns:
             dict: Updated workshop data or None if not found
 
         Raises:
-            ValueError: If project or folder not found
+            ValueError: If project not found
         """
         from uuid import UUID
 
-        from db.song_project_service import get_folder_by_id, get_project_by_id
+        from db.song_project_service import get_project_by_id
 
         try:
             project = get_project_by_id(db, UUID(project_id))
             if not project:
                 raise ValueError(f"Project not found: {project_id}")
 
-            if folder_id:
-                folder = get_folder_by_id(db, UUID(folder_id))
-                if not folder:
-                    raise ValueError(f"Folder not found: {folder_id}")
-                if folder.project_id != UUID(project_id):
-                    raise ValueError(f"Folder {folder_id} does not belong to project {project_id}")
-
             updated_workshop = workshop_service.update_workshop(
                 db=db,
                 workshop_id=workshop_id,
                 domain_id=domain_id,
                 project_id=project_id,
-                project_folder_id=folder_id,
+                project_folder_id=None,
             )
 
             if not updated_workshop:
@@ -158,7 +149,6 @@ class WorkshopOrchestrator:
                 "Workshop assigned to project",
                 workshop_id=workshop_id,
                 project_id=project_id,
-                folder_id=folder_id,
             )
 
             return {

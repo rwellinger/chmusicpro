@@ -28,11 +28,6 @@ interface ProjectListItem {
     project_name: string;
 }
 
-interface ProjectFolder {
-    id: string;
-    folder_name: string;
-}
-
 @Component({
     selector: "app-assign-to-project-dialog",
     standalone: true,
@@ -49,10 +44,8 @@ interface ProjectFolder {
 })
 export class AssignToProjectDialogComponent implements OnInit {
     projects: ProjectListItem[] = [];
-    folders: ProjectFolder[] = [];
     selectedProjectId: string | null = null;
     selectedProjectIds: string[] = []; // For release multi-select (Album)
-    selectedFolderId: string | null = null;
     loading = false;
     errorMessage = "";
 
@@ -96,37 +89,6 @@ export class AssignToProjectDialogComponent implements OnInit {
         } catch (error) {
             console.error("Failed to load projects", error);
             this.errorMessage = "assignToProject.errors.loadProjectsFailed";
-        } finally {
-            this.loading = false;
-        }
-    }
-
-    /**
-     * Load folders when a project is selected
-     */
-    async onProjectChange(): Promise<void> {
-        this.folders = [];
-        this.selectedFolderId = null;
-
-        if (!this.selectedProjectId) {
-            return;
-        }
-
-        this.loading = true;
-        this.errorMessage = "";
-        try {
-            const response = await firstValueFrom(
-                this.projectService.getProjectById(this.selectedProjectId)
-            );
-            this.folders = response.data?.folders || [];
-
-            // Sort folders numerically by folder_name (e.g., "01 Arrangement", "02 AI", ...)
-            this.folders.sort((a, b) =>
-                a.folder_name.localeCompare(b.folder_name, undefined, {numeric: true})
-            );
-        } catch (error) {
-            console.error("Failed to load folders", error);
-            this.errorMessage = "assignToProject.errors.loadFoldersFailed";
         } finally {
             this.loading = false;
         }
@@ -192,29 +154,25 @@ export class AssignToProjectDialogComponent implements OnInit {
                 case "image":
                     await this.imageService.assignToProject(
                         this.data.assetId,
-                        this.selectedProjectId!,
-                        this.selectedFolderId || undefined
+                        this.selectedProjectId!
                     );
                     break;
                 case "sketch":
                     await this.sketchService.assignToProject(
                         this.data.assetId,
-                        this.selectedProjectId!,
-                        this.selectedFolderId || undefined
+                        this.selectedProjectId!
                     );
                     break;
                 case "workshop":
                     await this.workshopService.assignToProject(
                         this.data.assetId,
-                        this.selectedProjectId!,
-                        this.selectedFolderId || undefined
+                        this.selectedProjectId!
                     );
                     break;
                 case "suno_template":
                     await this.sunoTemplateService.assignToProject(
                         this.data.assetId,
-                        this.selectedProjectId!,
-                        this.selectedFolderId || undefined
+                        this.selectedProjectId!
                     );
                     break;
                 case "release": {

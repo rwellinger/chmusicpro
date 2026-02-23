@@ -249,102 +249,103 @@
                     <div class="readonly-field">{{ selectedProject.description }}</div>
                   </div>
                 }
-                <!-- All Assigned Sketches -->
-                @if (selectedProject.all_assigned_sketches?.length) {
-                  <div class="assigned-assets-section">
-                    <h3 class="section-title">
-                      <i class="fas fa-pencil-alt"></i>
-                      {{ 'songProjects.detail.allAssignedSketches' | translate }}
-                    </h3>
-                    @for (sketch of selectedProject.all_assigned_sketches; track sketch) {
-                      <div class="asset-item">
-                        <div class="asset-info">
-                          <i class="fas"
-                          [class]="sketch.sketch_type === 'inspiration' ? 'fa-lightbulb' : 'fa-music'"></i>
-                          <span class="asset-title">{{ sketch.title || sketch.prompt }}</span>
-                          <span class="asset-badge">{{ sketch.workflow }}</span>
+                <!-- All Assigned Assets (2-column grid) -->
+                <div class="assigned-assets-grid">
+                  <!-- Sketches -->
+                  @if (selectedProject.all_assigned_sketches?.length) {
+                    <div class="assigned-assets-section">
+                      <h3 class="section-title">
+                        <i class="fas fa-pencil-alt"></i>
+                        {{ 'songProjects.detail.allAssignedSketches' | translate }}
+                      </h3>
+                      @for (sketch of selectedProject.all_assigned_sketches; track sketch) {
+                        <div class="asset-item">
+                          <div class="asset-info">
+                            <i class="fas"
+                            [class]="sketch.sketch_type === 'inspiration' ? 'fa-lightbulb' : 'fa-music'"></i>
+                            <span class="asset-title">{{ sketch.title || sketch.prompt }}</span>
+                            <span class="asset-badge">{{ sketch.workflow }}</span>
+                          </div>
+                          <button type="button" class="asset-action-button" (click)="openSketch(sketch)"
+                            [matTooltip]="'songProjects.detail.actions.openSketch' | translate">
+                            <i class="fas fa-external-link-alt"></i>
+                          </button>
                         </div>
-                        <button type="button" class="asset-action-button" (click)="openSketch(sketch)"
-                          [matTooltip]="'songProjects.detail.actions.openSketch' | translate">
-                          <i class="fas fa-external-link-alt"></i>
-                        </button>
-                      </div>
-                    }
-                  </div>
-                }
-                <!-- All Assigned Images -->
-                @if (selectedProject.all_assigned_images?.length) {
-                  <div class="assigned-assets-section">
-                    <h3 class="section-title">
-                      <i class="fas fa-image"></i>
-                      {{ 'songProjects.detail.allAssignedImages' | translate }}
-                    </h3>
-                    @for (image of selectedProject.all_assigned_images; track image) {
-                      <div class="asset-item">
-                        <div class="asset-info">
-                          <i class="fas fa-image"></i>
-                          <span class="asset-title">{{ image.title || image.prompt || 'Untitled' }}</span>
-                          @if (image.composition) {
-                            <span
-                            class="asset-meta">{{ image.composition }}</span>
-                          }
-                          @if (image.width && image.height) {
-                            <span class="asset-meta">{{ image.width }}
-                            x{{ image.height }}</span>
-                          }
+                      }
+                    </div>
+                  }
+                  <!-- Images -->
+                  @if (selectedProject.all_assigned_images?.length) {
+                    <div class="assigned-assets-section">
+                      <h3 class="section-title">
+                        <i class="fas fa-image"></i>
+                        {{ 'songProjects.detail.allAssignedImages' | translate }}
+                      </h3>
+                      @for (image of selectedProject.all_assigned_images; track image) {
+                        <div class="asset-item">
+                          <div class="asset-info">
+                            <i class="fas fa-image"></i>
+                            <span class="asset-title">{{ image.title || image.prompt || 'Untitled' }}</span>
+                            @if (image.composition) {
+                              <span class="asset-meta">{{ image.composition }}</span>
+                            }
+                            @if (image.width && image.height) {
+                              <span class="asset-meta">{{ image.width }}x{{ image.height }}</span>
+                            }
+                          </div>
+                          <button type="button" class="asset-action-button" (click)="openImage(image.id)"
+                            [matTooltip]="'songProjects.detail.actions.openImage' | translate">
+                            <i class="fas fa-external-link-alt"></i>
+                          </button>
                         </div>
-                        <button type="button" class="asset-action-button" (click)="openImage(image.id)"
-                          [matTooltip]="'songProjects.detail.actions.openImage' | translate">
-                          <i class="fas fa-external-link-alt"></i>
-                        </button>
-                      </div>
-                    }
-                  </div>
-                }
-                <!-- All Assigned Workshops -->
-                @if (selectedProject.all_assigned_workshops?.length) {
-                  <div class="assigned-assets-section">
-                    <h3 class="section-title">
-                      <i class="fas fa-pen-fancy"></i>
-                      {{ 'songProjects.detail.allAssignedWorkshops' | translate }}
-                    </h3>
-                    @for (workshop of selectedProject.all_assigned_workshops; track workshop) {
-                      <div class="asset-item">
-                        <div class="asset-info">
-                          <i class="fas fa-pen-fancy"></i>
-                          <span class="asset-title">{{ workshop.title }}</span>
-                          <span class="asset-badge">{{ workshop.current_phase }}</span>
+                      }
+                    </div>
+                  }
+                  <!-- Workshops -->
+                  @if (selectedProject.all_assigned_workshops?.length) {
+                    <div class="assigned-assets-section">
+                      <h3 class="section-title">
+                        <i class="fas fa-pen-fancy"></i>
+                        {{ 'songProjects.detail.allAssignedWorkshops' | translate }}
+                      </h3>
+                      @for (workshop of selectedProject.all_assigned_workshops; track workshop) {
+                        <div class="asset-item">
+                          <div class="asset-info">
+                            <i class="fas fa-pen-fancy"></i>
+                            <span class="asset-title">{{ workshop.title }}</span>
+                            <span class="asset-badge">{{ workshop.current_phase }}</span>
+                          </div>
+                          <button type="button" class="asset-action-button" (click)="openWorkshop(workshop)"
+                            [matTooltip]="'songProjects.detail.actions.openWorkshop' | translate">
+                            <i class="fas fa-external-link-alt"></i>
+                          </button>
                         </div>
-                        <button type="button" class="asset-action-button" (click)="openWorkshop(workshop)"
-                          [matTooltip]="'songProjects.detail.actions.openWorkshop' | translate">
-                          <i class="fas fa-external-link-alt"></i>
-                        </button>
-                      </div>
-                    }
-                  </div>
-                }
-                <!-- All Assigned Suno Templates -->
-                @if (selectedProject.all_assigned_suno_templates?.length) {
-                  <div class="assigned-assets-section">
-                    <h3 class="section-title">
-                      <i class="fas fa-wand-sparkles"></i>
-                      {{ 'songProjects.detail.allAssignedSunoTemplates' | translate }}
-                    </h3>
-                    @for (template of selectedProject.all_assigned_suno_templates; track template) {
-                      <div class="asset-item">
-                        <div class="asset-info">
-                          <i class="fas fa-wand-sparkles"></i>
-                          <span class="asset-title">{{ template.title }}</span>
-                          <span class="asset-badge">{{ template.template_type }}</span>
+                      }
+                    </div>
+                  }
+                  <!-- Suno Templates -->
+                  @if (selectedProject.all_assigned_suno_templates?.length) {
+                    <div class="assigned-assets-section">
+                      <h3 class="section-title">
+                        <i class="fas fa-wand-sparkles"></i>
+                        {{ 'songProjects.detail.allAssignedSunoTemplates' | translate }}
+                      </h3>
+                      @for (template of selectedProject.all_assigned_suno_templates; track template) {
+                        <div class="asset-item">
+                          <div class="asset-info">
+                            <i class="fas fa-wand-sparkles"></i>
+                            <span class="asset-title">{{ template.title }}</span>
+                            <span class="asset-badge">{{ template.template_type }}</span>
+                          </div>
+                          <button type="button" class="asset-action-button" (click)="openSunoTemplate(template)"
+                            [matTooltip]="'songProjects.detail.actions.openSunoTemplate' | translate">
+                            <i class="fas fa-external-link-alt"></i>
+                          </button>
                         </div>
-                        <button type="button" class="asset-action-button" (click)="openSunoTemplate(template)"
-                          [matTooltip]="'songProjects.detail.actions.openSunoTemplate' | translate">
-                          <i class="fas fa-external-link-alt"></i>
-                        </button>
-                      </div>
-                    }
-                  </div>
-                }
+                      }
+                    </div>
+                  }
+                </div>
                 <div class="detail-field-row">
                   <div class="detail-field">
                     <span class="field-label">{{ 'songProjects.detail.stats.created' | translate }}</span>
@@ -426,111 +427,6 @@
                             <span class="file-count">({{ getFolderContentLabel(folder) }})</span>
                           </mat-panel-title>
                         </mat-expansion-panel-header>
-                        <!-- Assigned Assets Sections -->
-                        <div class="assigned-assets-container">
-                          <!-- Assigned Sketches -->
-                          @if (folder.assigned_sketches && folder.assigned_sketches.length > 0) {
-                            <div
-                              class="assigned-assets-section">
-                              <h4 class="assets-section-title">
-                                <i class="fas fa-pencil-alt"></i>
-                                {{ 'songProjects.detail.assignedSketches' | translate }}
-                              </h4>
-                              @for (sketch of folder.assigned_sketches; track sketch) {
-                                <div class="asset-item">
-                                  <div class="asset-info">
-                                    <i class="fas"
-                                    [class]="sketch.sketch_type === 'inspiration' ? 'fa-lightbulb' : 'fa-music'"></i>
-                                    <span class="asset-title">{{ sketch.title || sketch.prompt }}</span>
-                                    <span class="asset-badge">{{ sketch.workflow }}</span>
-                                  </div>
-                                  <button type="button" class="asset-action-button"
-                                    (click)="openSketch(sketch)"
-                                    [matTooltip]="'songProjects.detail.actions.openSketch' | translate">
-                                    <i class="fas fa-external-link-alt"></i>
-                                  </button>
-                                </div>
-                              }
-                            </div>
-                          }
-                          <!-- Assigned Images -->
-                          @if (folder.assigned_images && folder.assigned_images.length > 0) {
-                            <div
-                              class="assigned-assets-section">
-                              <h4 class="assets-section-title">
-                                <i class="fas fa-image"></i>
-                                {{ 'songProjects.detail.assignedImages' | translate }}
-                              </h4>
-                              @for (image of folder.assigned_images; track image) {
-                                <div class="asset-item">
-                                  <div class="asset-info">
-                                    <i class="fas fa-image"></i>
-                                    <span class="asset-title">{{ image.title || image.prompt || 'Untitled' }}</span>
-                                    @if (image.composition) {
-                                      <span
-                                      class="asset-meta">{{ image.composition }}</span>
-                                    }
-                                    @if (image.width && image.height) {
-                                      <span
-                                      class="asset-meta">{{ image.width }}x{{ image.height }}</span>
-                                    }
-                                  </div>
-                                  <button type="button" class="asset-action-button"
-                                    (click)="openImage(image.id)"
-                                    [matTooltip]="'songProjects.detail.actions.openImage' | translate">
-                                    <i class="fas fa-external-link-alt"></i>
-                                  </button>
-                                </div>
-                              }
-                            </div>
-                          }
-                          <!-- Assigned Workshops -->
-                          @if (folder.assigned_workshops && folder.assigned_workshops.length > 0) {
-                            <div class="assigned-assets-section">
-                              <h4 class="assets-section-title">
-                                <i class="fas fa-pen-fancy"></i>
-                                {{ 'songProjects.detail.assignedWorkshops' | translate }}
-                              </h4>
-                              @for (workshop of folder.assigned_workshops; track workshop) {
-                                <div class="asset-item">
-                                  <div class="asset-info">
-                                    <i class="fas fa-pen-fancy"></i>
-                                    <span class="asset-title">{{ workshop.title }}</span>
-                                    <span class="asset-badge">{{ workshop.current_phase }}</span>
-                                  </div>
-                                  <button type="button" class="asset-action-button"
-                                    (click)="openWorkshop(workshop)"
-                                    [matTooltip]="'songProjects.detail.actions.openWorkshop' | translate">
-                                    <i class="fas fa-external-link-alt"></i>
-                                  </button>
-                                </div>
-                              }
-                            </div>
-                          }
-                          <!-- Assigned Suno Templates -->
-                          @if (folder.assigned_suno_templates && folder.assigned_suno_templates.length > 0) {
-                            <div class="assigned-assets-section">
-                              <h4 class="assets-section-title">
-                                <i class="fas fa-wand-sparkles"></i>
-                                {{ 'songProjects.detail.assignedSunoTemplates' | translate }}
-                              </h4>
-                              @for (template of folder.assigned_suno_templates; track template) {
-                                <div class="asset-item">
-                                  <div class="asset-info">
-                                    <i class="fas fa-wand-sparkles"></i>
-                                    <span class="asset-title">{{ template.title }}</span>
-                                    <span class="asset-badge">{{ template.template_type }}</span>
-                                  </div>
-                                  <button type="button" class="asset-action-button"
-                                    (click)="openSunoTemplate(template)"
-                                    [matTooltip]="'songProjects.detail.actions.openSunoTemplate' | translate">
-                                    <i class="fas fa-external-link-alt"></i>
-                                  </button>
-                                </div>
-                              }
-                            </div>
-                          }
-                        </div>
                         <!-- Files in Folder -->
                         <div class="folder-files"
                           (dragover)="onDragOver($event, folder.id)"
@@ -741,37 +637,6 @@
                   <div
                     class="empty-folder">
                     <p>{{ 'songProjects.detail.noFiles' | translate }}</p>
-                  </div>
-                }
-                <!-- Assigned Releases -->
-                @if (selectedProject.assigned_releases && selectedProject.assigned_releases.length > 0) {
-                  <div
-                    class="assigned-releases-section">
-                    <h3 class="section-title">
-                      <i class="fas fa-compact-disc"></i>
-                      {{ 'songProjects.detail.assignedReleases' | translate }}
-                    </h3>
-                    <div class="assigned-releases-list">
-                      @for (release of selectedProject.assigned_releases; track release) {
-                        <div class="release-item">
-                          <div class="release-info">
-                            <i class="fas fa-compact-disc"></i>
-                            <span class="release-name">{{ release.name }}</span>
-                            <span class="release-badge">{{ release.type }}</span>
-                            <span class="release-meta">{{ release.genre }}</span>
-                            <span class="release-status"
-                            [class]="getStatusBadgeClass(release.status)">{{ release.status }}</span>
-                          </div>
-                          <button
-                            type="button"
-                            class="asset-action-button"
-                            (click)="openRelease(release.id)"
-                            [matTooltip]="'songProjects.detail.actions.viewRelease' | translate">
-                            <i class="fas fa-external-link-alt"></i>
-                          </button>
-                        </div>
-                      }
-                    </div>
                   </div>
                 }
               </div>

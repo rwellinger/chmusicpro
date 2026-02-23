@@ -98,17 +98,10 @@ export interface ProjectFolderWithFiles extends ProjectFolder {
     files: ProjectFile[];
 }
 
-export interface ProjectFolderWithAssets extends ProjectFolderWithFiles {
-    assigned_sketches?: AssignedSketch[];
-    assigned_images?: AssignedImage[];
-    assigned_workshops?: AssignedWorkshop[];
-    assigned_suno_templates?: AssignedSunoTemplate[];
-}
-
 export interface SongProjectDetail extends SongProject {
     total_files: number;  // Live calculated
     total_size_bytes: number;  // Live calculated
-    folders: ProjectFolderWithAssets[];
+    folders: ProjectFolderWithFiles[];
     assigned_releases?: AssignedRelease[];
     // All assigned assets (regardless of folder) - for Metadata tab
     all_assigned_sketches?: AssignedSketch[];

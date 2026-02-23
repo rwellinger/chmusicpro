@@ -232,15 +232,12 @@ class WorkshopController:
         domain_id: str,
         workshop_id: str,
         project_id: str,
-        folder_id: str | None = None,
     ) -> tuple[dict[str, Any], int]:
         """Assign workshop to a project (1:1 relationship)"""
         try:
             try:
                 UUID(workshop_id)
                 UUID(project_id)
-                if folder_id:
-                    UUID(folder_id)
             except ValueError as e:
                 return {"error": f"Invalid UUID format: {str(e)}"}, 400
 
@@ -250,7 +247,6 @@ class WorkshopController:
                 domain_id=domain_id,
                 workshop_id=workshop_id,
                 project_id=project_id,
-                folder_id=folder_id,
             )
 
             if not result:
@@ -260,7 +256,6 @@ class WorkshopController:
                 "Workshop assigned to project",
                 workshop_id=workshop_id,
                 project_id=project_id,
-                folder_id=folder_id,
             )
 
             return {"success": True, "data": result}, 200

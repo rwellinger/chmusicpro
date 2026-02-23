@@ -55,10 +55,9 @@ export class SunoTemplateService {
         );
     }
 
-    async assignToProject(templateId: string, projectId: string, folderId?: string): Promise<any> {
+    async assignToProject(templateId: string, projectId: string): Promise<any> {
         const body: any = {
-            project_id: projectId,
-            folder_id: folderId || null
+            project_id: projectId
         };
         return firstValueFrom(
             this.http.post(this.apiConfig.endpoints.sunoTemplate.assignToProject(templateId), body)

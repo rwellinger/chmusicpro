@@ -724,77 +724,6 @@ class SongProjectService:
             )
             return None
 
-    def get_assigned_sketches_for_folder(self, db: Session, project_id: UUID, folder_id: UUID) -> list[Any]:
-        """
-        Get all assigned sketches for a project folder (CRUD only)
-
-        Args:
-            db: Database session
-            project_id: Project UUID
-            folder_id: Folder UUID
-
-        Returns:
-            List of SongSketch instances
-        """
-        try:
-            from db.models import SongSketch
-
-            sketches = (
-                db.query(SongSketch)
-                .filter(SongSketch.project_id == project_id, SongSketch.project_folder_id == folder_id)
-                .order_by(SongSketch.created_at.desc())
-                .all()
-            )
-            logger.debug(
-                "Assigned sketches retrieved", project_id=str(project_id), folder_id=str(folder_id), count=len(sketches)
-            )
-            return sketches
-        except SQLAlchemyError as e:
-            logger.error(
-                "Failed to get assigned sketches",
-                error=str(e),
-                error_type=type(e).__name__,
-                project_id=str(project_id),
-                folder_id=str(folder_id),
-            )
-            return []
-
-    def get_assigned_images_for_folder(self, db: Session, project_id: UUID, folder_id: UUID) -> list[Any]:
-        """
-        Get all assigned images for a project folder (CRUD only)
-
-        Args:
-            db: Database session
-            project_id: Project UUID
-            folder_id: Folder UUID
-
-        Returns:
-            List of GeneratedImage instances
-        """
-        try:
-            from db.models import GeneratedImage, ProjectImageReference
-
-            images = (
-                db.query(GeneratedImage)
-                .join(ProjectImageReference, ProjectImageReference.image_id == GeneratedImage.id)
-                .filter(ProjectImageReference.project_id == project_id, ProjectImageReference.folder_id == folder_id)
-                .order_by(GeneratedImage.created_at.desc())
-                .all()
-            )
-            logger.debug(
-                "Assigned images retrieved", project_id=str(project_id), folder_id=str(folder_id), count=len(images)
-            )
-            return images
-        except SQLAlchemyError as e:
-            logger.error(
-                "Failed to get assigned images",
-                error=str(e),
-                error_type=type(e).__name__,
-                project_id=str(project_id),
-                folder_id=str(folder_id),
-            )
-            return []
-
     def get_all_assigned_sketches_for_project(self, db: Session, project_id: UUID) -> list[Any]:
         """
         Get ALL assigned sketches for a project (regardless of folder assignment)
@@ -892,44 +821,6 @@ class SongProjectService:
             )
             return []
 
-    def get_assigned_workshops_for_folder(self, db: Session, project_id: UUID, folder_id: UUID) -> list[Any]:
-        """
-        Get all assigned workshops for a project folder (CRUD only)
-
-        Args:
-            db: Database session
-            project_id: Project UUID
-            folder_id: Folder UUID
-
-        Returns:
-            List of LyricWorkshop instances
-        """
-        try:
-            from db.models import LyricWorkshop
-
-            workshops = (
-                db.query(LyricWorkshop)
-                .filter(LyricWorkshop.project_id == project_id, LyricWorkshop.project_folder_id == folder_id)
-                .order_by(LyricWorkshop.created_at.desc())
-                .all()
-            )
-            logger.debug(
-                "Assigned workshops retrieved for folder",
-                project_id=str(project_id),
-                folder_id=str(folder_id),
-                count=len(workshops),
-            )
-            return workshops
-        except SQLAlchemyError as e:
-            logger.error(
-                "Failed to get assigned workshops for folder",
-                error=str(e),
-                error_type=type(e).__name__,
-                project_id=str(project_id),
-                folder_id=str(folder_id),
-            )
-            return []
-
     def get_all_assigned_workshops_for_project(self, db: Session, project_id: UUID) -> list[Any]:
         """
         Get ALL assigned workshops for a project (regardless of folder assignment)
@@ -958,44 +849,6 @@ class SongProjectService:
                 error=str(e),
                 error_type=type(e).__name__,
                 project_id=str(project_id),
-            )
-            return []
-
-    def get_assigned_suno_templates_for_folder(self, db: Session, project_id: UUID, folder_id: UUID) -> list[Any]:
-        """
-        Get all assigned suno templates for a project folder (CRUD only)
-
-        Args:
-            db: Database session
-            project_id: Project UUID
-            folder_id: Folder UUID
-
-        Returns:
-            List of SunoTemplate instances
-        """
-        try:
-            from db.models import SunoTemplate
-
-            templates = (
-                db.query(SunoTemplate)
-                .filter(SunoTemplate.project_id == project_id, SunoTemplate.project_folder_id == folder_id)
-                .order_by(SunoTemplate.created_at.desc())
-                .all()
-            )
-            logger.debug(
-                "Assigned suno templates retrieved for folder",
-                project_id=str(project_id),
-                folder_id=str(folder_id),
-                count=len(templates),
-            )
-            return templates
-        except SQLAlchemyError as e:
-            logger.error(
-                "Failed to get assigned suno templates for folder",
-                error=str(e),
-                error_type=type(e).__name__,
-                project_id=str(project_id),
-                folder_id=str(folder_id),
             )
             return []
 

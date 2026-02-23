@@ -3,7 +3,7 @@
 
 // ===== Container =====
 .text-workshop-container {
-  height: calc(100vh - $step-bar-height);
+  height: calc(100dvh - $step-bar-height);
   overflow: hidden;
   background: $background-white;
   display: flex;
@@ -16,12 +16,12 @@
     grid-template-columns: 35fr 65fr;
     gap: 0;
     width: 100%;
-    height: calc(100vh - $step-bar-height);
+    height: calc(100dvh - $step-bar-height);
     overflow: hidden;
   }
 
   .list-section {
-    height: calc(100vh - $step-bar-height);
+    height: calc(100dvh - $step-bar-height);
     overflow-y: auto;
     overflow-x: hidden;
     padding: $spacing-md;
@@ -30,7 +30,7 @@
   }
 
   .list-card {
-    height: calc(100vh - $step-bar-height - 2rem);
+    height: calc(100dvh - $step-bar-height - 2rem);
     display: flex;
     flex-direction: column;
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -309,7 +309,7 @@
     border-radius: 12px;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - $step-bar-height - 2rem);
+    height: calc(100dvh - $step-bar-height - 2rem);
   }
 
   .empty-detail {
@@ -982,14 +982,14 @@
 
     .list-section {
       height: auto;
-      max-height: 50vh;
+      max-height: 50dvh;
       border-right: none;
       border-bottom: 1px solid $border-light;
     }
 
     .detail-section {
       height: auto;
-      max-height: 50vh;
+      max-height: 50dvh;
     }
 
     .list-card,

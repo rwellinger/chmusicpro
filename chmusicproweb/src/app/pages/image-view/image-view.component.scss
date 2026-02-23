@@ -2,7 +2,7 @@
 @use '../../../scss/mixins' as *;
 
 .image-view-container {
-  height: calc(100vh - $step-bar-height);
+  height: calc(100dvh - $step-bar-height);
   overflow: hidden;
   
   &.master-detail-layout {
@@ -22,7 +22,7 @@
 
 // Left Side: List Section
 .image-gallery-section {
-  height: calc(100vh - $step-bar-height);
+  height: calc(100dvh - $step-bar-height);
   overflow-y: auto;
   overflow-x: hidden;
   padding: $spacing-md;
@@ -31,7 +31,7 @@
 }
 
 .image-gallery-card {
-  height: calc(100vh - $step-bar-height - 2rem);
+  height: calc(100dvh - $step-bar-height - 2rem);
   display: flex;
   flex-direction: column;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -370,7 +370,7 @@
 
 // Right Side: Detail Section
 .image-details-section {
-  height: calc(100vh - $step-bar-height);
+  height: calc(100dvh - $step-bar-height);
   overflow-y: auto;
   overflow-x: hidden;
   padding: $spacing-md;
@@ -382,7 +382,7 @@
   border-radius: 12px;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - $step-bar-height - 2rem);
+  height: calc(100dvh - $step-bar-height - 2rem);
   
   mat-card-content {
     padding: 0;
@@ -481,8 +481,8 @@
 .modal-content {
   background: $background-white;
   border-radius: 12px;
-  max-width: 90vw;
-  max-height: 90vh;
+  max-width: 90dvw;
+  max-height: 90dvh;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
@@ -515,7 +515,7 @@
 
 .preview-image {
   max-width: 100%;
-  max-height: 70vh;
+  max-height: 70dvh;
   border-radius: $border-radius-xl;
 }
 
@@ -529,7 +529,7 @@
   
   .image-gallery-section {
     height: auto;
-    max-height: 50vh;
+    max-height: 50dvh;
     border-right: none;
     border-bottom: 1px solid $border-light;
     padding: $spacing-sm;
@@ -537,7 +537,7 @@
   
   .image-details-section {
     height: auto;
-    max-height: 50vh;
+    max-height: 50dvh;
     padding: $spacing-sm;
   }
   
@@ -559,7 +559,7 @@
   .image-gallery-section,
   .image-details-section {
     height: auto;
-    max-height: 50vh;
+    max-height: 50dvh;
     overflow-y: auto;
   }
   

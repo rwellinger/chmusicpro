@@ -1,5 +1,5 @@
 .model-context-windows-container {
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -191,7 +191,7 @@ td .mat-mdc-icon-button {
 .dialog-card {
   width: 90%;
   max-width: 500px;
-  max-height: 85vh;
+  max-height: 85dvh;
   overflow-y: auto;
   padding: 1.5rem;
 }

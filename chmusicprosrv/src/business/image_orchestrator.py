@@ -805,7 +805,6 @@ class ImageOrchestrator:
         domain_id: str,
         image_id: str,
         project_id: str,
-        folder_id: str | None = None,
     ) -> dict[str, Any]:
         """
         Assign an image to a project (N:M relationship)
@@ -814,7 +813,6 @@ class ImageOrchestrator:
             domain_id: Domain UUID for tenant filtering
             image_id: Image UUID
             project_id: Project UUID
-            folder_id: Optional folder UUID
 
         Returns:
             dict: Assignment result with reference_id
@@ -842,22 +840,12 @@ class ImageOrchestrator:
             if not project:
                 raise ValueError(f"Project not found: {project_id}")
 
-            # Validate folder if provided
-            if folder_id:
-                from db.song_project_service import get_folder_by_id
-
-                folder = get_folder_by_id(db, UUID(folder_id))
-                if not folder:
-                    raise ValueError(f"Folder not found: {folder_id}")
-                if folder.project_id != UUID(project_id):
-                    raise ValueError(f"Folder {folder_id} does not belong to project {project_id}")
-
             # Create reference (or update existing)
             reference = create_image_reference(
                 db=db,
                 project_id=UUID(project_id),
                 image_id=UUID(image_id),
-                folder_id=UUID(folder_id) if folder_id else None,
+                folder_id=None,
             )
 
             logger.info(
@@ -865,14 +853,13 @@ class ImageOrchestrator:
                 reference_id=str(reference.id),
                 image_id=image_id,
                 project_id=project_id,
-                folder_id=folder_id,
             )
 
             return {
                 "reference_id": str(reference.id),
                 "project_id": str(reference.project_id),
                 "image_id": str(reference.image_id),
-                "folder_id": str(reference.folder_id) if reference.folder_id else None,
+                "folder_id": None,
             }
 
         finally:

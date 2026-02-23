@@ -230,15 +230,12 @@ class SunoTemplateController:
         domain_id: str,
         template_id: str,
         project_id: str,
-        folder_id: str | None = None,
     ) -> tuple[dict[str, Any], int]:
         """Assign suno template to a project"""
         try:
             try:
                 UUID(template_id)
                 UUID(project_id)
-                if folder_id:
-                    UUID(folder_id)
             except ValueError as e:
                 return {"error": f"Invalid UUID format: {str(e)}"}, 400
 
@@ -248,7 +245,6 @@ class SunoTemplateController:
                 domain_id=domain_id,
                 template_id=template_id,
                 project_id=project_id,
-                folder_id=folder_id,
             )
 
             if not result:

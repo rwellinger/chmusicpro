@@ -359,7 +359,6 @@ class ImageController:
         domain_id: str,
         image_id: str,
         project_id: str,
-        folder_id: str | None = None,
     ) -> tuple[dict[str, Any], int]:
         """
         Assign image to a project (N:M relationship via project_image_references)
@@ -368,7 +367,6 @@ class ImageController:
             domain_id: Domain UUID for tenant filtering
             image_id: Image UUID
             project_id: Project UUID
-            folder_id: Optional folder UUID
 
         Returns:
             Tuple of (response_data, status_code)
@@ -378,14 +376,12 @@ class ImageController:
                 domain_id=domain_id,
                 image_id=image_id,
                 project_id=project_id,
-                folder_id=folder_id,
             )
 
             logger.info(
                 "Image assigned to project",
                 image_id=image_id,
                 project_id=project_id,
-                folder_id=folder_id,
                 reference_id=result.get("reference_id"),
             )
 

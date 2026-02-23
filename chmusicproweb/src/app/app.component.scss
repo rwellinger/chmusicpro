@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: linear-gradient(135deg, #D32F2F 0%, #880E4F 100%);
   padding: 2rem;
   text-align: center;
@@ -79,7 +79,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   padding: 2rem;
   text-align: center;
@@ -142,7 +142,7 @@
 
 .app-layout {
   display: flex;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -151,7 +151,7 @@
   width: 85vw;
   overflow-y: auto;
   overflow-x: hidden;
-  height: 100vh;
+  height: 100dvh;
   background: $background-white;
 
   app-pipeline-step-bar {
@@ -166,7 +166,7 @@
     display: grid;
     grid-template-columns: 35fr 45fr;
     gap: 0;
-    height: 100vh;
+    height: 100dvh;
   }
   
   /* Full width for profile pages or when no side menu */

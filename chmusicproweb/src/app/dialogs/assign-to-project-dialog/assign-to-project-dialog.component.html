@@ -14,7 +14,6 @@
       <mat-label>{{ 'assignToProject.selectProject' | translate }}</mat-label>
       <mat-select
         [(ngModel)]="selectedProjectId"
-        (selectionChange)="onProjectChange()"
         [disabled]="loading">
         @for (project of projects; track project) {
           <mat-option [value]="project.id">
@@ -47,30 +46,6 @@
     </mat-form-field>
   }
 
-  <!-- Folder Selection (only for non-release assets) -->
-  @if (data.assetType !== 'release' && selectedProjectId && folders.length > 0) {
-    <mat-form-field
-      appearance="outline"
-      class="full-width">
-      <mat-label>{{ 'assignToProject.selectFolder' | translate }}</mat-label>
-      <mat-select [(ngModel)]="selectedFolderId" [disabled]="loading">
-        <mat-option [value]="null">{{ 'assignToProject.noFolder' | translate }}</mat-option>
-        @for (folder of folders; track folder) {
-          <mat-option [value]="folder.id">
-            {{ folder.folder_name }}
-          </mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-  }
-
-  <!-- No Folders Info (only for non-release assets) -->
-  @if (data.assetType !== 'release' && selectedProjectId && folders.length === 0 && !loading) {
-    <div
-      class="info-message">
-      {{ 'assignToProject.noFoldersAvailable' | translate }}
-    </div>
-  }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">

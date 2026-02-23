@@ -4,7 +4,7 @@
 /* ===== IMAGE GENERATOR CARD LAYOUT ===== */
 
 .image-generator-container {
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   
   .image-generator-header {
@@ -43,7 +43,7 @@
     display: contents;
     
     .image-creation-section {
-      height: 100vh;
+      height: 100dvh;
       overflow-y: auto;
       overflow-x: hidden;
       padding: $spacing-md;
@@ -51,7 +51,7 @@
     }
     
     .generated-image-section {
-      height: 100vh;
+      height: 100dvh;
       overflow-y: auto;
       overflow-x: hidden;
       padding: $spacing-md;
@@ -59,7 +59,7 @@
     
     .image-creation-card,
     .generated-image-card {
-      height: calc(100vh - 2rem);
+      height: calc(100dvh - 2rem);
       display: flex;
       flex-direction: column;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -472,7 +472,7 @@
 
 .preview-image {
   max-width: 100%;
-  max-height: 70vh;
+  max-height: 70dvh;
   border-radius: 8px;
 }
 
@@ -486,7 +486,7 @@
   
   .image-creation-section {
     height: auto;
-    max-height: 50vh;
+    max-height: 50dvh;
     border-right: none;
     border-bottom: 1px solid $border-light;
     padding: $spacing-sm;
@@ -494,7 +494,7 @@
   
   .generated-image-section {
     height: auto;
-    max-height: 50vh;
+    max-height: 50dvh;
     padding: $spacing-sm;
   }
   
@@ -512,7 +512,7 @@
   
   .generator-card {
     max-width: 100%;
-    height: calc(100vh - 1rem);
+    height: calc(100dvh - 1rem);
   }
   
   // Larger form inputs for touch

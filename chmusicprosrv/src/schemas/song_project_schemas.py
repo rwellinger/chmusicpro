@@ -146,6 +146,32 @@ class AssignedReleaseResponse(BaseModel):
         from_attributes = True
 
 
+class AssignedWorkshopResponse(BaseModel):
+    """Response schema for an assigned workshop"""
+
+    id: str
+    title: str
+    current_phase: str
+    draft_language: str | None
+    created_at: str | None
+
+    class Config:
+        from_attributes = True
+
+
+class AssignedSunoTemplateResponse(BaseModel):
+    """Response schema for an assigned suno template"""
+
+    id: str
+    title: str | None
+    template_type: str
+    style_prompt: str | None
+    created_at: str | None
+
+    class Config:
+        from_attributes = True
+
+
 class ProjectDetailResponse(BaseModel):
     """Response schema for project with folders and files"""
 
@@ -168,6 +194,8 @@ class ProjectDetailResponse(BaseModel):
     all_assigned_songs: list[AssignedSongResponse] | None = None
     all_assigned_sketches: list[AssignedSketchResponse] | None = None
     all_assigned_images: list[AssignedImageResponse] | None = None
+    all_assigned_workshops: list[AssignedWorkshopResponse] | None = None
+    all_assigned_suno_templates: list[AssignedSunoTemplateResponse] | None = None
 
     class Config:
         from_attributes = True

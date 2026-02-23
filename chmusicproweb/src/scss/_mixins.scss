@@ -102,7 +102,7 @@
 }
 
 // 4. Master-Detail Layout - Standardized for all view components
-@mixin master-detail-layout($gap: 20px, $master-width: 40%, $min-height: calc(100vh - 320px)) {
+@mixin master-detail-layout($gap: 20px, $master-width: 40%, $min-height: calc(100dvh - 320px)) {
   display: flex;
   gap: $gap;
   min-height: $min-height;
@@ -128,7 +128,7 @@
 
 // 4a. Generator Layout - Standardized for image-generator & composition creator
 @mixin generator-layout() {
-  @include master-detail-layout($spacing-20, 40%, calc(100vh - 320px));
+  @include master-detail-layout($spacing-20, 40%, calc(100dvh - 320px));
   
   .controls-panel {
     @include card-container($border-light, $background-white, 0);
@@ -323,7 +323,7 @@
 }
 
 // 6a. Standard Modal Content
-@mixin modal-content($max-width: 90vw, $max-height: 90vh, $border-radius: $border-radius-xl) {
+@mixin modal-content($max-width: 90dvw, $max-height: 90dvh, $border-radius: $border-radius-xl) {
   background: $background-white;
   border-radius: $border-radius;
   max-width: $max-width;
@@ -584,11 +584,11 @@
   // Responsive adjustments
   @include respond-to(tablet) {
     flex: none;
-    height: 40vh;
+    height: 40dvh;
   }
-  
+
   @include respond-to(mobile) {
-    height: 35vh;
+    height: 35dvh;
   }
 }
 

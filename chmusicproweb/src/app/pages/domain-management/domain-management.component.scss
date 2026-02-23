@@ -3,7 +3,7 @@
 @use '../../../scss/mixins' as *;
 
 .domain-management-container {
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 
   &.master-detail-layout {
@@ -15,7 +15,7 @@
 
 // Left Side: List Section
 .list-section {
-  height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
   overflow-x: hidden;
   padding: $spacing-md;
@@ -24,7 +24,7 @@
 }
 
 .list-card {
-  height: calc(100vh - 2rem);
+  height: calc(100dvh - 2rem);
   display: flex;
   flex-direction: column;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -188,7 +188,7 @@
 
 // Right Side: Detail Section
 .detail-section {
-  height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
   overflow-x: hidden;
   padding: $spacing-md;
@@ -459,19 +459,19 @@
 
   .list-section {
     height: auto;
-    max-height: 40vh;
+    max-height: 40dvh;
     border-right: none;
     border-bottom: 1px solid $border-light;
   }
 
   .list-card {
     height: auto;
-    max-height: calc(40vh - 2rem);
+    max-height: calc(40dvh - 2rem);
   }
 
   .detail-section {
     height: auto;
-    min-height: 60vh;
+    min-height: 60dvh;
   }
 
   .domain-info-grid {

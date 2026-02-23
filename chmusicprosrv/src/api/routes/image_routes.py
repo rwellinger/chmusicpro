@@ -255,9 +255,7 @@ def assign_to_project(image_id: str, body: AssignToProjectRequest):
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        response_data, status_code = image_controller.assign_to_project(
-            str(domain_id), image_id, str(body.project_id), str(body.folder_id) if body.folder_id else None
-        )
+        response_data, status_code = image_controller.assign_to_project(str(domain_id), image_id, str(body.project_id))
         return jsonify(response_data), status_code
     except Exception as e:
         error_response = ErrorResponse(error=str(e))

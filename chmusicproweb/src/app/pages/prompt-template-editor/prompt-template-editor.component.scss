@@ -5,7 +5,7 @@
 // (lyric-* → prompt-editor-*)
 
 .prompt-editor-container {
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   padding: $spacing-md;
   background: $background-white;
@@ -16,7 +16,7 @@
 .prompt-editor-card {
   max-width: 1600px;
   width: 100%;
-  height: calc(100vh - 2rem);
+  height: calc(100dvh - 2rem);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   display: flex;
@@ -273,7 +273,7 @@
 // MacBook Air 13" M4 2025 - Height adjustments
 @media (max-height: 1000px) {
   .prompt-editor-card {
-    height: calc(100vh - 1.5rem);
+    height: calc(100dvh - 1.5rem);
   }
   
   .prompt-editor-textarea {

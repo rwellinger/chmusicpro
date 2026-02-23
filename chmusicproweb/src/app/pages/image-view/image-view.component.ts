@@ -650,7 +650,7 @@ export class ImageViewComponent implements OnInit, AfterViewInit, OnDestroy {
 
         const dialogRef = this.dialog.open(AssignToProjectDialogComponent, {
             width: "600px",
-            maxHeight: "90vh",
+            maxHeight: "90dvh",
             data: {
                 assetType: "image",
                 assetId: this.selectedImage.id

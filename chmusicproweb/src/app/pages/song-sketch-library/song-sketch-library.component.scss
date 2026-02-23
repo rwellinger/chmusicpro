@@ -2,7 +2,7 @@
 @use '../../../scss/mixins' as *;
 
 .sketch-library-container {
-  height: calc(100vh - $step-bar-height);
+  height: calc(100dvh - $step-bar-height);
   overflow: hidden;
   
   &.master-detail-layout {
@@ -14,7 +14,7 @@
 
 // Left Side: List Section
 .list-section {
-  height: calc(100vh - $step-bar-height);
+  height: calc(100dvh - $step-bar-height);
   overflow-y: auto;
   overflow-x: hidden;
   padding: $spacing-md;
@@ -23,7 +23,7 @@
 }
 
 .list-card {
-  height: calc(100vh - $step-bar-height - 2rem);
+  height: calc(100dvh - $step-bar-height - 2rem);
   display: flex;
   flex-direction: column;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -354,7 +354,7 @@
   border-radius: 12px;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - $step-bar-height - 2rem);
+  height: calc(100dvh - $step-bar-height - 2rem);
   
   mat-card-content {
     padding: $spacing-lg;
@@ -790,7 +790,7 @@
   
   .list-section {
     height: auto;
-    max-height: 50vh;
+    max-height: 50dvh;
     border-right: none;
     border-bottom: 1px solid $border-light;
     padding: $spacing-sm;
@@ -798,7 +798,7 @@
   
   .detail-section {
     height: auto;
-    max-height: 50vh;
+    max-height: 50dvh;
     padding: $spacing-sm;
   }
   
@@ -820,7 +820,7 @@
   .list-section,
   .detail-section {
     height: auto;
-    max-height: 50vh;
+    max-height: 50dvh;
     overflow-y: auto;
   }
   

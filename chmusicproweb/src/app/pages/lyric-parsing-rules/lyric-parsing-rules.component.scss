@@ -1,5 +1,5 @@
 .lyric-parsing-rules-container {
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   padding: 1.5rem;
   max-width: 1400px;
@@ -238,7 +238,7 @@
     .dialog-card {
       width: 90%;
       max-width: 900px;
-      max-height: 85vh;
+      max-height: 85dvh;
       overflow-y: auto;
       padding: 1.5rem;
       

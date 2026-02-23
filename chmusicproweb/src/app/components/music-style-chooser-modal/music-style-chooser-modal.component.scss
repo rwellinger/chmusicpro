@@ -7,7 +7,7 @@
     margin: 0;
     overflow: hidden;
     min-height: 500px;
-    max-height: 85vh;
+    max-height: 85dvh;
     width: 1100px;
     max-width: 95vw;
   }
@@ -220,7 +220,7 @@
   @media (max-width: 1024px) {
     .dialog-content {
       width: 90vw;
-      max-height: 90vh;
+      max-height: 90dvh;
     }
     
     .tag-grid {
@@ -238,7 +238,7 @@
   @media (max-width: 768px) {
     .dialog-content {
       width: 95vw;
-      max-height: 90vh;
+      max-height: 90dvh;
     }
     
     .style-chooser-container {

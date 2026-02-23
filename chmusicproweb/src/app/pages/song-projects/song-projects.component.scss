@@ -6,13 +6,13 @@
   display: grid;
   grid-template-columns: 35fr 65fr;
   gap: 0;
-  min-height: calc(100vh - 100px);
+  min-height: calc(100dvh - 100px);
 }
 
 .list-section {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
   border-right: 1px solid $border-light;
 }
@@ -886,6 +886,14 @@ mat-accordion {
   }
 }
 
+// Assigned Assets Grid (2-column layout for Metadata tab)
+.assigned-assets-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
 // Assigned Assets Section
 .assigned-assets-container {
   margin-top: $spacing-md;
@@ -895,7 +903,7 @@ mat-accordion {
 
 .assigned-assets-section {
   margin-bottom: $spacing-md;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -1079,7 +1087,7 @@ mat-accordion {
 // Assigned Releases Section (within tab)
 .assigned-releases-section {
   margin-top: $spacing-lg;
-  
+
   .section-title {
     margin-bottom: $spacing-md;
   }
