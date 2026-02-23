@@ -37,6 +37,6 @@ describe("SunoEnhancerComponent", () => {
 
     it("should have correct char limits", () => {
         expect(component.LYRICS_LIMIT).toBe(3000);
-        expect(component.STYLE_LIMIT).toBe(240);
+        expect(component.STYLE_LIMIT).toBe(1000);
     });
 });
