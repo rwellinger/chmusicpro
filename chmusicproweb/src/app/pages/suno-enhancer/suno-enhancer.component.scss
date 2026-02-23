@@ -76,24 +76,8 @@
     white-space: nowrap;
   }
 
-  .create-song-button {
+  .new-button {
     @include button-primary('sm');
-    min-width: auto !important;
-    width: 36px;
-    height: 36px;
-    padding: 0 !important;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    i { font-size: $font-base; margin: 0; }
-
-    span { display: none; }
-  }
-
-  .create-instrumental-button {
-    @include button-secondary('sm');
     min-width: auto !important;
     width: 36px;
     height: 36px;
@@ -482,21 +466,28 @@
 
 .editor-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: $spacing-md;
   padding: $spacing-sm $spacing-md;
-  margin-bottom: $spacing-md;
+  margin-bottom: $spacing-sm;
   background: $background-white;
   border-radius: $border-radius-md;
   border: 1px solid $border-light;
   flex-shrink: 0;
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-  flex: 1;
+.editor-title {
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    i { color: $ai-color; }
+  }
 }
 
 .back-link {
@@ -516,25 +507,63 @@
   i { font-size: 0.75rem; }
 }
 
-.title-field {
-  border: none;
-  outline: none;
-  font-size: $font-lg;
-  font-weight: $font-weight-semibold;
-  flex: 1;
-  min-width: 200px;
-  background: transparent;
-  padding: $spacing-sm 0;
+.title-row {
+  display: flex;
+  align-items: flex-end;
+  gap: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  margin-bottom: $spacing-md;
+  background: $background-white;
+  border-radius: $border-radius-md;
+  border: 1px solid $border-light;
+  flex-shrink: 0;
 }
 
-.header-right {
+.form-group {
   display: flex;
-  align-items: center;
-  gap: $spacing-md;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: $font-sm;
+    font-weight: $font-weight-medium;
+    color: $text-secondary;
+  }
+}
+
+.title-group {
+  flex: 1;
+}
+
+.title-input,
+.type-select {
+  height: 38px;
+  padding: 0 $spacing-sm;
+  border: 1px solid $border-standard;
+  border-radius: 8px;
+  font-size: $font-sm;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+}
+
+.title-input {
+  &::placeholder { color: $text-muted; }
+}
+
+.type-group {
+  flex-shrink: 0;
 }
 
 .type-select {
-  width: 140px;
+  background: $background-white;
+  cursor: pointer;
+  min-width: 150px;
 }
 
 .save-status {
@@ -544,6 +573,7 @@
   font-size: $font-xs;
   color: $text-muted;
   min-width: 80px;
+  align-self: flex-end;
 
   i.fa-check {
     color: $success-color;
@@ -617,12 +647,37 @@
   }
 }
 
+.mat-mdc-menu-item {
+  .menu-icon {
+    margin-right: $spacing-sm;
+    width: 20px;
+    text-align: center;
+    font-size: $font-base;
+  }
+}
+
 .tag-chips {
   display: flex;
   flex-wrap: wrap;
   gap: $spacing-xs;
   padding: $spacing-sm 0;
   border-top: 1px solid $border-light;
+}
+
+.tag-disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-xs;
+  padding: $spacing-xs 0;
+  font-size: $font-xs;
+  color: $text-muted;
+  line-height: 1.4;
+
+  i {
+    color: $text-muted;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
 }
 
 .tag-chip {
@@ -966,10 +1021,17 @@
   justify-content: center;
 }
 
-.copy-all-button {
-  @include button-primary('base');
-  flex: 1;
+.undo-button {
+  @include button-secondary('base');
+  flex: 0 0 auto;
   justify-content: center;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
 }
 
 .action-button {

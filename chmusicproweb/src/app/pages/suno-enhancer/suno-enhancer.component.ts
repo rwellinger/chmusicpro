@@ -11,6 +11,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {MatSelectModule} from "@angular/material/select";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import {MatMenuModule} from "@angular/material/menu";
 import {debounceTime, Subject, takeUntil} from "rxjs";
 
 import {MatDialog, MatDialogModule} from "@angular/material/dialog";
@@ -47,6 +48,7 @@ import {
         MatInputModule,
         MatSelectModule,
         MatSlideToggleModule,
+        MatMenuModule,
         MatDialogModule,
         TranslateModule,
         MusicStyleChooserInlineComponent,
@@ -117,6 +119,10 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
 
     isEnhancingPrompt = false;
     isTranslatingPrompt = false;
+
+    // Undo state
+    lastLyricsState: string | null = null;
+    lastStyleState: string | null = null;
 
     get isAnyAiOperationInProgress(): boolean {
         return this.isEnhancingPrompt || this.isTranslatingPrompt;
@@ -453,6 +459,8 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
         const textarea = this.lyricsTextarea?.nativeElement;
         if (!textarea) return;
 
+        this.lastLyricsState = this.templateForm.get('enhanced_lyrics')?.value || '';
+
         const tagText = `[${tag.tag}]\n`;
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
@@ -481,6 +489,8 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
 
     applyModifier(modifier: string): void {
         if (!this.lastInsertedTag) return;
+
+        this.lastLyricsState = this.templateForm.get('enhanced_lyrics')?.value || '';
 
         const current = this.templateForm.get('enhanced_lyrics')?.value || '';
         const plainTag = `[${this.lastInsertedTag.tag}]`;
@@ -613,6 +623,8 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
         const currentPrompt = this.styleForm.get('style_prompt')?.value?.trim();
         if (!currentPrompt) return;
 
+        this.lastStyleState = this.styleForm.get('style_prompt')?.value || '';
+
         let gender: "male" | "female" | undefined;
         const lower = currentPrompt.toLowerCase();
         if (lower.includes('male vocal') || lower.includes('male-voice')) gender = 'male';
@@ -637,6 +649,8 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
     async translatePrompt(): Promise<void> {
         const currentPrompt = this.styleForm.get('style_prompt')?.value?.trim();
         if (!currentPrompt) return;
+
+        this.lastStyleState = this.styleForm.get('style_prompt')?.value || '';
 
         this.currentMode = 'manual';
         this.isTranslatingPrompt = true;
@@ -710,10 +724,27 @@ export class SunoEnhancerComponent implements OnInit, OnDestroy {
         await navigator.clipboard.writeText(prompt);
     }
 
-    async copyAll(): Promise<void> {
-        const lyrics = this.templateForm.get('enhanced_lyrics')?.value || '';
-        const prompt = this.styleForm.get('style_prompt')?.value || '';
-        const combined = `LYRICS:\n${lyrics}\n\nSTYLE PROMPT:\n${prompt}`;
-        await navigator.clipboard.writeText(combined);
+    // ===== Undo =====
+
+    get canUndoLyrics(): boolean {
+        return this.lastLyricsState !== null;
+    }
+
+    get canUndoStyle(): boolean {
+        return this.lastStyleState !== null;
+    }
+
+    undoLyrics(): void {
+        if (this.lastLyricsState === null) return;
+        this.templateForm.patchValue({enhanced_lyrics: this.lastLyricsState});
+        this.lastLyricsState = null;
+        this.notificationService.info(this.translate.instant('sunoEnhancer.undoApplied'));
+    }
+
+    undoStyle(): void {
+        if (this.lastStyleState === null) return;
+        this.styleForm.patchValue({style_prompt: this.lastStyleState});
+        this.lastStyleState = null;
+        this.notificationService.info(this.translate.instant('sunoEnhancer.undoApplied'));
     }
 }

@@ -2219,6 +2219,8 @@
     "confirmDelete": "Delete this template?",
     "deleted": "Template deleted",
     "backToLibrary": "Back to Library",
+    "titleLabel": "Title",
+    "typeLabel": "Type",
     "titlePlaceholder": "Template title...",
     "saving": "Saving...",
     "saved": "Saved",
@@ -2262,14 +2264,19 @@
     },
     "copy": {
       "lyrics": "Copy Lyrics",
-      "stylePrompt": "Copy Style Prompt",
-      "all": "Copy All"
+      "stylePrompt": "Copy Style Prompt"
     },
     "copied": {
       "lyrics": "Lyrics copied to clipboard",
-      "stylePrompt": "Style prompt copied to clipboard",
-      "all": "Complete template copied to clipboard"
+      "stylePrompt": "Style prompt copied to clipboard"
     },
+    "undo": {
+      "lyrics": "Undo Lyrics",
+      "stylePrompt": "Undo Style"
+    },
+    "undoApplied": "Change undone",
+    "newTemplate": "New Template",
+    "tagDisclaimer": "Instructions are not always followed exactly by Suno. It cannot be guaranteed that tags will always work as expected.",
     "defaults": {
       "songTitle": "New Song Template",
       "instrumentalTitle": "New Instrumental Template"

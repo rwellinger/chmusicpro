@@ -1,7 +1,7 @@
 export const SUNO_LYRICS_CHAR_LIMIT = 3000;
 export const SUNO_LYRICS_WARNING_LIMIT = 2400;
-export const SUNO_STYLE_CHAR_LIMIT = 240;
-export const SUNO_STYLE_WARNING_LIMIT = 200;
+export const SUNO_STYLE_CHAR_LIMIT = 1000;
+export const SUNO_STYLE_WARNING_LIMIT = 800;
 
 export interface SunoTag {
     label: string;

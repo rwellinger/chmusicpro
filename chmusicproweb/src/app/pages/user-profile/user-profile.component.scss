@@ -163,11 +163,11 @@
                 }
 
                 &.verified {
-                  background: color.adjust($primary-color, $lightness: 40%);
-                  color: color.adjust($primary-color, $lightness: -35%);
+                  background: color.adjust($success-color, $lightness: 45%);
+                  color: color.adjust($success-color, $lightness: -30%);
 
                   i {
-                    color: $primary-color;
+                    color: $success-color;
                   }
                 }
               }

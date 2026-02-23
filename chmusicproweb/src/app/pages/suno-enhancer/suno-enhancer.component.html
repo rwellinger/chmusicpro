@@ -20,12 +20,21 @@
             </div>
           </div>
           <div class="header-actions">
-            <button type="button" class="action-button create-song-button" (click)="createNewTemplate('song')" [title]="'sunoEnhancer.newSong' | translate">
-              <i class="fas fa-music"></i>
+            <button type="button" class="action-button new-button"
+              [matMenuTriggerFor]="createMenu"
+              [title]="'sunoEnhancer.newTemplate' | translate">
+              <i class="fas fa-plus"></i>
             </button>
-            <button type="button" class="action-button create-instrumental-button" (click)="createNewTemplate('instrumental')" [title]="'sunoEnhancer.newInstrumental' | translate">
-              <i class="fas fa-drum"></i>
-            </button>
+            <mat-menu #createMenu="matMenu">
+              <button mat-menu-item (click)="createNewTemplate('song')">
+                <i class="fas fa-music menu-icon"></i>
+                <span>{{ 'sunoEnhancer.newSong' | translate }}</span>
+              </button>
+              <button mat-menu-item (click)="createNewTemplate('instrumental')">
+                <i class="fas fa-drum menu-icon"></i>
+                <span>{{ 'sunoEnhancer.newInstrumental' | translate }}</span>
+              </button>
+            </mat-menu>
           </div>
         </div>
 
@@ -289,37 +298,46 @@
   <div class="suno-enhancer-container editor-mode">
     <!-- Editor Header -->
     <div class="editor-header">
-      <div class="header-left">
-        <button type="button" class="back-link" (click)="backToLibrary()">
-          <i class="fas fa-arrow-left"></i>
-          {{ 'sunoEnhancer.backToLibrary' | translate }}
-        </button>
-        <div class="title-input" [formGroup]="templateForm">
-          <input
-            type="text"
-            formControlName="title"
-            [placeholder]="'sunoEnhancer.titlePlaceholder' | translate"
-            class="title-field"
-          />
-        </div>
+      <button type="button" class="back-link" (click)="backToLibrary()">
+        <i class="fas fa-arrow-left"></i>
+        {{ 'sunoEnhancer.backToLibrary' | translate }}
+      </button>
+      <div class="editor-title">
+        <h2>
+          <i class="fas fa-wand-sparkles"></i>
+          {{ 'sunoEnhancer.title' | translate }}
+        </h2>
       </div>
-      <div class="header-right">
-        <div class="type-selector" [formGroup]="templateForm">
-          <mat-select formControlName="template_type" class="type-select">
-            <mat-option value="song">{{ 'sunoEnhancer.filter.song' | translate }}</mat-option>
-            <mat-option value="instrumental">{{ 'sunoEnhancer.filter.instrumental' | translate }}</mat-option>
-          </mat-select>
-        </div>
-        <div class="save-status">
-          @if (saveStatus === 'saving') {
-            <i class="fas fa-spinner fa-spin"></i>
-            <span>{{ 'sunoEnhancer.saving' | translate }}</span>
-          }
-          @if (saveStatus === 'saved') {
-            <i class="fas fa-check"></i>
-            <span>{{ 'sunoEnhancer.saved' | translate }}</span>
-          }
-        </div>
+    </div>
+
+    <!-- Title & Type Row -->
+    <div class="title-row" [formGroup]="templateForm">
+      <div class="form-group title-group">
+        <label for="suno_title">{{ 'sunoEnhancer.titleLabel' | translate }}</label>
+        <input
+          id="suno_title"
+          type="text"
+          formControlName="title"
+          class="title-input"
+          [placeholder]="'sunoEnhancer.titlePlaceholder' | translate"
+        />
+      </div>
+      <div class="form-group type-group" [formGroup]="templateForm">
+        <label for="suno_type">{{ 'sunoEnhancer.typeLabel' | translate }}</label>
+        <select id="suno_type" formControlName="template_type" class="type-select">
+          <option value="song">{{ 'sunoEnhancer.filter.song' | translate }}</option>
+          <option value="instrumental">{{ 'sunoEnhancer.filter.instrumental' | translate }}</option>
+        </select>
+      </div>
+      <div class="save-status">
+        @if (saveStatus === 'saving') {
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>{{ 'sunoEnhancer.saving' | translate }}</span>
+        }
+        @if (saveStatus === 'saved') {
+          <i class="fas fa-check"></i>
+          <span>{{ 'sunoEnhancer.saved' | translate }}</span>
+        }
       </div>
     </div>
 
@@ -364,6 +382,11 @@
                   }
                 }
               }
+            </div>
+
+            <div class="tag-disclaimer">
+              <i class="fas fa-info-circle"></i>
+              <span>{{ 'sunoEnhancer.tagDisclaimer' | translate }}</span>
             </div>
           }
 
@@ -517,19 +540,25 @@
           </div>
         </mat-card>
 
-        <!-- Copy Actions -->
+        <!-- Copy & Undo Actions -->
         <div class="copy-actions">
           <button type="button" class="action-button copy-button" (click)="copyLyrics()">
             <i class="fas fa-copy"></i>
             <span>{{ 'sunoEnhancer.copy.lyrics' | translate }}</span>
           </button>
+          <button type="button" class="action-button undo-button"
+            (click)="undoLyrics()" [disabled]="!canUndoLyrics">
+            <i class="fas fa-undo"></i>
+            <span>{{ 'sunoEnhancer.undo.lyrics' | translate }}</span>
+          </button>
           <button type="button" class="action-button copy-button" (click)="copyStylePrompt()">
             <i class="fas fa-copy"></i>
             <span>{{ 'sunoEnhancer.copy.stylePrompt' | translate }}</span>
           </button>
-          <button type="button" class="action-button copy-all-button" (click)="copyAll()">
-            <i class="fas fa-clipboard"></i>
-            <span>{{ 'sunoEnhancer.copy.all' | translate }}</span>
+          <button type="button" class="action-button undo-button"
+            (click)="undoStyle()" [disabled]="!canUndoStyle">
+            <i class="fas fa-undo"></i>
+            <span>{{ 'sunoEnhancer.undo.stylePrompt' | translate }}</span>
           </button>
         </div>
       </div>
