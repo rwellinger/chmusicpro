@@ -280,6 +280,7 @@ export class SongReleaseGalleryComponent implements OnInit, OnDestroy {
             [ReleaseStatus.REJECTED]: "badge-rejected",
             [ReleaseStatus.UPLOADED]: "badge-uploaded",
             [ReleaseStatus.RELEASED]: "badge-released",
+            [ReleaseStatus.RELEASED_SC]: "badge-released-sc",
             [ReleaseStatus.DOWNTAKEN]: "badge-downtaken",
             [ReleaseStatus.ARCHIVED]: "badge-archived"
         };

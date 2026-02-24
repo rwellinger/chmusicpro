@@ -224,7 +224,8 @@ export class SongReleaseEditorComponent implements OnInit, OnDestroy {
                 break;
             }
 
-            case ReleaseStatus.RELEASED: {
+            case ReleaseStatus.RELEASED:
+            case ReleaseStatus.RELEASED_SC: {
                 this.addRequiredValidator("upload_date");
                 this.addRequiredValidator("release_date"); // REQUIRED after release
                 // UPC/ISRC are OPTIONAL (not all platforms require them)
@@ -433,6 +434,7 @@ export class SongReleaseEditorComponent implements OnInit, OnDestroy {
                 break;
 
             case ReleaseStatus.RELEASED:
+            case ReleaseStatus.RELEASED_SC:
                 if (!this.releaseForm.get("upload_date")?.value) missingFields.push("Upload Date");
                 if (!this.releaseForm.get("release_date")?.value) missingFields.push("Release Date");
                 if (!this.releaseForm.get("copyright_info")?.value) missingFields.push("Copyright Info");
@@ -604,15 +606,15 @@ export class SongReleaseEditorComponent implements OnInit, OnDestroy {
             case "upc":
             case "copyright_info":
             case "smart_link":
-                return [ReleaseStatus.UPLOADED, ReleaseStatus.RELEASED, ReleaseStatus.DOWNTAKEN].includes(status);
+                return [ReleaseStatus.UPLOADED, ReleaseStatus.RELEASED, ReleaseStatus.RELEASED_SC, ReleaseStatus.DOWNTAKEN].includes(status);
 
             case "release_date":
                 // Release date = planned release date (optional for uploaded, required after release)
-                return [ReleaseStatus.UPLOADED, ReleaseStatus.RELEASED, ReleaseStatus.DOWNTAKEN].includes(status);
+                return [ReleaseStatus.UPLOADED, ReleaseStatus.RELEASED, ReleaseStatus.RELEASED_SC, ReleaseStatus.DOWNTAKEN].includes(status);
 
             case "isrc":
                 // ISRC only available after actual release
-                return [ReleaseStatus.RELEASED, ReleaseStatus.DOWNTAKEN].includes(status);
+                return [ReleaseStatus.RELEASED, ReleaseStatus.RELEASED_SC, ReleaseStatus.DOWNTAKEN].includes(status);
 
             case "rejected_reason":
                 return status === ReleaseStatus.REJECTED;

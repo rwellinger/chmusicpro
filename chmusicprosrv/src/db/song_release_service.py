@@ -175,7 +175,7 @@ class SongReleaseService:
                 elif status_filter == "uploaded":
                     query = query.filter(SongRelease.status == "uploaded")
                 elif status_filter == "released":
-                    query = query.filter(SongRelease.status == "released")
+                    query = query.filter(SongRelease.status.in_(["released", "released_sc"]))
                 elif status_filter == "archive":
                     query = query.filter(SongRelease.status.in_(["rejected", "downtaken", "archived"]))
 
@@ -194,7 +194,7 @@ class SongReleaseService:
             # - archived/rejected: sort by updated_at
             # - draft/arranging/mixing/mastering: sort by created_at (newest first)
             sort_field = case(
-                (SongRelease.status == "released", SongRelease.release_date),
+                (SongRelease.status.in_(["released", "released_sc"]), SongRelease.release_date),
                 (SongRelease.status == "uploaded", SongRelease.upload_date),
                 (SongRelease.status == "downtaken", SongRelease.downtaken_date),
                 (SongRelease.status.in_(["archived", "rejected"]), SongRelease.updated_at),

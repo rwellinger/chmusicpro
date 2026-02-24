@@ -728,7 +728,7 @@ class TestGetStatusFilterValues:
         result = get_status_filter_values("released")
 
         # Assert
-        assert result == ["released"]
+        assert result == ["released", "released_sc"]
 
     def test_archive_filter(self):
         """Test archive filter returns correct statuses"""

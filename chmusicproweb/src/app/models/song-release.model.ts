@@ -16,6 +16,7 @@ export enum ReleaseStatus {
     REJECTED = "rejected",
     UPLOADED = "uploaded",
     RELEASED = "released",
+    RELEASED_SC = "released_sc",
     DOWNTAKEN = "downtaken",
     ARCHIVED = "archived"
 }

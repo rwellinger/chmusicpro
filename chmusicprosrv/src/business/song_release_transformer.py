@@ -65,6 +65,8 @@ def validate_required_fields_for_status(status: str, data: dict[str, Any]) -> tu
         + ["upload_date", "copyright_info", "cover_s3_key"],  # UPC/ISRC optional, release_date optional
         "released": base_fields
         + ["upload_date", "release_date", "copyright_info", "cover_s3_key"],  # UPC/ISRC optional
+        "released_sc": base_fields
+        + ["upload_date", "release_date", "copyright_info", "cover_s3_key"],  # SoundCloud only, no UPC/ISRC needed
         "downtaken": base_fields
         + [
             "upload_date",
@@ -314,7 +316,7 @@ def get_status_filter_values(status_filter: str) -> list[str] | None:
     filters = {
         "progress": ["arranging", "mixing", "mastering", "pre_release"],
         "uploaded": ["uploaded"],
-        "released": ["released"],
+        "released": ["released", "released_sc"],
         "archive": ["rejected", "downtaken", "archived"],
     }
 

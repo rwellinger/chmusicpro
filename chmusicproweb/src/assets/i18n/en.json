@@ -1804,6 +1804,7 @@
       "rejected": "Rejected",
       "uploaded": "Uploaded",
       "released": "Released",
+      "released_sc": "SC Release",
       "downtaken": "Downtaken",
       "archived": "Archived"
     },
