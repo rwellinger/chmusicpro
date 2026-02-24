@@ -18,7 +18,7 @@ export interface Sketch {
     id: string;
     title?: string;
     lyrics?: string;
-    prompt: string;
+    prompt?: string;
     tags?: string;
     sketch_type: "inspiration" | "song";
     description_long?: string;

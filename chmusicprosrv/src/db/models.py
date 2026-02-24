@@ -103,7 +103,7 @@ class SongSketch(Base):
     # Core song data
     title = Column(String(500), nullable=True)
     lyrics = Column(Text, nullable=True)
-    prompt = Column(Text, nullable=False)
+    prompt = Column(Text, nullable=True)
 
     # Metadata
     tags = Column(String(1000), nullable=True)

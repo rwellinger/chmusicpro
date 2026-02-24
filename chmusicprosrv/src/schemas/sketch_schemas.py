@@ -24,7 +24,7 @@ class SketchCreateRequest(BaseModel):
 
     title: str | None = Field(None, max_length=500, description="Sketch title")
     lyrics: str | None = Field(None, max_length=10000, description="Song lyrics (optional)")
-    prompt: str = Field(..., min_length=1, max_length=1024, description="Music style prompt")
+    prompt: str | None = Field(None, max_length=1024, description="Music style prompt")
     tags: str | None = Field(None, max_length=1000, description="Comma-separated tags")
     sketch_type: str = Field(
         default="song", pattern="^(inspiration|song)$", description="Sketch type: inspiration or song"
@@ -43,7 +43,7 @@ class SketchResponse(BaseModel):
     id: UUID = Field(..., description="Unique sketch ID")
     title: str | None = Field(None, description="Sketch title")
     lyrics: str | None = Field(None, description="Song lyrics")
-    prompt: str = Field(..., description="Music style prompt")
+    prompt: str | None = Field(None, description="Music style prompt")
     tags: str | None = Field(None, description="Comma-separated tags")
     sketch_type: str = Field(..., description="Sketch type: inspiration or song")
     description_long: str | None = Field(None, description="Long description for release platforms")

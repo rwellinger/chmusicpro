@@ -137,6 +137,7 @@ export class SongSketchLibraryComponent implements OnInit, OnDestroy {
         try {
             const offset = page * this.pagination.limit;
             const workflowParam = this.currentWorkflow === "all" ? undefined : this.currentWorkflow;
+            const previousSelectedId = this.selectedSketch?.id;
 
             const response = await firstValueFrom(
                 this.sketchService.getSketches(
@@ -150,8 +151,11 @@ export class SongSketchLibraryComponent implements OnInit, OnDestroy {
             this.pagination = response.pagination || this.pagination;
             this.pagination.offset = offset;
 
-            // Select first sketch if nothing selected
-            if (this.sketches.length > 0 && !this.selectedSketch) {
+            // Re-select previously selected sketch with fresh data, or fall back to first
+            if (previousSelectedId) {
+                this.selectedSketch = this.sketches.find(s => s.id === previousSelectedId) || null;
+            }
+            if (!this.selectedSketch && this.sketches.length > 0) {
                 this.selectSketch(this.sketches[0]);
             } else if (this.sketches.length === 0) {
                 this.selectedSketch = null;

@@ -218,7 +218,7 @@ export class SongSketchCreatorComponent implements OnInit, OnDestroy {
             const sketchData = {
                 title: formValue.title?.trim() || undefined,
                 lyrics: formValue.lyrics?.trim() || undefined,
-                prompt: formValue.prompt?.trim() || null,
+                prompt: formValue.prompt?.trim() || undefined,
                 tags: tagsString,
                 sketch_type: formValue.sketch_type || "song",
                 workflow: formValue.workflow || "draft",
