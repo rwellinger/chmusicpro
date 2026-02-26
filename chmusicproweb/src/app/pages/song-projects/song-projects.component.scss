@@ -804,6 +804,48 @@ mat-accordion {
   margin-bottom: $spacing-sm;
 }
 
+// File Selection Bar
+.file-selection-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-xs $spacing-sm;
+  margin-bottom: $spacing-sm;
+  background-color: rgba($primary-color, 0.06);
+  border: 1px solid rgba($primary-color, 0.2);
+  border-radius: $border-radius-sm;
+
+  .selection-count {
+    font-size: $font-sm;
+    font-weight: $font-weight-medium;
+    color: $primary-color;
+  }
+
+  .selection-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  .select-all-btn,
+  .deselect-all-btn,
+  .download-selected-btn,
+  .delete-selected-btn {
+    @include button-secondary('sm');
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    i {
+      font-size: $font-xs;
+    }
+  }
+
+  .download-selected-btn {
+    margin-left: $spacing-sm;
+  }
+}
+
 .file-item {
   display: flex;
   justify-content: space-between;
@@ -813,9 +855,14 @@ mat-accordion {
   background-color: $background-light;
   border: 1px solid $border-light;
   border-radius: $border-radius-sm;
-  
+
   &:hover {
     background-color: $background-selected;
+  }
+
+  .file-checkbox {
+    flex-shrink: 0;
+    margin-right: $spacing-xs;
   }
 }
 
@@ -848,43 +895,6 @@ mat-accordion {
   }
 }
 
-.file-actions {
-  display: flex;
-  align-items: center;
-  gap: $spacing-xs;
-  flex-shrink: 0;
-}
-
-.file-download-button {
-  @include button-secondary('base');
-  padding: $spacing-xs $spacing-sm !important;
-  min-width: auto !important;
-
-  i {
-    font-size: $font-sm;
-  }
-}
-
-.file-delete-button {
-  background: transparent;
-  border: 1px solid transparent;
-  color: $text-muted;
-  padding: $spacing-xs $spacing-sm;
-  min-width: auto;
-  border-radius: $border-radius-sm;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  i {
-    font-size: $font-sm;
-  }
-
-  &:hover {
-    color: #991b1b;
-    background-color: #fef2f2;
-    border-color: #fecaca;
-  }
-}
 
 // Assigned Assets Grid (2-column layout for Metadata tab)
 .assigned-assets-grid {

@@ -419,7 +419,10 @@
                 @if (selectedProject.folders && selectedProject.folders.length > 0) {
                   <mat-accordion>
                     @for (folder of selectedProject.folders; track folder) {
-                      <mat-expansion-panel>
+                      <mat-expansion-panel
+                        [expanded]="expandedFolderIds.has(folder.id)"
+                        (opened)="expandedFolderIds.add(folder.id)"
+                        (closed)="expandedFolderIds.delete(folder.id)">
                         <mat-expansion-panel-header>
                           <mat-panel-title>
                             <i class="fas fa-folder"></i>
@@ -595,36 +598,46 @@
                               }
                             </div>
                           }
+                          <!-- File Selection Bar -->
+                          @if (getSelectedCountInFolder(folder) > 0) {
+                            <div class="file-selection-bar">
+                              <span class="selection-count">
+                                {{ 'songProjects.download.filesSelected' | translate: {count: getSelectedCountInFolder(folder)} }}
+                              </span>
+                              <div class="selection-actions">
+                                @if (!isAllSelectedInFolder(folder)) {
+                                  <button type="button" class="select-all-btn" (click)="selectAllInFolder(folder)">
+                                    {{ 'songProjects.download.selectAll' | translate }}
+                                  </button>
+                                }
+                                <button type="button" class="deselect-all-btn" (click)="deselectAllInFolder(folder)">
+                                  {{ 'songProjects.download.deselectAll' | translate }}
+                                </button>
+                                <button type="button" class="download-selected-btn" (click)="downloadSelectedFiles()">
+                                  <i class="fas fa-download"></i>
+                                  {{ 'songProjects.download.downloadSelected' | translate }}
+                                </button>
+                                @if (canUploadFiles()) {
+                                  <button type="button" class="delete-selected-btn" (click)="deleteSelectedFiles()">
+                                    <i class="fas fa-trash-alt"></i>
+                                    {{ 'songProjects.download.deleteSelected' | translate }}
+                                  </button>
+                                }
+                              </div>
+                            </div>
+                          }
                           @for (file of folder.files; track file) {
                             <div class="file-item">
+                              <mat-checkbox
+                                [checked]="isFileSelected(file.id)"
+                                (change)="toggleFileSelection(file.id)"
+                                class="file-checkbox">
+                              </mat-checkbox>
                               <div class="file-info">
-                                <i class="fas fa-file"></i>
                                 <span class="filename"
                                 [title]="file.relative_path">{{ getFilePathInFolder(file.relative_path, folder.folder_name) }}</span>
                                 <span class="file-date">{{ file.created_at | date:'dd.MM.yyyy HH:mm' }}</span>
                                 <span class="filesize">{{ formatFileSize(file.file_size_bytes) }}</span>
-                              </div>
-                              <div class="file-actions">
-                                @if (file.download_url) {
-                                  <button
-                                    type="button"
-                                    class="file-download-button"
-                                    (click)="downloadFile(file.download_url!)"
-                                    [matTooltip]="'songProjects.detail.actions.downloadFile' | translate"
-                                    >
-                                    <i class="fas fa-download"></i>
-                                  </button>
-                                }
-                                @if (canUploadFiles()) {
-                                  <button
-                                    type="button"
-                                    class="file-delete-button"
-                                    (click)="deleteFile(file)"
-                                    [matTooltip]="'songProjects.detail.actions.deleteFile' | translate"
-                                    >
-                                    <i class="fas fa-trash-alt"></i>
-                                  </button>
-                                }
                               </div>
                             </div>
                           }

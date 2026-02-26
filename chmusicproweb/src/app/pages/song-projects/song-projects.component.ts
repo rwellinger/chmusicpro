@@ -14,6 +14,7 @@ import {MatDialog, MatDialogModule} from "@angular/material/dialog";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatTabsModule} from "@angular/material/tabs";
 import {MatProgressBarModule} from "@angular/material/progress-bar";
+import {MatCheckboxModule} from "@angular/material/checkbox";
 import {HttpEventType} from "@angular/common/http";
 
 import {SongProjectService} from "../../services/business/song-project.service";
@@ -43,7 +44,8 @@ import {getColorFromString, getInitials} from "../../services/utils/cover-utils"
         MatDialogModule,
         MatTooltipModule,
         MatTabsModule,
-        MatProgressBarModule
+        MatProgressBarModule,
+        MatCheckboxModule
     ],
     templateUrl: "./song-projects.component.html",
     styleUrl: "./song-projects.component.scss"
@@ -88,6 +90,12 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
 
     // Folder download state
     folderDownloadProgress: { folderId: string; current: number; total: number; filename: string } | null = null;
+
+    // File selection state
+    selectedFiles = new Set<string>();
+
+    // Expanded folder state (survives refresh)
+    expandedFolderIds = new Set<string>();
 
     // Math for template
     Math = Math;
@@ -201,8 +209,12 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     /**
      * Select a project and load details.
      */
-    async selectProject(project: SongProjectListItem): Promise<void> {
+    async selectProject(project: SongProjectListItem, keepState = false): Promise<void> {
         this.isLoadingDetail = true;
+        if (!keepState) {
+            this.selectedFiles.clear();
+            this.expandedFolderIds.clear();
+        }
 
         try {
             const response = await firstValueFrom(
@@ -264,7 +276,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
 
         try {
             this.isLoadingDetail = true;
-            await this.selectProject(this.selectedProject);
+            await this.selectProject(this.selectedProject, true);
         } catch (error) {
             console.error("Failed to refresh project:", error);
             this.notificationService.error(
@@ -386,6 +398,106 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
         }
     }
 
+    // ── File Selection ────────────────────────────────────────────────
+
+    toggleFileSelection(fileId: string): void {
+        if (this.selectedFiles.has(fileId)) {
+            this.selectedFiles.delete(fileId);
+        } else {
+            this.selectedFiles.add(fileId);
+        }
+    }
+
+    isFileSelected(fileId: string): boolean {
+        return this.selectedFiles.has(fileId);
+    }
+
+    selectAllInFolder(folder: any): void {
+        for (const file of folder.files || []) {
+            this.selectedFiles.add(file.id);
+        }
+    }
+
+    deselectAllInFolder(folder: any): void {
+        for (const file of folder.files || []) {
+            this.selectedFiles.delete(file.id);
+        }
+    }
+
+    isAllSelectedInFolder(folder: any): boolean {
+        const files = folder.files || [];
+        return files.length > 0 && files.every((f: any) => this.selectedFiles.has(f.id));
+    }
+
+    getSelectedCountInFolder(folder: any): number {
+        return (folder.files || []).filter((f: any) => this.selectedFiles.has(f.id)).length;
+    }
+
+    async downloadSelectedFiles(): Promise<void> {
+        if (!this.selectedProject || this.selectedFiles.size === 0) return;
+
+        const selectedIds = [...this.selectedFiles];
+
+        if (selectedIds.length === 1) {
+            // Single file: download via service with save picker
+            for (const folder of this.selectedProject.folders || []) {
+                const file = (folder.files || []).find((f: any) => f.id === selectedIds[0]);
+                if (file) {
+                    try {
+                        const blob = await firstValueFrom(
+                            this.projectService.downloadFile(this.selectedProject!.id, file.id)
+                        );
+                        const filename = file.filename || 'download';
+                        await this.saveBlobGeneric(blob, filename);
+                    } catch (error) {
+                        console.error("Failed to download file:", error);
+                        this.notificationService.error(
+                            this.translate.instant("songProjects.download.zipDownloadError")
+                        );
+                    }
+                    return;
+                }
+            }
+            return;
+        }
+
+        // Multiple files: download as ZIP
+        try {
+            const blob = await firstValueFrom(
+                this.projectService.downloadSelectedZip(this.selectedProject.id, selectedIds)
+            );
+            await this.saveBlob(blob, `${this.selectedProject.project_name}-selected.zip`);
+        } catch (error) {
+            console.error("Failed to download selected files:", error);
+            this.notificationService.error(
+                this.translate.instant("songProjects.download.zipDownloadError")
+            );
+        }
+    }
+
+    async deleteSelectedFiles(): Promise<void> {
+        if (!this.selectedProject || this.selectedFiles.size === 0) return;
+
+        const count = this.selectedFiles.size;
+        const confirmed = confirm(
+            this.translate.instant("songProjects.download.deleteSelectedConfirm", {count})
+        );
+        if (!confirmed) return;
+
+        try {
+            await firstValueFrom(
+                this.projectService.deleteFiles(this.selectedProject.id, [...this.selectedFiles])
+            );
+            this.selectedFiles.clear();
+            await this.selectProject(this.selectedProject, true);
+        } catch (error) {
+            console.error("Failed to delete selected files:", error);
+            this.notificationService.error(
+                this.translate.instant("songProjects.messages.deleteFileError")
+            );
+        }
+    }
+
     /**
      * Delete a single file from the project.
      */
@@ -404,7 +516,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
             );
 
             // Refresh project to show updated file list
-            await this.selectProject(this.selectedProject);
+            await this.selectProject(this.selectedProject, true);
         } catch (error) {
             console.error("Failed to delete file:", error);
             this.notificationService.error(
@@ -626,7 +738,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
 
         // Refresh project to show new files
         if (this.selectedProject) {
-            await this.selectProject(this.selectedProject);
+            await this.selectProject(this.selectedProject, true);
         }
     }
 
@@ -906,7 +1018,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
 
         // Refresh project
         if (this.selectedProject) {
-            await this.selectProject(this.selectedProject);
+            await this.selectProject(this.selectedProject, true);
         }
     }
 
@@ -1111,7 +1223,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
             );
 
             // Refresh project to show updated file list
-            await this.selectProject(this.selectedProject);
+            await this.selectProject(this.selectedProject, true);
         } catch (error) {
             console.error("Failed to clear folder:", error);
             this.notificationService.error(
@@ -1289,6 +1401,31 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
                     return;
                 }
                 // Other errors (Brave SecurityError etc.) → fall through to <a> download
+            }
+        }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    private async saveBlobGeneric(blob: Blob, filename: string): Promise<void> {
+        if ("showSaveFilePicker" in window) {
+            try {
+                const handle = await (window as any).showSaveFilePicker({
+                    suggestedName: filename
+                });
+                const writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+                return;
+            } catch (err: any) {
+                if (err?.name === "AbortError") {
+                    return;
+                }
             }
         }
 

@@ -177,6 +177,7 @@ export class ApiConfigService {
             templateZip: (projectId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/template-zip`,
             folderZip: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/download-zip`,
             fileDownload: (projectId: string, fileId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/files/${fileId}/download`,
+            selectedZip: (projectId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/files/download-zip`,
             chunkedUploadInit: (projectId: string, folderId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/folders/${folderId}/chunked-upload/init`,
             chunkedUploadPart: (uploadId: string, partNumber: number, s3Key: string) => `${this.baseUrl}/api/v1/song-projects/chunked-upload/${uploadId}/part/${partNumber}?s3_key=${encodeURIComponent(s3Key)}`,
             chunkedUploadComplete: (projectId: string, uploadId: string) => `${this.baseUrl}/api/v1/song-projects/${projectId}/chunked-upload/${uploadId}/complete`,

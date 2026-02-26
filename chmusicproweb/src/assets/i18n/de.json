@@ -2030,7 +2030,13 @@
       "templateZip": "Vorlage herunterladen",
       "downloadFolder": "Ordner herunterladen",
       "zipDownloadError": "Download fehlgeschlagen",
-      "downloadComplete": "{{count}} Dateien heruntergeladen"
+      "downloadComplete": "{{count}} Dateien heruntergeladen",
+      "downloadSelected": "Ausgewaehlte herunterladen",
+      "filesSelected": "{{count}} Dateien ausgewaehlt",
+      "selectAll": "Alle auswaehlen",
+      "deselectAll": "Alle abwaehlen",
+      "deleteSelected": "Ausgewaehlte loeschen",
+      "deleteSelectedConfirm": "{{count}} ausgewaehlte Dateien loeschen?"
     },
     "mirror": {
       "dropToSync": "Ablegen zum Synchronisieren",

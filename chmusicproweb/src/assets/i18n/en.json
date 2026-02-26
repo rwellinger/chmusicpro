@@ -2030,7 +2030,13 @@
       "templateZip": "Download Template",
       "downloadFolder": "Download Folder",
       "zipDownloadError": "Download failed",
-      "downloadComplete": "Downloaded {{count}} files"
+      "downloadComplete": "Downloaded {{count}} files",
+      "downloadSelected": "Download Selected",
+      "filesSelected": "{{count}} files selected",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All",
+      "deleteSelected": "Delete Selected",
+      "deleteSelectedConfirm": "Delete {{count}} selected files?"
     },
     "mirror": {
       "dropToSync": "Drop to sync",

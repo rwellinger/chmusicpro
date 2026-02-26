@@ -238,4 +238,8 @@ export class SongProjectService {
     downloadFile(projectId: string, fileId: string): Observable<Blob> {
         return this.http.get(this.apiConfig.endpoints.songProject.fileDownload(projectId, fileId), {responseType: 'blob'});
     }
+
+    downloadSelectedZip(projectId: string, fileIds: string[]): Observable<Blob> {
+        return this.http.post(this.apiConfig.endpoints.songProject.selectedZip(projectId), {file_ids: fileIds}, {responseType: 'blob'});
+    }
 }

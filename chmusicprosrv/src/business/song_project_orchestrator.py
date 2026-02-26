@@ -1449,6 +1449,64 @@ class SongProjectOrchestrator:
             )
             raise
 
+    def generate_selected_files_zip(
+        self, db: Session, project_id: UUID, domain_id: UUID, file_ids: list[str]
+    ) -> tuple[str, str] | None:
+        """Generate ZIP with selected files from a project using a temp file on disk.
+
+        Returns (temp_file_path, project_name) or None if not found.
+        Caller is responsible for deleting the temp file after use.
+        """
+        temp_path = None
+        try:
+            project = self.db_service.get_project_with_details(db, project_id)
+            if not project or project.domain_id != domain_id:
+                return None
+
+            # Collect all files from all folders, indexed by ID
+            all_files = {}
+            for folder in project.folders:
+                for file_obj in folder.files:
+                    all_files[str(file_obj.id)] = file_obj
+
+            # Validate all requested file IDs belong to this project
+            selected_files = []
+            for fid in file_ids:
+                file_obj = all_files.get(fid)
+                if not file_obj:
+                    logger.warning("File not found in project", file_id=fid, project_id=str(project_id))
+                    return None
+                selected_files.append(file_obj)
+
+            if not selected_files:
+                return None
+
+            # Write ZIP to temp file on disk
+            temp_fd, temp_path = tempfile.mkstemp(suffix=".zip")
+            os.close(temp_fd)
+
+            with zipfile.ZipFile(temp_path, "w", zipfile.ZIP_STORED) as zf:
+                for file_obj in selected_files:
+                    if not file_obj.s3_key:
+                        continue
+                    zip_path = file_obj.relative_path or file_obj.filename
+                    logger.debug("Adding to ZIP", filename=zip_path)
+                    with zf.open(zip_path, "w") as entry:
+                        self.storage.download_to_fileobj(file_obj.s3_key, entry)
+
+            return temp_path, project.project_name
+
+        except Exception:
+            if temp_path:
+                with contextlib.suppress(OSError):
+                    os.unlink(temp_path)
+            logger.error(
+                "Generate selected files ZIP failed",
+                project_id=str(project_id),
+                file_count=len(file_ids),
+            )
+            raise
+
     # ── Chunked Upload Methods ──────────────────────────────────────────
 
     def init_chunked_upload(

@@ -796,6 +796,71 @@ def download_template_zip(project_id: str):
         return jsonify({"error": "Failed to generate template ZIP"}), 500
 
 
+@api_song_projects_v1.route("/<project_id>/files/download-zip", methods=["POST"])
+@jwt_required
+def download_selected_files_zip(project_id: str):
+    """Download selected files as ZIP (streams from S3, writes to temp file).
+
+    Request Body:
+        {"file_ids": ["uuid1", "uuid2", ...]}
+
+    Response:
+        200: ZIP file (application/zip)
+        400: Invalid request
+        401: Unauthorized
+        404: Project or files not found
+    """
+    domain_id = get_current_domain_id()
+    if not domain_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        import contextlib
+        import os
+
+        from flask import after_this_request, send_file
+
+        from business.song_project_orchestrator import song_project_orchestrator
+
+        data = request.get_json()
+        if not data or "file_ids" not in data or not data["file_ids"]:
+            return jsonify({"error": "file_ids required"}), 400
+
+        project_uuid = UUID(project_id)
+        domain_uuid = UUID(domain_id)
+
+        db: Session = next(get_db())
+        try:
+            result = song_project_orchestrator.generate_selected_files_zip(
+                db, project_uuid, domain_uuid, data["file_ids"]
+            )
+            if result is None:
+                return jsonify({"error": "Project or files not found"}), 404
+
+            temp_path, project_name = result
+
+            @after_this_request
+            def cleanup(response):
+                with contextlib.suppress(OSError):
+                    os.unlink(temp_path)
+                return response
+
+            return send_file(
+                temp_path,
+                mimetype="application/zip",
+                as_attachment=True,
+                download_name=f"{project_name}-selected.zip",
+            )
+        finally:
+            db.close()
+
+    except ValueError:
+        return jsonify({"error": "Invalid ID format"}), 400
+    except Exception as e:
+        logger.error("Error generating selected files ZIP", project_id=project_id, error=str(e))
+        return jsonify({"error": "Failed to generate ZIP"}), 500
+
+
 @api_song_projects_v1.route("/<project_id>/folders/<folder_id>/download-zip", methods=["GET"])
 @jwt_required
 def download_folder_zip(project_id: str, folder_id: str):
