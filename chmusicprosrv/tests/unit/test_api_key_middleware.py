@@ -7,7 +7,6 @@ from flask import Flask, g
 
 
 class TestLoadUserApiKeys:
-
     @pytest.fixture
     def app(self):
         return Flask(__name__)
@@ -27,6 +26,7 @@ class TestLoadUserApiKeys:
 
         with app.test_request_context():
             from api.api_key_middleware import load_user_api_keys
+
             load_user_api_keys()
 
             assert g.user_openai_api_key == "sk-openai-123"
@@ -39,6 +39,7 @@ class TestLoadUserApiKeys:
     def test_skips_when_no_user_id(self, mock_get_user, app):
         with app.test_request_context():
             from api.api_key_middleware import load_user_api_keys
+
             load_user_api_keys()
 
             assert not hasattr(g, "user_openai_api_key")
@@ -52,6 +53,7 @@ class TestLoadUserApiKeys:
 
         with app.test_request_context():
             from api.api_key_middleware import load_user_api_keys
+
             load_user_api_keys()
 
             assert g.user_openai_api_key is None
@@ -71,6 +73,7 @@ class TestLoadUserApiKeys:
 
         with app.test_request_context():
             from api.api_key_middleware import load_user_api_keys
+
             load_user_api_keys()
 
             assert g.user_openai_api_key == "sk-openai-only"
@@ -79,7 +82,6 @@ class TestLoadUserApiKeys:
 
 
 class TestRequireApiKey:
-
     @pytest.fixture
     def app(self):
         return Flask(__name__)
@@ -88,23 +90,27 @@ class TestRequireApiKey:
         with app.test_request_context():
             g.user_openai_api_key = "sk-test"
             from api.api_key_middleware import require_api_key
+
             assert require_api_key("openai") is None
 
     def test_returns_none_when_claude_key_present(self, app):
         with app.test_request_context():
             g.user_claude_api_key = "sk-claude"
             from api.api_key_middleware import require_api_key
+
             assert require_api_key("claude") is None
 
     def test_returns_none_when_openai_admin_key_present(self, app):
         with app.test_request_context():
             g.user_openai_admin_api_key = "sk-admin"
             from api.api_key_middleware import require_api_key
+
             assert require_api_key("openai_admin") is None
 
     def test_returns_error_when_openai_key_missing(self, app):
         with app.test_request_context():
             from api.api_key_middleware import require_api_key
+
             result = require_api_key("openai")
 
             assert result is not None
@@ -117,6 +123,7 @@ class TestRequireApiKey:
     def test_returns_error_when_claude_key_missing(self, app):
         with app.test_request_context():
             from api.api_key_middleware import require_api_key
+
             result = require_api_key("claude")
 
             assert result is not None
@@ -128,6 +135,7 @@ class TestRequireApiKey:
     def test_returns_error_for_unknown_provider(self, app):
         with app.test_request_context():
             from api.api_key_middleware import require_api_key
+
             result = require_api_key("unknown_provider")
 
             assert result is not None
@@ -139,6 +147,7 @@ class TestRequireApiKey:
         with app.test_request_context():
             g.user_openai_api_key = None
             from api.api_key_middleware import require_api_key
+
             result = require_api_key("openai")
 
             assert result is not None
@@ -149,6 +158,7 @@ class TestRequireApiKey:
         with app.test_request_context():
             g.user_openai_api_key = ""
             from api.api_key_middleware import require_api_key
+
             result = require_api_key("openai")
 
             assert result is not None
