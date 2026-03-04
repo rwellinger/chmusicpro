@@ -19,6 +19,7 @@ export class AppComponent implements OnInit {
     title = "chmusicproweb";
     showMobileWarning = false;
     showLandscapeWarning = false;
+    menuCollapsed = false;
 
     private authService = inject(AuthService);
     private versionCheckService = inject(VersionCheckService);

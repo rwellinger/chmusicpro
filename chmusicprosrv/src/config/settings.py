@@ -59,6 +59,11 @@ AGENT_EXTERNAL_MODEL_OPENAI = os.getenv("AGENT_EXTERNAL_MODEL_OPENAI", "gpt-4.1-
 AGENT_EXTERNAL_MODEL_CLAUDE = os.getenv("AGENT_EXTERNAL_MODEL_CLAUDE", "claude-haiku-4-5-20250929")
 
 # --------------------------------------------------
+# Application Mode (PROFI / LIGHT / PRJCT)
+# --------------------------------------------------
+APPLICATION_MODE = os.getenv("APPLICATION_MODE", "PROFI")
+
+# --------------------------------------------------
 # Image URL Config
 # --------------------------------------------------
 IMAGE_BASE_URL = os.getenv("IMAGE_BASE_URL", "http://localhost:8000/api/v1/image")

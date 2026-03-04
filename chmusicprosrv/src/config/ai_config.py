@@ -8,6 +8,7 @@ from config.settings import (
     AGENT_EXTERNAL_MODEL_CLAUDE,
     AGENT_EXTERNAL_MODEL_OPENAI,
     AGENT_EXTERNAL_PROVIDER,
+    APPLICATION_MODE,
     USE_AI_AGENT_GENERAL,
 )
 
@@ -26,6 +27,13 @@ PROVIDER_CLAUDE = "claude"
 
 VALID_PROVIDERS = {PROVIDER_OLLAMA, PROVIDER_OPENAI, PROVIDER_CLAUDE}
 EXTERNAL_PROVIDERS = {PROVIDER_OPENAI, PROVIDER_CLAUDE}
+
+# Application Mode constants
+APP_MODE_PROFI = "PROFI"
+APP_MODE_LIGHT = "LIGHT"
+APP_MODE_PRJCT = "PRJCT"
+
+VALID_APP_MODES = {APP_MODE_PROFI, APP_MODE_LIGHT, APP_MODE_PRJCT}
 
 
 class AIConfig:
@@ -76,6 +84,14 @@ class AIConfig:
         if AIConfig.is_external_enabled():
             providers.append(AIConfig.get_external_provider())
         return providers
+
+    @staticmethod
+    def get_application_mode() -> str:
+        """Get current application mode (PROFI/LIGHT/PRJCT)."""
+        mode = APPLICATION_MODE.upper().strip()
+        if mode not in VALID_APP_MODES:
+            return APP_MODE_PROFI
+        return mode
 
     @staticmethod
     def validate_provider(provider: str) -> bool:

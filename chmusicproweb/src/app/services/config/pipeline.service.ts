@@ -1,11 +1,13 @@
 import {inject, Injectable} from "@angular/core";
 import {NavigationEnd, Router} from "@angular/router";
-import {filter, map, shareReplay, startWith} from "rxjs";
+import {combineLatest, filter, map, shareReplay, startWith} from "rxjs";
 import {PIPELINE_STEPS, PipelineStep} from "./pipeline.config";
+import {AIConfigService} from "./ai-config.service";
 
 @Injectable({providedIn: "root"})
 export class PipelineService {
     private router = inject(Router);
+    private aiConfigService = inject(AIConfigService);
 
     readonly steps: PipelineStep[] = PIPELINE_STEPS;
 
@@ -16,8 +18,14 @@ export class PipelineService {
         shareReplay(1)
     );
 
-    readonly isOnPipelinePage$ = this.currentStep$.pipe(
-        map(step => step !== null)
+    private applicationMode$ = this.aiConfigService.getApplicationMode();
+
+    readonly isOnPipelinePage$ = combineLatest([this.currentStep$, this.applicationMode$]).pipe(
+        map(([step, mode]) => step !== null && mode !== "PRJCT")
+    );
+
+    readonly filteredSteps$ = this.applicationMode$.pipe(
+        map(mode => mode === "PRJCT" ? this.steps.filter(s => s.step === 6) : this.steps)
     );
 
     private findStep(url: string): PipelineStep | null {

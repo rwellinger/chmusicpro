@@ -5,6 +5,9 @@
 DEBUG=false
 APP_VERSION=v0.4.0
 
+# Application Mode: PROFI (all features), LIGHT (no file uploads), PRJCT (projects only)
+APPLICATION_MODE=PROFI
+
 # ==================================================
 # JWT AUTHENTICATION
 # ==================================================

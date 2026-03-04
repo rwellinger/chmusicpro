@@ -1,30 +1,37 @@
-import {Component, inject, OnDestroy, OnInit} from "@angular/core";
+import {Component, EventEmitter, inject, OnDestroy, OnInit, Output} from "@angular/core";
 
 import {Router, RouterModule} from "@angular/router";
+import {MatTooltipModule} from "@angular/material/tooltip";
 import {TranslateModule} from "@ngx-translate/core";
 import {Subject} from "rxjs";
 import {takeUntil} from "rxjs/operators";
 import {AuthService} from "../../services/business/auth.service";
 import {AIConfigService} from "../../services/config/ai-config.service";
+import {ApplicationMode} from "../../models/ai-config.model";
 import {AuthState, User} from "../../models/user.model";
 import appVersion from "../../../assets/app-version.json";
 
 @Component({
     selector: "app-side-menu",
     standalone: true,
-    imports: [RouterModule, TranslateModule],
+    imports: [RouterModule, TranslateModule, MatTooltipModule],
     templateUrl: "./side-menu.component.html",
-    styleUrl: "./side-menu.component.scss"
+    styleUrl: "./side-menu.component.scss",
+    host: {"[class.collapsed]": "isCollapsed"}
 })
 export class SideMenuComponent implements OnInit, OnDestroy {
     version = appVersion.version;
     authState: AuthState | null = null;
     currentUser: User | null = null;
-    firstName = "Guest"; // Computed property to avoid method calls in template
-    activeDomainName = ""; // Active domain name from JWT
+    firstName = "Guest";
+    activeDomainName = "";
     isAdmin = false;
     showInternalChat = true;
     showExternalChat = true;
+    applicationMode: ApplicationMode = "PROFI";
+    isCollapsed = false;
+
+    @Output() collapsedChange = new EventEmitter<boolean>();
 
     private destroy$ = new Subject<void>();
     private authService = inject(AuthService);
@@ -52,11 +59,14 @@ export class SideMenuComponent implements OnInit, OnDestroy {
                 next: (config) => {
                     this.showInternalChat = config.ollama_enabled;
                     this.showExternalChat = config.external_enabled;
+                    this.applicationMode = config.application_mode;
+                    this.setDefaultCollapsed();
                 },
                 error: () => {
-                    // Fallback: show both
                     this.showInternalChat = true;
                     this.showExternalChat = true;
+                    this.applicationMode = "PROFI";
+                    this.setDefaultCollapsed();
                 }
             });
     }
@@ -81,10 +91,16 @@ export class SideMenuComponent implements OnInit, OnDestroy {
             });
     }
 
-    /**
-     * Update firstName property based on current user
-     * Called when user changes to avoid method calls in template
-     */
+    toggleCollapse(): void {
+        this.isCollapsed = !this.isCollapsed;
+        this.collapsedChange.emit(this.isCollapsed);
+    }
+
+    private setDefaultCollapsed(): void {
+        this.isCollapsed = this.applicationMode === "PRJCT";
+        this.collapsedChange.emit(this.isCollapsed);
+    }
+
     private updateFirstName(): void {
         if (!this.currentUser) {
             this.firstName = "Guest";

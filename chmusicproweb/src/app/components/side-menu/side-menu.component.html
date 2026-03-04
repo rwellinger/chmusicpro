@@ -1,3 +1,8 @@
+<!-- Collapse Toggle (half-circle on right edge) -->
+<button class="collapse-toggle" (click)="toggleCollapse()">
+  <i class="fas" [class.fa-chevron-left]="!isCollapsed" [class.fa-chevron-right]="isCollapsed"></i>
+</button>
+
 <aside class="side-menu">
   <!-- Logo and Brand Section -->
   <div class="brand-section">
@@ -7,146 +12,213 @@
         <i class="fas fa-music"></i>
       </span>
     </div>
-    <div class="brand">
-      <span class="brand-text">thWelly's Song Production</span>
-      <span class="version-text">v{{ version }}</span>
-    </div>
+    @if (!isCollapsed) {
+      <div class="brand">
+        <span class="brand-text">thWelly's Song Production</span>
+        <span class="version-text">v{{ version }}</span>
+      </div>
+    }
   </div>
 
   <!-- Navigation Section -->
   <nav class="nav-section">
 
-    <div class="nav-group">
-      <div class="group-items">
-        <a routerLink="/dashboard" routerLinkActive="active">
-          <i class="fas fa-th-large"></i>
-          {{ 'sideMenu.dashboard' | translate }}
-        </a>
-      </div>
-    </div>
-
-    @if (showInternalChat || showExternalChat) {
+    @if (applicationMode !== 'PRJCT') {
       <div class="nav-group">
-        <span class="group-label">
-          <i class="fas fa-robot"></i>
-          {{ 'sideMenu.aiChat' | translate }}
-        </span>
+        <div class="group-items">
+          <a routerLink="/dashboard" routerLinkActive="active"
+             [matTooltip]="'sideMenu.dashboard' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
+            <i class="fas fa-th-large"></i>
+            <span class="nav-label">{{ 'sideMenu.dashboard' | translate }}</span>
+          </a>
+        </div>
+      </div>
+    }
+
+    @if (applicationMode !== 'PRJCT' && (showInternalChat || showExternalChat)) {
+      <div class="nav-group">
+        @if (!isCollapsed) {
+          <span class="group-label">
+            <i class="fas fa-robot"></i>
+            {{ 'sideMenu.aiChat' | translate }}
+          </span>
+        }
         <div class="group-items">
           @if (showInternalChat) {
-            <a routerLink="/ai-chat" routerLinkActive="active">
+            <a routerLink="/ai-chat" routerLinkActive="active"
+               [matTooltip]="'sideMenu.ollamaChat' | translate"
+               matTooltipPosition="right"
+               [matTooltipDisabled]="!isCollapsed">
               <i class="fas fa-server"></i>
-              {{ 'sideMenu.ollamaChat' | translate }}
+              <span class="nav-label">{{ 'sideMenu.ollamaChat' | translate }}</span>
             </a>
           }
           @if (showExternalChat) {
-            <a routerLink="/openai-chat" routerLinkActive="active">
+            <a routerLink="/openai-chat" routerLinkActive="active"
+               [matTooltip]="'sideMenu.openaiChat' | translate"
+               matTooltipPosition="right"
+               [matTooltipDisabled]="!isCollapsed">
               <i class="fas fa-cloud"></i>
-              {{ 'sideMenu.openaiChat' | translate }}
+              <span class="nav-label">{{ 'sideMenu.openaiChat' | translate }}</span>
             </a>
           }
         </div>
       </div>
     }
 
-    <div class="nav-group">
-      <span class="group-label">
-        <i class="fas fa-pen-fancy"></i>
-        {{ 'sideMenu.lyricCreation' | translate }}
-      </span>
-      <div class="group-items">
-        <a routerLink="/text-workshop" routerLinkActive="active">
-          <i class="fas fa-book-open"></i>
-          {{ 'sideMenu.workshopLibrary' | translate }}
-        </a>
-        <a routerLink="/song-sketch-library" routerLinkActive="active">
-          <i class="fas fa-folder-open"></i>
-          {{ 'sideMenu.sketchLibrary' | translate }}
-        </a>
-        <a routerLink="/suno-enhancer" routerLinkActive="active">
-          <i class="fas fa-wand-sparkles"></i>
-          {{ 'sideMenu.sunoEnhancer' | translate }}
-        </a>
-      </div>
-    </div>
-
-    <div class="nav-group">
-      <span class="group-label">
-        <i class="fas fa-image"></i>
-        {{ 'sideMenu.coverArt' | translate }}
-      </span>
-      <div class="group-items">
-        <a routerLink="/imageview" routerLinkActive="active">
-          <i class="fas fa-images"></i>
-          {{ 'sideMenu.gallery' | translate }}
-        </a>
-        <a routerLink="/text-overlay-editor" routerLinkActive="active">
-          <i class="fas fa-layer-group"></i>
-          {{ 'sideMenu.textOverlayEditor' | translate }}
-        </a>
-      </div>
-    </div>
-
-    <div class="nav-group">
-      <span class="group-label">
-        <i class="fas fa-share-alt"></i>
-        {{ 'sideMenu.distribution' | translate }}
-      </span>
-      <div class="group-items">
-        <a routerLink="/song-releases" routerLinkActive="active">
-          <i class="fas fa-compact-disc"></i>
-          {{ 'sideMenu.songReleases' | translate }}
-        </a>
-      </div>
-    </div>
-
-    <div class="nav-group">
-      <span class="group-label">
-        <i class="fas fa-folder-open"></i>
-        {{ 'sideMenu.manageProjects' | translate }}
-      </span>
-      <div class="group-items">
-        <a routerLink="/song-projects" routerLinkActive="active">
-          <i class="fas fa-folder-open"></i>
-          {{ 'sideMenu.songProjects' | translate }}
-        </a>
-      </div>
-    </div>
-
-    <div class="nav-group">
-      <span class="group-label">
-        <i class="fas fa-toolbox"></i>
-        {{ 'sideMenu.equipment' | translate }}
-      </span>
-      <div class="group-items">
-        <a routerLink="/equipment-gallery" routerLinkActive="active">
-          <i class="fas fa-folder-open"></i>
-          {{ 'sideMenu.equipmentGallery' | translate }}
-        </a>
-      </div>
-    </div>
-
-    @if (isAdmin) {
+    @if (applicationMode !== 'PRJCT') {
       <div class="nav-group">
-        <span class="group-label">
-          <i class="fas fa-cogs"></i>
-          {{ 'sideMenu.settings' | translate }}
-        </span>
+        @if (!isCollapsed) {
+          <span class="group-label">
+            <i class="fas fa-pen-fancy"></i>
+            {{ 'sideMenu.lyricCreation' | translate }}
+          </span>
+        }
         <div class="group-items">
-          <a routerLink="/prompt-templates" routerLinkActive="active">
+          <a routerLink="/text-workshop" routerLinkActive="active"
+             [matTooltip]="'sideMenu.workshopLibrary' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
+            <i class="fas fa-book-open"></i>
+            <span class="nav-label">{{ 'sideMenu.workshopLibrary' | translate }}</span>
+          </a>
+          <a routerLink="/song-sketch-library" routerLinkActive="active"
+             [matTooltip]="'sideMenu.sketchLibrary' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
+            <i class="fas fa-folder-open"></i>
+            <span class="nav-label">{{ 'sideMenu.sketchLibrary' | translate }}</span>
+          </a>
+          <a routerLink="/suno-enhancer" routerLinkActive="active"
+             [matTooltip]="'sideMenu.sunoEnhancer' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
+            <i class="fas fa-wand-sparkles"></i>
+            <span class="nav-label">{{ 'sideMenu.sunoEnhancer' | translate }}</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        @if (!isCollapsed) {
+          <span class="group-label">
+            <i class="fas fa-image"></i>
+            {{ 'sideMenu.coverArt' | translate }}
+          </span>
+        }
+        <div class="group-items">
+          <a routerLink="/imageview" routerLinkActive="active"
+             [matTooltip]="'sideMenu.gallery' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
+            <i class="fas fa-images"></i>
+            <span class="nav-label">{{ 'sideMenu.gallery' | translate }}</span>
+          </a>
+          <a routerLink="/text-overlay-editor" routerLinkActive="active"
+             [matTooltip]="'sideMenu.textOverlayEditor' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
+            <i class="fas fa-layer-group"></i>
+            <span class="nav-label">{{ 'sideMenu.textOverlayEditor' | translate }}</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        @if (!isCollapsed) {
+          <span class="group-label">
+            <i class="fas fa-share-alt"></i>
+            {{ 'sideMenu.distribution' | translate }}
+          </span>
+        }
+        <div class="group-items">
+          <a routerLink="/song-releases" routerLinkActive="active"
+             [matTooltip]="'sideMenu.songReleases' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
+            <i class="fas fa-compact-disc"></i>
+            <span class="nav-label">{{ 'sideMenu.songReleases' | translate }}</span>
+          </a>
+        </div>
+      </div>
+    }
+
+    <div class="nav-group">
+      @if (!isCollapsed) {
+        <span class="group-label">
+          <i class="fas fa-folder-open"></i>
+          {{ 'sideMenu.manageProjects' | translate }}
+        </span>
+      }
+      <div class="group-items">
+        <a routerLink="/song-projects" routerLinkActive="active"
+           [matTooltip]="'sideMenu.songProjects' | translate"
+           matTooltipPosition="right"
+           [matTooltipDisabled]="!isCollapsed">
+          <i class="fas fa-folder-open"></i>
+          <span class="nav-label">{{ 'sideMenu.songProjects' | translate }}</span>
+        </a>
+      </div>
+    </div>
+
+    @if (applicationMode !== 'PRJCT') {
+      <div class="nav-group">
+        @if (!isCollapsed) {
+          <span class="group-label">
+            <i class="fas fa-toolbox"></i>
+            {{ 'sideMenu.equipment' | translate }}
+          </span>
+        }
+        <div class="group-items">
+          <a routerLink="/equipment-gallery" routerLinkActive="active"
+             [matTooltip]="'sideMenu.equipmentGallery' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
+            <i class="fas fa-folder-open"></i>
+            <span class="nav-label">{{ 'sideMenu.equipmentGallery' | translate }}</span>
+          </a>
+        </div>
+      </div>
+    }
+
+    @if (isAdmin && applicationMode !== 'PRJCT') {
+      <div class="nav-group">
+        @if (!isCollapsed) {
+          <span class="group-label">
+            <i class="fas fa-cogs"></i>
+            {{ 'sideMenu.settings' | translate }}
+          </span>
+        }
+        <div class="group-items">
+          <a routerLink="/prompt-templates" routerLinkActive="active"
+             [matTooltip]="'sideMenu.promptTemplates' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
             <i class="fas fa-file-text"></i>
-            {{ 'sideMenu.promptTemplates' | translate }}
+            <span class="nav-label">{{ 'sideMenu.promptTemplates' | translate }}</span>
           </a>
-          <a routerLink="/lyric-parsing-rules" routerLinkActive="active">
+          <a routerLink="/lyric-parsing-rules" routerLinkActive="active"
+             [matTooltip]="'sideMenu.lyricParsingRules' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
             <i class="fas fa-wand-magic-sparkles"></i>
-            {{ 'sideMenu.lyricParsingRules' | translate }}
+            <span class="nav-label">{{ 'sideMenu.lyricParsingRules' | translate }}</span>
           </a>
-          <a routerLink="/system-context-templates" routerLinkActive="active">
+          <a routerLink="/system-context-templates" routerLinkActive="active"
+             [matTooltip]="'sideMenu.systemContextTemplates' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
             <i class="fas fa-comment-dots"></i>
-            {{ 'sideMenu.systemContextTemplates' | translate }}
+            <span class="nav-label">{{ 'sideMenu.systemContextTemplates' | translate }}</span>
           </a>
-          <a routerLink="/model-context-windows" routerLinkActive="active">
+          <a routerLink="/model-context-windows" routerLinkActive="active"
+             [matTooltip]="'sideMenu.aiModels' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
             <i class="fas fa-microchip"></i>
-            {{ 'sideMenu.aiModels' | translate }}
+            <span class="nav-label">{{ 'sideMenu.aiModels' | translate }}</span>
           </a>
         </div>
       </div>
@@ -154,22 +226,33 @@
 
     @if (authState && authState.isAuthenticated) {
       <div class="nav-group">
-        <span class="group-label">
-          <i class="fas fa-user"></i>
-          {{ firstName }} ({{ activeDomainName }})
-        </span>
+        @if (!isCollapsed) {
+          <span class="group-label">
+            <i class="fas fa-user"></i>
+            {{ firstName }} ({{ activeDomainName }})
+          </span>
+        }
         <div class="group-items">
-          <a routerLink="/domain-management" routerLinkActive="active">
+          <a routerLink="/domain-management" routerLinkActive="active"
+             [matTooltip]="'sideMenu.domainManagement' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
             <i class="fas fa-layer-group"></i>
-            {{ 'sideMenu.domainManagement' | translate }}
+            <span class="nav-label">{{ 'sideMenu.domainManagement' | translate }}</span>
           </a>
-          <a routerLink="/profile" routerLinkActive="active">
+          <a routerLink="/profile" routerLinkActive="active"
+             [matTooltip]="'sideMenu.profile' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
             <i class="fas fa-user-circle"></i>
-            {{ 'sideMenu.profile' | translate }}
+            <span class="nav-label">{{ 'sideMenu.profile' | translate }}</span>
           </a>
-          <a href="javascript:void(0)" (click)="onLogout()" class="logout-link">
+          <a href="javascript:void(0)" (click)="onLogout()" class="logout-link"
+             [matTooltip]="'sideMenu.logout' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
             <i class="fas fa-sign-out-alt"></i>
-            {{ 'sideMenu.logout' | translate }}
+            <span class="nav-label">{{ 'sideMenu.logout' | translate }}</span>
           </a>
         </div>
       </div>
@@ -178,16 +261,21 @@
     <!-- Login Button (when not authenticated) -->
     @if (authState && !authState.isAuthenticated) {
       <div class="auth-section">
-        <a routerLink="/login" class="login-button">
+        <a routerLink="/login" class="login-button"
+           [matTooltip]="'sideMenu.login' | translate"
+           matTooltipPosition="right"
+           [matTooltipDisabled]="!isCollapsed">
           <i class="fas fa-sign-in-alt"></i>
-          {{ 'sideMenu.login' | translate }}
+          <span class="nav-label">{{ 'sideMenu.login' | translate }}</span>
         </a>
       </div>
     }
   </nav>
 
   <!-- Footer Section -->
-  <div class="footer-section">
-    <p>© 2026 thWelly's Song Production</p>
-  </div>
+  @if (!isCollapsed) {
+    <div class="footer-section">
+      <p>&copy; 2026 thWelly's Song Production</p>
+    </div>
+  }
 </aside>

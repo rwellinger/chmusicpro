@@ -1,45 +1,14 @@
-# Anforderungen an KI-Rechenleistung fuer chmusicpro
+# Anforderungen an KI-Rechenleistung
 
-**Stand:** Februar 2026
-**Szenario:** 10 User, lokale KI via Ollama, alle Sprachen (DE, EN, FR, IT, ES)
 
----
-
-## Geschaeftliche Anforderungen
-
-- **Zielgruppe:** Songwriter und Musikproduzenten (Einzelpersonen, kleine Labels)
-- **Startphase:** 10 registrierte User pro Mandant (Domain)
-- **Sprachen:** Deutsch, Englisch, Franzoesisch, Italienisch, Spanisch
-- **Datenhoheit:** Alle Daten und KI-Verarbeitung sollen in der Schweiz bleiben ("Swissness") -- keine Cloud-APIs wie OpenAI oder Claude
-- **Verfuegbarkeit:** Buerozeiten (ca. 8-18 Uhr), kein 24/7-SLA noetig
-- **Antwortzeit:** Maximal 10-15 Sekunden pro KI-Anfrage im Normalbetrieb
-
----
-
-## Was macht die KI in der App?
-
-Die KI unterstuetzt Songwriter bei ihrer taeglichen Arbeit:
-
-| Funktion | Beispiel |
-|----------|---------|
-| **Songtexte schreiben** | Aus einer Idee einen kompletten Songtext generieren |
-| **Texte verbessern** | Einzelne Strophen umschreiben, verdichten, verfeinern |
-| **Uebersetzen** | Lyrics zwischen DE/EN/FR/IT/ES uebersetzen -- poetisch, nicht woertlich |
-| **Beschreibungen** | Marketing-Texte fuer Streaming-Plattformen generieren |
-| **Kreativ-Workshop** | Brainstorming, Mindmaps, Reimvorschlaege, Wortbibliotheken |
-| **Titel finden** | Passenden Songtitel aus dem Text ableiten |
-| **Prompts verbessern** | Eingaben fuer Bild- und Musik-KI optimieren |
-
-Alle Funktionen erzeugen **kurze Textantworten** (eine Strophe, ein Titel, ein Absatz) -- keine langen Dokumente oder Analysen. Das haelt die Tokens pro Anfrage niedrig (~60-80 Tokens Output) und die Antwortzeiten kurz.
-
----
 
 ## Welches KI-Modell?
 
 | Rolle | Modell | Wofuer |
 |-------|--------|--------|
-| **Hauptmodell** | Qwen3-32B | Lyrics, Uebersetzung, Workshop, Beschreibungen -- alle anspruchsvollen Aufgaben |
+| **Hauptmodell** | Qwen3-32B | Text, Uebersetzung, Workflow, Beschreibungen -- alle anspruchsvollen Aufgaben |
 | **Schnellmodell** | Qwen3-8B | Titel generieren, schnelle Prompt-Verbesserungen |
+
 
 Beide Modelle sind **Open Source** und **lizenzfrei** nutzbar (Apache 2.0). Keine laufenden Lizenzkosten. Alle 5 Zielsprachen nativ unterstuetzt.
 
@@ -49,9 +18,9 @@ Beide Modelle muessen **gleichzeitig geladen** sein (~26-30 GB VRAM zusammen), d
 
 ## Annahmen zur Nutzung
 
-Die KI wird **nicht permanent** beansprucht. Der typische Arbeitsablauf eines Songwriters:
+Die KI wird **nicht permanent** beansprucht.
 
-1. User arbeitet **1-5 Minuten** am Text (schreiben, lesen, nachdenken)
+1. User arbeitet **1-5 Minuten**
 2. Klickt auf "Generieren", "Verbessern" oder "Uebersetzen"
 3. Wartet **wenige Sekunden** auf das KI-Ergebnis (~60-80 Tokens)
 4. Arbeitet wieder **1-5 Minuten** manuell weiter
@@ -59,8 +28,7 @@ Die KI wird **nicht permanent** beansprucht. Der typische Arbeitsablauf eines So
 Bei 10 registrierten Usern sind erfahrungsgemaess:
 
 - **2-4 gleichzeitig eingeloggt** (nicht alle arbeiten zur selben Zeit)
-- **1-2 davon gerade am Generieren** (die anderen tippen, lesen, denken)
-- **Gleichzeitige KI-Anfragen sind selten** -- die GPU ist den Grossteil der Zeit idle
+- **1-2 davon nutzen aktiv die KI** (die anderen tippen, lesen, denken)
 
 Ein einzelner GPU-Server reicht fuer 10 User, weil die KI-Last **sporadisch** anfaellt und sich zeitlich verteilt.
 

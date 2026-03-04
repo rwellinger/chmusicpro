@@ -5,7 +5,7 @@
     </button>
 
     <div class="steps-track">
-      @for (step of steps; track step.step) {
+      @for (step of steps$ | async; track step.step) {
         <div class="step-item"
              [class.active]="currentStep.step === step.step"
              [class.enabled]="step.enabled"

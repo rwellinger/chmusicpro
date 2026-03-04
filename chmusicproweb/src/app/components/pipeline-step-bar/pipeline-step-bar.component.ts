@@ -17,7 +17,7 @@ export class PipelineStepBarComponent {
     private router = inject(Router);
     private pipelineService = inject(PipelineService);
 
-    readonly steps = this.pipelineService.steps;
+    readonly steps$ = this.pipelineService.filteredSteps$;
     readonly currentStep$ = this.pipelineService.currentStep$;
 
     goHome(): void {

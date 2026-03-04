@@ -357,6 +357,7 @@
                   </div>
                 </div>
                 <!-- File Workflow Diagram -->
+                @if (showFiles) {
                 <div class="workflow-diagram">
                   <h3 class="section-title">
                     <i class="fas fa-project-diagram"></i>
@@ -410,9 +411,11 @@
                     </div>
                   </div>
                 </div>
+                }
               </div>
             </mat-tab>
             <!-- Files & Folders Tab -->
+            @if (showFiles) {
             <mat-tab [label]="'songProjects.detail.tabs.filesAndFolders' | translate">
               <div class="tab-content">
                 <!-- Folders Accordion -->
@@ -654,6 +657,7 @@
                 }
               </div>
             </mat-tab>
+            }
           </mat-tab-group>
           <!-- Detail Actions -->
           <div class="detail-actions">

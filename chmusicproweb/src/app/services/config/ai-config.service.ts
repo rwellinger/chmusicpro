@@ -2,7 +2,7 @@ import {inject, Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {map, Observable, of, shareReplay, tap} from "rxjs";
 
-import {AIConfig, AIProvider} from "../../models/ai-config.model";
+import {AIConfig, AIProvider, ApplicationMode} from "../../models/ai-config.model";
 import {ApiConfigService} from "./api-config.service";
 
 @Injectable({
@@ -40,6 +40,10 @@ export class AIConfigService {
 
     getAvailableProviders(): Observable<AIProvider[]> {
         return this.getConfig().pipe(map(c => c.available_providers));
+    }
+
+    getApplicationMode(): Observable<ApplicationMode> {
+        return this.getConfig().pipe(map(c => c.application_mode));
     }
 
     clearCache(): void {

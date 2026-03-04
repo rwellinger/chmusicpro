@@ -17,6 +17,7 @@ import {MatProgressBarModule} from "@angular/material/progress-bar";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {HttpEventType} from "@angular/common/http";
 
+import {AIConfigService} from "../../services/config/ai-config.service";
 import {SongProjectService} from "../../services/business/song-project.service";
 import {NotificationService} from "../../services/ui/notification.service";
 import {UserSettingsService} from "../../services/user-settings.service";
@@ -97,6 +98,9 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     // Expanded folder state (survives refresh)
     expandedFolderIds = new Set<string>();
 
+    // Application mode
+    showFiles = true;
+
     // Math for template
     Math = Math;
 
@@ -114,6 +118,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     private fileIgnoreService = inject(FileIgnoreService);
     private fileHashService = inject(FileHashService);
     private chunkedUploadService = inject(ChunkedUploadService);
+    private aiConfigService = inject(AIConfigService);
 
     // Navigation state (must be captured in constructor)
     private navigationState: any = null;
@@ -129,6 +134,13 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        // Load application mode for LIGHT mode (hide files)
+        this.aiConfigService.getConfig()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(config => {
+                this.showFiles = config.application_mode !== "LIGHT";
+            });
+
         // Setup search debounce
         this.searchSubject
             .pipe(

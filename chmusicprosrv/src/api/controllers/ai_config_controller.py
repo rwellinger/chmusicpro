@@ -15,6 +15,7 @@ class AIConfigController:
             "available_providers": AIConfig.get_available_providers(),
             "ollama_enabled": AIConfig.is_ollama_enabled(),
             "external_enabled": AIConfig.is_external_enabled(),
+            "application_mode": AIConfig.get_application_mode(),
         }
 
         if AIConfig.is_external_enabled():

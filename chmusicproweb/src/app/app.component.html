@@ -43,10 +43,10 @@
   <div class="app-layout">
     <!-- Side Menu (20%) - Only show when authenticated -->
     @if ((authState$ | async)?.isAuthenticated) {
-      <app-side-menu></app-side-menu>
+      <app-side-menu (collapsedChange)="menuCollapsed = $event"></app-side-menu>
     }
-    <!-- Main Content Area (80%) -->
-    <main class="main-content" [class.full-width]="!(authState$ | async)?.isAuthenticated">
+    <!-- Main Content Area -->
+    <main class="main-content" [class.full-width]="!(authState$ | async)?.isAuthenticated" [class.collapsed-menu]="menuCollapsed">
       @if ((authState$ | async)?.isAuthenticated) {
         <app-pipeline-step-bar />
       }
