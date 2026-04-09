@@ -468,8 +468,8 @@
     "sizeLabel": "Picture Size:",
     "size": {
       "square": "Square (1024x1024)",
-      "landscape": "Landscape (1792x1024)",
-      "portrait": "Portrait (1024x1792)"
+      "landscape": "Landscape (1536x1024)",
+      "portrait": "Portrait (1024x1536)"
     },
     "styles": {
       "sectionTitle": "Style Selection",

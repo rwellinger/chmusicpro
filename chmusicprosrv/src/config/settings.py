@@ -26,7 +26,8 @@ load_dotenv(dotenv_file)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_ADMIN_API_KEY = os.getenv("OPENAI_ADMIN_API_KEY")
 OPENAI_ADMIN_BASE_URL = os.getenv("OPENAI_ADMIN_BASE_URL", "https://api.openai.com/v1")
-OPENAI_IMAGE_MODEL = os.getenv("OPENAI_IMAGE_MODEL", "dall-e-3")
+OPENAI_IMAGE_MODEL = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1")
+OPENAI_IMAGE_QUALITY = os.getenv("OPENAI_IMAGE_QUALITY", "high")
 OPENAI_CHAT_MODELS = os.getenv(
     "OPENAI_CHAT_MODELS", "gpt-5,gpt-5-mini,gpt-5-nano,gpt-4o,gpt-4o-mini,gpt-4.1,gpt-4.1-mini"
 )

@@ -468,8 +468,8 @@
     "sizeLabel": "Bildgröße:",
     "size": {
       "square": "Quadratisch (1024x1024)",
-      "landscape": "Querformat (1792x1024)",
-      "portrait": "Hochformat (1024x1792)"
+      "landscape": "Querformat (1536x1024)",
+      "portrait": "Hochformat (1024x1536)"
     },
     "styles": {
       "sectionTitle": "Stil-Auswahl",

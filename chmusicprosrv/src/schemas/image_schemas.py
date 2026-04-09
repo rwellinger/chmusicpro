@@ -27,8 +27,8 @@ class ImageGenerateRequest(BaseModel):
     @field_validator("size")
     @classmethod
     def validate_size(cls, v):
-        if v and v not in ["512x512", "1024x1024", "1024x1792", "1792x1024"]:
-            raise ValueError("size must be one of: 512x512, 1024x1024, 1024x1792, 1792x1024")
+        if v and v not in ["1024x1024", "1024x1536", "1536x1024"]:
+            raise ValueError("size must be one of: 1024x1024, 1024x1536, 1536x1024")
         return v
 
     model_config = ConfigDict(

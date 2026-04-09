@@ -141,7 +141,7 @@ class TestTransformImageToApiFormat:
             "size": "1024x1024",
             "filename": "test.png",
             "local_url": "/images/test.png",
-            "model_used": "dall-e-3",
+            "model_used": "gpt-image-1",
             "title": "Test Image",
             "tags": "test,image",
             "text_overlay_metadata": None,
@@ -176,7 +176,7 @@ class TestTransformImageToApiFormat:
         assert result["filename"] == "test.png"
         assert result["url"] == "/images/test.png"
         assert result["display_url"] == "/images/test.png"  # No overlay
-        assert result["model_used"] == "dall-e-3"
+        assert result["model_used"] == "gpt-image-1"
         assert result["title"] == "Test Image"
         assert result["tags"] == "test,image"
 

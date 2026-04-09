@@ -100,10 +100,10 @@ class ImageOrchestrator:
             from .external_api_service import OpenAIService
 
             openai_service = OpenAIService()
-            image_url = openai_service.generate_image(final_prompt, size)
+            image_data = openai_service.generate_image(final_prompt, size)
 
-            # Download and save image to S3
-            filename, s3_key = self._process_and_save_image(image_url, prompt)
+            # Save image to S3
+            filename, s3_key = self._process_and_save_image(image_data, prompt)
 
             # Save metadata to database and get the generated image record
             generated_image = self._save_image_metadata(
@@ -714,24 +714,17 @@ class ImageOrchestrator:
             )
             raise ImageGenerationError(f"Failed to add text overlay: {e}") from e
 
-    def _process_and_save_image(self, image_url: str, prompt: str) -> tuple[str, str]:
-        """Download and save image to S3
+    def _process_and_save_image(self, image_data: bytes, prompt: str) -> tuple[str, str]:
+        """Save image bytes to S3
 
         Returns:
             tuple: (filename, s3_key)
         """
         import uuid
 
-        import requests
-
         # Generate unique ID and filename
         image_id = str(uuid.uuid4())
         filename = ImageTransformer.generate_filename(prompt)
-
-        # Download image from OpenAI
-        response = requests.get(image_url, timeout=30)
-        response.raise_for_status()
-        image_data = response.content
 
         # Generate S3 key: shared/{image_id}.png
         # Note: Using "shared" prefix (no multi-tenant for images yet)

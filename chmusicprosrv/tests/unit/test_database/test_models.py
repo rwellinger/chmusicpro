@@ -19,19 +19,19 @@ class TestGeneratedImageModel:
             filename="test-image.png",
             file_path="/path/to/image.png",
             local_url="http://localhost/images/test.png",
-            model_used="dall-e-3",
+            model_used="gpt-image-1",
         )
 
         assert image.prompt == "A beautiful landscape"
         assert image.size == "1024x1024"
         assert image.filename == "test-image.png"
-        assert image.model_used == "dall-e-3"
+        assert image.model_used == "gpt-image-1"
 
     def test_image_repr(self):
         """Test GeneratedImage __repr__ method"""
         image = GeneratedImage(
             prompt="A" * 100,  # Long prompt
-            size="512x512",
+            size="1024x1024",
             filename="test.png",
             file_path="/test.png",
             local_url="http://localhost/test.png",

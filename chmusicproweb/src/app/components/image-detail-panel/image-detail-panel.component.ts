@@ -286,9 +286,9 @@ export class ImageDetailPanelComponent implements OnInit, OnChanges {
 
         if (size === "1024x1024") {
             return "square";
-        } else if (size === "1792x1024") {
+        } else if (size === "1536x1024") {
             return "landscape";
-        } else if (size === "1024x1792") {
+        } else if (size === "1024x1536") {
             return "portrait";
         }
 

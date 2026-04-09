@@ -314,9 +314,9 @@ export class ImageViewComponent implements OnInit, AfterViewInit, OnDestroy {
         switch (size) {
             case "1024x1024":
                 return "square";
-            case "1792x1024":
+            case "1536x1024":
                 return "landscape";
-            case "1024x1792":
+            case "1024x1536":
                 return "portrait";
             default:
                 // Fallback for unknown sizes

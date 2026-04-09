@@ -337,7 +337,7 @@ export class ImageGeneratorComponent implements OnInit {
                         enhanced_prompt: data.enhanced_prompt || null,
                         title: titleValue || null,
                         size: formValue.size,
-                        model_used: "DALL-E 3",
+                        model_used: "gpt-image-1",
                         created_at: new Date().toISOString(),
                         artistic_style: data.artistic_style || null,
                         composition: data.composition || null,
