@@ -26,6 +26,7 @@ from business.song_project_transformer import (
     calculate_file_hash,
     calculate_pagination_meta,
     detect_file_type,
+    detect_mirror_moves,
     generate_s3_prefix,
     get_default_folder_structure,
     get_display_cover_info,
@@ -793,6 +794,8 @@ class SongProjectOrchestrator:
             {
                 'to_upload': [relative_path, ...],  # New files
                 'to_update': [relative_path, ...],  # Changed files (hash mismatch)
+                'to_move': [{file_id, old_path, new_path, ...}, ...],  # Detected moves
+                'move_groups': [{'old_dir', 'new_dir', 'file_count'}, ...],  # Directory renames
                 'to_delete': [{'file_id': uuid, 'relative_path': str}, ...],  # Remote only
                 'unchanged': [relative_path, ...]  # Hash match
             }
@@ -870,59 +873,17 @@ class SongProjectOrchestrator:
                         }
                     )
 
-            # MOVE DETECTION: Detect files with same hash but different path
-            # Build hash-to-files maps for move detection
-            local_hash_map: dict[str, list[str]] = {}
-            remote_hash_map: dict[str, list[dict]] = {}
-
-            for rel_path, local_file in local_map.items():
-                hash_val = local_file["file_hash"]
-                local_hash_map.setdefault(hash_val, []).append(rel_path)
-
-            for rel_path, remote_file in remote_map.items():
-                hash_val = remote_file.file_hash
-                remote_hash_map.setdefault(hash_val, []).append({"path": rel_path, "file": remote_file})
-
-            # Detect moves (same hash, different path)
-            to_move = []
-            moved_upload_paths = set()  # Track paths to remove from to_upload
-            moved_delete_items = []  # Track items to remove from to_delete
-
-            for hash_val in local_hash_map.keys() & remote_hash_map.keys():
-                local_paths = set(local_hash_map[hash_val])
-                remote_items = remote_hash_map[hash_val]
-                remote_paths = {item["path"] for item in remote_items}
-
-                # Files that disappeared from old location
-                disappeared = remote_paths - local_paths
-                # Files that appeared at new location
-                appeared = local_paths - remote_paths
-
-                # Only handle clear 1:1 moves to avoid ambiguity
-                if len(disappeared) == 1 and len(appeared) == 1:
-                    old_path = list(disappeared)[0]
-                    new_path = list(appeared)[0]
-                    remote_file = next(item["file"] for item in remote_items if item["path"] == old_path)
-
-                    # Construct new S3 key (must include folder_name prefix)
-                    # Strip leading slash from new_path to avoid double slashes
-                    new_s3_key = f"{project.s3_prefix.rstrip('/')}/{folder_name}/{new_path.lstrip('/')}"
-
-                    to_move.append(
-                        {
-                            "file_id": str(remote_file.id),
-                            "old_path": old_path,
-                            "new_path": new_path,
-                            "file_hash": hash_val,
-                            "file_size_bytes": remote_file.file_size_bytes,
-                            "s3_key_old": remote_file.s3_key,
-                            "s3_key_new": new_s3_key,
-                        }
-                    )
-
-                    # Mark for removal from to_upload/to_delete
-                    moved_upload_paths.add(new_path)
-                    moved_delete_items.append(str(remote_file.id))
+            # Detect moves (delegated to pure transformer function for testability)
+            local_only_paths = set(to_upload)
+            remote_only_paths = {d["relative_path"] for d in to_delete}
+            to_move, move_groups, moved_upload_paths, moved_delete_items = detect_mirror_moves(
+                local_only_paths=local_only_paths,
+                remote_only_paths=remote_only_paths,
+                local_map=local_map,
+                remote_map=remote_map,
+                s3_prefix=project.s3_prefix,
+                folder_name=folder_name,
+            )
 
             # Remove moved files from to_upload and to_delete
             to_upload = [p for p in to_upload if p not in moved_upload_paths]
@@ -935,6 +896,7 @@ class SongProjectOrchestrator:
                 to_upload=len(to_upload),
                 to_update=len(to_update),
                 to_move=len(to_move),
+                move_groups=len(move_groups),
                 to_delete=len(to_delete),
                 unchanged=len(unchanged),
             )
@@ -943,6 +905,7 @@ class SongProjectOrchestrator:
                 "to_upload": to_upload,
                 "to_update": to_update,
                 "to_move": to_move,
+                "move_groups": move_groups,
                 "to_delete": to_delete,
                 "unchanged": unchanged,
             }

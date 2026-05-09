@@ -54,7 +54,6 @@ CLAUDE_MAX_TOKENS = int(os.getenv("CLAUDE_MAX_TOKENS", "4096"))
 # --------------------------------------------------
 # AI Agent Config (Multi-Provider Support)
 # --------------------------------------------------
-USE_AI_AGENT_GENERAL = os.getenv("USE_AI_AGENT_GENERAL", "internal")  # internal | external | hybrid
 AGENT_EXTERNAL_PROVIDER = os.getenv("AGENT_EXTERNAL_PROVIDER", "openai")  # openai | claude
 AGENT_EXTERNAL_MODEL_OPENAI = os.getenv("AGENT_EXTERNAL_MODEL_OPENAI", "gpt-4.1-mini")
 AGENT_EXTERNAL_MODEL_CLAUDE = os.getenv("AGENT_EXTERNAL_MODEL_CLAUDE", "claude-haiku-4-5-20250929")
@@ -111,16 +110,6 @@ S3_EQUIPMENT_DATA_BUCKET = os.getenv("S3_EQUIPMENT_DATA_BUCKET", "equipment-data
 S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY", "minioadmin")
 S3_SECRET_KEY = os.getenv("S3_SECRET_KEY", "minioadmin")
 S3_REGION = os.getenv("S3_REGION", "us-east-1")
-
-# --------------------------------------------------
-# Ollama Config
-# --------------------------------------------------
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_TIMEOUT = int(os.getenv("OLLAMA_TIMEOUT", "60"))
-OLLAMA_CHAT_MODELS = os.getenv("OLLAMA_CHAT_MODELS", "")
-OLLAMA_DEFAULT_MODEL = os.getenv("OLLAMA_DEFAULT_MODEL", "llama3.2:3b")
-OLLAMA_ALLOWED_MODELS = os.getenv("OLLAMA_ALLOWED_MODELS", "llama3.2:3b,gpt-oss:20b,deepseek-r1:8b,gemma3:4b")
-OLLAMA_SUMMARY_MODEL = os.getenv("OLLAMA_SUMMARY_MODEL", "")  # Empty = use conversation model
 
 # --------------------------------------------------
 # JWT Authentication Config

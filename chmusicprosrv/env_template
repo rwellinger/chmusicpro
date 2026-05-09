@@ -31,7 +31,7 @@ ENCRYPTION_SECRET_KEY=
 # debug mode, "/images" in production)
 # ==================================================
 IMAGES_DIR=./images
-# Base URL for image downloads (DEV: http://localhost:5050/api/v1/image, PROD: https://macstudio/aiproxysrv/api/v1/image)
+# Base URL for image downloads (DEV: http://localhost:5050/api/v1/image, PROD: https://<your-host>/api/v1/image)
 IMAGE_BASE_URL=http://localhost:5050/api/v1/image
 
 # Control if physical files should be deleted when images are deleted (defaults to true)
@@ -42,29 +42,6 @@ DELETE_PHYSICAL_FILES=true
 # Chat Debug Logging - Shows detailed prompt construction (true/false)
 CHAT_DEBUG_LOGGING=false
 LOG_LEVEL=INFO
-
-# ==================================================
-# OLLAMA API CONFIGURATION
-# ==================================================
-OLLAMA_URL=http://localhost:11434
-OLLAMA_TIMEOUT=360
-
-# Ollama Chat Models (comma-separated list, empty = all models from server)
-# Example: llama3.2:3b,llama3.1:8b,mistral:7b,gemma2:9b
-# Leave empty to automatically show all models installed on Ollama server
-OLLAMA_CHAT_MODELS=
-
-# Default Ollama Chat Model (must be in OLLAMA_CHAT_MODELS if set)
-OLLAMA_DEFAULT_MODEL=llama3.2:3b
-
-# Allowed models for Prompt Templates (comma-separated list)
-# These models can be assigned to prompt templates for text generation
-OLLAMA_ALLOWED_MODELS=llama3.2:3b,gpt-oss:20b,deepseek-r1:8b,gemma3:4b,MichelRosselli/apertus:latest
-
-# Dedicated model for conversation summarization/compression (optional)
-# If set, this model will be used for all Ollama conversation summaries
-# If empty, the conversation's own model will be used (default behavior)
-OLLAMA_SUMMARY_MODEL=MichelRosselli/apertus:latest
 
 # ==================================================
 # FLASK SERVER CONFIGURATION
@@ -101,7 +78,7 @@ OPENAI_COST_CACHE_TTL=3600
 
 # Deprecated (backwards compatibility) - will be removed in future
 # OPENAI_URL=https://api.openai.com/v1/images
-# OPENAI_MODEL=dall-e-3
+# OPENAI_MODEL=gpt-image-1
 
 # ==================================================
 # CLAUDE CONFIGURATION (Anthropic Claude API)
@@ -125,15 +102,13 @@ CLAUDE_TIMEOUT=120
 CLAUDE_MAX_TOKENS=4096
 
 # ==================================================
-# AI AGENT CONFIGURATION (Multi-Provider Support)
+# AI AGENT CONFIGURATION (External providers only)
 # ==================================================
-# Mode: internal (Ollama only), external (OpenAI/Claude only), hybrid (both)
-USE_AI_AGENT_GENERAL=internal
-
-# External provider: openai | claude (used when mode is external or hybrid)
+# External provider: openai | claude
 AGENT_EXTERNAL_PROVIDER=openai
 
-# Default external models per provider (used for template override in external-only mode)
+# Default external models per provider (used as fallback when a template
+# does not specify a model or specifies a legacy/unsupported provider)
 AGENT_EXTERNAL_MODEL_OPENAI=gpt-4.1-mini
 AGENT_EXTERNAL_MODEL_CLAUDE=claude-haiku-4-5-20250929
 
@@ -166,26 +141,30 @@ POSTGRES_PASSWORD=
 #DATABASE_POOL_RECYCLE=3600
 
 # ==================================================
-# S3 Storage (MinIO / AWS / Backblaze / Wasabi)
+# S3 Storage
 # ==================================================
+# Production: Hetzner Object Storage (region hel1, endpoint
+# https://hel1.your-objectstorage.com), buckets prefixed with 'chmusicpro-'.
+# Local dev: MinIO via develop-env/docker-compose.yml on http://localhost:9000.
+#
 # Storage backend: 's3' or 'filesystem'
 STORAGE_BACKEND=s3
 
-# S3 Provider: 'minio', 'aws', 'backblaze', 'wasabi'
+# S3 Provider: 'minio' (local dev), 'hetzner', 'aws', 'backblaze', 'wasabi'
 S3_PROVIDER=minio
 S3_ENDPOINT=http://localhost:9000
 S3_ACCESS_KEY=minioadmin
 S3_SECRET_KEY=minioadmin
 S3_REGION=us-east-1
 
-# S3 Buckets
-S3_BUCKET=aiproxy-media
-S3_SONG_PROJECTS_BUCKET=song-projects
-S3_SONG_RELEASES_BUCKET=song-releases
-S3_SONGS_BUCKET=songs
-S3_IMAGES_BUCKET=ai-generated-images
-S3_EQUIPMENT_DATA_BUCKET=equipment-data
+# S3 Buckets (production uses 'chmusicpro-' prefix on Hetzner)
+S3_BUCKET=chmusicpro-media
+S3_SONG_PROJECTS_BUCKET=chmusicpro-song-projects
+S3_SONG_RELEASES_BUCKET=chmusicpro-song-releases
+S3_SONGS_BUCKET=chmusicpro-songs
+S3_IMAGES_BUCKET=chmusicpro-images
+S3_EQUIPMENT_DATA_BUCKET=chmusicpro-equipment-data
 
-# MinIO Root Credentials (for Docker/MinIO setup)
+# MinIO Root Credentials (for local Docker/MinIO setup only)
 MINIO_ROOT_USER:
 MINIO_ROOT_PASSWORD:

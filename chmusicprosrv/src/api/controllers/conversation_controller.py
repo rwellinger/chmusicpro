@@ -8,16 +8,12 @@ from typing import Any
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from adapters.ollama.api_client import OllamaAPIClient, OllamaAPIError
 from api.api_key_middleware import require_api_key
 from api.controllers.claude_chat_controller import ClaudeAPIError as ClaudeError
 from api.controllers.claude_chat_controller import ClaudeChatController
 from api.controllers.openai_chat_controller import OpenAIAPIError as OpenAIError
 from api.controllers.openai_chat_controller import OpenAIChatController
-from config.model_context_windows import (
-    get_context_window_size,
-    get_external_provider_context_window,
-)
+from config.model_context_windows import get_external_provider_context_window
 from config.settings import CLAUDE_MAX_TOKENS, OPENAI_MAX_TOKENS
 from db.models import Conversation, Message, MessageArchive
 from schemas.conversation_schemas import (
@@ -278,22 +274,12 @@ class ConversationController:
             Tuple of (response_data, status_code)
         """
         try:
-            # Validate external_provider field
-            provider = data.provider or "internal"
+            # Only external provider is supported (Ollama removed). Coerce legacy 'internal' to 'external'.
+            provider = "external"
+            external_provider = data.external_provider or "openai"
 
-            if provider == "external" and not data.external_provider:
-                return {"error": "external_provider is required when provider='external'"}, 400
-
-            if provider == "internal" and data.external_provider:
-                return {"error": "external_provider should not be set when provider='internal'"}, 400
-
-            # Get context window size for the model (provider-aware)
-            if provider == "external" and data.external_provider:
-                # External providers (Claude, OpenAI, etc.)
-                context_window_size = get_external_provider_context_window(data.external_provider, data.model)
-            else:
-                # Internal (Ollama) models
-                context_window_size = get_context_window_size(data.model)
+            # Get context window size for the model
+            context_window_size = get_external_provider_context_window(external_provider, data.model)
 
             # Create conversation
             conversation = Conversation(
@@ -303,7 +289,7 @@ class ConversationController:
                 title=data.title,
                 model=data.model,
                 provider=provider,
-                external_provider=data.external_provider,
+                external_provider=external_provider,
                 system_context=data.system_context,
                 context_window_size=context_window_size,
                 current_token_count=0,
@@ -512,59 +498,56 @@ class ConversationController:
             for msg in messages:
                 chat_messages.append({"role": msg.role, "content": msg.content})
 
-            # Route to appropriate provider
+            # Route to appropriate external provider (Ollama / 'internal' is no longer supported)
             try:
-                if conversation.provider == "external":
-                    # Route to external provider based on external_provider field
-                    if not conversation.external_provider:
+                if conversation.provider != "external":
+                    db.rollback()
+                    return {
+                        "error": "Legacy 'internal' conversations are no longer supported. Please create a new conversation."
+                    }, 400
+
+                if not conversation.external_provider:
+                    db.rollback()
+                    logger.error(
+                        "External conversation without external_provider field",
+                        conversation_id=str(conversation_id),
+                    )
+                    return {"error": "Invalid conversation: external provider requires external_provider field"}, 500
+
+                if conversation.external_provider == "claude":
+                    # Check API key before calling external API
+                    error = require_api_key("claude")
+                    if error:
                         db.rollback()
-                        logger.error(
-                            "External conversation without external_provider field",
-                            conversation_id=str(conversation_id),
-                        )
-                        return {
-                            "error": "Invalid conversation: external provider requires external_provider field"
-                        }, 500
+                        return error[0], error[1]
 
-                    if conversation.external_provider == "claude":
-                        # Check API key before calling external API
-                        error = require_api_key("claude")
-                        if error:
-                            db.rollback()
-                            return error[0], error[1]
+                    # Enhance system context with model information for Claude
+                    enhanced_messages = self._enhance_claude_system_context(chat_messages, conversation.model)
 
-                        # Enhance system context with model information for Claude
-                        enhanced_messages = self._enhance_claude_system_context(chat_messages, conversation.model)
-
-                        # Call Claude Chat API
-                        assistant_content, prompt_eval_count, eval_count = self._call_claude_chat_api(
-                            conversation.model, enhanced_messages
-                        )
-                    elif conversation.external_provider == "openai":
-                        # Check API key before calling external API
-                        error = require_api_key("openai")
-                        if error:
-                            db.rollback()
-                            return error[0], error[1]
-
-                        # Call OpenAI Chat API
-                        assistant_content, prompt_eval_count, eval_count = self._call_openai_chat_api(
-                            conversation.model, chat_messages
-                        )
-                    else:
+                    # Call Claude Chat API
+                    assistant_content, prompt_eval_count, eval_count = self._call_claude_chat_api(
+                        conversation.model, enhanced_messages
+                    )
+                elif conversation.external_provider == "openai":
+                    # Check API key before calling external API
+                    error = require_api_key("openai")
+                    if error:
                         db.rollback()
-                        logger.error(
-                            "Unknown external_provider",
-                            external_provider=conversation.external_provider,
-                            conversation_id=str(conversation_id),
-                        )
-                        return {"error": f"Unknown external_provider: {conversation.external_provider}"}, 500
-                else:
-                    # Call Ollama chat API (default/internal)
-                    assistant_content, prompt_eval_count, eval_count = self._call_ollama_chat_api(
+                        return error[0], error[1]
+
+                    # Call OpenAI Chat API
+                    assistant_content, prompt_eval_count, eval_count = self._call_openai_chat_api(
                         conversation.model, chat_messages
                     )
-            except (OllamaAPIError, OpenAIError, ClaudeError) as e:
+                else:
+                    db.rollback()
+                    logger.error(
+                        "Unknown external_provider",
+                        external_provider=conversation.external_provider,
+                        conversation_id=str(conversation_id),
+                    )
+                    return {"error": f"Unknown external_provider: {conversation.external_provider}"}, 500
+            except (OpenAIError, ClaudeError) as e:
                 db.rollback()
                 logger.error(
                     "Chat API Error", error=str(e), provider=conversation.provider, stacktrace=traceback.format_exc()
@@ -618,35 +601,6 @@ class ConversationController:
                 stacktrace=traceback.format_exc(),
             )
             return {"error": f"Failed to send message: {e}"}, 500
-
-    def _call_ollama_chat_api(self, model: str, messages: list[dict[str, str]]) -> tuple[str, int, int]:
-        """
-        Call Ollama chat API via OllamaAPIClient.
-
-        Args:
-            model: Model name
-            messages: List of messages with role and content
-
-        Returns:
-            Tuple of (assistant_content, prompt_eval_count, eval_count)
-
-        Raises:
-            OllamaAPIError: If API call fails
-        """
-        api_client = OllamaAPIClient()
-        resp_json = api_client.chat(model, messages)
-
-        # Extract assistant message
-        if "message" in resp_json and "content" in resp_json["message"]:
-            content = resp_json["message"]["content"]
-            prompt_eval_count = resp_json.get("prompt_eval_count", 0)
-            eval_count = resp_json.get("eval_count", 0)
-
-            logger.debug("Token counts extracted", prompt_tokens=prompt_eval_count, response_tokens=eval_count)
-
-            return content, prompt_eval_count, eval_count
-        else:
-            raise OllamaAPIError("Invalid API response format")
 
     def _call_openai_chat_api(self, model: str, messages: list[dict[str, str]]) -> tuple[str, int, int]:
         """

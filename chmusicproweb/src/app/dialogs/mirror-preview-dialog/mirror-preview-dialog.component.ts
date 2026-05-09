@@ -4,13 +4,14 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from "@angular/material/
 import {MatButtonModule} from "@angular/material/button";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {TranslateModule} from "@ngx-translate/core";
-import {MirrorFileAction, MirrorMoveAction} from "../../models/song-project.model";
+import {MirrorFileAction, MirrorMoveAction, MirrorMoveGroup} from "../../models/song-project.model";
 
 export interface MirrorPreviewDialogData {
     folderName: string;
     toUpload: string[];
     toUpdate: string[];
     toMove: MirrorMoveAction[];
+    moveGroups: MirrorMoveGroup[];
     toDelete: MirrorFileAction[];
     unchanged: string[];
     totalUploadSize: number;

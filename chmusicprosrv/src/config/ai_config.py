@@ -9,23 +9,14 @@ from config.settings import (
     AGENT_EXTERNAL_MODEL_OPENAI,
     AGENT_EXTERNAL_PROVIDER,
     APPLICATION_MODE,
-    USE_AI_AGENT_GENERAL,
 )
 
 
-# AI Mode constants
-AI_MODE_INTERNAL = "internal"
-AI_MODE_EXTERNAL = "external"
-AI_MODE_HYBRID = "hybrid"
-
-VALID_MODES = {AI_MODE_INTERNAL, AI_MODE_EXTERNAL, AI_MODE_HYBRID}
-
 # AI Provider constants
-PROVIDER_OLLAMA = "ollama"
 PROVIDER_OPENAI = "openai"
 PROVIDER_CLAUDE = "claude"
 
-VALID_PROVIDERS = {PROVIDER_OLLAMA, PROVIDER_OPENAI, PROVIDER_CLAUDE}
+VALID_PROVIDERS = {PROVIDER_OPENAI, PROVIDER_CLAUDE}
 EXTERNAL_PROVIDERS = {PROVIDER_OPENAI, PROVIDER_CLAUDE}
 
 # Application Mode constants
@@ -38,26 +29,6 @@ VALID_APP_MODES = {APP_MODE_PROFI, APP_MODE_LIGHT, APP_MODE_PRJCT}
 
 class AIConfig:
     """Central AI configuration with static methods."""
-
-    @staticmethod
-    def get_mode() -> str:
-        """Get current AI mode (internal/external/hybrid)."""
-        mode = USE_AI_AGENT_GENERAL.lower().strip()
-        if mode not in VALID_MODES:
-            return AI_MODE_INTERNAL
-        return mode
-
-    @staticmethod
-    def is_ollama_enabled() -> bool:
-        """Check if Ollama (internal) provider is available."""
-        mode = AIConfig.get_mode()
-        return mode in (AI_MODE_INTERNAL, AI_MODE_HYBRID)
-
-    @staticmethod
-    def is_external_enabled() -> bool:
-        """Check if external providers (OpenAI/Claude) are available."""
-        mode = AIConfig.get_mode()
-        return mode in (AI_MODE_EXTERNAL, AI_MODE_HYBRID)
 
     @staticmethod
     def get_external_provider() -> str:
@@ -77,13 +48,8 @@ class AIConfig:
 
     @staticmethod
     def get_available_providers() -> list[str]:
-        """Get list of available provider names based on mode."""
-        providers = []
-        if AIConfig.is_ollama_enabled():
-            providers.append(PROVIDER_OLLAMA)
-        if AIConfig.is_external_enabled():
-            providers.append(AIConfig.get_external_provider())
-        return providers
+        """Get list of available provider names."""
+        return [AIConfig.get_external_provider()]
 
     @staticmethod
     def get_application_mode() -> str:
@@ -96,8 +62,4 @@ class AIConfig:
     @staticmethod
     def validate_provider(provider: str) -> bool:
         """Check if a provider is valid and currently available."""
-        if provider not in VALID_PROVIDERS:
-            return False
-        if provider == PROVIDER_OLLAMA:
-            return AIConfig.is_ollama_enabled()
-        return AIConfig.is_external_enabled()
+        return provider in VALID_PROVIDERS

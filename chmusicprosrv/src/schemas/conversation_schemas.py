@@ -33,14 +33,14 @@ class ConversationCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=255, description="Conversation title")
     model: str = Field(..., min_length=1, max_length=100, description="AI model name")
     provider: str | None = Field(
-        "internal",
+        "external",
         pattern="^(internal|external)$",
-        description="Provider type: internal (Ollama) or external (OpenAI, Claude)",
+        description="Provider type: 'external' (OpenAI/Claude). 'internal' is accepted for legacy clients but coerced to 'external'.",
     )
     external_provider: str | None = Field(
-        None,
+        "openai",
         pattern="^(openai|claude)$",
-        description="External provider name: 'openai' or 'claude' (only for provider='external')",
+        description="External provider name: 'openai' or 'claude' (defaults to 'openai')",
     )
     system_context: str | None = Field(None, description="System context/prompt")
 
@@ -52,7 +52,7 @@ class ConversationResponse(BaseModel):
     user_id: UUID
     title: str
     model: str
-    provider: str = "internal"
+    provider: str = "external"
     external_provider: str | None = None
     system_context: str | None
     archived: bool = False

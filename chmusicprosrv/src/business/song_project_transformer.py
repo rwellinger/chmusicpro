@@ -7,6 +7,7 @@ NO database operations, NO file system operations, NO external dependencies.
 import hashlib
 import re
 from datetime import date
+from pathlib import PurePosixPath
 from typing import Any
 
 
@@ -639,3 +640,133 @@ def get_display_cover_info(releases: list[Any]) -> dict[str, Any]:
         "release_id": str(newest_release.id),
         "release_name": newest_release.name,
     }
+
+
+def _parent_dir(path: str) -> str:
+    """Return parent directory of a POSIX-style path, '' for root-level files."""
+    parent = PurePosixPath(path).parent
+    return "" if str(parent) == "." else str(parent)
+
+
+def detect_mirror_moves(
+    local_only_paths: set[str],
+    remote_only_paths: set[str],
+    local_map: dict[str, dict[str, Any]],
+    remote_map: dict[str, Any],
+    s3_prefix: str,
+    folder_name: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], set[str], set[str]]:
+    """Detect file moves between local and remote.
+
+    Two-pass algorithm:
+      1. Match by ``(file_hash, basename)`` — handles directory renames robustly
+         even when several files share the same content hash (e.g. multiple
+         empty ``.gitkeep`` files). Within a bucket, files are paired in sorted
+         order so pairings are deterministic.
+      2. Fallback ``hash``-only 1:1 — catches pure renames where only the
+         filename changed (different basename).
+
+    Args:
+        local_only_paths: Paths present locally but missing remotely.
+        remote_only_paths: Paths present remotely but missing locally.
+        local_map: Map ``relative_path -> {"file_hash": str, "file_size_bytes": int, ...}``.
+        remote_map: Map ``relative_path -> SQLAlchemy ProjectFile`` (needs ``id``,
+            ``file_hash``, ``s3_key``, ``file_size_bytes``).
+        s3_prefix: Project ``s3_prefix`` (e.g. ``users/<uid>/projects/<name>``).
+        folder_name: Folder name to prepend when constructing the new S3 key.
+
+    Returns:
+        Tuple ``(moves, move_groups, moved_local_paths, moved_remote_file_ids)`` where:
+          - ``moves``: list of move action dicts with keys ``file_id``, ``old_path``,
+            ``new_path``, ``file_hash``, ``file_size_bytes``, ``s3_key_old``, ``s3_key_new``.
+          - ``move_groups``: list of ``{"old_dir", "new_dir", "file_count"}`` aggregating
+            moves where ``old_dir != new_dir`` (for FE display of directory renames).
+          - ``moved_local_paths``: paths to remove from ``to_upload``.
+          - ``moved_remote_file_ids``: file IDs (str) to remove from ``to_delete``.
+    """
+    moves: list[dict[str, Any]] = []
+    moved_local: set[str] = set()
+    moved_remote_ids: set[str] = set()
+
+    if not local_only_paths or not remote_only_paths:
+        return moves, [], moved_local, moved_remote_ids
+
+    s3_prefix_clean = s3_prefix.rstrip("/")
+
+    def make_move(new_path: str, old_path: str, remote_file: Any, file_hash: str) -> dict[str, Any]:
+        new_s3_key = f"{s3_prefix_clean}/{folder_name}/{new_path.lstrip('/')}"
+        return {
+            "file_id": str(remote_file.id),
+            "old_path": old_path,
+            "new_path": new_path,
+            "file_hash": file_hash,
+            "file_size_bytes": remote_file.file_size_bytes,
+            "s3_key_old": remote_file.s3_key,
+            "s3_key_new": new_s3_key,
+        }
+
+    # Pass 1: (hash, basename) matching — robust against hash collisions
+    local_by_key: dict[tuple[str, str], list[str]] = {}
+    for path in local_only_paths:
+        f = local_map[path]
+        key = (f["file_hash"], PurePosixPath(path).name)
+        local_by_key.setdefault(key, []).append(path)
+
+    remote_by_key: dict[tuple[str, str], list[tuple[str, Any]]] = {}
+    for path in remote_only_paths:
+        f = remote_map[path]
+        key = (f.file_hash, PurePosixPath(path).name)
+        remote_by_key.setdefault(key, []).append((path, f))
+
+    for key, local_paths in local_by_key.items():
+        remote_items = remote_by_key.get(key)
+        if not remote_items:
+            continue
+        local_sorted = sorted(local_paths)
+        remote_sorted = sorted(remote_items, key=lambda x: x[0])
+        pair_count = min(len(local_sorted), len(remote_sorted))
+        for i in range(pair_count):
+            new_path = local_sorted[i]
+            old_path, remote_file = remote_sorted[i]
+            moves.append(make_move(new_path, old_path, remote_file, key[0]))
+            moved_local.add(new_path)
+            moved_remote_ids.add(str(remote_file.id))
+
+    # Pass 2: hash-only 1:1 fallback — catches renames (different basename)
+    remaining_local = local_only_paths - moved_local
+    remaining_remote = {p for p in remote_only_paths if str(remote_map[p].id) not in moved_remote_ids}
+
+    if remaining_local and remaining_remote:
+        local_by_hash: dict[str, list[str]] = {}
+        for path in remaining_local:
+            local_by_hash.setdefault(local_map[path]["file_hash"], []).append(path)
+
+        remote_by_hash: dict[str, list[tuple[str, Any]]] = {}
+        for path in remaining_remote:
+            remote_by_hash.setdefault(remote_map[path].file_hash, []).append((path, remote_map[path]))
+
+        for h, locs in local_by_hash.items():
+            rems = remote_by_hash.get(h)
+            if not rems:
+                continue
+            # Only handle unambiguous 1:1 here to avoid arbitrary pairings on rename+collision
+            if len(locs) == 1 and len(rems) == 1:
+                new_path = locs[0]
+                old_path, remote_file = rems[0]
+                moves.append(make_move(new_path, old_path, remote_file, h))
+                moved_local.add(new_path)
+                moved_remote_ids.add(str(remote_file.id))
+
+    # Group moves by (old_dir, new_dir) shift for FE directory-rename display
+    group_counts: dict[tuple[str, str], int] = {}
+    for m in moves:
+        old_dir = _parent_dir(m["old_path"])
+        new_dir = _parent_dir(m["new_path"])
+        if old_dir != new_dir:
+            group_counts[(old_dir, new_dir)] = group_counts.get((old_dir, new_dir), 0) + 1
+
+    move_groups = [
+        {"old_dir": old, "new_dir": new, "file_count": cnt} for (old, new), cnt in sorted(group_counts.items())
+    ]
+
+    return moves, move_groups, moved_local, moved_remote_ids

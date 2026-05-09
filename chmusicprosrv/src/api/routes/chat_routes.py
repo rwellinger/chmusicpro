@@ -8,12 +8,13 @@ from flask_pydantic import validate
 from api.api_key_middleware import load_user_api_keys, require_api_key
 from api.auth_middleware import get_current_user_id, jwt_required
 from api.controllers.chat_controller import ChatController
-from config.ai_config import AI_MODE_EXTERNAL, AI_MODE_INTERNAL, PROVIDER_OLLAMA, AIConfig
+from config.ai_config import EXTERNAL_PROVIDERS, AIConfig
 from config.settings import CHAT_DEBUG_LOGGING
 from schemas.chat_schemas import ChatErrorResponse, UnifiedChatRequest
 from utils.logger import logger
 
 
+# URL prefix kept as /api/v1/ollama/chat for frontend compatibility (legacy path).
 api_chat_v1 = Blueprint("api_chat_v1", __name__, url_prefix="/api/v1/ollama/chat")
 
 # Controller instance
@@ -25,11 +26,10 @@ def _resolve_provider_and_model(category: str | None, action: str | None, reques
 
     Priority:
     1. Load template from DB -> use template.provider and template.model
-    2. Internal mode + non-ollama provider -> force Ollama
-    3. External mode + provider != configured external provider -> override with external config
-    4. Fallback (no template): use mode to decide provider
+    2. If template provider not in EXTERNAL_PROVIDERS (e.g. legacy 'ollama') -> fall back to configured external provider
+    3. No template context -> use configured external provider + default model
     """
-    provider = PROVIDER_OLLAMA
+    provider = AIConfig.get_external_provider()
     model = request_model
 
     # Try to load template from DB for provider info
@@ -43,45 +43,27 @@ def _resolve_provider_and_model(category: str | None, action: str | None, reques
                 service = PromptTemplateService()
                 template = service.get_template_by_category_action(db, category, action)
                 if template:
-                    provider = template.provider or PROVIDER_OLLAMA
-                    if not model:
-                        model = template.model
+                    template_provider = template.provider or provider
+                    if template_provider in EXTERNAL_PROVIDERS:
+                        provider = template_provider
+                        if not model:
+                            model = template.model
+                    else:
+                        # Legacy template provider (e.g. 'ollama') -> use configured external
+                        logger.info(
+                            "Legacy template provider, falling back to configured external",
+                            original_provider=template_provider,
+                            new_provider=provider,
+                        )
+                        if not model:
+                            model = AIConfig.get_external_model()
             finally:
                 db.close()
         except Exception as e:
             logger.warning("Failed to load template for provider resolution", error=str(e))
 
-    mode = AIConfig.get_mode()
-
-    if mode == AI_MODE_INTERNAL and provider != PROVIDER_OLLAMA:
-        # Internal-only: force all templates to Ollama
-        logger.info(
-            "Internal-only mode: overriding external template to Ollama",
-            original_provider=provider,
-            original_model=model,
-        )
-        provider = PROVIDER_OLLAMA
-        model = None  # Let Ollama use its default model
-
-    elif mode == AI_MODE_EXTERNAL and provider != AIConfig.get_external_provider():
-        # External-only: override non-matching templates to configured external provider
-        logger.info(
-            "External-only mode: overriding non-matching provider template",
-            original_provider=provider,
-            new_provider=AIConfig.get_external_provider(),
-            new_model=AIConfig.get_external_model(),
-        )
-        provider = AIConfig.get_external_provider()
+    if not model:
         model = AIConfig.get_external_model()
-
-    elif not category and not action:
-        # No template context - use mode to decide
-        if mode == AI_MODE_EXTERNAL:
-            provider = AIConfig.get_external_provider()
-            if not model:
-                model = AIConfig.get_external_model()
-        elif mode == AI_MODE_INTERNAL:
-            provider = PROVIDER_OLLAMA
 
     return provider, model
 
@@ -96,13 +78,12 @@ def generate_unified(body: UnifiedChatRequest):
         provider, resolved_model = _resolve_provider_and_model(body.category, body.action, body.model)
         model = resolved_model or body.model
 
-        # Load per-user API keys and check provider key (skip for Ollama)
-        if provider != PROVIDER_OLLAMA:
-            load_user_api_keys()
-            provider_key = "claude" if provider == "claude" else "openai"
-            error = require_api_key(provider_key)
-            if error:
-                return jsonify(error[0]), error[1]
+        # Load per-user API keys and check provider key
+        load_user_api_keys()
+        provider_key = "claude" if provider == "claude" else "openai"
+        error = require_api_key(provider_key)
+        if error:
+            return jsonify(error[0]), error[1]
 
         # Validate that required template parameters are provided
         if model is None:

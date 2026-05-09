@@ -268,6 +268,17 @@ class MirrorMoveAction(BaseModel):
         from_attributes = True
 
 
+class MirrorMoveGroup(BaseModel):
+    """Schema for an aggregated directory rename (multiple files moved old_dir -> new_dir)"""
+
+    old_dir: str = Field(..., description="Old directory (relative to folder, '' for folder root)")
+    new_dir: str = Field(..., description="New directory (relative to folder, '' for folder root)")
+    file_count: int = Field(..., ge=1, description="Number of files moved within this directory rename")
+
+    class Config:
+        from_attributes = True
+
+
 class MirrorResponse(BaseModel):
     """Response schema for mirror endpoint (diff result)"""
 
@@ -275,6 +286,10 @@ class MirrorResponse(BaseModel):
     to_update: list[str] = Field(default_factory=list, description="Files to update (hash mismatch)")
     to_move: list[MirrorMoveAction] = Field(
         default_factory=list, description="Files to move (same hash, different path)"
+    )
+    move_groups: list[MirrorMoveGroup] = Field(
+        default_factory=list,
+        description="Aggregation of to_move grouped by (old_dir, new_dir) for directory-rename display",
     )
     to_delete: list[MirrorFileAction] = Field(default_factory=list, description="Files to delete (only on remote)")
     unchanged: list[str] = Field(default_factory=list, description="Files unchanged (hash match)")

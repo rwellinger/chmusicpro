@@ -6,7 +6,7 @@ DB entries take precedence over these defaults via the orchestrator cache.
 """
 
 DEFAULT_CONTEXT_WINDOWS = {
-    # OpenAI Models (External) - GPT-5 Series
+    # OpenAI Models - GPT-5 Series
     "gpt-5.1": 200000,
     "gpt-5.1-codex-mini": 200000,
     "gpt-5": 200000,
@@ -28,45 +28,6 @@ DEFAULT_CONTEXT_WINDOWS = {
     # OpenAI Models - GPT-3.5 Series
     "gpt-3.5-turbo": 16385,
     "gpt-3.5-turbo-16k": 16385,
-    # GPT-OSS Models (Ollama)
-    "gpt-oss:20b": 8192,
-    # DeepSeek Models
-    "deepseek-r1:8b": 131072,
-    # Apertus Models
-    "MichelRosselli/apertus:latest": 65536,
-    # LLaMA Models
-    "llama2:7b": 4096,
-    "llama2:13b": 4096,
-    "llama2:70b": 4096,
-    "llama3:8b": 8192,
-    "llama3:70b": 8192,
-    "llama3.1:8b": 131072,
-    "llama3.1:70b": 131072,
-    "llama3.2:1b": 131072,
-    "llama3.2:3b": 131072,
-    # Mistral Models
-    "mistral:7b": 8192,
-    "mistral:instruct": 8192,
-    "mixtral:8x7b": 32768,
-    # Gemma Models
-    "gemma:2b": 8192,
-    "gemma:7b": 8192,
-    "gemma2:9b": 8192,
-    "gemma2:27b": 8192,
-    "gemma3:4b": 131072,
-    # CodeLlama Models
-    "codellama:7b": 16384,
-    "codellama:13b": 16384,
-    "codellama:34b": 16384,
-    # Phi Models
-    "phi3:mini": 4096,
-    "phi3:medium": 4096,
-    # Qwen Models
-    "qwen:7b": 8192,
-    "qwen:14b": 8192,
-    "qwen2:7b": 32768,
-    "qwen3:8b": 32768,
-    "qwen3:30b": 32768,
     # Default fallback
     "default": 2048,
 }
@@ -84,7 +45,7 @@ def get_context_window_size(model_name: str) -> int:
     Falls back to DEFAULT_CONTEXT_WINDOWS if DB is unavailable.
 
     Args:
-        model_name: Model name (e.g., "gpt-4o", "gpt-oss:20b", "llama3.1:8b")
+        model_name: Model name (e.g., "gpt-4o", "gpt-4.1-mini")
 
     Returns:
         Context window size in tokens
@@ -92,10 +53,6 @@ def get_context_window_size(model_name: str) -> int:
     Examples:
         >>> get_context_window_size("gpt-4o")
         128000
-        >>> get_context_window_size("gpt-oss:20b")
-        8192
-        >>> get_context_window_size("llama3.1:8b")
-        131072
         >>> get_context_window_size("unknown-model")
         2048
     """

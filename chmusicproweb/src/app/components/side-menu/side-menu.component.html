@@ -37,7 +37,7 @@
       </div>
     }
 
-    @if (applicationMode !== 'PRJCT' && (showInternalChat || showExternalChat)) {
+    @if (applicationMode !== 'PRJCT' && showExternalChat) {
       <div class="nav-group">
         @if (!isCollapsed) {
           <span class="group-label">
@@ -46,24 +46,13 @@
           </span>
         }
         <div class="group-items">
-          @if (showInternalChat) {
-            <a routerLink="/ai-chat" routerLinkActive="active"
-               [matTooltip]="'sideMenu.ollamaChat' | translate"
-               matTooltipPosition="right"
-               [matTooltipDisabled]="!isCollapsed">
-              <i class="fas fa-server"></i>
-              <span class="nav-label">{{ 'sideMenu.ollamaChat' | translate }}</span>
-            </a>
-          }
-          @if (showExternalChat) {
-            <a routerLink="/openai-chat" routerLinkActive="active"
-               [matTooltip]="'sideMenu.openaiChat' | translate"
-               matTooltipPosition="right"
-               [matTooltipDisabled]="!isCollapsed">
-              <i class="fas fa-cloud"></i>
-              <span class="nav-label">{{ 'sideMenu.openaiChat' | translate }}</span>
-            </a>
-          }
+          <a routerLink="/openai-chat" routerLinkActive="active"
+             [matTooltip]="'sideMenu.openaiChat' | translate"
+             matTooltipPosition="right"
+             [matTooltipDisabled]="!isCollapsed">
+            <i class="fas fa-cloud"></i>
+            <span class="nav-label">{{ 'sideMenu.openaiChat' | translate }}</span>
+          </a>
         </div>
       </div>
     }
