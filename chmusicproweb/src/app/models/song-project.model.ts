@@ -187,10 +187,17 @@ export interface MirrorFileAction {
     file_size_bytes: number;
 }
 
+export interface MirrorMoveGroup {
+    old_dir: string;
+    new_dir: string;
+    file_count: number;
+}
+
 export interface MirrorCompareResult {
     to_upload: string[];
     to_update: string[];
     to_move: MirrorMoveAction[];
+    move_groups?: MirrorMoveGroup[];
     to_delete: MirrorFileAction[];
     unchanged: string[];
 }

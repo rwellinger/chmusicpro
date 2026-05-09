@@ -966,6 +966,7 @@ export class SongProjectsComponent implements OnInit, OnDestroy {
                 toUpload: compareResult.to_upload,
                 toUpdate: compareResult.to_update,
                 toMove: compareResult.to_move,
+                moveGroups: compareResult.move_groups || [],
                 toDelete: compareResult.to_delete,
                 unchanged: compareResult.unchanged,
                 totalUploadSize,

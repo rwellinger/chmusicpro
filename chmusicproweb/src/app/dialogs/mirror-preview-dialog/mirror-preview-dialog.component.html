@@ -87,6 +87,27 @@
             {{ 'songProjects.mirror.preview.movedFiles' | translate: {count: data.toMove.length} }}
           </mat-panel-title>
         </mat-expansion-panel-header>
+
+        @if (data.moveGroups && data.moveGroups.length > 0) {
+          <div class="move-groups">
+            <div class="move-groups-title">
+              {{ 'songProjects.mirror.preview.directoryRenames' | translate }}
+            </div>
+            @for (group of data.moveGroups; track group.old_dir + '|' + group.new_dir) {
+              <div class="move-group-row">
+                <i class="fas fa-folder"></i>
+                @if (group.old_dir && group.new_dir) {
+                  {{ 'songProjects.mirror.preview.directoryRenameRow' | translate: {count: group.file_count, old: group.old_dir, new: group.new_dir} }}
+                } @else if (group.old_dir) {
+                  {{ 'songProjects.mirror.preview.directoryRenameRowToRoot' | translate: {count: group.file_count, old: group.old_dir} }}
+                } @else {
+                  {{ 'songProjects.mirror.preview.directoryRenameRowFromRoot' | translate: {count: group.file_count, new: group.new_dir} }}
+                }
+              </div>
+            }
+          </div>
+        }
+
         <div class="file-list">
           @for (move of data.toMove.slice(0, maxVisibleItems); track move.file_id) {
             <div class="file-entry move-entry">

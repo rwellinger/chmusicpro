@@ -7,6 +7,7 @@ from business.song_project_transformer import (
     calculate_file_hash,
     calculate_pagination_meta,
     detect_file_type,
+    detect_mirror_moves,
     generate_s3_prefix,
     get_default_folder_structure,
     get_display_cover_info,
@@ -734,3 +735,212 @@ class TestGetDisplayCoverInfo:
 
             assert result["source"] == "release", f"Status '{status}' should be valid"
             assert result["release_id"] == f"{status}-id"
+
+
+def _make_remote(rel_path: str, file_hash: str, file_id: str = "rid", size: int = 1024):
+    """Build a Mock that mimics a ProjectFile DB row for detect_mirror_moves tests."""
+    f = Mock()
+    f.id = file_id
+    f.relative_path = rel_path
+    f.file_hash = file_hash
+    f.file_size_bytes = size
+    f.s3_key = f"users/u/projects/p/{rel_path}"
+    return f
+
+
+class TestDetectMirrorMoves:
+    """Tests for detect_mirror_moves() — pure function for mirror-sync move detection."""
+
+    S3_PREFIX = "users/u/projects/p"
+    FOLDER = "01 Arrangement"
+
+    def test_no_overlap_returns_empty(self):
+        """No local-only or no remote-only paths -> no moves."""
+        local_map = {"a.wav": {"file_hash": "h1", "file_size_bytes": 10}}
+        remote_map = {"a.wav": _make_remote("01 Arrangement/a.wav", "h1")}
+
+        moves, groups, ml, mr = detect_mirror_moves(
+            local_only_paths=set(),
+            remote_only_paths=set(),
+            local_map=local_map,
+            remote_map=remote_map,
+            s3_prefix=self.S3_PREFIX,
+            folder_name=self.FOLDER,
+        )
+
+        assert moves == []
+        assert groups == []
+        assert ml == set()
+        assert mr == set()
+
+    def test_simple_directory_rename_three_files_unique_hashes(self):
+        """Renaming a directory with N files (unique hashes) is detected as N moves + 1 group."""
+        local_map = {
+            "new/a.wav": {"file_hash": "ha", "file_size_bytes": 10},
+            "new/b.wav": {"file_hash": "hb", "file_size_bytes": 20},
+            "new/c.wav": {"file_hash": "hc", "file_size_bytes": 30},
+        }
+        remote_map = {
+            "old/a.wav": _make_remote("01 Arrangement/old/a.wav", "ha", "id-a"),
+            "old/b.wav": _make_remote("01 Arrangement/old/b.wav", "hb", "id-b"),
+            "old/c.wav": _make_remote("01 Arrangement/old/c.wav", "hc", "id-c"),
+        }
+
+        moves, groups, moved_local, moved_remote = detect_mirror_moves(
+            local_only_paths=set(local_map.keys()),
+            remote_only_paths=set(remote_map.keys()),
+            local_map=local_map,
+            remote_map=remote_map,
+            s3_prefix=self.S3_PREFIX,
+            folder_name=self.FOLDER,
+        )
+
+        assert len(moves) == 3
+        assert {m["file_id"] for m in moves} == {"id-a", "id-b", "id-c"}
+        # All moves are old/* -> new/*
+        assert all(m["old_path"].startswith("old/") and m["new_path"].startswith("new/") for m in moves)
+        # New S3 keys are constructed correctly
+        a_move = next(m for m in moves if m["file_id"] == "id-a")
+        assert a_move["s3_key_new"] == "users/u/projects/p/01 Arrangement/new/a.wav"
+        # Single directory-rename group
+        assert groups == [{"old_dir": "old", "new_dir": "new", "file_count": 3}]
+        assert moved_local == {"new/a.wav", "new/b.wav", "new/c.wav"}
+        assert moved_remote == {"id-a", "id-b", "id-c"}
+
+    def test_hash_collision_resolved_by_basename(self):
+        """Multiple files share the same hash but different basenames -> matched via basename."""
+        empty_hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        local_map = {
+            "new/X.txt": {"file_hash": empty_hash, "file_size_bytes": 0},
+            "new/Y.txt": {"file_hash": empty_hash, "file_size_bytes": 0},
+        }
+        remote_map = {
+            "old/X.txt": _make_remote("01 Arrangement/old/X.txt", empty_hash, "id-x"),
+            "old/Y.txt": _make_remote("01 Arrangement/old/Y.txt", empty_hash, "id-y"),
+        }
+
+        moves, groups, _, _ = detect_mirror_moves(
+            local_only_paths=set(local_map.keys()),
+            remote_only_paths=set(remote_map.keys()),
+            local_map=local_map,
+            remote_map=remote_map,
+            s3_prefix=self.S3_PREFIX,
+            folder_name=self.FOLDER,
+        )
+
+        # Both files should be matched as moves (basename disambiguation)
+        assert len(moves) == 2
+        x_move = next(m for m in moves if m["file_id"] == "id-x")
+        y_move = next(m for m in moves if m["file_id"] == "id-y")
+        assert x_move["old_path"] == "old/X.txt" and x_move["new_path"] == "new/X.txt"
+        assert y_move["old_path"] == "old/Y.txt" and y_move["new_path"] == "new/Y.txt"
+        assert groups == [{"old_dir": "old", "new_dir": "new", "file_count": 2}]
+
+    def test_hash_collision_same_basename_paired_deterministically(self):
+        """Same hash + same basename in multiple dirs -> paired in sorted-path order."""
+        h = "deadbeef" * 8
+        local_map = {
+            "newA/.gitkeep": {"file_hash": h, "file_size_bytes": 0},
+            "newB/.gitkeep": {"file_hash": h, "file_size_bytes": 0},
+        }
+        remote_map = {
+            "oldA/.gitkeep": _make_remote("01 Arrangement/oldA/.gitkeep", h, "id-1"),
+            "oldB/.gitkeep": _make_remote("01 Arrangement/oldB/.gitkeep", h, "id-2"),
+        }
+
+        moves, groups, _, _ = detect_mirror_moves(
+            local_only_paths=set(local_map.keys()),
+            remote_only_paths=set(remote_map.keys()),
+            local_map=local_map,
+            remote_map=remote_map,
+            s3_prefix=self.S3_PREFIX,
+            folder_name=self.FOLDER,
+        )
+
+        # Both detected as moves (sorted-path pairing: newA<->oldA, newB<->oldB)
+        assert len(moves) == 2
+        # Two different directory groups
+        assert {(g["old_dir"], g["new_dir"]) for g in groups} == {("oldA", "newA"), ("oldB", "newB")}
+
+    def test_pure_rename_uses_hash_only_fallback(self):
+        """File renamed within same directory (different basename, same hash) -> Pass 2 fallback."""
+        local_map = {"track-renamed.wav": {"file_hash": "h1", "file_size_bytes": 100}}
+        remote_map = {"track-original.wav": _make_remote("01 Arrangement/track-original.wav", "h1", "id-r")}
+
+        moves, groups, _, moved_remote = detect_mirror_moves(
+            local_only_paths={"track-renamed.wav"},
+            remote_only_paths={"track-original.wav"},
+            local_map=local_map,
+            remote_map=remote_map,
+            s3_prefix=self.S3_PREFIX,
+            folder_name=self.FOLDER,
+        )
+
+        assert len(moves) == 1
+        assert moves[0]["old_path"] == "track-original.wav"
+        assert moves[0]["new_path"] == "track-renamed.wav"
+        # No directory change -> no group
+        assert groups == []
+        assert moved_remote == {"id-r"}
+
+    def test_unequal_counts_pairs_what_it_can(self):
+        """When local has more files of (hash,name) than remote, only the matchable ones become moves."""
+        h = "abc" * 21 + "x"
+        local_map = {
+            "new/dup.txt": {"file_hash": h, "file_size_bytes": 5},
+            "new/extra/dup.txt": {"file_hash": h, "file_size_bytes": 5},
+        }
+        remote_map = {
+            "old/dup.txt": _make_remote("01 Arrangement/old/dup.txt", h, "id-d"),
+        }
+
+        moves, _, moved_local, moved_remote = detect_mirror_moves(
+            local_only_paths=set(local_map.keys()),
+            remote_only_paths=set(remote_map.keys()),
+            local_map=local_map,
+            remote_map=remote_map,
+            s3_prefix=self.S3_PREFIX,
+            folder_name=self.FOLDER,
+        )
+
+        # Only 1 move (sorted: 'new/dup.txt' < 'new/extra/dup.txt' so first paired)
+        assert len(moves) == 1
+        assert moves[0]["new_path"] == "new/dup.txt"
+        assert moves[0]["old_path"] == "old/dup.txt"
+        assert moved_remote == {"id-d"}
+        # The unmatched 'new/extra/dup.txt' stays in caller's to_upload (not in moved_local)
+        assert "new/extra/dup.txt" not in moved_local
+
+    def test_root_to_subfolder_move_grouped(self):
+        """File moved from folder root to subfolder -> group with empty old_dir."""
+        local_map = {"sub/track.wav": {"file_hash": "h1", "file_size_bytes": 10}}
+        remote_map = {"track.wav": _make_remote("01 Arrangement/track.wav", "h1", "id-t")}
+
+        moves, groups, _, _ = detect_mirror_moves(
+            local_only_paths={"sub/track.wav"},
+            remote_only_paths={"track.wav"},
+            local_map=local_map,
+            remote_map=remote_map,
+            s3_prefix=self.S3_PREFIX,
+            folder_name=self.FOLDER,
+        )
+
+        assert len(moves) == 1
+        assert groups == [{"old_dir": "", "new_dir": "sub", "file_count": 1}]
+
+    def test_no_directory_change_no_group(self):
+        """Pure renames (same dir) don't appear as a directory-rename group."""
+        local_map = {"a/new-name.wav": {"file_hash": "h1", "file_size_bytes": 10}}
+        remote_map = {"a/old-name.wav": _make_remote("01 Arrangement/a/old-name.wav", "h1", "id-r")}
+
+        moves, groups, _, _ = detect_mirror_moves(
+            local_only_paths={"a/new-name.wav"},
+            remote_only_paths={"a/old-name.wav"},
+            local_map=local_map,
+            remote_map=remote_map,
+            s3_prefix=self.S3_PREFIX,
+            folder_name=self.FOLDER,
+        )
+
+        assert len(moves) == 1  # via Pass 2 hash-only
+        assert groups == []  # old_dir == new_dir == "a"

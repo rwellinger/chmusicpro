@@ -90,6 +90,36 @@
   word-break: break-all;
 }
 
+.move-groups {
+  margin-bottom: $spacing-sm;
+  padding: $spacing-xs $spacing-sm;
+  background-color: rgba(37, 99, 235, 0.06);
+  border-left: 3px solid #2563eb;
+  border-radius: 2px;
+}
+
+.move-groups-title {
+  font-size: $font-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.move-group-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: $font-sm;
+  font-family: 'Courier New', monospace;
+  color: $text-primary;
+  padding: 2px 0;
+
+  i {
+    color: #2563eb;
+    flex-shrink: 0;
+  }
+}
+
 .move-entry {
   display: flex;
   align-items: center;
