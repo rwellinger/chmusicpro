@@ -20,11 +20,6 @@ export const routes: Routes = [
         loadComponent: () => import("./auth/register/register.component").then(m => m.RegisterComponent)
     },
     {
-        path: "ai-chat",
-        canActivate: [AuthGuard, appModeGuard(["PRJCT"]), aiProviderGuard("ollama")],
-        loadComponent: () => import("./pages/ai-chat/ai-chat.component").then(m => m.AiChatComponent)
-    },
-    {
         path: "external-chat",
         canActivate: [AuthGuard, appModeGuard(["PRJCT"]), aiProviderGuard("external")],
         loadComponent: () => import("./pages/external-chat/external-chat.component").then(m => m.ExternalChatComponent)

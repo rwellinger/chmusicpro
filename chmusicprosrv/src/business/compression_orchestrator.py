@@ -4,7 +4,6 @@ import traceback
 import uuid
 from typing import Any
 
-import requests
 from sqlalchemy.orm import Session
 
 from api.api_key_middleware import require_api_key
@@ -17,7 +16,6 @@ from business.compression_transformer import (
     format_summary_message,
 )
 from business.openai_chat_orchestrator import OpenAIChatOrchestrator
-from config.settings import OLLAMA_SUMMARY_MODEL, OLLAMA_TIMEOUT, OLLAMA_URL
 from db.conversation_compression_service import ConversationCompressionService
 from db.conversation_service import ConversationService
 from db.message_service import MessageService
@@ -85,12 +83,11 @@ class CompressionOrchestrator:
                 recent=len(recent_messages),
             )
 
-            # Check API key before calling external AI for summary
-            if conversation.provider == "external":
-                provider_key = getattr(conversation, "external_provider", "openai") or "openai"
-                error = require_api_key(provider_key)
-                if error:
-                    return error[0], error[1]
+            # Check API key for external provider summary (always external since Ollama removed)
+            provider_key = getattr(conversation, "external_provider", "openai") or "openai"
+            error = require_api_key(provider_key)
+            if error:
+                return error[0], error[1]
 
             # Create AI summary of old messages
             summary_content, summary_token_count = self._create_ai_summary(
@@ -140,12 +137,12 @@ class CompressionOrchestrator:
 
     def _create_ai_summary(self, messages: list, model: str, provider: str) -> tuple[str, int]:
         """
-        Create AI summary of messages using the conversation's model.
+        Create AI summary of messages using OpenAI.
 
         Args:
             messages: List of message objects to summarize
             model: Model name
-            provider: Provider ('internal' or 'external')
+            provider: Provider name (kept for logging; only OpenAI is used)
 
         Returns:
             Tuple of (summary_text, token_count)
@@ -155,38 +152,11 @@ class CompressionOrchestrator:
         summary_messages = build_summary_messages(summary_prompt)
 
         try:
-            if provider == "external":
-                # Use OpenAI via orchestrator
-                content, prompt_tokens, completion_tokens = self.openai_orchestrator.send_chat_message(
-                    model=model, messages=summary_messages
-                )
-                # For OpenAI, we only care about completion tokens (the summary itself)
-                token_count = completion_tokens
-            else:
-                # Use Ollama - prefer dedicated summary model if configured
-                summary_model = OLLAMA_SUMMARY_MODEL if OLLAMA_SUMMARY_MODEL else model
-                api_url = f"{OLLAMA_URL}/api/chat"
-                payload = {
-                    "model": summary_model,
-                    "messages": summary_messages,
-                    "stream": False,
-                }
-
-                resp = requests.post(api_url, json=payload, timeout=OLLAMA_TIMEOUT)
-                resp.raise_for_status()
-                resp_json = resp.json()
-
-                if "message" in resp_json and "content" in resp_json["message"]:
-                    content = resp_json["message"]["content"]
-                    # Get token count from Ollama response (eval_count = completion tokens)
-                    token_count = resp_json.get("eval_count", len(content.split()))
-                else:
-                    raise Exception("Invalid Ollama API response")
-
-            summary_model_used = OLLAMA_SUMMARY_MODEL if (provider != "external" and OLLAMA_SUMMARY_MODEL) else model
-            logger.info(
-                "AI summary created successfully", provider=provider, model=summary_model_used, token_count=token_count
+            content, _prompt_tokens, completion_tokens = self.openai_orchestrator.send_chat_message(
+                model=model, messages=summary_messages
             )
+            token_count = completion_tokens
+            logger.info("AI summary created successfully", provider=provider, model=model, token_count=token_count)
             return content, token_count
 
         except Exception as e:
@@ -201,57 +171,29 @@ class CompressionOrchestrator:
 
     def _get_actual_token_count(self, messages: list[dict[str, str]], model: str, provider: str) -> int:
         """
-        Get actual token count by making a test call to the model.
+        Estimate token count from message contents.
 
         Args:
             messages: List of messages with role and content
-            model: Model name
-            provider: Provider ('internal' or 'external')
+            model: Model name (unused, kept for signature compat)
+            provider: Provider name (kept for logging)
 
         Returns:
-            Actual token count from the model
+            Estimated token count
         """
         try:
-            if provider == "external":
-                # Use OpenAI - estimate based on message lengths using transformer
-                estimated_tokens = calculate_token_estimate(
-                    "".join([msg.get("content", "") for msg in messages]), chars_per_token=4
-                )
-                logger.info("Token count estimated for OpenAI", estimated_tokens=estimated_tokens, provider=provider)
-                return estimated_tokens
-            else:
-                # Use Ollama - get prompt_eval_count
-                api_url = f"{OLLAMA_URL}/api/chat"
-
-                # Add minimal user message to trigger eval
-                test_messages = messages + [{"role": "user", "content": "."}]
-
-                payload = {
-                    "model": model,
-                    "messages": test_messages,
-                    "stream": False,
-                }
-
-                resp = requests.post(api_url, json=payload, timeout=OLLAMA_TIMEOUT)
-                resp.raise_for_status()
-                resp_json = resp.json()
-
-                prompt_eval_count = resp_json.get("prompt_eval_count", 0)
-
-                logger.info(
-                    "Actual token count retrieved from Ollama", prompt_eval_count=prompt_eval_count, provider=provider
-                )
-
-                return prompt_eval_count
-
+            estimated_tokens = calculate_token_estimate(
+                "".join([msg.get("content", "") for msg in messages]), chars_per_token=4
+            )
+            logger.info("Token count estimated", estimated_tokens=estimated_tokens, provider=provider)
+            return estimated_tokens
         except Exception as e:
             logger.warning(
-                "Failed to get actual token count, using fallback",
+                "Failed to estimate token count, using fallback",
                 error=str(e),
                 provider=provider,
                 stacktrace=traceback.format_exc(),
             )
-            # Fallback: estimate using transformer
             return calculate_token_estimate("".join([msg.get("content", "") for msg in messages]), chars_per_token=4)
 
     def restore_archive(

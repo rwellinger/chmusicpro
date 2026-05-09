@@ -90,7 +90,7 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
             pre_condition: ["", Validators.required],
             post_condition: ["", Validators.required],
             description: [""],
-            provider: ["ollama"],
+            provider: ["openai"],
             model: [""],
             temperature: [null],
             max_tokens: [null]
@@ -109,8 +109,8 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
                     this.availableProviders = providers;
                 },
                 error: () => {
-                    // Fallback: show ollama only
-                    this.availableProviders = ["ollama"];
+                    // Fallback: show openai only
+                    this.availableProviders = ["openai"];
                 }
             });
 
@@ -166,13 +166,13 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
                     });
                 break;
 
-            default: // ollama
-                this.conversationService
-                    .getChatModels()
+            default:
+                // Legacy provider (e.g. 'ollama') -> fall back to OpenAI models so the UI stays usable
+                this.modelCacheService.getOpenAIModels()
                     .pipe(takeUntil(this.destroy$))
                     .subscribe({
                         next: (models) => {
-                            this.models = (models || []).map(m => ({name: m.name}));
+                            this.models = models.map(m => ({name: m.name}));
                             this.isLoadingModels = false;
                         },
                         error: () => this.handleModelLoadError()
@@ -193,7 +193,7 @@ export class PromptTemplateEditorComponent implements OnInit, OnDestroy {
         this.category = template.category;
         this.action = template.action;
 
-        const provider = template.provider || "ollama";
+        const provider = template.provider || "openai";
 
         // Populate form
         this.editorForm.patchValue({

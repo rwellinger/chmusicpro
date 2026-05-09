@@ -1,6 +1,6 @@
 """Unified AI Adapter - Provider-agnostic interface for AI text generation.
 
-Wraps Ollama, OpenAI and Claude API clients behind a common interface.
+Wraps OpenAI and Claude API clients behind a common interface.
 Used by ChatOrchestrator to route requests to the configured provider.
 """
 
@@ -10,7 +10,6 @@ from typing import Any
 
 from config.ai_config import (
     PROVIDER_CLAUDE,
-    PROVIDER_OLLAMA,
     PROVIDER_OPENAI,
     AIConfig,
 )
@@ -50,38 +49,6 @@ class AIAdapter(ABC):
     @abstractmethod
     def get_provider_name(self) -> str:
         """Return provider identifier."""
-
-
-class OllamaAdapter(AIAdapter):
-    """Adapter for Ollama API. Uses single-string prompt format."""
-
-    def __init__(self):
-        from adapters.ollama.api_client import OllamaAPIClient
-
-        self.client = OllamaAPIClient()
-
-    def generate(self, request: AIGenerationRequest) -> AIGenerationResponse:
-        """Generate via Ollama /api/generate endpoint."""
-        # Ollama uses a single prompt string with [INSTRUCTION]/[USER]/[FORMAT] markers
-        # The prompt is already formatted by the orchestrator
-        response_data = self.client.generate(
-            model=request.model,
-            prompt=request.prompt,
-            temperature=request.temperature,
-            max_tokens=request.max_tokens,
-        )
-
-        return AIGenerationResponse(
-            content=response_data.get("response", ""),
-            provider=PROVIDER_OLLAMA,
-            model=request.model,
-            prompt_tokens=response_data.get("prompt_eval_count", 0),
-            completion_tokens=response_data.get("eval_count", 0),
-            raw_response=response_data,
-        )
-
-    def get_provider_name(self) -> str:
-        return PROVIDER_OLLAMA
 
 
 class OpenAIAdapter(AIAdapter):
@@ -174,7 +141,6 @@ class AIAdapterFactory:
     """Factory to create the appropriate AI adapter based on provider name."""
 
     _adapters = {
-        PROVIDER_OLLAMA: OllamaAdapter,
         PROVIDER_OPENAI: OpenAIAdapter,
         PROVIDER_CLAUDE: ClaudeAdapter,
     }
@@ -184,10 +150,7 @@ class AIAdapterFactory:
         """Create adapter for the given provider. Validates provider is available."""
         if not AIConfig.validate_provider(provider):
             available = AIConfig.get_available_providers()
-            raise ValueError(
-                f"Provider '{provider}' is not available. "
-                f"Current mode: {AIConfig.get_mode()}, available providers: {available}"
-            )
+            raise ValueError(f"Provider '{provider}' is not available. Available providers: {available}")
 
         adapter_class = AIAdapterFactory._adapters.get(provider)
         if not adapter_class:

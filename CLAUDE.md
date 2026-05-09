@@ -1,6 +1,6 @@
 # Claude Code Configuration
 
-**Last Updated:** 2026-02-21
+**Last Updated:** 2026-05-09
 
 ---
 
@@ -45,11 +45,11 @@ private baseUrl = 'http://localhost:5050/api';
 ```
 
 ### External APIs ONLY via chmusicprosrv Proxy
-- **ALL** external calls (OpenAI, Ollama, S3/MinIO) **MUST** go through backend
+- **ALL** external calls (OpenAI, Claude, S3) **MUST** go through backend
 - **NEVER** call external APIs directly from Angular
-- **NEVER** use S3 presigned URLs in Angular (Browser can't access internal MinIO!)
+- **NEVER** use S3 presigned URLs in Angular (browser can't access internal endpoints reliably)
 
-**Why?** HTTPS/CORS, API Keys in Backend, Internal services not accessible from Browser
+**Why?** HTTPS/CORS, API keys in backend, internal services not accessible from browser
 
 ### S3 Resources: Backend Proxy Pattern (MANDATORY!)
 ```
@@ -57,9 +57,10 @@ private baseUrl = 'http://localhost:5050/api';
 Frontend → /api/v1/resource/{id} → Backend loads from S3 → Binary Response
 
 ❌ WRONG:
-Frontend ← MinIO presigned URL (https://minio:9000/...) ← Backend
-          └─ Browser CAN'T access internal MinIO!
+Frontend ← S3 presigned URL ← Backend
 ```
+
+**Storage backend (Production):** Hetzner Object Storage (`hel1.your-objectstorage.com`), buckets prefixed `chmusicpro-*`. **Local dev:** MinIO via `develop-env/docker-compose.yml`.
 
 **Reference:** `song_release_routes.py` → `serve_cover()` → `s3_proxy_service.py`
 
@@ -74,19 +75,21 @@ def get_user_profile():
 
 ---
 
-## 3. Template-Driven Ollama Integration (MANDATORY)
+## 3. Template-Driven AI Integration (MANDATORY)
 
-**This is NOT a direct Ollama proxy - it's a Template-Driven Generation System!**
+**This is a Template-Driven Generation System using OpenAI/Claude — not a direct provider proxy.**
 
 **Workflow:**
 ```
 User Input → Load Template from DB → Validate → Unified Endpoint → Response
 ```
 
+**Supported providers:** `openai`, `claude` (Ollama was removed; legacy `provider="ollama"` templates fall back to the configured external provider).
+
 **Rules:**
-- **ALL** Ollama+Template calls **MUST** use `/api/v1/ollama/chat/generate-unified`
+- **ALL** template chat calls **MUST** use `/api/v1/ollama/chat/generate-unified` (URL kept for backwards compat)
 - **ALL** operations **MUST** go through `ChatService` in frontend
-- **NEVER** implement direct Ollama API calls
+- **NEVER** implement direct provider API calls from Angular
 - **NEVER** use templates before they exist in DB
 
 ```typescript
@@ -95,8 +98,8 @@ async myNewFeature(input: string): Promise<string> {
   return this.chatService.validateAndCallUnified('category', 'action', input);
 }
 
-// ❌ WRONG: Direct Ollama call
-this.http.post('http://localhost:11434/api/generate', {...});
+// ❌ WRONG: Direct provider call from Angular
+this.http.post('https://api.openai.com/v1/...', {...});
 ```
 
 **Reference:** `chat.service.ts` → `validateAndCallUnified()`
@@ -136,7 +139,7 @@ grep -r "serve.*s3\|proxy.*resource" src/
 |---------|---------------|---------|
 | **S3 Proxy** | `song_release_routes.py` → `serve_cover()` → `s3_proxy_service.py` | Serve S3 resources via backend |
 | **3-Layer** | `sketch_controller.py` → `sketch_orchestrator.py` → `sketch_normalizer.py` | Testable business logic |
-| **AI Integration** | Backend: `chat_controller.py`, Frontend: `chat.service.ts` | Template-driven Ollama |
+| **AI Integration** | Backend: `chat_controller.py`, Frontend: `chat.service.ts` | Template-driven OpenAI/Claude |
 | **DB Migration** | `chmusicprosrv/src/alembic/versions/` | Schema changes |
 
 ## Frontend Patterns
@@ -190,8 +193,8 @@ Internal code names (filenames, routes, DB tables) differ from what the user see
 | `coverArt` (pipeline step) | **Cover Art** | Pipeline + menu |
 | `workshop`, `text-workshop` | **Text Workshop** / **Lyric Creation** | Pipeline step 1 |
 
-**Important:** There is NO song generation feature (Mureka/Celery were removed). The app generates **text** (lyrics, descriptions, prompts) and **images** (DALL-E), not audio.
+**Important:** There is NO song generation feature (Mureka/Celery were removed). The app generates **text** (lyrics, descriptions, prompts) and **images** (gpt-image-1), not audio. Local Ollama support was also removed; only OpenAI and Claude are supported as AI providers.
 
 ---
 
-**Last Review:** 2026-02-21
+**Last Review:** 2026-05-09

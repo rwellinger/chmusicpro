@@ -22,8 +22,8 @@ Idea → Composition → Lyrics → Song → Cover → Project
 | **Composition** | Structure your idea with title, genre, mood | Generate catchy titles |
 | **Lyrics** | Write verses, chorus, bridge | Improve, rewrite, extend lyrics |
 | **Song** | Generate full audio from lyrics | Use your own tool (Suno, Udio, etc.) |
-| **Cover** | Create album artwork | Image generation (DALL-E 3) |
-| **Project** | Organize files, sync with DAW | S3 storage, browser-based Mirror Sync |
+| **Cover** | Create album artwork | Image generation (OpenAI `gpt-image-1`) |
+| **Project** | Organize files, sync with DAW | S3 storage (Hetzner), browser-based Mirror Sync |
 
 ---
 
@@ -42,7 +42,7 @@ Section-based editor for verses, choruses, bridges, and more. AI-powered tools h
 Use your preferred AI music generation tool (such as Suno, Udio, or others) to generate songs from your lyrics. Export lyrics directly from the lyric editor in the format your tool needs. Prompt suggestions and lyric formatting are optimized for the most popular AI music generation tools.
 
 ### Cover Art
-DALL-E 3 integration creates album artwork. One-click AI prompt enhancement for better results. Built-in text overlay editor adds titles and artist names. Gallery view keeps all your artwork organized.
+OpenAI `gpt-image-1` integration creates album artwork. One-click AI prompt enhancement for better results. Built-in text overlay editor adds titles and artist names. Gallery view keeps all your artwork organized.
 
 ### Project Management
 Complete file management for music production. Hierarchical folder structure (Arrangement, Mixing, Stems, etc.) mirrors your DAW project. S3 cloud storage with batch upload/download. Browser-based Mirror Sync for drag & drop file synchronization. ZIP download for project templates and individual folders.
@@ -51,7 +51,7 @@ Complete file management for music production. Hierarchical folder structure (Ar
 Guided 8-step production pipeline from lyric creation through distribution. Sticky step-bar with numbered circles shows your current progress. Dashboard tiles link directly to each pipeline stage.
 
 ### AI Chat Assistant
-Multi-provider support: Ollama (local, free), OpenAI GPT, and Anthropic Claude. Persistent conversation history. Reusable system context templates for consistent AI behavior. Use it for brainstorming, research, or general creative assistance.
+Provider support: OpenAI GPT and Anthropic Claude. Persistent conversation history. Reusable system context templates for consistent AI behavior. Use it for brainstorming, research, or general creative assistance.
 
 ### Equipment Tracking
 Track your music production software, plugins, and gear. Secure credential storage (encrypted). License management for iLok, online activations, and serial keys.
@@ -64,15 +64,13 @@ Track your music production software, plugins, and gear. Secure credential stora
 
 | Feature | Provider | Cost |
 |---------|----------|------|
-| Cover Art Generation | [OpenAI](https://platform.openai.com/) (DALL-E 3) | Pay-per-use |
-| AI Chat (cloud) | [OpenAI](https://platform.openai.com/) or [Anthropic](https://console.anthropic.com/) | Pay-per-use |
-| AI Chat (local) | [Ollama](https://ollama.ai/) | Free (runs locally) |
+| Cover Art Generation | [OpenAI](https://platform.openai.com/) (`gpt-image-1`) | Pay-per-use |
+| AI Chat | [OpenAI](https://platform.openai.com/) or [Anthropic](https://console.anthropic.com/) | Pay-per-use |
 
 **Important:**
 - All API keys are configured in your local `.env` file on your own infrastructure
 - You obtain and manage API keys directly with each provider
 - The project author has no access to your keys or usage data
-- Ollama provides a free, local alternative for AI chat features
 
 ---
 
@@ -82,9 +80,8 @@ Track your music production software, plugins, and gear. Secure credential stora
 
 - Python 3.12+ with Conda/Miniconda
 - Node.js 20+ with npm
-- Docker (via Colima on macOS)
-- PostgreSQL 15+
-- Redis
+- Docker (via Colima on macOS) for local Postgres + MinIO
+- PostgreSQL 15+ (provided via `develop-env/docker-compose.yml`)
 
 ### Development Setup
 
@@ -119,11 +116,6 @@ Track your music production software, plugins, and gear. Secure credential stora
    npm run dev
    ```
 
-4. **Start Celery Worker** (for async tasks like music generation)
-   ```bash
-   python src/worker.py
-   ```
-
 ---
 
 ## For Developers
@@ -133,11 +125,10 @@ Track your music production software, plugins, and gear. Secure credential stora
 | Layer | Technologies |
 |-------|-------------|
 | **Frontend** | Angular 21, TypeScript, Angular Material, SCSS, RxJS |
-| **Backend** | Python 3.12, FastAPI, SQLAlchemy 2.0, Pydantic 2.0 |
-| **Async Processing** | Celery 5.4, Redis |
+| **Backend** | Python 3.12, Flask, SQLAlchemy 2.0, Pydantic 2.0 |
 | **Database** | PostgreSQL 15 |
-| **Storage** | S3-compatible (MinIO, AWS S3, Backblaze B2) |
-| **AI Services** | OpenAI (DALL-E 3, GPT), Anthropic Claude, Ollama |
+| **Storage** | S3 (Hetzner Object Storage in production, MinIO for local dev) |
+| **AI Services** | OpenAI (`gpt-image-1`, GPT models), Anthropic Claude |
 | **Deployment** | Docker, Docker Compose, Nginx, GitHub Actions |
 | **Code Quality** | Ruff (Python), ESLint (TypeScript), import-linter |
 
@@ -155,7 +146,7 @@ This project follows a **3-layer architecture** with strict separation of concer
         │            │                            │
         ▼            ▼                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                   Backend (FastAPI)                          │
+│                     Backend (Flask)                          │
 │  ┌────────────┐  ┌─────────────┐  ┌──────────────────────┐  │
 │  │ Controller │→ │ Orchestrator │→ │ Transformer/Service │  │
 │  │  (HTTP)    │  │ (Coordinate) │  │  (Pure Functions)   │  │
@@ -166,11 +157,11 @@ This project follows a **3-layer architecture** with strict separation of concer
 │  └───────────────────────┬──────────────────────────────┘   │
 └──────────────────────────┼──────────────────────────────────┘
                            │
-        ┌──────────────────┼──────────────────┐
-        ▼                  ▼                  ▼
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│  PostgreSQL  │  │    Redis     │  │  S3 Storage  │
-└──────────────┘  └──────────────┘  └──────────────┘
+                ┌──────────┴──────────┐
+                ▼                     ▼
+        ┌──────────────┐      ┌──────────────┐
+        │  PostgreSQL  │      │  S3 Storage  │
+        └──────────────┘      └──────────────┘
 ```
 
 For detailed architecture documentation, see [docs/arch42/README.md](docs/arch42/README.md).
@@ -179,13 +170,12 @@ For detailed architecture documentation, see [docs/arch42/README.md](docs/arch42
 
 ```
 chmusicpro/
-├── chmusicprosrv/          # Python Backend (FastAPI)
+├── chmusicprosrv/          # Python Backend (Flask)
 │   ├── src/
-│   │   ├── adapters/    # External API clients (OpenAI, Ollama)
+│   │   ├── adapters/    # External API clients (OpenAI, Claude, S3)
 │   │   ├── api/         # Controllers & Routes
 │   │   ├── business/    # Business logic (transformers, orchestrators)
-│   │   ├── db/          # Repository layer (SQLAlchemy)
-│   │   └── celery_app/  # Async task processing
+│   │   └── db/          # Repository layer (SQLAlchemy)
 │   └── fonts/           # Font files for text overlays
 │
 ├── chmusicproweb/             # Angular 21 Frontend
@@ -263,7 +253,7 @@ This project is licensed under the [Elastic License 2.0 (ELv2)](LICENSE).
 
 ## Acknowledgments
 
-- [OpenAI](https://openai.com/) - DALL-E 3 and GPT APIs
-- [Ollama](https://ollama.ai/) - Local LLM infrastructure
+- [OpenAI](https://openai.com/) - `gpt-image-1` and GPT APIs
+- [Anthropic](https://www.anthropic.com/) - Claude APIs
 - [Angular](https://angular.dev/) - Frontend framework
-- [FastAPI](https://fastapi.tiangolo.com/) - Backend framework
+- [Flask](https://flask.palletsprojects.com/) - Backend framework
