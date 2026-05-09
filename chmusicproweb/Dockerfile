@@ -1,5 +1,5 @@
 # Build stage - Angular production build
-FROM node:20-slim AS builder
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build:prod -- --output-path dist/chmusicproweb
 
 # Production stage - Nginx with built Angular app
-FROM nginx:1.26-alpine AS production
+FROM nginx:1.28-alpine AS production
 
 # Copy built Angular app
 COPY --from=builder /app/dist/chmusicproweb/browser /usr/share/nginx/html/chmusicproweb/browser
